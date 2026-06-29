@@ -1,0 +1,235 @@
+/* Reset default margins and paddings */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    background-color: #0e4d92;
+    color: #fff;
+    width: 250px;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 0.5rem;
+}
+
+#verb-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#verb-list li {
+    padding: 0.5rem 0.25rem;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#verb-list li.now {
+    background-color: #1c6fc4;
+}
+
+#verb-list li.next {
+    background-color: #3e83d7;
+}
+
+#verb-list li.completed.correct {
+    background-color: #2e8b57; /* green for correct */
+}
+
+#verb-list li.completed.wrong {
+    background-color: #b22222; /* red for wrong */
+}
+
+#verb-list li span.status {
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.scoreboard {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: #e5e5e5;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #0e4d92;
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+/* Row container within scoreboard holding progress and score info */
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.progress-info span,
+.score-info span {
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+.progress-info span,
+.score-info span {
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+.card-wrapper {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    perspective: 1000px;
+    margin-bottom: 1rem;
+}
+
+.flashcard {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    position: absolute;
+    cursor: pointer;
+}
+
+.flashcard.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-front {
+    background-color: #0e4d92;
+    color: #fff;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.card-back {
+    background-color: #ffffff;
+    color: #0e4d92;
+    transform: rotateY(180deg);
+    font-size: 1rem;
+    text-align: left;
+}
+
+.card-back p {
+    margin: 0.2rem 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action-buttons button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.action-buttons button.wrong {
+    background-color: #b22222;
+}
+
+.action-buttons button.wrong:hover {
+    background-color: #8b0000;
+}
+
+.action-buttons button.right {
+    background-color: #2e8b57;
+}
+
+.action-buttons button.right:hover {
+    background-color: #206f41;
+}
+
+.restart {
+    margin-top: 0.5rem;
+}
+
+.restart button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #0e4d92;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.restart button:hover {
+    background-color: #083b6f;
+}

@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Præpositions-Mester · Lær danske præpositioner</title>
+<style>
+:root{
+  --red:#ee1515; --red-d:#c70e0e;
+  --blue:#2a75bb; --blue-d:#1b5790;
+  --yellow:#ffcb05; --yellow-d:#e0a800;
+  --green:#3ec46d; --green-d:#2da559;
+  --ink:#243447; --ink-soft:#51637a;
+  --bg1:#5fb0f0; --bg2:#3a86d6;
+  --card:#ffffff; --line:#e6ecf3;
+  --shadow:0 10px 30px rgba(18,40,70,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Trebuchet MS","Segoe UI",system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+  background-attachment:fixed;
+}
+.wrap{max-width:680px;margin:0 auto;padding:14px 14px 60px}
+
+/* Header / Pokedex bar */
+.dex{
+  background:linear-gradient(180deg,var(--red),var(--red-d));
+  border-radius:20px;
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  color:#fff;
+  display:flex;align-items:center;gap:14px;
+  position:relative;
+}
+.dexlight{
+  width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%,#bfeaff,#3aa0ff 60%,#0b62c9);
+  border:3px solid #fff;flex:none;
+  box-shadow:0 0 0 3px rgba(255,255,255,.35),0 0 14px #6fc4ff;
+  animation:blink 2.4s infinite;
+}
+@keyframes blink{0%,92%,100%{opacity:1}96%{opacity:.45}}
+.dex h1{font-size:1.25rem;margin:0;letter-spacing:.3px;line-height:1.1}
+.dex p{margin:2px 0 0;font-size:.78rem;opacity:.92;font-weight:bold}
+.minidots{display:flex;gap:6px;margin-left:auto}
+.minidots span{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,.7)}
+.minidots .r{background:#ff5a5a}.minidots .y{background:var(--yellow)}.minidots .g{background:var(--green)}
+
+/* Progress bar */
+.pbar-wrap{margin:14px 2px 6px}
+.pbar-top{display:flex;justify-content:space-between;font-size:.78rem;font-weight:bold;color:#fff;margin-bottom:5px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.pbar{height:16px;background:rgba(255,255,255,.4);border-radius:20px;overflow:hidden;border:2px solid #fff;box-shadow:inset 0 1px 3px rgba(0,0,0,.15)}
+.pbar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--green));border-radius:20px;transition:width .5s cubic-bezier(.4,1.4,.5,1)}
+
+/* Cards */
+.card{
+  background:var(--card);border-radius:20px;padding:20px;margin-top:14px;
+  box-shadow:var(--shadow);animation:fade .35s ease both;
+}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* Menu grid */
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mode-btn{
+  border:none;cursor:pointer;border-radius:16px;padding:16px 12px;color:#fff;
+  text-align:left;font-family:inherit;
+  transition:transform .08s;position:relative;overflow:hidden;
+}
+.mode-btn:active{transform:translateY(2px)}
+.mode-btn .emoji{font-size:1.6rem;display:block;margin-bottom:6px}
+.mode-btn .t{font-size:1rem;font-weight:bold;display:block;line-height:1.15}
+.mode-btn .d{font-size:.72rem;opacity:.92;display:block;margin-top:3px}
+.c-red{background:linear-gradient(160deg,#ff5a5a,var(--red-d))}
+.c-blue{background:linear-gradient(160deg,#4a9fe0,var(--blue-d))}
+.c-green{background:linear-gradient(160deg,#56d98a,var(--green-d))}
+.c-yellow{background:linear-gradient(160deg,#ffd84a,var(--yellow-d));color:#5a4500}
+.c-purple{background:linear-gradient(160deg,#a07be8,#6f48c9)}
+.c-teal{background:linear-gradient(160deg,#3fd0c9,#1f9a94)}
+.c-orange{background:linear-gradient(160deg,#ff9d4a,#e06d12)}
+.c-pink{background:linear-gradient(160deg,#ff7eb3,#d6478c)}
+.c-slate{background:linear-gradient(160deg,#6b8cae,#43607e)}
+.c-gold{background:linear-gradient(160deg,#e8c45a,#b8901f)}
+
+.section-title{color:#fff;font-size:1.05rem;font-weight:bold;margin:18px 4px 2px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+/* Exercise */
+.exhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px}
+.badge{background:var(--blue);color:#fff;font-size:.72rem;font-weight:bold;padding:5px 11px;border-radius:20px}
+.badge.theme{background:var(--yellow);color:#5a4500}
+.qcount{font-size:.8rem;color:var(--ink-soft);font-weight:bold}
+.prompt{font-size:.82rem;color:var(--ink-soft);margin:10px 0 4px;font-weight:bold}
+.sentence{font-size:1.5rem;line-height:1.5;margin:12px 0 6px;font-weight:bold}
+.sentence .blank{display:inline-block;min-width:74px;border-bottom:4px dotted var(--blue);text-align:center;color:var(--blue);padding:0 6px}
+.sentence .filled{color:var(--green)}
+.sentence .word{cursor:pointer;border-radius:6px;padding:1px 4px;transition:background .15s}
+.sentence .word:hover{background:#ffe9a8}
+.sentence .word.sel{background:var(--yellow);color:#5a4500}
+
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.opt{
+  border:3px solid var(--line);background:#fff;border-radius:14px;padding:14px;
+  font-size:1.2rem;font-weight:bold;cursor:pointer;font-family:inherit;color:var(--ink);
+  transition:transform .08s,border-color .15s,background .15s;
+}
+.opt:hover{border-color:var(--blue);transform:translateY(-2px)}
+.opt.correct{background:var(--green);border-color:var(--green-d);color:#fff;animation:pop .35s}
+.opt.wrong{background:var(--red);border-color:var(--red-d);color:#fff;animation:shake .35s}
+.opt.dim{opacity:.5}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}60%{transform:translateX(8px)}}
+
+/* drag */
+.dragzone{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;justify-content:center}
+.chip{
+  background:linear-gradient(160deg,#4a9fe0,var(--blue-d));color:#fff;border:none;
+  padding:11px 16px;border-radius:30px;font-size:1.1rem;font-weight:bold;cursor:grab;
+  font-family:inherit;transition:transform .08s;
+  touch-action:none;
+}
+.chip:active{cursor:grabbing;transform:scale(1.06)}
+.chip.used{opacity:.3;pointer-events:none}
+.drop{display:inline-block;min-width:90px;border:3px dashed var(--blue);border-radius:12px;
+  padding:2px 10px;color:var(--blue);text-align:center;vertical-align:middle}
+.drop.over{background:#dff0ff;border-style:solid}
+.drop.filled{border-style:solid;background:var(--green);color:#fff;border-color:var(--green-d)}
+
+/* text input */
+.tinput{width:100%;font-size:1.15rem;font-family:inherit;padding:13px 15px;border:3px solid var(--line);
+  border-radius:14px;margin-top:14px;color:var(--ink);font-weight:bold}
+.tinput:focus{outline:none;border-color:var(--blue)}
+
+.btn{
+  border:none;cursor:pointer;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:bold;
+  font-family:inherit;color:#fff;background:linear-gradient(160deg,#56d98a,var(--green-d));
+  transition:transform .08s;
+}
+.btn:active{transform:translateY(2px)}
+.btn.blue{background:linear-gradient(160deg,#4a9fe0,var(--blue-d))}
+.btn.grey{background:linear-gradient(160deg,#9fb0c4,#6b7d92)}
+.btn.full{width:100%;margin-top:14px}
+.btn.sm{padding:9px 16px;font-size:.85rem}
+.btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btnrow .btn{flex:1;min-width:120px}
+
+/* feedback */
+.fb{margin-top:16px;border-radius:14px;padding:14px 16px;font-size:.95rem;animation:fade .3s both;display:none}
+.fb.show{display:block}
+.fb.good{background:#e3f9ec;border:2px solid var(--green);color:var(--green-d)}
+.fb.bad{background:#ffe9e9;border:2px solid var(--red);color:var(--red-d)}
+.fb .big{font-size:1.15rem;font-weight:bold;display:block;margin-bottom:4px}
+.fb .corr{font-weight:bold}
+
+.topbtn{background:var(--blue);border:none;color:#fff;border-radius:12px;
+  padding:9px 16px;font-weight:bold;font-family:inherit;cursor:pointer;font-size:.9rem}
+.topbtn:hover{background:var(--blue-d)}
+.topbtn:active{transform:scale(.96)}
+.backrow{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+
+/* stats */
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+.stat{background:linear-gradient(160deg,#f4f8fc,#e9f1fa);border-radius:16px;padding:14px;text-align:center;border:2px solid var(--line)}
+.stat .n{font-size:1.9rem;font-weight:bold;color:var(--blue-d);line-height:1}
+.stat .l{font-size:.75rem;color:var(--ink-soft);font-weight:bold;margin-top:4px}
+.preplist{margin-top:8px}
+.preprow{display:flex;align-items:center;gap:10px;margin:7px 0}
+.prepname{width:64px;font-weight:bold;font-size:1rem}
+.prepbar{flex:1;height:14px;background:var(--line);border-radius:10px;overflow:hidden}
+.prepbar i{display:block;height:100%;border-radius:10px}
+.preppct{width:46px;text-align:right;font-size:.8rem;font-weight:bold;color:var(--ink-soft)}
+.tag{display:inline-block;background:var(--yellow);color:#5a4500;border-radius:20px;padding:4px 11px;font-weight:bold;font-size:.85rem;margin:3px 4px 0 0}
+.tag.weak{background:#ffd6d6;color:var(--red-d)}
+.tag.strong{background:#cdf3da;color:var(--green-d)}
+
+/* speed */
+.timer{font-size:2.4rem;font-weight:bold;text-align:center;color:var(--red-d);margin:4px 0}
+.timer.warn{animation:pulse .5s infinite}
+@keyframes pulse{50%{color:var(--yellow-d);transform:scale(1.06)}}
+.scoreline{text-align:center;font-size:1rem;font-weight:bold;color:var(--ink-soft)}
+
+.hint{font-size:.82rem;color:var(--ink-soft);margin-top:10px;text-align:center}
+.streakpop{position:fixed;left:50%;top:24%;transform:translateX(-50%);background:var(--yellow);
+  color:#5a4500;font-weight:bold;padding:10px 20px;border-radius:30px;box-shadow:var(--shadow);
+  font-size:1.1rem;z-index:50;pointer-events:none;animation:streak 1.1s ease both}
+@keyframes streak{0%{opacity:0;transform:translateX(-50%) scale(.6)}25%{opacity:1;transform:translateX(-50%) scale(1.1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}
+
+.particle{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:40;
+  animation:burst .7s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+
+footer{text-align:center;color:rgba(255,255,255,.85);font-size:.72rem;margin-top:22px;font-weight:bold}
+.hide{display:none!important}
+@media(max-width:430px){
+  .sentence{font-size:1.25rem}
+  .menu-grid{grid-template-columns:repeat(2,1fr)}
+  .dex h1{font-size:1.05rem}
+  .opt{font-size:1.05rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="dex">
+    <div class="dexlight"></div>
+    <div>
+      <h1>Præpositions-Mester</h1>
+      <p>Bliv ekspert i danske præpositioner!</p>
+    </div>
+    <div class="minidots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+  </div>
+
+  <div class="pbar-wrap">
+    <div class="pbar-top"><span id="lvlText">Niveau 1 · Nybegynder</span><span id="xpText">0 XP</span></div>
+    <div class="pbar"><div class="pbar-fill" id="pbarFill"></div></div>
+  </div>
+
+  <!-- MENU -->
+  <div id="menu">
+    <div class="card">
+      <div class="section-title" style="color:var(--ink);margin-top:0">Vælg en øvelse</div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+    <div class="section-title">Din fremgang</div>
+    <div class="card" style="margin-top:8px" id="miniStats"></div>
+  </div>
+
+  <!-- EXERCISE -->
+  <div id="exercise" class="hide"></div>
+
+  <!-- STATS -->
+  <div id="stats" class="hide"></div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   PRÆPOSITIONER + DATA
+   ============================================================ */
+const PREPS = ["i","på","til","for","med","af","om","hos","fra","efter","uden","under","over","mellem","ved"];
+
+// confusion map: which wrong prepositions a learner is most likely to use
+const CONFUSE = {
+  "i":["på","til","ved"], "på":["i","ved","til"], "til":["i","for","hos"],
+  "for":["til","af","om"], "med":["uden","af","ved"], "af":["fra","for","af"],
+  "om":["på","over","for"], "hos":["i","ved","til"], "fra":["af","fra","til"],
+  "efter":["til","for","under"], "uden":["med","uden","for"], "under":["over","i","ved"],
+  "over":["under","på","om"], "mellem":["under","ved","i"], "ved":["på","i","hos"]
+};
+
+const ITEMS = [];
+// gen(pattern, answer, fills, explanation, theme, {err, pair})
+// pattern uses {a} for the preposition slot and {x} for the variable noun
+function gen(pattern, answer, fills, ex, theme, opts){
+  opts = opts || {};
+  fills.forEach(function(x){
+    ITEMS.push({
+      text: pattern.replace("{a}", answer).replace("{x}", x),
+      a: answer, ex: ex, theme: theme,
+      err: opts.err || (CONFUSE[answer]?CONFUSE[answer][0]:"i"),
+      pair: opts.pair || null
+    });
+  });
+}
+
+/* ---------- i ---------- */
+gen("Jeg bor {a} {x}.","i",["København","Aarhus","Odense","Aalborg","Esbjerg","Randers","en lejlighed","et rækkehus","centrum","en lille by"],
+  "Byer, lande og boliger tager 'i': man bor i en by eller i et hus.","Bolig",{err:"på",pair:"i|på"});
+gen("Vi mødes {a} {x}.","i",["kantinen","mødelokalet","biografen","kælderen","klasselokalet","svømmehallen"],
+  "Indvendigt i lukkede rum bruger man 'i': i kantinen, i biografen.","Arbejde",{err:"på",pair:"i|på"});
+gen("Mødet ligger {a} {x}.","i",["januar","februar","marts","maj","august","oktober","december"],
+  "Måneder og årstider tager 'i': i januar, i sommer.","Møder",{err:"på"});
+gen("Børnene går {a} {x}.","i",["skole","kirke","børnehave","biografen","byen","teatret"],
+  "Faste udtryk med aktivitet: gå i skole, i kirke, i byen.","Familie",{err:"på"});
+gen("Der er mange varer {a} {x}.","i",["Netto","kurven","butikken","køleskabet","tasken","skuffen"],
+  "Inde i en beholder eller butik: i kurven, i køleskabet.","Indkøb",{err:"på"});
+gen("Han sidder stadig {a} {x}.","i",["bilen","toget","sofaen","haven","mørket"],
+  "Inde i et køretøj eller rum: i bilen, i toget.","Rejse",{err:"på"});
+
+/* ---------- på ---------- */
+gen("Jeg arbejder {a} {x}.","på",["kontoret","fabrikken","hospitalet","værkstedet","posthuset","biblioteket","en café","apoteket"],
+  "Mange arbejdspladser og institutioner tager 'på': på kontoret, på hospitalet.","Arbejde",{err:"i",pair:"i|på"});
+gen("Bogen ligger {a} {x}.","på",["bordet","gulvet","hylden","skrivebordet","stolen","sengen","reolen"],
+  "Oven på en flade bruger man 'på': på bordet, på gulvet.","Hjem",{err:"i",pair:"i|på"});
+gen("Vi ses {a} {x}.","på",["stationen","torvet","gaden","pladsen","hjørnet"],
+  "Åbne steder og pladser tager ofte 'på': på stationen, på torvet.","Rejse",{err:"i"});
+gen("Hun er {a} {x} i dag.","på",["vagt","ferie","barsel","kursus","besøg","udflugt"],
+  "Faste tilstandsudtryk: på arbejde, på ferie, på kursus.","Arbejde",{err:"i"});
+gen("Skriv det venligst {a} {x}.","på",["listen","tavlen","papiret","computeren","telefonen"],
+  "På en overflade eller skærm: på listen, på tavlen.","Møder",{err:"i"});
+gen("Vi bor {a} {x}.","på",["landet","femte sal","et hotel","en bondegård","Frederiksberg"],
+  "Særlige bolig-udtryk tager 'på': på landet, på femte sal, på hotel.","Bolig",{err:"i",pair:"i|på"});
+
+/* ---------- til ---------- */
+gen("Jeg skal {a} {x} i morgen.","til",["København","mødet","lægen","tandlægen","frisøren","stranden","fest","koncert"],
+  "Bevægelse mod et mål eller en begivenhed tager 'til': til mødet, til lægen.","Rejse",{err:"i",pair:"i|til"});
+gen("Vi glæder os {a} {x}.","til",["weekenden","ferien","jul","sommeren","festen","at se dig"],
+  "'Glæde sig til' styrer altid 'til' + det man ser frem til.","Familie",{err:"for"});
+gen("Hun gav gaven {a} {x}.","til",["sin mor","læreren","chefen","sin ven","naboen","barnet"],
+  "Modtageren af noget får 'til': give noget til nogen.","Familie",{err:"for"});
+gen("Hvad skal vi have {a} {x}?","til",["aftensmad","frokost","dessert","middag","morgenmad"],
+  "Måltider som formål tager 'til': hvad skal vi have til frokost.","Mad",{err:"for"});
+gen("Brevet er {a} {x}.","til",["dig","direktøren","hele afdelingen","kunden","min familie"],
+  "Adressaten for et brev eller besked får 'til'.","Arbejde",{err:"for"});
+gen("Jeg cykler {a} {x} hver dag.","til",["arbejde","skole","stationen","træning","byen"],
+  "Mål for en daglig tur tager 'til': cykle til arbejde.","Transport",{err:"på",pair:"i|til"});
+
+/* ---------- for ---------- */
+gen("Tak {a} {x}!","for",["hjælpen","maden","kaffen","gaven","invitationen","i dag","sidst","lånet"],
+  "'Tak for ...' bruger altid 'for'.","Høflighed",{err:"til"});
+gen("Jeg er bange {a} {x}.","for",["hunde","edderkopper","mørket","højder","at flyve","at komme for sent"],
+  "'Bange for' styrer 'for' + det man frygter.","Følelser",{err:"af"});
+gen("Hun kæmper {a} {x}.","for",["en god sag","miljøet","de fattige","menneskerettigheder","klimaet"],
+  "At gøre en indsats i tjeneste af en sag tager 'for': kæmpe for en god sag.","Samfund",{err:"til"});
+gen("Det er godt {a} {x}.","for",["helbredet","miljøet","dig","kroppen","din karriere"],
+  "Til gavn for nogen/noget: godt for helbredet.","Sundhed",{err:"til"});
+gen("Du arbejder {a} {x}.","for",["meget","hårdt","længe"],
+  "'For' kan betyde 'i for høj grad': for meget, for hårdt, for længe.","Arbejde",{err:"til"});
+gen("Hun interesserer sig {a} {x}.","for",["kunst","politik","fodbold","historie","klassisk musik"],
+  "'Interessere sig for' styrer altid 'for'.","Fritid",{err:"om"});
+gen("Hun er ansvarlig {a} {x}.","for",["projektet","hele teamet","økonomien","afdelingen","sikkerheden"],
+  "'Ansvarlig for' styrer altid 'for'.","Arbejde",{err:"til"});
+
+/* ---------- med ---------- */
+gen("Jeg tager {a} {x} på arbejde.","med",["bussen","toget","metroen","færgen","bilen"],
+  "Transportmiddel man rejser med: tage med bussen, med toget.","Transport",{err:"i",pair:"med|uden"});
+gen("Hun bor sammen {a} {x}.","med",["sin kæreste","sin familie","en veninde","sine forældre","sin hund"],
+  "'Sammen med' angiver selskab: bo sammen med nogen.","Familie",{err:"hos"});
+gen("Kan du hjælpe mig {a} {x}?","med",["opgaven","flytningen","maden","computeren","regnskabet","tasken"],
+  "'Hjælpe med' styrer 'med' + det man hjælper med.","Arbejde",{err:"i"});
+gen("Jeg drikker kaffe {a} {x}.","med",["en kollega","mælk","en god ven","sukker","fløde"],
+  "Ledsagelse eller tilbehør: kaffe med mælk, kaffe med en ven.","Mad",{err:"uden",pair:"med|uden"});
+gen("Han betalte {a} {x}.","med",["kort","kontanter","mobilen","MobilePay"],
+  "Betalingsmiddel tager 'med': betale med kort.","Indkøb",{err:"i"});
+gen("Vi er meget tilfredse {a} {x}.","med",["resultatet","servicen","den nye kollega","mødet","produktet"],
+  "'Tilfreds med' styrer altid 'med'.","Arbejde",{err:"af"});
+
+/* ---------- af ---------- */
+gen("Bordet er lavet {a} {x}.","af",["træ","glas","metal","plastik","sten","massivt egetræ"],
+  "Materiale noget er lavet af: lavet af træ.","Bolig",{err:"fra",pair:"af|fra"});
+gen("Jeg er træt {a} {x}.","af",["at vente","regnen","larmen","det lange møde","at sidde stille"],
+  "'Træt af' = led ved noget, styrer 'af'.","Følelser",{err:"for"});
+gen("Halvdelen {a} {x} var væk.","af",["klassen","kagen","pengene","holdet","gæsterne","lageret"],
+  "Mængde af en helhed: halvdelen af klassen.","Samfund",{err:"fra"});
+gen("Hun stod {a} {x} ved stationen.","af",["bussen","toget","cyklen","færgen"],
+  "Stå af et køretøj: stå af bussen (modsat 'stige på').","Transport",{err:"fra",pair:"af|fra"});
+gen("Det afhænger {a} {x}.","af",["vejret","prisen","tiden","din beslutning","situationen"],
+  "'Afhænge af' styrer altid 'af'.","Samfund",{err:"fra"});
+gen("Jeg holder meget {a} {x}.","af",["min familie","klassisk musik","at rejse","gamle film"],
+  "'Holde af' = være glad for, styrer 'af'.","Følelser",{err:"for"});
+
+/* ---------- om ---------- */
+gen("Vi taler {a} {x}.","om",["politik","vejret","arbejdet","fremtiden","ferien","problemet"],
+  "Emne man taler om: tale om politik.","Samtale",{err:"på",pair:"om|på"});
+gen("Jeg er færdig {a} {x}.","om",["en time","ti minutter","et øjeblik","en uge","lidt"],
+  "Tid der går, før noget sker, tager 'om': om en time.","Tid",{err:"i",pair:"om|på"});
+gen("Bogen handler {a} {x}.","om",["kærlighed","krig","en familie","Danmarks historie","et mord"],
+  "'Handle om' = have som emne, styrer 'om'.","Kultur",{err:"på"});
+gen("Han drømmer {a} {x}.","om",["et nyt job","en lang ferie","at vinde","et større hus"],
+  "'Drømme om' styrer altid 'om'.","Følelser",{err:"på"});
+gen("Vi mødes {a} {x}.","om",["morgenen","aftenen","formiddagen","natten","eftermiddagen"],
+  "Faste tider på døgnet tager 'om': om morgenen, om aftenen.","Tid",{err:"på",pair:"om|på"});
+gen("Jeg har en aftale {a} {x}.","om",["et lån","en ny kontrakt","prisen","leveringen"],
+  "Aftale/enighed om et emne: en aftale om prisen.","Arbejde",{err:"på"});
+
+/* ---------- hos ---------- */
+gen("Jeg arbejder {a} {x}.","hos",["Netto","en advokat","en frisør","en tandlæge","en lokal bager","en mekaniker"],
+  "Hos en arbejdsgiver (firma eller person): arbejde hos Netto.","Arbejde",{err:"i",pair:"hos|i"});
+gen("Vi var {a} {x} i weekenden.","hos",["min mormor","mine forældre","naboen","gode venner","min søster"],
+  "Hjemme hos en person bruger man 'hos': være hos mormor.","Familie",{err:"ved",pair:"hos|i"});
+gen("Hun bor {a} {x} for tiden.","hos",["sin tante","en veninde","sine bedsteforældre","en værtsfamilie"],
+  "At bo hjemme hos nogen: bo hos sin tante.","Familie",{err:"med",pair:"hos|i"});
+gen("Jeg har en tid {a} {x}.","hos",["lægen","frisøren","tandlægen","fysioterapeuten","dyrlægen"],
+  "Aftale hos en fagperson: en tid hos lægen.","Sundhed",{err:"til",pair:"hos|i"});
+gen("Det kan du købe {a} {x}.","hos",["bageren","slagteren","en lokal forhandler","din boghandler"],
+  "Handle hos en bestemt forhandler/person: købe hos bageren.","Indkøb",{err:"i",pair:"hos|i"});
+
+/* ---------- fra ---------- */
+gen("Jeg kommer {a} {x}.","fra",["Danmark","Spanien","København","en lille by","Jylland","udlandet"],
+  "Oprindelse eller udgangspunkt tager 'fra': komme fra Danmark.","Rejse",{err:"af",pair:"af|fra"});
+gen("Toget kører {a} {x}.","fra",["perron 3","Aarhus","hovedstationen","spor 2"],
+  "Afgangssted tager 'fra': toget kører fra perron 3.","Transport",{err:"af",pair:"af|fra"});
+gen("Brevet er {a} {x}.","fra",["banken","kommunen","min ven","Skat","min gamle skole"],
+  "Afsenderen af noget tager 'fra': et brev fra banken.","Samfund",{err:"af",pair:"af|fra"});
+gen("Butikken har åbent {a} {x}.","fra",["klokken ni","mandag","tidlig morgen","i dag"],
+  "Startpunkt i tid tager 'fra': åbent fra klokken ni.","Indkøb",{err:"af"});
+gen("Hun er lige kommet hjem {a} {x}.","fra",["arbejde","ferie","udlandet","skole","møde"],
+  "Bevægelse væk fra et sted: hjem fra arbejde.","Arbejde",{err:"af"});
+
+/* ---------- efter ---------- */
+gen("Vi spiser {a} {x}.","efter",["mødet","træning","arbejde","filmen","gæsterne er gået"],
+  "Tidspunkt der følger noget: spise efter mødet.","Tid",{err:"til"});
+gen("Jeg leder {a} {x}.","efter",["mine nøgler","en ny lejlighed","et job","min telefon","en gave"],
+  "'Lede efter' = søge, styrer altid 'efter'.","Hverdag",{err:"for"});
+gen("Han kom {a} {x}.","efter",["frokost","lukketid","alle andre","en lang dag"],
+  "Rækkefølge i tid: komme efter frokost.","Tid",{err:"til"});
+gen("Hun længes {a} {x}.","efter",["sommeren","sin familie","ferie","hjemlandet"],
+  "'Længes efter' styrer altid 'efter'.","Følelser",{err:"til"});
+gen("Vi rydder op {a} {x}.","efter",["festen","middagen","børnene","mødet"],
+  "'Rydde op efter' = efter en begivenhed eller nogen.","Hjem",{err:"for"});
+gen("Spørg lige {a} {x}.","efter",["vejen","prisen","chefen","din kollega"],
+  "'Spørge efter' = bede om eller efterspørge noget.","Hverdag",{err:"for"});
+
+/* ---------- uden ---------- */
+gen("Jeg drikker te {a} {x}.","uden",["mælk","sukker","citron","honning"],
+  "'Uden' = fravær af noget, modsat 'med'.","Mad",{err:"med",pair:"med|uden"});
+gen("Han gik ud {a} {x}.","uden",["jakke","paraply","sko","en krone på lommen"],
+  "Manglende ledsagelse eller udstyr: gå uden jakke.","Hverdag",{err:"med",pair:"med|uden"});
+gen("Vi klarer os ikke {a} {x}.","uden",["hjælp","penge","internet","vand","strøm"],
+  "'Klare sig uden' = undvære noget.","Samfund",{err:"med",pair:"med|uden"});
+gen("Hun rejste {a} {x}.","uden",["bagage","sin mand","at sige farvel","problemer"],
+  "Fravær af noget eller nogen: rejse uden bagage.","Rejse",{err:"med",pair:"med|uden"});
+gen("Mødet sluttede {a} {x}.","uden",["en konklusion","resultat","en beslutning"],
+  "Uden noget som udfald: slutte uden resultat.","Møder",{err:"med",pair:"med|uden"});
+
+/* ---------- under ---------- */
+gen("Katten ligger {a} {x}.","under",["bordet","sengen","stolen","tæppet","sofaen","bilen"],
+  "Placering nedenunder noget: under bordet.","Hjem",{err:"over",pair:"under|over"});
+gen("Det skete {a} {x}.","under",["mødet","krigen","ferien","koncerten","middagen","rejsen"],
+  "Tidsrum noget foregår indenfor: under mødet.","Tid",{err:"over"});
+gen("Temperaturen er {a} {x}.","under",["frysepunktet","nul grader","gennemsnittet","det normale"],
+  "Mindre end et niveau: under frysepunktet.","Samfund",{err:"over",pair:"under|over"});
+gen("Børnene legede {a} {x}.","under",["bordet","trappen","træet","broen"],
+  "Fysisk placering nedenunder: lege under bordet.","Familie",{err:"over",pair:"under|over"});
+gen("Hele projektet er stadig {a} {x}.","under",["udvikling","opbygning","planlægning","kontrol"],
+  "Igangværende proces: under udvikling.","Arbejde",{err:"over"});
+
+/* ---------- over ---------- */
+gen("Lampen hænger {a} {x}.","over",["bordet","sengen","sofaen","spisebordet"],
+  "Placering ovenover noget: over bordet.","Hjem",{err:"under",pair:"under|over"});
+gen("Vi snakkede sammen {a} {x}.","over",["en kop kaffe","en øl","en kande te","et glas vin"],
+  "Mens man deler en drik: snakke over en kop kaffe.","Samtale",{err:"på"});
+gen("Der var {a} {x} til stede.","over",["hundrede mennesker","tusind gæster","halvdelen af byen"],
+  "Mere end et antal: over hundrede mennesker.","Samfund",{err:"på"});
+gen("Broen går {a} {x}.","over",["floden","åen","havnen","motorvejen"],
+  "Hen over noget: broen går over floden.","Rejse",{err:"under",pair:"under|over"});
+gen("Vi gik {a} {x}.","over",["gaden","vejen","pladsen","græsplænen","parkeringspladsen"],
+  "Hen over en flade: gå over gaden.","Hverdag",{err:"under",pair:"under|over"});
+gen("Flyet fløj lavt {a} {x}.","over",["byen","havet","bjergene","skoven"],
+  "Hen over noget i luften: flyve over byen.","Rejse",{err:"under",pair:"under|over"});
+
+/* ---------- mellem ---------- */
+gen("Mødet er {a} {x}.","mellem",["klokken ni og elleve","frokost og pause","to og tre"],
+  "Tidsrum afgrænset af to punkter: mellem ni og elleve.","Møder",{err:"under"});
+gen("Samarbejdet {a} {x} fungerer godt.","mellem",["de to afdelinger","kollegerne","landene","parterne","holdene"],
+  "Forholdet mellem to eller flere parter tager 'mellem'.","Arbejde",{err:"ved"});
+gen("Han sad {a} {x}.","mellem",["sine to børn","mig og chefen","to fremmede","rækkerne"],
+  "Placering i midten af to ting: sidde mellem to personer.","Hverdag",{err:"ved"});
+gen("Du må vælge {a} {x}.","mellem",["de to modeller","kage og frugt","tog og bus","ja og nej"],
+  "'Vælge mellem' = vælge ud af to muligheder.","Indkøb",{err:"af"});
+gen("Aftalen er {a} {x}.","mellem",["de to firmaer","os","parterne","nabolandene"],
+  "Forhold mellem to parter: aftale mellem to firmaer.","Arbejde",{err:"ved"});
+
+/* ---------- ved ---------- */
+gen("Huset ligger {a} {x}.","ved",["stranden","søen","skoven","havet","vejen","kysten"],
+  "Tæt på noget tager 'ved': huset ligger ved stranden.","Bolig",{err:"på"});
+gen("Vi mødes {a} {x}.","ved",["indgangen","springvandet","hoveddøren","kassen","porten"],
+  "Mødested helt tæt på et konkret punkt: mødes ved indgangen.","Hverdag",{err:"i"});
+gen("Hun sidder {a} {x}.","ved",["vinduet","computeren","skrivebordet","bordet","klaveret"],
+  "Placeret tæt ved et møbel/redskab: sidde ved computeren.","Arbejde",{err:"på"});
+gen("Vi bor lige {a} {x}.","ved",["havnen","parken","torvet","skolen","stationen"],
+  "I umiddelbar nærhed: bo lige ved parken.","Bolig",{err:"på"});
+gen("Bilen holder {a} {x}.","ved",["fortovet","indkørslen","kantstenen","porten"],
+  "Holde tæt ved noget: bilen holder ved fortovet.","Transport",{err:"på"});
+
+/* ---------- EXTRA BATCH (everyday / work / family / travel / shopping / meetings / society) ---------- */
+gen("Der er tilbud {a} {x} i denne uge.","på",["kaffe","frugt","alle bøger","elektronik","sko","mælk"],
+  "Tilbud og rabat på en vare tager 'på'.","Indkøb",{err:"i",pair:"i|på"});
+gen("Vi skal lige nå {a} {x}.","til",["flyet","toget","bussen","mødet","færgen"],
+  "At nå frem til noget tager 'til'.","Rejse",{err:"i"});
+gen("Send venligst rapporten {a} {x}.","til",["chefen","hele teamet","kunden","bestyrelsen","mig"],
+  "Modtageren af noget man sender får 'til'.","Arbejde",{err:"for"});
+gen("Jeg er helt enig {a} {x}.","med",["dig","chefen","min kollega","dem","hele gruppen"],
+  "Man er enig MED en person (men enig I en sag).","Samtale",{err:"i"});
+gen("Hun taler {a} {x} hver dag.","med",["sine kunder","sin chef","kollegerne","sin familie","naboen"],
+  "'Tale med' nogen (samtale) tager 'med'.","Samtale",{err:"på"});
+gen("Mange {a} {x} var enige.","af",["medarbejderne","deltagerne","vælgerne","borgerne","gæsterne"],
+  "En andel af en gruppe tager 'af': mange af deltagerne.","Samfund",{err:"fra"});
+gen("Bogen blev skrevet {a} {x}.","af",["en kendt forfatter","min gamle lærer","to journalister","en ung debutant"],
+  "Ved passiv handling angives den, der udfører handlingen, med 'af': skrevet af forfatteren.","Kultur",{err:"fra",pair:"af|fra"});
+gen("Vi snakker tit {a} {x}.","om",["budgettet","den nye plan","klimaet","reglerne","fremtiden"],
+  "At snakke om et emne tager 'om'.","Møder",{err:"på",pair:"om|på"});
+gen("Hun er i lære {a} {x}.","hos",["en tømrer","en kok","en frisør","et stort firma"],
+  "I lære hos en mester eller arbejdsgiver tager 'hos'.","Arbejde",{err:"i",pair:"hos|i"});
+gen("Flyet afgår {a} {x}.","fra",["København","terminal 2","gate 5","Kastrup"],
+  "Afgangsstedet tager 'fra': flyet afgår fra gate 5.","Rejse",{err:"af",pair:"af|fra"});
+gen("Jeg har lige hørt {a} {x}.","fra",["min chef","banken","skolen","forsikringen"],
+  "At høre fra en afsender tager 'fra'.","Arbejde",{err:"af",pair:"af|fra"});
+gen("Hun henter børnene {a} {x}.","efter",["skole","arbejde","fritidsordningen"],
+  "Tidspunkt efter en aktivitet tager 'efter'.","Familie",{err:"til"});
+gen("Suppen var desværre helt {a} {x}.","uden",["smag","salt","krydderi"],
+  "Fravær af en egenskab tager 'uden': uden smag.","Mad",{err:"med",pair:"med|uden"});
+gen("Jeg kan slet ikke leve {a} {x}.","uden",["kaffe","musik","min telefon","internettet"],
+  "At undvære noget: leve uden kaffe.","Hverdag",{err:"med",pair:"med|uden"});
+gen("Reglerne gælder {a} {x}.","under",["hele rejsen","prøvetiden","ferien","opholdet"],
+  "Noget der gælder i et tidsrum tager 'under'.","Samfund",{err:"over",pair:"under|over"});
+gen("Hunden sov {a} {x}.","under",["bordet","sengen","sofaen","trappen"],
+  "Placering nedenunder noget tager 'under'.","Hjem",{err:"over",pair:"under|over"});
+gen("Mødet varede {a} {x}.","over",["en time","to timer","en hel dag"],
+  "Varighed mere end et mål tager 'over': varede over en time.","Møder",{err:"på"});
+gen("Vi aftalte det hele {a} {x}.","over",["telefonen","en frokost","en kop kaffe"],
+  "Via et medie eller måltid: aftale noget over telefonen.","Arbejde",{err:"på"});
+gen("Forholdet {a} {x} er rigtig godt.","mellem",["kollegerne","de to lande","naboerne","parterne"],
+  "Forholdet mellem to eller flere parter tager 'mellem'.","Samfund",{err:"ved"});
+gen("Han står og venter {a} {x}.","ved",["springvandet","statuen","rundkørslen","lyskrydset"],
+  "At stå tæt ved et konkret punkt tager 'ved'.","Hverdag",{err:"i"});
+gen("Han sidder {a} {x} hele dagen.","i",["møder","kø","trafikken","et videomøde"],
+  "At være optaget i noget tager 'i': sidde i møder, i trafikken.","Arbejde",{err:"på"});
+gen("Vi var på ferie {a} {x} sidste år.","i",["Spanien","Italien","Norge","Frankrig","Tyskland"],
+  "Lande tager 'i': på ferie i Spanien.","Rejse",{err:"på",pair:"i|til"});
+gen("Læg pengene {a} {x}.","på",["kontoen","bordet","bankbogen"],
+  "Penge på en konto tager 'på': sætte penge på kontoen.","Samfund",{err:"i"});
+gen("Vi mangler stadig svar {a} {x}.","på",["spørgsmålet","din mail","ansøgningen","tilbuddet"],
+  "'Svar på' noget tager altid 'på'.","Arbejde",{err:"til"});
+gen("Jeg har tillid {a} {x}.","til",["dig","mit team","den nye chef","systemet"],
+  "'Tillid til' nogen/noget tager 'til'.","Arbejde",{err:"for"});
+gen("Hun er gift {a} {x}.","med",["en læge","sin ungdomskæreste","en englænder"],
+  "'Gift med' nogen tager altid 'med'.","Familie",{err:"til"});
+gen("Resultatet afhænger meget {a} {x}.","af",["indsatsen","vejret","markedet","kunderne"],
+  "'Afhænge af' tager altid 'af'.","Samfund",{err:"fra"});
+
+/* ---------- TRANSLATION pairs (curated EN -> DA) ---------- */
+const TRANS = [
+  ["I am going to Denmark tomorrow.","Jeg skal til Danmark i morgen.","til","Bevægelse mod et land tager 'til'."],
+  ["I work at Netto.","Jeg arbejder hos Netto.","hos","Arbejdsgiver som firma/person tager 'hos'."],
+  ["She lives in Copenhagen.","Hun bor i København.","i","Byer tager 'i'."],
+  ["The meeting is in the morning.","Mødet er om morgenen.","om","Faste tider på døgnet tager 'om'."],
+  ["The book is on the table.","Bogen ligger på bordet.","på","Oven på en flade tager 'på'."],
+  ["Thanks for your help.","Tak for hjælpen.","for","'Tak for' bruger altid 'for'."],
+  ["I am afraid of dogs.","Jeg er bange for hunde.","for","'Bange for' styrer 'for'."],
+  ["He travels by train.","Han rejser med tog.","med","Transportmiddel tager 'med'."],
+  ["The table is made of wood.","Bordet er lavet af træ.","af","Materiale tager 'af'."],
+  ["We are talking about the weather.","Vi taler om vejret.","om","Emne tager 'om'."],
+  ["I will be done in an hour.","Jeg er færdig om en time.","om","Tid før noget sker tager 'om'."],
+  ["The cat is under the bed.","Katten er under sengen.","under","Placering nedenunder tager 'under'."],
+  ["The lamp hangs over the table.","Lampen hænger over bordet.","over","Placering ovenover tager 'over'."],
+  ["I come from Spain.","Jeg kommer fra Spanien.","fra","Oprindelse tager 'fra'."],
+  ["We eat after the meeting.","Vi spiser efter mødet.","efter","Tid efter noget tager 'efter'."],
+  ["She drinks coffee without sugar.","Hun drikker kaffe uden sukker.","uden","Fravær af noget tager 'uden'."],
+  ["The house is by the sea.","Huset ligger ved havet.","ved","Tæt på noget tager 'ved'."],
+  ["Choose between tea and coffee.","Vælg mellem te og kaffe.","mellem","Valg mellem to ting tager 'mellem'."],
+  ["I am going to the doctor.","Jeg skal til lægen.","til","Aftale/mål tager 'til'."],
+  ["We were at my grandmother's.","Vi var hos min mormor.","hos","Hjemme hos en person tager 'hos'."],
+  ["He works for a big company.","Han arbejder for et stort firma.","for","I tjeneste af nogen tager 'for'."],
+  ["The children go to school.","Børnene går i skole.","i","Fast udtryk: gå i skole."],
+  ["I am on holiday.","Jeg er på ferie.","på","Fast udtryk: på ferie."],
+  ["We look forward to the weekend.","Vi glæder os til weekenden.","til","'Glæde sig til' styrer 'til'."],
+  ["Can you help me with the task?","Kan du hjælpe mig med opgaven?","med","'Hjælpe med' styrer 'med'."],
+  ["I am tired of waiting.","Jeg er træt af at vente.","af","'Træt af' styrer 'af'."],
+  ["The meeting is between nine and eleven.","Mødet er mellem ni og elleve.","mellem","Tidsrum mellem to punkter."],
+  ["She is at work.","Hun er på arbejde.","på","Fast udtryk: på arbejde."],
+  ["The letter is from the bank.","Brevet er fra banken.","fra","Afsender tager 'fra'."],
+  ["We talked over a cup of coffee.","Vi snakkede over en kop kaffe.","over","Over et måltid tager 'over'."],
+  ["I am looking for my keys.","Jeg leder efter mine nøgler.","efter","'Lede efter' styrer 'efter'."],
+  ["He lives in the countryside.","Han bor på landet.","på","Fast udtryk: på landet."],
+  ["I pay by card.","Jeg betaler med kort.","med","Betalingsmiddel tager 'med'."],
+  ["We are satisfied with the result.","Vi er tilfredse med resultatet.","med","'Tilfreds med' styrer 'med'."],
+  ["She dreams of a new job.","Hun drømmer om et nyt job.","om","'Drømme om' styrer 'om'."],
+  ["The store is open from nine.","Butikken har åbent fra klokken ni.","fra","Startpunkt i tid tager 'fra'."],
+  ["He got off the bus.","Han stod af bussen.","af","'Stå af' et køretøj tager 'af'."],
+  ["It depends on the weather.","Det afhænger af vejret.","af","'Afhænge af' styrer 'af'."],
+  ["We meet at the entrance.","Vi mødes ved indgangen.","ved","Mødested tæt på et punkt tager 'ved'."],
+  ["The bridge goes over the river.","Broen går over floden.","over","Hen over noget tager 'over'."]
+];
+
+/* ---------- PAIR groups ---------- */
+const PAIR_GROUPS = [
+  {key:"i|på", label:"i vs på", a:"i", b:"på"},
+  {key:"i|til", label:"i vs til", a:"i", b:"til"},
+  {key:"af|fra", label:"af vs fra", a:"af", b:"fra"},
+  {key:"hos|i", label:"hos vs i", a:"hos", b:"i"},
+  {key:"med|uden", label:"med vs uden", a:"med", b:"uden"},
+  {key:"om|på", label:"om vs på", a:"om", b:"på"}
+];
+
+/* ============================================================
+   STATE + PERSISTENCE
+   ============================================================ */
+const SKEY = "praep_mester_v1";
+const FEEDBACK_GOOD = ["Godt klaret!","Flot arbejde!","Super!","Perfekt!","Sådan!","Du er en mester!"];
+const FEEDBACK_BAD = ["Prøv igen!","Næsten!","Ikke helt!","Det lærer du!"];
+
+let prog = loadProg();
+function defaultProg(){
+  const per = {};
+  PREPS.forEach(p=>per[p]={c:0,w:0});
+  return {total:0,correct:0,streak:0,best:0,xp:0,per:per,reviewQ:[]};
+}
+function loadProg(){
+  try{
+    const raw = localStorage.getItem(SKEY);
+    if(!raw) return defaultProg();
+    const p = JSON.parse(raw);
+    const d = defaultProg();
+    return Object.assign(d,p,{per:Object.assign(d.per,p.per||{})});
+  }catch(e){ return defaultProg(); }
+}
+function saveProg(){ try{ localStorage.setItem(SKEY, JSON.stringify(prog)); }catch(e){} }
+
+function record(answerPrep, correct){
+  prog.total++;
+  if(!prog.per[answerPrep]) prog.per[answerPrep]={c:0,w:0};
+  if(correct){
+    prog.correct++; prog.streak++; prog.xp+=10;
+    prog.per[answerPrep].c++;
+    if(prog.streak>prog.best) prog.best=prog.streak;
+  }else{
+    prog.streak=0; prog.xp+=2;
+    prog.per[answerPrep].w++;
+  }
+  saveProg();
+  updateTopBar();
+}
+function addReview(item){
+  // store a lightweight copy to repeat later
+  if(prog.reviewQ.length>40) prog.reviewQ.shift();
+  prog.reviewQ.push({text:item.text,a:item.a,ex:item.ex,theme:item.theme,err:item.err});
+  saveProg();
+}
+function clearReviewItem(text){
+  prog.reviewQ = prog.reviewQ.filter(r=>r.text!==text);
+  saveProg();
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function sample(arr,n){ return shuffle(arr.slice()).slice(0,n); }
+function rand(item){ return JSON.parse(JSON.stringify(item)); }
+function randItem(filter){
+  let pool = ITEMS;
+  if(filter) pool = ITEMS.filter(filter);
+  if(pool.length===0) pool=ITEMS;
+  return rand(pick(pool));
+}
+function blankSentence(item){ // replace the answer preposition (whole word) with a blank marker
+  const re = new RegExp("(^|[\\s])"+item.a+"([\\s.,!?])");
+  let done=false;
+  return item.text.replace(re,function(m,p1,p2){ if(done) return m; done=true; return p1+"@@@"+p2; });
+}
+function distractorsFor(prep, n){
+  const c = (CONFUSE[prep]||[]).filter(p=>p!==prep);
+  let opts = [];
+  c.forEach(x=>{ if(opts.indexOf(x)<0 && x!==prep) opts.push(x); });
+  const rest = shuffle(PREPS.filter(p=>p!==prep && opts.indexOf(p)<0));
+  while(opts.length<n && rest.length) opts.push(rest.shift());
+  return opts.slice(0,n);
+}
+function goodMsg(){ return pick(FEEDBACK_GOOD); }
+function badMsg(){ return pick(FEEDBACK_BAD); }
+
+function burst(x,y){
+  const colors=["#ee1515","#2a75bb","#ffcb05","#3ec46d"];
+  for(let i=0;i<10;i++){
+    const p=document.createElement("div");p.className="particle";
+    p.style.cssText="left:"+x+"px;top:"+y+"px;background:"+pick(colors)+
+      ";--dx:"+((Math.random()-0.5)*140)+"px;--dy:"+((Math.random()-0.5)*140)+"px";
+    document.body.appendChild(p);
+    p.addEventListener("animationend",()=>p.remove());
+  }
+}
+function streakPop(n){
+  const d=document.createElement("div");d.className="streakpop";d.textContent="🔥 "+n+" i træk!";
+  document.body.appendChild(d);
+  d.addEventListener("animationend",()=>d.remove());
+}
+
+/* ============================================================
+   TOP BAR / LEVEL
+   ============================================================ */
+const LEVELS=[
+  [0,"Nybegynder"],[100,"Lærling"],[300,"Øvet"],[600,"Rutineret"],
+  [1000,"Ekspert"],[1600,"Mester"],[2400,"Stormester"],[3500,"Præpositions-Legende"]
+];
+function levelInfo(){
+  let idx=0;
+  for(let i=0;i<LEVELS.length;i++){ if(prog.xp>=LEVELS[i][0]) idx=i; }
+  const cur=LEVELS[idx], next=LEVELS[idx+1];
+  const floor=cur[0], ceil=next?next[0]:cur[0]+1000;
+  const pct=Math.min(100,Math.round(((prog.xp-floor)/(ceil-floor))*100));
+  return {num:idx+1,name:cur[1],pct:pct};
+}
+function updateTopBar(){
+  const li=levelInfo();
+  document.getElementById("lvlText").textContent="Niveau "+li.num+" · "+li.name;
+  document.getElementById("xpText").textContent=prog.xp+" XP";
+  document.getElementById("pbarFill").style.width=li.pct+"%";
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+const elMenu=document.getElementById("menu");
+const elEx=document.getElementById("exercise");
+const elStats=document.getElementById("stats");
+function show(which){
+  elMenu.classList.toggle("hide",which!=="menu");
+  elEx.classList.toggle("hide",which!=="ex");
+  elStats.classList.toggle("hide",which!=="stats");
+  if(which==="menu"){ renderMiniStats(); }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+const MODES=[
+  {id:"fill", t:"Udfyld hullet", d:"Skriv den rigtige præposition", e:"✏️", c:"c-red"},
+  {id:"mc", t:"Multiple choice", d:"Vælg blandt fire", e:"🎯", c:"c-blue"},
+  {id:"drag", t:"Træk & slip", d:"Træk præpositionen ind", e:"🧲", c:"c-green"},
+  {id:"mistake", t:"Find fejlen", d:"Hvilket ord er forkert?", e:"🔍", c:"c-yellow"},
+  {id:"correct", t:"Ret sætningen", d:"Skriv den korrekt", e:"📝", c:"c-purple"},
+  {id:"trans", t:"Oversættelse", d:"Engelsk → dansk", e:"🌍", c:"c-teal"},
+  {id:"pairs", t:"Forvekslings-par", d:"i vs på, af vs fra ...", e:"⚖️", c:"c-orange"},
+  {id:"speed", t:"Lynrunde", d:"60 sekunder!", e:"⚡", c:"c-pink"},
+  {id:"review", t:"Gentag fejl", d:"Træn dine fejl", e:"🔁", c:"c-slate"},
+  {id:"stats", t:"Statistik", d:"Se din fremgang", e:"📊", c:"c-gold"}
+];
+function renderMenu(){
+  const g=document.getElementById("menuGrid");
+  g.innerHTML="";
+  MODES.forEach(m=>{
+    const b=document.createElement("button");
+    b.className="mode-btn "+m.c;
+    let extra="";
+    if(m.id==="review"){ extra=' <span style="font-size:.7rem;background:rgba(0,0,0,.18);padding:1px 7px;border-radius:10px">'+prog.reviewQ.length+'</span>'; }
+    b.innerHTML='<span class="emoji">'+m.e+'</span><span class="t">'+m.t+extra+'</span><span class="d">'+m.d+'</span>';
+    b.onclick=()=>{ if(m.id==="stats") openStats(); else startMode(m.id); };
+    g.appendChild(b);
+  });
+}
+function renderMiniStats(){
+  const acc=prog.total?Math.round(prog.correct/prog.total*100):0;
+  document.getElementById("miniStats").innerHTML=
+    '<div class="statgrid">'+
+    '<div class="stat"><div class="n">'+acc+'%</div><div class="l">Nøjagtighed</div></div>'+
+    '<div class="stat"><div class="n">'+prog.streak+'</div><div class="l">Aktuel stime</div></div>'+
+    '<div class="stat"><div class="n">'+prog.best+'</div><div class="l">Bedste stime</div></div>'+
+    '<div class="stat"><div class="n">'+prog.total+'</div><div class="l">Spørgsmål i alt</div></div>'+
+    '</div>';
+}
+
+/* ============================================================
+   GENERIC EXERCISE SHELL
+   ============================================================ */
+let session={mode:null,n:0};
+function exShell(modeLabel, theme, bodyHtml){
+  elEx.innerHTML=
+    '<div class="card">'+
+      '<div class="backrow">'+
+        '<button class="topbtn" onclick="goMenu()">‹ Menu</button>'+
+        '<span class="qcount">Spørgsmål '+session.n+'</span>'+
+      '</div>'+
+      '<div class="exhead" style="margin-top:12px">'+
+        '<span class="badge">'+modeLabel+'</span>'+
+        (theme?'<span class="badge theme">'+theme+'</span>':'')+
+      '</div>'+
+      bodyHtml+
+      '<div class="fb" id="fb"></div>'+
+    '</div>';
+}
+function goMenu(){ if(speedTimer){clearInterval(speedTimer);speedTimer=null;} renderMenu(); show("menu"); }
+
+function showFB(ok, item, correctText){
+  const fb=document.getElementById("fb");
+  fb.className="fb show "+(ok?"good":"bad");
+  let html='<span class="big">'+(ok?"✅ "+goodMsg():"❌ "+badMsg())+'</span>';
+  if(!ok && correctText){ html+='<div>Rigtigt svar: <span class="corr">'+correctText+'</span></div>'; }
+  if(item && item.ex){ html+='<div style="margin-top:6px">💡 '+item.ex+'</div>'; }
+  fb.innerHTML=html;
+}
+
+function startMode(id){
+  session={mode:id,n:0};
+  if(id==="fill") nextFill();
+  else if(id==="mc") nextMC();
+  else if(id==="drag") nextDrag();
+  else if(id==="mistake") nextMistake();
+  else if(id==="correct") nextCorrect();
+  else if(id==="trans") nextTrans();
+  else if(id==="pairs") startPairs();
+  else if(id==="speed") startSpeed();
+  else if(id==="review") nextReview();
+  show("ex");
+}
+
+/* ---------- 1. FILL IN THE BLANK ---------- */
+function nextFill(item){
+  session.n++;
+  item = item || randItem();
+  const html = blankSentence(item).replace("@@@",'<span class="blank">?</span>');
+  exShell("✏️ Udfyld hullet", item.theme,
+    '<p class="prompt">Skriv den præposition der mangler:</p>'+
+    '<div class="sentence">'+html+'</div>'+
+    '<input class="tinput" id="fillIn" placeholder="fx i, på, til ..." autocomplete="off" autocapitalize="none">'+
+    '<div class="btnrow"><button class="btn" id="fillCheck">Tjek svar</button>'+
+    '<button class="btn grey" id="fillNext">Spring over</button></div>');
+  const inp=document.getElementById("fillIn"); inp.focus();
+  function check(){
+    const val=inp.value.trim().toLowerCase();
+    if(!val) return;
+    const ok = val===item.a;
+    document.querySelector(".blank").textContent=item.a;
+    document.querySelector(".blank").classList.toggle("filled",ok);
+    record(item.a,ok);
+    if(ok){ const r=inp.getBoundingClientRect(); burst(r.left+r.width/2,r.top); if(prog.streak%5===0&&prog.streak)streakPop(prog.streak);}
+    else addReview(item);
+    showFB(ok,item, item.a);
+    document.getElementById("fillCheck").textContent="Næste →";
+    document.getElementById("fillCheck").onclick=()=>nextFill();
+    inp.disabled=true;
+    document.getElementById("fillNext").classList.add("hide");
+  }
+  document.getElementById("fillCheck").onclick=check;
+  document.getElementById("fillNext").onclick=()=>nextFill();
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("fillCheck").onclick(); });
+}
+
+/* ---------- 2. MULTIPLE CHOICE ---------- */
+function nextMC(item){
+  session.n++;
+  item=item||randItem();
+  const opts=shuffle([item.a].concat(distractorsFor(item.a,3)));
+  const html=blankSentence(item).replace("@@@",'<span class="blank" id="mcBlank">?</span>');
+  exShell("🎯 Multiple choice", item.theme,
+    '<p class="prompt">Vælg den rigtige præposition:</p>'+
+    '<div class="sentence">'+html+'</div>'+
+    '<div class="opts" id="mcOpts"></div>');
+  const box=document.getElementById("mcOpts");
+  opts.forEach((o,i)=>{
+    const b=document.createElement("button");b.className="opt";
+    b.textContent=String.fromCharCode(65+i)+") "+o;
+    b.onclick=(e)=>{
+      const ok=o===item.a;
+      document.querySelectorAll("#mcOpts .opt").forEach(x=>{x.classList.add("dim");x.onclick=null;});
+      b.classList.remove("dim");
+      b.classList.add(ok?"correct":"wrong");
+      if(!ok){ document.querySelectorAll("#mcOpts .opt").forEach(x=>{ if(x.textContent.endsWith(") "+item.a)){x.classList.remove("dim");x.classList.add("correct");} }); addReview(item); }
+      document.getElementById("mcBlank").textContent=item.a;
+      document.getElementById("mcBlank").classList.toggle("filled",ok);
+      record(item.a,ok);
+      if(ok){ burst(e.clientX,e.clientY); if(prog.streak%5===0&&prog.streak)streakPop(prog.streak); }
+      showFB(ok,item,item.a);
+      const nb=document.createElement("button");nb.className="btn full";nb.textContent="Næste →";nb.onclick=()=>nextMC();
+      box.after(nb);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- 3. DRAG & DROP ---------- */
+function nextDrag(item){
+  session.n++;
+  item=item||randItem();
+  const chips=shuffle([item.a].concat(distractorsFor(item.a,3)));
+  const html=blankSentence(item).replace("@@@",'<span class="drop" id="dropZone">slip her</span>');
+  exShell("🧲 Træk & slip", item.theme,
+    '<p class="prompt">Træk den rigtige præposition ind i sætningen:</p>'+
+    '<div class="sentence">'+html+'</div>'+
+    '<div class="dragzone" id="chips"></div>'+
+    '<div class="hint">På mobil: tryk på en brik for at placere den.</div>');
+  const drop=document.getElementById("dropZone");
+  const cbox=document.getElementById("chips");
+  let answered=false;
+  function place(val,chipEl,x,y){
+    if(answered) return;
+    answered=true;
+    const ok=val===item.a;
+    drop.textContent=val;
+    drop.classList.add("filled");
+    if(!ok) drop.style.background="var(--red)",drop.style.borderColor="var(--red-d)";
+    record(item.a,ok);
+    if(ok){ burst(x||window.innerWidth/2,y||200); if(prog.streak%5===0&&prog.streak)streakPop(prog.streak);} else addReview(item);
+    showFB(ok,item,item.a);
+    document.querySelectorAll(".chip").forEach(c=>c.classList.add("used"));
+    const nb=document.createElement("button");nb.className="btn full";nb.textContent="Næste →";nb.onclick=()=>nextDrag();
+    cbox.after(nb);
+  }
+  chips.forEach(val=>{
+    const c=document.createElement("button");c.className="chip";c.textContent=val;c.draggable=true;
+    c.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text",val); });
+    c.addEventListener("click",e=>place(val,c,e.clientX,e.clientY)); // tap support
+    cbox.appendChild(c);
+  });
+  drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("over");});
+  drop.addEventListener("dragleave",()=>drop.classList.remove("over"));
+  drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");place(e.dataTransfer.getData("text"),null,e.clientX,e.clientY);});
+}
+
+/* ---------- 4. FIND THE MISTAKE ---------- */
+function nextMistake(item){
+  session.n++;
+  item=item||randItem(it=>it.err && it.err!==it.a && !(new RegExp("(^|\\s)"+it.err+"(\\s|[.,!?])").test(it.text)));
+  // build a wrong sentence by swapping the answer prep with err
+  const wrongText = item.text.replace(new RegExp("(^|[\\s])"+item.a+"([\\s.,!?])"), "$1"+item.err+"$2");
+  const words = wrongText.split(/(\s+)/);
+  exShell("🔍 Find fejlen", item.theme,
+    '<p class="prompt">Én præposition er forkert. Tryk på det forkerte ord:</p>'+
+    '<div class="sentence" id="msSent"></div>');
+  const sent=document.getElementById("msSent");
+  let answered=false;
+  words.forEach(w=>{
+    const clean=w.replace(/[.,!?]/g,"");
+    if(/\S/.test(w) && PREPS.indexOf(clean.toLowerCase())>=0){
+      const span=document.createElement("span");span.className="word";span.textContent=w;
+      span.onclick=(e)=>{
+        if(answered) return; answered=true;
+        const ok = clean.toLowerCase()===item.err.toLowerCase();
+        document.querySelectorAll("#msSent .word").forEach(x=>x.onclick=null);
+        if(ok){ span.classList.add("sel"); burst(e.clientX,e.clientY); }
+        record(item.a,ok);
+        if(!ok) addReview(item);
+        const fb=document.getElementById("fb");
+        fb.className="fb show "+(ok?"good":"bad");
+        fb.innerHTML='<span class="big">'+(ok?"✅ "+goodMsg():"❌ "+badMsg())+'</span>'+
+          '<div>Fejlen: <span class="corr">'+item.err+' → '+item.a+'</span></div>'+
+          '<div style="margin-top:6px">Korrekt: <b>'+item.text+'</b></div>'+
+          '<div style="margin-top:6px">💡 '+item.ex+'</div>';
+        const nb=document.createElement("button");nb.className="btn full";nb.textContent="Næste →";nb.onclick=()=>nextMistake();
+        sent.after(nb);
+      };
+      sent.appendChild(span);
+    } else {
+      sent.appendChild(document.createTextNode(w));
+    }
+  });
+}
+
+/* ---------- 5. SENTENCE CORRECTION ---------- */
+function nextCorrect(item){
+  session.n++;
+  item=item||randItem(it=>it.err && it.err!==it.a && !(new RegExp("(^|\\s)"+it.err+"(\\s|[.,!?])").test(it.text)));
+  const wrongText = item.text.replace(new RegExp("(^|[\\s])"+item.a+"([\\s.,!?])"), "$1"+item.err+"$2");
+  exShell("📝 Ret sætningen", item.theme,
+    '<p class="prompt">Denne sætning har en forkert præposition. Skriv den korrekt:</p>'+
+    '<div class="sentence" style="color:var(--red-d)">'+wrongText+'</div>'+
+    '<input class="tinput" id="corrIn" placeholder="Skriv hele den rettede sætning ...">'+
+    '<div class="hint">Tip: du kan også bare skrive den rigtige præposition.</div>'+
+    '<div class="btnrow"><button class="btn" id="corrCheck">Tjek svar</button>'+
+    '<button class="btn grey" id="corrShow">Vis svar</button></div>');
+  const inp=document.getElementById("corrIn");inp.focus();
+  function norm(s){ return s.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim(); }
+  function finish(ok){
+    record(item.a,ok); if(!ok) addReview(item);
+    const fb=document.getElementById("fb");
+    fb.className="fb show "+(ok?"good":"bad");
+    fb.innerHTML='<span class="big">'+(ok?"✅ "+goodMsg():"❌ "+badMsg())+'</span>'+
+      '<div>Korrekt: <span class="corr">'+item.text+'</span></div>'+
+      '<div style="margin-top:6px">💡 '+item.ex+'</div>';
+    document.getElementById("corrCheck").textContent="Næste →";
+    document.getElementById("corrCheck").onclick=()=>nextCorrect();
+    document.getElementById("corrShow").classList.add("hide");
+    inp.disabled=true;
+    if(ok){ const r=inp.getBoundingClientRect(); burst(r.left+r.width/2,r.top); }
+  }
+  document.getElementById("corrCheck").onclick=function(){
+    const v=norm(inp.value); if(!v) return;
+    const ok = v===norm(item.text) || v===item.a;
+    finish(ok);
+  };
+  document.getElementById("corrShow").onclick=()=>finish(false);
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("corrCheck").onclick(); });
+}
+
+/* ---------- 6. TRANSLATION ---------- */
+function nextTrans(){
+  session.n++;
+  const t=pick(TRANS); // [en, da, prep, ex]
+  const item={text:t[1],a:t[2],ex:t[3],theme:"Oversættelse",err:null};
+  exShell("🌍 Oversættelse", "Engelsk → dansk",
+    '<p class="prompt">Oversæt til dansk:</p>'+
+    '<div class="sentence" style="font-style:italic;color:var(--blue-d)">"'+t[0]+'"</div>'+
+    '<input class="tinput" id="trIn" placeholder="Skriv på dansk ...">'+
+    '<div class="btnrow"><button class="btn" id="trCheck">Tjek svar</button>'+
+    '<button class="btn grey" id="trShow">Vis svar</button></div>');
+  const inp=document.getElementById("trIn");inp.focus();
+  function norm(s){ return s.toLowerCase().replace(/[.,!?"]/g,"").replace(/\s+/g," ").trim(); }
+  function finish(ok){
+    record(t[2],ok); if(!ok) addReview(item);
+    const fb=document.getElementById("fb");
+    fb.className="fb show "+(ok?"good":"bad");
+    fb.innerHTML='<span class="big">'+(ok?"✅ "+goodMsg():"❌ "+badMsg())+'</span>'+
+      '<div>Korrekt: <span class="corr">'+t[1]+'</span></div>'+
+      '<div style="margin-top:6px">💡 '+t[3]+'</div>';
+    document.getElementById("trCheck").textContent="Næste →";
+    document.getElementById("trCheck").onclick=()=>nextTrans();
+    document.getElementById("trShow").classList.add("hide");
+    inp.disabled=true;
+    if(ok){ const r=inp.getBoundingClientRect(); burst(r.left+r.width/2,r.top); }
+  }
+  document.getElementById("trCheck").onclick=function(){
+    const v=norm(inp.value); if(!v) return;
+    // accept full match, or a close match that has the right preposition + key words
+    const ok = v===norm(t[1]);
+    finish(ok);
+  };
+  document.getElementById("trShow").onclick=()=>finish(false);
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("trCheck").onclick(); });
+}
+
+/* ---------- 7. PREPOSITION PAIRS ---------- */
+let curPair=null;
+function startPairs(){
+  // choose a pair group
+  elEx.innerHTML='<div class="card"><div class="backrow"><button class="topbtn" onclick="goMenu()">‹ Menu</button>'+
+    '<span class="qcount">Forvekslings-par</span></div>'+
+    '<p class="prompt" style="margin-top:14px">Vælg et par du vil træne:</p>'+
+    '<div class="menu-grid" id="pairGrid" style="margin-top:8px"></div></div>';
+  const g=document.getElementById("pairGrid");
+  const cols=["c-red","c-blue","c-green","c-yellow","c-purple","c-orange"];
+  PAIR_GROUPS.forEach((p,i)=>{
+    const b=document.createElement("button");b.className="mode-btn "+cols[i%cols.length];
+    b.innerHTML='<span class="emoji">⚖️</span><span class="t">'+p.label+'</span>';
+    b.onclick=()=>{ curPair=p; session.n=0; nextPair(); };
+    g.appendChild(b);
+  });
+  show("ex");
+}
+function nextPair(){
+  session.n++;
+  const p=curPair;
+  const item=randItem(it=> it.pair===p.key || (it.a===p.a && it.pair && it.pair.indexOf(p.a)>=0) );
+  // ensure options are exactly the two confusable prepositions
+  const opts=shuffle([p.a,p.b]);
+  const html=blankSentence(item).replace("@@@",'<span class="blank" id="prBlank">?</span>');
+  exShell("⚖️ "+p.label, item.theme,
+    '<p class="prompt">Hvilken passer her?</p>'+
+    '<div class="sentence">'+html+'</div>'+
+    '<div class="opts" id="prOpts" style="grid-template-columns:repeat(2,1fr)"></div>');
+  const box=document.getElementById("prOpts");
+  opts.forEach(o=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=(e)=>{
+      const ok=o===item.a;
+      document.querySelectorAll("#prOpts .opt").forEach(x=>{x.classList.add("dim");x.onclick=null;});
+      b.classList.remove("dim");b.classList.add(ok?"correct":"wrong");
+      if(!ok){ document.querySelectorAll("#prOpts .opt").forEach(x=>{ if(x.textContent===item.a){x.classList.remove("dim");x.classList.add("correct");} }); addReview(item);}
+      document.getElementById("prBlank").textContent=item.a;
+      document.getElementById("prBlank").classList.toggle("filled",ok);
+      record(item.a,ok);
+      if(ok){ burst(e.clientX,e.clientY); if(prog.streak%5===0&&prog.streak)streakPop(prog.streak); }
+      showFB(ok,item,item.a);
+      const nb=document.createElement("button");nb.className="btn full";nb.textContent="Næste →";nb.onclick=()=>nextPair();
+      box.after(nb);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- 8. SPEED ROUND ---------- */
+let speedTimer=null, speedLeft=60, speedScore=0, speedHits=0, speedMiss=0;
+function startSpeed(){
+  speedLeft=60; speedScore=0; speedHits=0; speedMiss=0;
+  speedTick(true);
+  if(speedTimer) clearInterval(speedTimer);
+  speedTimer=setInterval(()=>{
+    speedLeft--;
+    const t=document.getElementById("spTimer");
+    if(t){ t.textContent=speedLeft+"s"; t.classList.toggle("warn",speedLeft<=10); }
+    if(speedLeft<=0) endSpeed();
+  },1000);
+  show("ex");
+}
+function speedTick(first){
+  const item=randItem();
+  const opts=shuffle([item.a].concat(distractorsFor(item.a,3)));
+  const html=blankSentence(item).replace("@@@",'<span class="blank">?</span>');
+  elEx.innerHTML=
+    '<div class="card">'+
+    '<div class="backrow"><button class="topbtn" onclick="goMenu()">‹ Menu</button>'+
+    '<span class="qcount">⚡ Lynrunde</span></div>'+
+    '<div class="timer'+(speedLeft<=10?' warn':'')+'" id="spTimer">'+speedLeft+'s</div>'+
+    '<div class="scoreline">Point: '+speedScore+' &nbsp;·&nbsp; ✅ '+speedHits+' &nbsp; ❌ '+speedMiss+'</div>'+
+    '<div class="sentence" style="text-align:center">'+html+'</div>'+
+    '<div class="opts" id="spOpts"></div>'+
+    '</div>';
+  const box=document.getElementById("spOpts");
+  opts.forEach(o=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=(e)=>{
+      const ok=o===item.a;
+      if(ok){ speedScore+=10; speedHits++; prog.xp+=5; b.classList.add("correct"); burst(e.clientX,e.clientY); }
+      else { speedMiss++; b.classList.add("wrong"); addReview(item);
+        document.querySelectorAll("#spOpts .opt").forEach(x=>{ if(x.textContent===item.a) x.classList.add("correct"); }); }
+      record(item.a,ok);
+      document.querySelectorAll("#spOpts .opt").forEach(x=>x.onclick=null);
+      setTimeout(()=>{ if(speedLeft>0) speedTick(); }, ok?160:520);
+    };
+    box.appendChild(b);
+  });
+}
+function endSpeed(){
+  clearInterval(speedTimer); speedTimer=null;
+  const acc=(speedHits+speedMiss)?Math.round(speedHits/(speedHits+speedMiss)*100):0;
+  const best=parseInt(localStorage.getItem("praep_speed_best")||"0");
+  if(speedScore>best) localStorage.setItem("praep_speed_best",speedScore);
+  saveProg();
+  elEx.innerHTML=
+    '<div class="card" style="text-align:center">'+
+    '<div style="font-size:3rem">⚡</div>'+
+    '<h2 style="margin:6px 0">Tiden er gået!</h2>'+
+    '<div class="statgrid" style="margin-top:10px">'+
+    '<div class="stat"><div class="n">'+speedScore+'</div><div class="l">Point</div></div>'+
+    '<div class="stat"><div class="n">'+Math.max(speedScore,best)+'</div><div class="l">Rekord</div></div>'+
+    '<div class="stat"><div class="n">'+speedHits+'</div><div class="l">Rigtige</div></div>'+
+    '<div class="stat"><div class="n">'+acc+'%</div><div class="l">Nøjagtighed</div></div>'+
+    '</div>'+
+    '<div class="btnrow"><button class="btn" onclick="startSpeed()">Spil igen</button>'+
+    '<button class="btn blue" onclick="goMenu()">Menu</button></div>'+
+    '</div>';
+}
+
+/* ---------- 9. REVIEW MODE ---------- */
+function nextReview(){
+  if(prog.reviewQ.length===0){
+    elEx.innerHTML='<div class="card" style="text-align:center">'+
+      '<div style="font-size:3rem">🎉</div>'+
+      '<h2>Ingen fejl at gentage!</h2>'+
+      '<p style="color:var(--ink-soft)">Når du laver fejl i en øvelse, samles de her, så du kan mestre dem.</p>'+
+      '<button class="btn full" onclick="goMenu()">Tilbage til menu</button></div>';
+    return;
+  }
+  session.n++;
+  const item=prog.reviewQ[0];
+  const opts=shuffle([item.a].concat(distractorsFor(item.a,3)));
+  const html=blankSentence(item).replace("@@@",'<span class="blank" id="rvBlank">?</span>');
+  exShell("🔁 Gentag fejl", item.theme,
+    '<p class="prompt">Du svarede forkert tidligere — prøv igen ('+prog.reviewQ.length+' tilbage):</p>'+
+    '<div class="sentence">'+html+'</div>'+
+    '<div class="opts" id="rvOpts"></div>');
+  const box=document.getElementById("rvOpts");
+  opts.forEach(o=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=(e)=>{
+      const ok=o===item.a;
+      document.querySelectorAll("#rvOpts .opt").forEach(x=>{x.classList.add("dim");x.onclick=null;});
+      b.classList.remove("dim");b.classList.add(ok?"correct":"wrong");
+      if(!ok) document.querySelectorAll("#rvOpts .opt").forEach(x=>{ if(x.textContent===item.a){x.classList.remove("dim");x.classList.add("correct");} });
+      document.getElementById("rvBlank").textContent=item.a;
+      document.getElementById("rvBlank").classList.toggle("filled",ok);
+      record(item.a,ok);
+      if(ok){ clearReviewItem(item.text); burst(e.clientX,e.clientY); }
+      else { prog.reviewQ.push(prog.reviewQ.shift()); saveProg(); } // move to back, try later
+      showFB(ok,item,item.a);
+      const nb=document.createElement("button");nb.className="btn full";nb.textContent= prog.reviewQ.length?"Næste →":"Færdig 🎉";
+      nb.onclick=()=>nextReview();
+      box.after(nb);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ============================================================
+   STATS PAGE
+   ============================================================ */
+function openStats(){ renderStats(); show("stats"); }
+function renderStats(){
+  const acc=prog.total?Math.round(prog.correct/prog.total*100):0;
+  const speedBest=parseInt(localStorage.getItem("praep_speed_best")||"0");
+  // per-preposition accuracy
+  const rows=PREPS.map(p=>{
+    const d=prog.per[p]||{c:0,w:0}; const tot=d.c+d.w;
+    return {p:p,tot:tot,pct:tot?Math.round(d.c/tot*100):null};
+  });
+  const attempted=rows.filter(r=>r.tot>0);
+  const weak=attempted.slice().sort((a,b)=>a.pct-b.pct).slice(0,3);
+  const strong=attempted.slice().sort((a,b)=>b.pct-a.pct).slice(0,3);
+
+  let bars="";
+  rows.forEach(r=>{
+    const pct=r.pct===null?0:r.pct;
+    const col = r.pct===null?"#cdd6e0": pct>=80?"var(--green)":pct>=50?"var(--yellow)":"var(--red)";
+    bars+='<div class="preprow"><div class="prepname">'+r.p+'</div>'+
+      '<div class="prepbar"><i style="width:'+pct+'%;background:'+col+'"></i></div>'+
+      '<div class="preppct">'+(r.pct===null?"–":pct+"%")+'</div></div>';
+  });
+
+  let weakTags = attempted.length? weak.map(r=>'<span class="tag weak">'+r.p+' ('+r.pct+'%)</span>').join("") : '<span style="color:var(--ink-soft)">Ikke nok data endnu</span>';
+  let strongTags = attempted.length? strong.map(r=>'<span class="tag strong">'+r.p+' ('+r.pct+'%)</span>').join("") : '<span style="color:var(--ink-soft)">Ikke nok data endnu</span>';
+
+  elStats.innerHTML=
+    '<div class="card">'+
+    '<div class="backrow"><button class="topbtn" onclick="goMenu()">‹ Menu</button>'+
+    '<span class="qcount">📊 Statistik</span></div>'+
+    '<div class="statgrid" style="margin-top:14px">'+
+    '<div class="stat"><div class="n">'+acc+'%</div><div class="l">Nøjagtighed</div></div>'+
+    '<div class="stat"><div class="n">'+prog.total+'</div><div class="l">Spørgsmål i alt</div></div>'+
+    '<div class="stat"><div class="n">'+prog.streak+'</div><div class="l">Aktuel stime</div></div>'+
+    '<div class="stat"><div class="n">'+prog.best+'</div><div class="l">Bedste stime</div></div>'+
+    '<div class="stat"><div class="n">'+prog.xp+'</div><div class="l">XP i alt</div></div>'+
+    '<div class="stat"><div class="n">'+speedBest+'</div><div class="l">Lynrunde-rekord</div></div>'+
+    '</div>'+
+    '<div class="section-title" style="color:var(--ink)">Svageste præpositioner</div>'+
+    '<div>'+weakTags+'</div>'+
+    '<div class="section-title" style="color:var(--ink)">Stærkeste præpositioner</div>'+
+    '<div>'+strongTags+'</div>'+
+    '<div class="section-title" style="color:var(--ink)">Alle præpositioner</div>'+
+    '<div class="preplist">'+bars+'</div>'+
+    '<button class="btn grey full" onclick="resetProg()">Nulstil al fremgang</button>'+
+    '</div>';
+}
+function resetProg(){
+  if(confirm("Er du sikker? Al din fremgang slettes.")){
+    prog=defaultProg(); saveProg();
+    localStorage.removeItem("praep_speed_best");
+    updateTopBar(); renderStats(); renderMenu();
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.__ITEM_COUNT__ = ITEMS.length; // for testing
+renderMenu();
+renderMiniStats();
+updateTopBar();
+show("menu");
+</script>
+</body>
+</html>

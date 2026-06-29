@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dansk Mester — Learn Danish</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root{
+  --bg:#0f1626;
+  --bg2:#142036;
+  --surface:#1b2942;
+  --surface2:#233455;
+  --line:#2c3f63;
+  --text:#eaf0fb;
+  --muted:#93a4c4;
+  --accent:#33d17a;      /* danish-ish green */
+  --accent-d:#23a661;
+  --red:#e3556a;
+  --red-d:#c23b50;
+  --gold:#ffcf4a;
+  --blue:#4aa3ff;
+  --purple:#9b7dff;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Nunito',system-ui,-apple-system,sans-serif;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #1d2c49 0%, transparent 60%),
+    radial-gradient(1000px 500px at 100% 0%, #18283f 0%, transparent 55%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:760px;margin:0 auto;padding:18px 16px 90px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 2px 14px;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.35rem;letter-spacing:.3px}
+.brand .flag{
+  width:34px;height:24px;border-radius:5px;overflow:hidden;flex:none;
+  background:
+    linear-gradient(#c8102e,#c8102e);
+  position:relative;box-shadow:0 2px 6px rgba(0,0,0,.4)
+}
+.brand .flag::before,.brand .flag::after{content:"";position:absolute;background:#fff}
+.brand .flag::before{left:11px;top:0;bottom:0;width:5px}
+.brand .flag::after{top:9.5px;left:0;right:0;height:5px}
+.spacer{flex:1}
+.stat-chip{
+  display:flex;align-items:center;gap:6px;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.95rem
+}
+.stat-chip .ico{font-size:1.05rem}
+.stat-chip.xp{color:var(--gold)}
+.stat-chip.streak{color:#ff8f5e}
+
+/* ---------- buttons ---------- */
+.btn{
+  cursor:pointer;border:none;border-radius:14px;padding:14px 22px;
+  font-family:inherit;font-size:1rem;font-weight:800;color:#06210f;
+  background:var(--accent);
+  box-shadow:0 5px 0 var(--accent-d);
+  transition:transform .07s, box-shadow .07s, filter .15s;
+}
+.btn:hover{filter:brightness(1.04)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--accent-d)}
+.btn.secondary{background:var(--surface2);color:var(--text);box-shadow:0 5px 0 #16243d;border:1px solid var(--line)}
+.btn.secondary:active{box-shadow:0 1px 0 #16243d}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;border:1px solid var(--line);padding:10px 16px}
+.btn.ghost:active{transform:translateY(2px)}
+.btn.small{padding:9px 14px;font-size:.9rem;border-radius:11px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- cards / layout ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.h1{font-size:1.7rem;font-weight:900;margin:4px 0 2px}
+.sub{color:var(--muted);font-weight:600;margin:0 0 18px}
+.section-title{font-weight:900;font-size:1.15rem;margin:22px 2px 12px;display:flex;align-items:center;gap:8px}
+
+.path-grid{display:grid;gap:16px}
+.path-card{
+  position:relative;overflow:hidden;border-radius:22px;padding:22px;cursor:pointer;
+  border:1px solid var(--line);
+  background:linear-gradient(135deg,var(--surface2),var(--surface));
+  transition:transform .12s, box-shadow .12s;
+  animation:fade-in .4s both;
+}
+.path-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.path-card .pico{font-size:2.6rem;line-height:1}
+.path-card h3{margin:10px 0 4px;font-size:1.35rem;font-weight:900}
+.path-card p{margin:0;color:var(--muted);font-weight:600;font-size:.95rem}
+.path-card .glow{position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;filter:blur(10px);opacity:.25}
+.path-card.verbs .glow{background:var(--blue)}
+.path-card.phrases .glow{background:var(--purple)}
+
+/* progress bars */
+.bar{height:12px;border-radius:999px;background:#0e1830;overflow:hidden;border:1px solid var(--line)}
+.bar>span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),#8be38f);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.bar.sm{height:8px}
+.pct{font-weight:900;font-size:.85rem;color:var(--accent)}
+
+/* category list */
+.cat{
+  display:flex;align-items:center;gap:14px;background:var(--surface);
+  border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:11px;
+  cursor:pointer;transition:transform .1s,border-color .15s;animation:fade-in .35s both;
+}
+.cat:hover{transform:translateY(-2px);border-color:var(--accent)}
+.cat.locked{opacity:.55;cursor:not-allowed}
+.cat.locked:hover{transform:none;border-color:var(--line)}
+.cat .num{
+  width:42px;height:42px;border-radius:12px;flex:none;display:grid;place-items:center;
+  font-weight:900;font-size:1.1rem;background:var(--surface2);color:var(--accent)
+}
+.cat.locked .num{color:var(--muted)}
+.cat .cbody{flex:1;min-width:0}
+.cat .cname{font-weight:800;font-size:1.05rem}
+.cat .cmeta{color:var(--muted);font-size:.82rem;font-weight:600;margin-top:5px;display:flex;align-items:center;gap:8px}
+.cat .cmeta .bar{flex:1;max-width:160px}
+.cat .chev{color:var(--muted);font-size:1.4rem}
+.badge-done{background:var(--accent);color:#06210f;font-size:.7rem;font-weight:900;padding:3px 8px;border-radius:999px}
+
+/* mode grid */
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mode{
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 14px;cursor:pointer;
+  text-align:center;transition:transform .1s,border-color .15s;animation:fade-in .35s both
+}
+.mode:hover{transform:translateY(-3px);border-color:var(--accent)}
+.mode .mico{font-size:1.9rem}
+.mode .mname{font-weight:800;margin-top:8px;font-size:.98rem}
+.mode .mdesc{color:var(--muted);font-size:.76rem;font-weight:600;margin-top:4px;line-height:1.25}
+
+/* quiz */
+.quiz-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.quiz-head .bar{flex:1}
+.timer-pill{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:900;color:var(--gold)}
+.timer-pill.low{color:var(--red);animation:pulse .6s infinite}
+.prompt{
+  text-align:center;padding:28px 18px;border-radius:18px;background:linear-gradient(135deg,var(--surface2),var(--surface));
+  border:1px solid var(--line);margin-bottom:8px
+}
+.prompt .lbl{color:var(--muted);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:1px}
+.prompt .word{font-size:2rem;font-weight:900;margin-top:8px;line-height:1.2}
+.dir-tag{display:inline-block;font-size:.72rem;font-weight:800;color:var(--blue);background:#102036;border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin-top:12px}
+.options{display:grid;gap:11px;margin-top:18px}
+.opt{
+  text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;
+  padding:15px 16px;font-weight:800;font-size:1.02rem;cursor:pointer;color:var(--text);
+  font-family:inherit;transition:transform .08s,border-color .12s,background .12s
+}
+.opt:hover{border-color:var(--accent);transform:translateX(3px)}
+.opt.correct{border-color:var(--accent);background:rgba(51,209,122,.16);animation:pop .35s}
+.opt.wrong{border-color:var(--red);background:rgba(227,85,106,.16);animation:shake .35s}
+.opt:disabled{cursor:default}
+
+/* feedback banner */
+.feedback{margin-top:16px;text-align:center;min-height:30px;font-weight:900;font-size:1.15rem}
+.feedback.good{color:var(--accent)}
+.feedback.bad{color:var(--red)}
+
+/* flashcard */
+.flash-wrap{perspective:1200px;margin:8px 0 18px}
+.flash{
+  position:relative;width:100%;height:230px;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1)
+}
+.flash.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;display:grid;place-items:center;text-align:center;
+  border-radius:20px;border:1px solid var(--line);padding:24px;
+}
+.face.front{background:linear-gradient(135deg,#1f3151,var(--surface))}
+.face.back{background:linear-gradient(135deg,#13362a,#16213a);transform:rotateY(180deg)}
+.face .lbl{color:var(--muted);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;position:absolute;top:16px;left:0;right:0}
+.face .ftext{font-size:1.9rem;font-weight:900;line-height:1.25}
+.face .hint{position:absolute;bottom:16px;left:0;right:0;color:var(--muted);font-weight:700;font-size:.8rem}
+
+/* match pairs */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.match-cell{
+  background:var(--surface);border:2px solid var(--line);border-radius:13px;padding:14px 12px;
+  font-weight:800;cursor:pointer;min-height:60px;display:grid;place-items:center;text-align:center;
+  font-size:.95rem;transition:transform .08s,border-color .12s,opacity .3s,background .15s;font-family:inherit;color:var(--text)
+}
+.match-cell:hover{border-color:var(--accent)}
+.match-cell.sel{border-color:var(--blue);background:rgba(74,163,255,.15)}
+.match-cell.gone{opacity:0;pointer-events:none;transform:scale(.7)}
+.match-cell.miss{animation:shake .35s;border-color:var(--red)}
+
+/* result screen */
+.result{text-align:center}
+.result .big{font-size:3.2rem;font-weight:900;margin:6px 0}
+.ring{width:150px;height:150px;margin:6px auto 14px}
+.kv{display:flex;justify-content:space-between;padding:11px 4px;border-bottom:1px solid var(--line);font-weight:700}
+.kv .k{color:var(--muted)}
+.kv .v{font-weight:900}
+
+/* stats dashboard */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:8px}
+.stat-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+.stat-box .num{font-size:1.9rem;font-weight:900}
+.stat-box .lbl{color:var(--muted);font-weight:700;font-size:.82rem;margin-top:3px}
+.list-item{display:flex;justify-content:space-between;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);font-weight:700;align-items:center}
+.list-item .da{font-weight:900}
+.list-item .en{color:var(--muted);font-size:.85rem;font-weight:600}
+.acc-tag{font-weight:900;font-size:.85rem;flex:none}
+.acc-good{color:var(--accent)}
+.acc-bad{color:var(--red)}
+.spark{display:flex;align-items:flex-end;gap:6px;height:90px;padding-top:8px}
+.spark .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.spark .colbar{width:100%;background:linear-gradient(var(--accent),var(--accent-d));border-radius:6px 6px 0 0;min-height:3px;transition:height .5s}
+.spark .colday{color:var(--muted);font-size:.66rem;font-weight:800}
+
+/* badges */
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px}
+.ach{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 8px;opacity:.4;filter:grayscale(.8);transition:.3s}
+.ach.un{opacity:1;filter:none;border-color:var(--gold);box-shadow:0 0 16px rgba(255,207,74,.18)}
+.ach .aico{font-size:1.9rem}
+.ach .aname{font-weight:800;font-size:.72rem;margin-top:5px}
+
+/* bottom nav */
+.bottomnav{
+  position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;
+  background:rgba(15,22,38,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:30
+}
+.navbtn{
+  flex:1;max-width:160px;background:none;border:none;color:var(--muted);font-family:inherit;font-weight:800;
+  cursor:pointer;padding:7px 4px;border-radius:12px;font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:3px
+}
+.navbtn .nico{font-size:1.25rem}
+.navbtn.active{color:var(--accent);background:var(--surface)}
+
+.center{text-align:center}
+.muted{color:var(--muted)}
+.back{cursor:pointer;color:var(--muted);font-weight:800;display:inline-flex;align-items:center;gap:6px;margin-bottom:6px}
+.back:hover{color:var(--text)}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120%);
+  background:var(--accent);color:#06210f;font-weight:900;padding:12px 20px;border-radius:14px;
+  box-shadow:var(--shadow);z-index:60;transition:transform .4s cubic-bezier(.2,1.4,.4,1);max-width:90vw;text-align:center
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+.particle{position:fixed;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:50;animation:burst .7s ease-out forwards}
+
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}60%{transform:translateX(7px)}}
+@keyframes fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.screen{animation:fade-in .35s both}
+
+@media (max-width:480px){
+  .prompt .word{font-size:1.6rem}
+  .face .ftext{font-size:1.5rem}
+  .brand{font-size:1.15rem}
+  .stat-chip{padding:6px 10px;font-size:.85rem}
+  .h1{font-size:1.45rem}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   DATA
+========================================================= */
+const DATA = {
+  verbs:{
+    label:"Verb Combinations", icon:"🔗",
+    blurb:"verb + preposition expressions",
+    categories:[
+      {name:"Daily Actions", icon:"☀️", items:[
+        {da:"stå op", en:"get up"},
+        {da:"gå ud", en:"go out"},
+        {da:"komme ind", en:"come in"},
+        {da:"komme tilbage", en:"come back"},
+        {da:"tage af sted", en:"leave"},
+        {da:"holde op", en:"stop"},
+        {da:"blive ved", en:"continue"},
+        {da:"gå i gang", en:"get started"},
+      ]},
+      {name:"Communication", icon:"💬", items:[
+        {da:"tale om", en:"talk about"},
+        {da:"snakke om", en:"talk about"},
+        {da:"spørge om", en:"ask about"},
+        {da:"bede om", en:"ask for"},
+        {da:"høre om", en:"hear about"},
+        {da:"komme med", en:"come along / suggest"},
+        {da:"tænke på", en:"think about"},
+        {da:"tænke over", en:"think over"},
+      ]},
+      {name:"Work & Business", icon:"💼", items:[
+        {da:"arbejde med", en:"work with"},
+        {da:"begynde på", en:"start"},
+        {da:"fortsætte med", en:"continue with"},
+        {da:"deltage i", en:"participate in"},
+        {da:"lykkes med", en:"succeed in"},
+        {da:"hjælpe med", en:"help with"},
+        {da:"sørge for", en:"make sure"},
+        {da:"afhænge af", en:"depend on"},
+      ]},
+      {name:"Feelings & Thinking", icon:"💭", items:[
+        {da:"være interesseret i", en:"be interested in"},
+        {da:"være god til", en:"be good at"},
+        {da:"være dårlig til", en:"be bad at"},
+        {da:"være bange for", en:"be afraid of"},
+        {da:"være glad for", en:"be happy about"},
+        {da:"være træt af", en:"be tired of"},
+        {da:"tro på", en:"believe in"},
+        {da:"drømme om", en:"dream about"},
+        {da:"stole på", en:"trust"},
+      ]},
+      {name:"Social Life", icon:"🤝", items:[
+        {da:"være med", en:"participate"},
+        {da:"tage med", en:"bring along"},
+        {da:"gå med", en:"join"},
+        {da:"være enig i", en:"agree with"},
+        {da:"være uenig i", en:"disagree with"},
+        {da:"passe på", en:"take care of"},
+        {da:"tage sig af", en:"take care of"},
+        {da:"høre til", en:"belong to"},
+      ]},
+      {name:"Advanced Mixed Review", icon:"🎓", items:[
+        {da:"vente på", en:"wait for"},
+        {da:"lede efter", en:"look for"},
+        {da:"søge efter", en:"search for"},
+        {da:"kigge på", en:"look at"},
+        {da:"se på", en:"look at / watch"},
+        {da:"finde ud af", en:"figure out"},
+        {da:"gå efter", en:"go for"},
+        {da:"komme over", en:"get over"},
+        {da:"slippe af med", en:"get rid of"},
+      ]},
+    ]
+  },
+  phrases:{
+    label:"Idiomatic Expressions & Phrases", icon:"🗣️",
+    blurb:"idioms & fixed everyday phrases",
+    categories:[
+      {name:"Everyday Reactions", icon:"⚡", items:[
+        {da:"Det kan godt være", en:"That may be true"},
+        {da:"Det kommer an på", en:"It depends"},
+        {da:"Det går nok", en:"It'll be fine"},
+        {da:"Det er lige meget", en:"It doesn't matter"},
+        {da:"Det er i orden", en:"That's okay"},
+        {da:"Det lyder godt", en:"Sounds good"},
+        {da:"Det giver mening", en:"That makes sense"},
+        {da:"Det er klart", en:"Of course"},
+        {da:"Det er fair nok", en:"Fair enough"},
+        {da:"Helt sikkert", en:"Definitely"},
+      ]},
+      {name:"Agreement & Disagreement", icon:"⚖️", items:[
+        {da:"Det er jeg enig i", en:"I agree"},
+        {da:"Det er jeg ikke enig i", en:"I disagree"},
+        {da:"Du har ret", en:"You're right"},
+        {da:"Det tror jeg ikke", en:"I don't think so"},
+        {da:"Det kan du have ret i", en:"You may be right"},
+        {da:"Det synes jeg også", en:"I think so too"},
+        {da:"Det synes jeg ikke", en:"I don't think so"},
+        {da:"Det er jeg med på", en:"I'm on board"},
+        {da:"Det er en god idé", en:"That's a good idea"},
+        {da:"Det er ikke så enkelt", en:"It's not that simple"},
+      ]},
+      {name:"Work & Meetings", icon:"📋", items:[
+        {da:"Lad os komme i gang", en:"Let's get started"},
+        {da:"Vi tager den senere", en:"We'll take it later"},
+        {da:"Vi følger op på det", en:"We'll follow up"},
+        {da:"Vi holder kontakten", en:"We'll stay in touch"},
+        {da:"Hvad tænker du", en:"What do you think"},
+        {da:"Det skal vi se på", en:"We'll look into it"},
+        {da:"Det er på plads", en:"It's sorted"},
+        {da:"Vi er på rette spor", en:"We're on the right track"},
+        {da:"Det kræver lidt arbejde", en:"It needs some work"},
+        {da:"Der er styr på det", en:"It's under control"},
+      ]},
+      {name:"Common Idioms", icon:"🎭", items:[
+        {da:"At have travlt", en:"To be busy"},
+        {da:"At være på farten", en:"To be on the go"},
+        {da:"At slå to fluer med ét smæk", en:"Kill two birds with one stone"},
+        {da:"At tage tyren ved hornene", en:"Take the bull by the horns"},
+        {da:"At gå lige til sagen", en:"Get straight to the point"},
+        {da:"At have ben i næsen", en:"Be determined"},
+        {da:"At have is i maven", en:"Stay calm under pressure"},
+        {da:"At være på tynd is", en:"Be on thin ice"},
+        {da:"At få kolde fødder", en:"Get cold feet"},
+        {da:"At gå over gevind", en:"Go too far"},
+      ]},
+      {name:"Very Danish Expressions", icon:"🇩🇰", items:[
+        {da:"Pyt", en:"Never mind"},
+        {da:"Nå", en:"Oh, I see"},
+        {da:"Nå ja", en:"Oh right"},
+        {da:"Nå okay", en:"Alright then"},
+        {da:"Sådan er det", en:"That's how it is"},
+        {da:"Det må tiden vise", en:"Time will tell"},
+        {da:"Det er ikke så ringe endda", en:"Not bad at all"},
+        {da:"Det kunne være værre", en:"Could be worse"},
+        {da:"Ingen ko på isen", en:"No need to worry"},
+        {da:"Det går fremad", en:"Things are improving"},
+      ]},
+      {name:"Problem Solving", icon:"🧩", items:[
+        {da:"Finde ud af det", en:"Figure it out"},
+        {da:"Tage hånd om noget", en:"Take care of something"},
+        {da:"Komme til bunds i noget", en:"Get to the bottom of something"},
+        {da:"Få styr på noget", en:"Get something under control"},
+        {da:"Løse problemet", en:"Solve the problem"},
+        {da:"Tage ansvar", en:"Take responsibility"},
+        {da:"Tage en beslutning", en:"Make a decision"},
+        {da:"Holde hovedet koldt", en:"Keep a cool head"},
+        {da:"Komme videre", en:"Move on"},
+        {da:"Se mulighederne", en:"See the opportunities"},
+      ]},
+      {name:"Social Situations", icon:"🎉", items:[
+        {da:"Hvordan går det", en:"How are you"},
+        {da:"Hvad så", en:"What's up"},
+        {da:"Det var hyggeligt", en:"That was nice"},
+        {da:"Vi ses", en:"See you"},
+        {da:"Pas på dig selv", en:"Take care"},
+        {da:"Hav en god dag", en:"Have a nice day"},
+        {da:"God arbejdslyst", en:"Enjoy your work"},
+        {da:"Velbekomme", en:"You're welcome / enjoy your meal"},
+        {da:"Det var så lidt", en:"My pleasure"},
+        {da:"Tak for sidst", en:"Nice seeing you last time"},
+      ]},
+      {name:"Strong Native-Like Phrases", icon:"💪", items:[
+        {da:"Det er ikke min kop te", en:"It's not my cup of tea"},
+        {da:"Der er noget om snakken", en:"There's something to it"},
+        {da:"Det er lettere sagt end gjort", en:"Easier said than done"},
+        {da:"Man skal ikke male fanden på væggen", en:"Don't imagine the worst"},
+        {da:"Rom blev ikke bygget på én dag", en:"Rome wasn't built in a day"},
+        {da:"Øvelse gør mester", en:"Practice makes perfect"},
+        {da:"Bedre sent end aldrig", en:"Better late than never"},
+        {da:"Ingen regel uden undtagelse", en:"No rule without exception"},
+        {da:"Tiden flyver", en:"Time flies"},
+        {da:"Små skridt tæller også", en:"Small steps count too"},
+      ]},
+      {name:"Workplace Danish", icon:"🏢", items:[
+        {da:"Jeg vender tilbage", en:"I'll get back to you"},
+        {da:"Lad os tage et møde", en:"Let's have a meeting"},
+        {da:"Vi er enige om retningen", en:"We agree on the direction"},
+        {da:"Hvad er status", en:"What's the status"},
+        {da:"Det er en prioritet", en:"It's a priority"},
+        {da:"Vi er næsten i mål", en:"We're almost there"},
+        {da:"Vi mangler lige det sidste", en:"We're just missing the last bit"},
+        {da:"Det ser lovende ud", en:"It looks promising"},
+        {da:"Det er et godt spørgsmål", en:"That's a good question"},
+        {da:"Lad os holde det simpelt", en:"Let's keep it simple"},
+      ]},
+      {name:"Expressions You'll Hear Constantly", icon:"🔁", items:[
+        {da:"Det skal nok gå", en:"It'll be fine"},
+        {da:"Det tror jeg", en:"I think so"},
+        {da:"Det ved jeg ikke", en:"I don't know"},
+        {da:"Det har du ret i", en:"You're right about that"},
+        {da:"Det kan jeg godt forstå", en:"I can understand that"},
+        {da:"Det er helt fint", en:"It's totally fine"},
+        {da:"Det passer ikke", en:"That's not right"},
+        {da:"Hvad mener du", en:"What do you mean"},
+        {da:"Det er ikke sikkert", en:"It's not certain"},
+        {da:"Nu giver det mening", en:"Now it makes sense"},
+      ]},
+    ]
+  }
+};
+
+const PRAISE = ["Godt klaret!","Flot arbejde!","Fremragende!","Du lærer hurtigt!","Perfekt!","Sådan!"];
+const RETRY  = ["Prøv igen!","Ikke helt — øv videre!","Næsten!"];
+
+/* =========================================================
+   PROGRESS  (localStorage)
+========================================================= */
+const SKEY="danskMester.v1";
+const MASTER_LEVEL=4;            // Leitner box that counts as "mastered"
+const MAX_LEVEL=5;
+let P = load();
+
+function blankProgress(){
+  return {xp:0, currentStreak:0, bestStreak:0, lastActiveDate:null,
+    totalAnswered:0, totalCorrect:0, sessions:0,
+    daily:{}, items:{}, badges:[], catScore:{},
+    last:{path:null, cat:0}};
+}
+function load(){
+  try{ const r=JSON.parse(localStorage.getItem(SKEY)); if(r&&r.items) return Object.assign(blankProgress(),r);}catch(e){}
+  return blankProgress();
+}
+function save(){ try{ localStorage.setItem(SKEY,JSON.stringify(P)); }catch(e){} }
+
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function itemKey(path,da){return path+"|"+da;}
+function itemRec(path,da){
+  const k=itemKey(path,da);
+  if(!P.items[k]) P.items[k]={level:0,correct:0,wrong:0,seen:0,due:0};
+  return P.items[k];
+}
+
+function registerStreak(){
+  const t=todayStr();
+  if(P.lastActiveDate===t) return;
+  const y=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(P.lastActiveDate===y) P.currentStreak+=1;
+  else P.currentStreak=1;
+  if(P.currentStreak>P.bestStreak) P.bestStreak=P.currentStreak;
+  P.lastActiveDate=t;
+}
+
+function recordAnswer(path,item,correct,xp){
+  const r=itemRec(path,item.da);
+  r.seen++;
+  P.totalAnswered++;
+  const t=todayStr();
+  P.daily[t]=P.daily[t]||{answered:0,correct:0};
+  P.daily[t].answered++;
+  if(correct){
+    r.correct++; P.totalCorrect++; P.daily[t].correct++;
+    r.level=Math.min(MAX_LEVEL,r.level+1);
+    P.xp+=(xp||10);
+    P.daily[t].correct=P.daily[t].correct; // noop keep
+  }else{
+    r.wrong++;
+    r.level=Math.max(0,r.level-1);
+    P.xp+=2;
+  }
+  r.due=Date.now()+srInterval(r.level);
+  registerStreak();
+  save();
+}
+
+function srInterval(level){
+  const days=[0,1,2,4,7,14][Math.min(level,5)];
+  return days*86400000;
+}
+
+/* category / path mastery */
+function catItems(path,ci){return DATA[path].categories[ci].items;}
+function catMastery(path,ci){
+  const items=catItems(path,ci); if(!items.length) return 0;
+  let m=0; items.forEach(it=>{ if(itemRec(path,it.da).level>=MASTER_LEVEL) m++; });
+  return Math.round(m/items.length*100);
+}
+function catBestScore(path,ci){ return P.catScore[path+":"+ci]||0; }
+/* category progress = best of long-term mastery vs best session score */
+function catProgress(path,ci){ return Math.max(catMastery(path,ci), catBestScore(path,ci)); }
+function catUnlocked(path,ci){
+  if(ci===0) return true;
+  return catProgress(path,ci-1)>=80;
+}
+function pathMastery(path){
+  const cats=DATA[path].categories;
+  let tot=0,m=0;
+  cats.forEach((c,ci)=>{ c.items.forEach(it=>{ tot++; if(itemRec(path,it.da).level>=MASTER_LEVEL) m++; }); });
+  return tot? Math.round(m/tot*100):0;
+}
+function pathLearned(path){
+  let m=0; DATA[path].categories.forEach((c,ci)=>c.items.forEach(it=>{if(itemRec(path,it.da).level>=MASTER_LEVEL)m++;}));
+  return m;
+}
+function pathTotal(path){let t=0;DATA[path].categories.forEach(c=>t+=c.items.length);return t;}
+
+/* all items helper */
+function allItems(path){
+  const out=[]; DATA[path].categories.forEach((c,ci)=>c.items.forEach(it=>out.push({path,ci,it}))); return out;
+}
+function weakItems(path){
+  return allItems(path).map(x=>{
+    const r=itemRec(path,x.it.da);
+    const acc = r.seen? r.correct/r.seen : 1;
+    return {...x,r,acc};
+  }).filter(x=>x.r.seen>0 && (x.acc<0.7 || x.r.wrong>x.r.correct))
+    .sort((a,b)=>a.acc-b.acc);
+}
+function dueItems(path){
+  const now=Date.now();
+  return allItems(path).map(x=>({...x,r:itemRec(path,x.it.da)}))
+    .filter(x=> x.r.seen===0 || x.r.due<=now)
+    .sort((a,b)=> (a.r.seen?a.r.due:0)-(b.r.seen?b.r.due:0));
+}
+function overallAccuracy(){return P.totalAnswered? Math.round(P.totalCorrect/P.totalAnswered*100):0;}
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+const ACHS=[
+  {id:"first",  ico:"🌱", name:"First Steps", test:()=>P.totalAnswered>=1},
+  {id:"xp100",  ico:"⭐", name:"100 XP", test:()=>P.xp>=100},
+  {id:"xp500",  ico:"🌟", name:"500 XP", test:()=>P.xp>=500},
+  {id:"streak3",ico:"🔥", name:"3-Day Streak", test:()=>P.bestStreak>=3},
+  {id:"streak7",ico:"🏆", name:"7-Day Streak", test:()=>P.bestStreak>=7},
+  {id:"acc90",  ico:"🎯", name:"90% Accuracy", test:()=>P.totalAnswered>=20&&overallAccuracy()>=90},
+  {id:"verbcat",ico:"🔗", name:"Verb Novice", test:()=>catMastery('verbs',0)>=80},
+  {id:"phrcat", ico:"🗣️", name:"Phrase Novice", test:()=>catMastery('phrases',0)>=80},
+  {id:"verbmas",ico:"💎", name:"Verb Master", test:()=>pathMastery('verbs')>=100},
+  {id:"phrmas", ico:"👑", name:"Phrase Master", test:()=>pathMastery('phrases')>=100},
+  {id:"learn50",ico:"📚", name:"50 Learned", test:()=>pathLearned('verbs')+pathLearned('phrases')>=50},
+  {id:"perfect",ico:"✨", name:"Perfect Round", test:()=>P._perfect===true},
+];
+function checkAchievements(){
+  const newly=[];
+  ACHS.forEach(a=>{ if(!P.badges.includes(a.id) && a.test()){P.badges.push(a.id);newly.push(a);} });
+  if(newly.length){save(); newly.forEach((a,i)=>setTimeout(()=>toast("🎉 Badge: "+a.name),i*1200));}
+}
+
+/* =========================================================
+   UTIL / FX
+========================================================= */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){return (s+"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function burst(x,y,color){
+  const colors=color?[color]:["#33d17a","#ffcf4a","#4aa3ff","#9b7dff"];
+  for(let i=0;i<14;i++){
+    const p=document.createElement("div");p.className="particle";
+    const ang=Math.random()*Math.PI*2, dist=40+Math.random()*70;
+    p.style.cssText=`left:${x}px;top:${y}px;background:${colors[i%colors.length]};--dx:${Math.cos(ang)*dist}px;--dy:${Math.sin(ang)*dist}px`;
+    document.body.appendChild(p);p.addEventListener("animationend",()=>p.remove());
+  }
+}
+function ringSVG(pct,color){
+  color=color||"var(--accent)";
+  const r=62,c=2*Math.PI*r,off=c*(1-pct/100);
+  return `<svg class="ring" viewBox="0 0 150 150">
+    <circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--line)" stroke-width="14"/>
+    <circle cx="75" cy="75" r="${r}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 75 75)"/>
+    <text x="75" y="82" text-anchor="middle" font-size="34" font-weight="900" fill="var(--text)">${pct}%</text>
+  </svg>`;
+}
+function bar(pct){return `<div class="bar"><span style="width:${pct}%"></span></div>`;}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+let route={name:"home"};
+function go(name,opts={}){route={name,...opts};render();}
+
+function topbar(){
+  return `<div class="topbar">
+    <div class="brand"><span class="flag"></span> Dansk Mester</div>
+    <div class="spacer"></div>
+    <div class="stat-chip xp"><span class="ico">⭐</span>${P.xp}</div>
+    <div class="stat-chip streak"><span class="ico">🔥</span>${P.currentStreak}</div>
+  </div>`;
+}
+function bottomnav(active){
+  const b=(n,ico,lbl)=>`<button class="navbtn ${active===n?'active':''}" onclick="go('${n}')"><span class="nico">${ico}</span>${lbl}</button>`;
+  return `<div class="bottomnav">${b('home','🏠','Home')}${b('stats','📊','Stats')}${b('badges','🏅','Badges')}</div>`;
+}
+
+function render(){
+  let html="";
+  if(route.name==="home")        html=screenHome();
+  else if(route.name==="path")   html=screenPath(route.path);
+  else if(route.name==="modes")  html=screenModes(route.path,route.ci,route.scope);
+  else if(route.name==="stats")  html=screenStats();
+  else if(route.name==="badges") html=screenBadges();
+  else if(route.name==="quiz")   html=`<div id="gamewrap"></div>`;
+  app.innerHTML = topbar()+`<div class="screen">${html}</div>`+ (["home","stats","badges"].includes(route.name)?bottomnav(route.name):"");
+  if(route.name==="quiz") startGame(route.cfg);
+  checkAchievements();
+}
+
+/* =========================================================
+   HOME
+========================================================= */
+function screenHome(){
+  const pc=(key)=>{
+    const d=DATA[key], m=pathMastery(key), learned=pathLearned(key), tot=pathTotal(key);
+    return `<div class="path-card ${key}" onclick="go('path',{path:'${key}'})">
+      <div class="glow"></div>
+      <div class="pico">${d.icon}</div>
+      <h3>${d.label}</h3>
+      <p>${d.blurb} • ${tot} items</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
+        ${bar(m)}<span class="pct">${m}%</span>
+      </div>
+      <p style="margin-top:8px;font-size:.82rem">${learned}/${tot} mastered</p>
+    </div>`;
+  };
+  let cont="";
+  if(P.last.path!=null){
+    const d=DATA[P.last.path], c=d.categories[P.last.cat];
+    cont=`<div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="font-size:2rem">⏯️</div>
+      <div style="flex:1;min-width:140px">
+        <div style="font-weight:900">Continue where you left off</div>
+        <div class="muted" style="font-size:.9rem">${d.label} — ${c?c.name:''}</div>
+      </div>
+      <button class="btn small" onclick="go('modes',{path:'${P.last.path}',ci:${P.last.cat}})">Continue ▸</button>
+    </div>`;
+  }
+  return `<div class="h1">Hej! 👋 Ready to learn Danish?</div>
+    <p class="sub">Master verb combinations & native phrases. Choose a path to begin.</p>
+    ${cont}
+    <div class="path-grid">${pc('verbs')}${pc('phrases')}</div>
+    <div class="section-title">🔥 Quick practice</div>
+    <div class="btn-row">
+      <button class="btn secondary small" onclick="quickMixed()">🎲 Mixed Review (everything)</button>
+      <button class="btn secondary small" onclick="quickWeak()">🩹 Weak Words</button>
+    </div>`;
+}
+function quickMixed(){
+  const pool=shuffle(allItems('verbs').concat(allItems('phrases'))).slice(0,15);
+  go('quiz',{cfg:{mode:'mc',pool,title:'Mixed Review',ret:{name:'home'}}});
+}
+function quickWeak(){
+  let pool=weakItems('verbs').concat(weakItems('phrases'));
+  if(pool.length<4){toast("Practice more first to find weak words!");return;}
+  go('quiz',{cfg:{mode:'mc',pool:pool.slice(0,15),title:'Weak Words',ret:{name:'home'}}});
+}
+
+/* =========================================================
+   PATH -> categories
+========================================================= */
+function screenPath(path){
+  const d=DATA[path];
+  let cats=d.categories.map((c,ci)=>{
+    const unlocked=catUnlocked(path,ci), m=catProgress(path,ci), done=m>=80;
+    return `<div class="cat ${unlocked?'':'locked'}" onclick="${unlocked?`go('modes',{path:'${path}',ci:${ci}})`:`toast('🔒 Reach 80% in the previous category to unlock')`}">
+      <div class="num">${unlocked?(ci+1):'🔒'}</div>
+      <div class="cbody">
+        <div class="cname">${c.icon} ${c.name} ${done?'<span class="badge-done">DONE</span>':''}</div>
+        <div class="cmeta">${c.items.length} items ${bar(m)} <span class="pct">${m}%</span></div>
+      </div>
+      <div class="chev">›</div>
+    </div>`;
+  }).join("");
+  return `<div class="back" onclick="go('home')">‹ Back</div>
+    <div class="h1">${d.icon} ${d.label}</div>
+    <p class="sub">Overall mastery ${pathMastery(path)}% — unlock categories by reaching 80%.</p>
+    <div class="btn-row" style="margin-bottom:16px">
+      <button class="btn small" onclick="go('modes',{path:'${path}',ci:0})">▶ Start from Category 1</button>
+      <button class="btn secondary small" onclick="go('quiz',{cfg:{mode:'mc',pool:shuffle(allItems('${path}')).slice(0,15),title:'${d.label} — Mixed',ret:{name:'path',path:'${path}'}}})">🎲 Mixed Review</button>
+    </div>
+    ${cats}`;
+}
+
+/* =========================================================
+   MODES for a category
+========================================================= */
+function screenModes(path,ci){
+  P.last={path,cat:ci}; save();
+  const d=DATA[path], c=d.categories[ci];
+  const modes=[
+    {id:"mc",   ico:"✅", name:"Multiple Choice", desc:"Pick the right meaning"},
+    {id:"flash",ico:"🃏", name:"Flash Cards", desc:"Flip & self-check"},
+    {id:"match",ico:"🧲", name:"Match Pairs", desc:"Connect DA ↔ EN"},
+    {id:"timed",ico:"⏱️", name:"Timed Challenge", desc:"Beat the clock"},
+    {id:"mixed",ico:"🎲", name:"Mixed Review", desc:"Whole path mixed"},
+    {id:"sr",   ico:"🧠", name:"Spaced Repetition", desc:"Review what's due"},
+    {id:"weak", ico:"🩹", name:"Weak Words", desc:"Fix your trouble spots"},
+  ];
+  const cells=modes.map(m=>`<div class="mode" onclick="launchMode('${path}',${ci},'${m.id}')">
+      <div class="mico">${m.ico}</div><div class="mname">${m.name}</div><div class="mdesc">${m.desc}</div>
+    </div>`).join("");
+  return `<div class="back" onclick="go('path',{path:'${path}'})">‹ ${d.label}</div>
+    <div class="h1">${c.icon} ${c.name}</div>
+    <p class="sub">${c.items.length} items • progress ${catProgress(path,ci)}% • choose a game mode</p>
+    <div class="mode-grid">${cells}</div>`;
+}
+
+function launchMode(path,ci,mode){
+  const d=DATA[path], c=d.categories[ci];
+  const ret={name:'modes',path,ci};
+  const catPool=c.items.map(it=>({path,ci,it}));
+  if(mode==='mc'||mode==='timed'){
+    go('quiz',{cfg:{mode:(mode==='timed'?'timed':'mc'),pool:shuffle(catPool),title:c.name,path,ci,ret}});
+  }else if(mode==='flash'){
+    go('quiz',{cfg:{mode:'flash',pool:shuffle(catPool),title:c.name,path,ci,ret}});
+  }else if(mode==='match'){
+    go('quiz',{cfg:{mode:'match',pool:shuffle(catPool),title:c.name,path,ci,ret}});
+  }else if(mode==='mixed'){
+    go('quiz',{cfg:{mode:'mc',pool:shuffle(allItems(path)).slice(0,15),title:d.label+' — Mixed',path,ci,ret}});
+  }else if(mode==='sr'){
+    let pool=dueItems(path); if(pool.length<1)pool=shuffle(allItems(path));
+    go('quiz',{cfg:{mode:'mc',pool:pool.slice(0,15),title:'Spaced Repetition',path,ci,ret,sr:true}});
+  }else if(mode==='weak'){
+    let pool=weakItems(path); if(pool.length<4){toast("Not enough weak words yet — keep practicing!");return;}
+    go('quiz',{cfg:{mode:'mc',pool:pool.slice(0,15),title:'Weak Words',path,ci,ret}});
+  }
+}
+
+/* =========================================================
+   GAME ENGINE
+========================================================= */
+let G=null;
+function startGame(cfg){
+  G={cfg,idx:0,correct:0,total:0,results:[]};
+  if(cfg.mode==='match'){renderMatch();return;}
+  if(cfg.mode==='flash'){renderFlash();return;}
+  nextQuestion();
+}
+function gameHead(extra){
+  const total=G.cfg.mode==='match'?G.cfg.pool.length:Math.min(G.cfg.pool.length, G.cfg.mode==='flash'?G.cfg.pool.length:G.cfg.pool.length);
+  const prog=Math.round(G.idx/ (G.cfg.pool.length||1) *100);
+  return `<div class="back" onclick="quitGame()">‹ Quit</div>
+    <div class="quiz-head">
+      ${bar(prog)}
+      ${extra||''}
+    </div>`;
+}
+function quitGame(){ if(G&&G.timer)clearInterval(G.timer); go(G.cfg.ret.name,G.cfg.ret); }
+
+/* ---- Multiple Choice / Timed ---- */
+function nextQuestion(){
+  const cfg=G.cfg;
+  if(G.idx>=cfg.pool.length){return finishGame();}
+  const q=cfg.pool[G.idx];
+  const ask = Math.random()<0.5 ? 'da2en':'en2da';
+  const promptText = ask==='da2en'? q.it.da : q.it.en;
+  const answer     = ask==='da2en'? q.it.en : q.it.da;
+  // distractors from same path
+  const others=allItems(q.path).filter(x=>x.it.da!==q.it.da);
+  const picks=shuffle(others).slice(0,3).map(x=> ask==='da2en'? x.it.en : x.it.da);
+  const opts=shuffle([answer,...picks]);
+  G._answer=answer; G._q=q; G._answered=false;
+
+  let timerHtml = cfg.mode==='timed'? `<div class="timer-pill" id="tpill">⏱️ ${G._time||10}</div>`:'';
+  const wrap=$("#gamewrap");
+  wrap.innerHTML = gameHead(`<span class="muted" style="font-weight:800">${G.idx+1}/${cfg.pool.length}</span>${timerHtml}`)+
+    `<div class="prompt">
+      <div class="lbl">${cfg.title}</div>
+      <div class="word">${esc(promptText)}</div>
+      <div class="dir-tag">${ask==='da2en'?'🇩🇰 Danish → 🇬🇧 English':'🇬🇧 English → 🇩🇰 Danish'}</div>
+    </div>
+    <div class="options" id="opts">
+      ${opts.map(o=>`<button class="opt" onclick="answerMC(this,'${esc(o).replace(/'/g,"\\'")}')">${esc(o)}</button>`).join("")}
+    </div>
+    <div class="feedback" id="fb"></div>`;
+
+  if(cfg.mode==='timed'){
+    G._time=10; updateTimer();
+    G.timer=setInterval(()=>{
+      G._time--; updateTimer();
+      if(G._time<=0){clearInterval(G.timer); if(!G._answered) timeoutMC();}
+    },1000);
+  }
+}
+function updateTimer(){const p=$("#tpill"); if(p){p.textContent="⏱️ "+G._time; p.classList.toggle("low",G._time<=3);}}
+function timeoutMC(){
+  G._answered=true;
+  document.querySelectorAll("#opts .opt").forEach(b=>{b.disabled=true; if(b.textContent===G._answer)b.classList.add("correct");});
+  finishAnswer(false,"⏰ Time's up!");
+}
+function answerMC(btn,chosen){
+  if(G._answered) return;
+  G._answered=true;
+  if(G.cfg.mode==='timed'&&G.timer)clearInterval(G.timer);
+  const correct = chosen===G._answer;
+  document.querySelectorAll("#opts .opt").forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===G._answer)b.classList.add("correct");
+    else if(b===btn)b.classList.add("wrong");
+  });
+  if(correct){const r=btn.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);}
+  finishAnswer(correct);
+}
+function finishAnswer(correct,msg){
+  const cfg=G.cfg;
+  G.total++; if(correct)G.correct++;
+  const xp = cfg.mode==='timed'? 8+Math.max(0,(G._time||0)) : 10;
+  recordAnswer(G._q.path,G._q.it,correct,xp);
+  G.results.push({it:G._q.it,path:G._q.path,correct});
+  const fb=$("#fb");
+  fb.className="feedback "+(correct?"good":"bad");
+  fb.textContent = msg|| (correct? PRAISE[Math.floor(Math.random()*PRAISE.length)] : `${RETRY[Math.floor(Math.random()*RETRY.length)]} → ${G._answer}`);
+  G.idx++;
+  setTimeout(()=>nextQuestion(), correct?750:1500);
+}
+
+/* ---- Flash Cards ---- */
+function renderFlash(){
+  const cfg=G.cfg;
+  if(G.idx>=cfg.pool.length)return finishGame();
+  const q=cfg.pool[G.idx];
+  G._q=q; G._flipped=false;
+  const wrap=$("#gamewrap");
+  wrap.innerHTML=gameHead(`<span class="muted" style="font-weight:800">${G.idx+1}/${cfg.pool.length}</span>`)+
+    `<div class="prompt" style="padding:14px"><div class="lbl">${cfg.title} • tap card to flip</div></div>
+     <div class="flash-wrap"><div class="flash" id="flash" onclick="flipCard()">
+        <div class="face front"><div class="lbl">🇩🇰 Danish</div><div class="ftext">${esc(q.it.da)}</div><div class="hint">tap to reveal</div></div>
+        <div class="face back"><div class="lbl">🇬🇧 English</div><div class="ftext">${esc(q.it.en)}</div><div class="hint">did you know it?</div></div>
+     </div></div>
+     <div class="btn-row" style="justify-content:center" id="flashbtns" style="opacity:.4">
+       <button class="btn secondary" onclick="gradeFlash(false)">😕 Still learning</button>
+       <button class="btn" onclick="gradeFlash(true)">😎 I knew it</button>
+     </div>`;
+}
+function flipCard(){G._flipped=!G._flipped;$("#flash").classList.toggle("flipped",G._flipped);}
+function gradeFlash(known){
+  recordAnswer(G._q.path,G._q.it,known,known?10:3);
+  G.total++; if(known)G.correct++;
+  G.results.push({it:G._q.it,path:G._q.path,correct:known});
+  if(known){const el=$("#flash").getBoundingClientRect();burst(el.left+el.width/2,el.top+el.height/2);}
+  G.idx++; renderFlash();
+}
+
+/* ---- Match Pairs ---- */
+function renderMatch(){
+  const cfg=G.cfg;
+  if(G.idx>=cfg.pool.length) return finishMatch();
+  const round=cfg.pool.slice(G.idx, G.idx+6);
+  G._matchTotal=round.length; G._matched=0; G._sel=null;
+  const left=shuffle(round.map(x=>({txt:x.it.da,key:x.it.da,x})));
+  const right=shuffle(round.map(x=>({txt:x.it.en,key:x.it.da,x})));
+  const cell=(item,side)=>`<button class="match-cell" data-key="${esc(item.key)}" data-side="${side}" onclick="pickMatch(this)">${esc(item.txt)}</button>`;
+  const wrap=$("#gamewrap");
+  wrap.innerHTML=`<div class="back" onclick="quitGame()">‹ Quit</div>
+    <div class="h1" style="font-size:1.3rem">🧲 Match Pairs</div>
+    <p class="sub">${cfg.title} — tap a Danish word, then its English match.</p>
+    <div class="match-grid">
+      <div>${left.map(i=>cell(i,'da')).join("")}</div>
+      <div>${right.map(i=>cell(i,'en')).join("")}</div>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+}
+function pickMatch(btn){
+  if(btn.classList.contains("gone"))return;
+  if(!G._sel){ G._sel=btn; btn.classList.add("sel"); return; }
+  if(btn===G._sel){ btn.classList.remove("sel"); G._sel=null; return; }
+  const a=G._sel, b=btn;
+  if(a.dataset.side===b.dataset.side){ // same column, switch selection
+    a.classList.remove("sel"); G._sel=b; b.classList.add("sel"); return;
+  }
+  const match = a.dataset.key===b.dataset.key;
+  const item = G.cfg.pool.find(x=>x.it.da===a.dataset.key);
+  if(match){
+    [a,b].forEach(el=>{el.classList.remove("sel");el.classList.add("gone");});
+    const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);
+    recordAnswer(item.path,item.it,true,10);
+    G._matched++; G._sel=null;
+    if(G._matched>=G._matchTotal){
+      const fb=$("#fb");fb.className="feedback good";fb.textContent="Fremragende! Alle par fundet! 🎉";
+      setTimeout(()=>{ // advance to next round or finish
+        G.idx+=6;
+        if(G.idx<G.cfg.pool.length) renderMatch();
+        else { finishMatch(); }
+      },1100);
+    }
+  }else{
+    a.classList.add("miss");b.classList.add("miss");
+    const itemB=G.cfg.pool.find(x=>x.it.da===b.dataset.key);
+    recordAnswer(item.path,item.it,false,0);
+    setTimeout(()=>{a.classList.remove("miss","sel");b.classList.remove("miss");},400);
+    G._sel=null;
+  }
+}
+function finishMatch(){
+  const acc=overallAccuracy();
+  $("#gamewrap").innerHTML=`<div class="card result">
+    <div class="big">🧲✨</div>
+    <h2 style="margin:0 0 6px">All pairs matched!</h2>
+    <p class="muted">Great memory work in “${esc(G.cfg.title)}”.</p>
+    <div class="btn-row" style="justify-content:center;margin-top:18px">
+      <button class="btn" onclick="go('${G.cfg.ret.name}',${JSON.stringify(G.cfg.ret).replace(/"/g,"'")})">Continue ▸</button>
+    </div></div>`;
+  checkAchievements();
+}
+
+/* ---- finish quiz (mc/timed/flash) ---- */
+function finishGame(){
+  if(G.timer)clearInterval(G.timer);
+  P.sessions++;
+  const pct = G.total? Math.round(G.correct/G.total*100):0;
+  P._perfect = (G.total>=5 && pct===100);
+  // record best session score for this category (drives unlocking)
+  if(G.cfg.path!=null && G.cfg.ci!=null && !G.cfg.title.includes('Mixed') && G.cfg.title!=='Weak Words' && G.cfg.title!=='Spaced Repetition'){
+    const ck=G.cfg.path+":"+G.cfg.ci;
+    P.catScore[ck]=Math.max(P.catScore[ck]||0, pct);
+  }
+  save(); checkAchievements();
+  // did we just unlock the next category?
+  let nextUnlocked=false, nextName="";
+  if(G.cfg.path!=null && G.cfg.ci!=null){
+    const ni=G.cfg.ci+1, cats=DATA[G.cfg.path].categories;
+    if(ni<cats.length && catUnlocked(G.cfg.path,ni)){nextUnlocked=true;nextName=cats[ni].name;}
+  }
+  const color = pct>=80?"var(--accent)": pct>=50?"var(--gold)":"var(--red)";
+  const headline = pct>=90?"Fremragende! 🌟": pct>=80?"Flot arbejde! 🎉": pct>=50?"Godt forsøg! 👍":"Bliv ved — du lærer! 💪";
+  const xpEarned = G.results.reduce((s,r)=>s+(r.correct?10:2),0);
+  const wrap=$("#gamewrap");
+  wrap.innerHTML=`<div class="card result">
+    ${ringSVG(pct,color)}
+    <h2 style="margin:2px 0 4px">${headline}</h2>
+    <p class="muted">${esc(G.cfg.title)}</p>
+    <div style="max-width:340px;margin:16px auto 0;text-align:left">
+      <div class="kv"><span class="k">Correct</span><span class="v">${G.correct}/${G.total}</span></div>
+      <div class="kv"><span class="k">Accuracy</span><span class="v">${pct}%</span></div>
+      <div class="kv"><span class="k">XP earned</span><span class="v" style="color:var(--gold)">+${xpEarned}</span></div>
+      <div class="kv"><span class="k">Current streak</span><span class="v" style="color:#ff8f5e">🔥 ${P.currentStreak}</span></div>
+    </div>
+    ${nextUnlocked?`<div style="margin-top:16px;background:rgba(51,209,122,.12);border:1px solid var(--accent);border-radius:14px;padding:12px;font-weight:800">🔓 Unlocked: ${esc(nextName)}!</div>`:''}
+    <div class="btn-row" style="justify-content:center;margin-top:18px">
+      <button class="btn" onclick="retryGame()">↻ Play again</button>
+      <button class="btn secondary" onclick="go('${G.cfg.ret.name}',${JSON.stringify(G.cfg.ret).replace(/"/g,"'")})">Continue ▸</button>
+    </div>
+  </div>`;
+  if(pct>=80){setTimeout(()=>burst(innerWidth/2,180),200);setTimeout(()=>burst(innerWidth/2,180),500);}
+}
+function retryGame(){ const cfg=G.cfg; cfg.pool=shuffle(cfg.pool); go('quiz',{cfg}); }
+
+/* =========================================================
+   STATS
+========================================================= */
+function screenStats(){
+  const acc=overallAccuracy();
+  const learned=pathLearned('verbs')+pathLearned('phrases');
+  const totItems=pathTotal('verbs')+pathTotal('phrases');
+  let catsDone=0,catsTot=0;
+  ['verbs','phrases'].forEach(p=>DATA[p].categories.forEach((c,ci)=>{catsTot++;if(catProgress(p,ci)>=80)catsDone++;}));
+
+  // weakest & strongest
+  const seen=allItems('verbs').concat(allItems('phrases'))
+    .map(x=>{const r=itemRec(x.path,x.it.da);return {...x,r,acc:r.seen?r.correct/r.seen:null};})
+    .filter(x=>x.r.seen>0);
+  const weakest=seen.slice().sort((a,b)=>a.acc-b.acc).slice(0,5);
+  const strongest=seen.slice().sort((a,b)=>b.acc-a.acc||b.r.seen-a.r.seen).slice(0,5);
+
+  // daily spark (last 7 days)
+  const days=[];for(let i=6;i>=0;i--){const d=new Date(Date.now()-i*86400000);days.push(d);}
+  const maxd=Math.max(1,...days.map(d=>{const k=d.toISOString().slice(0,10);return P.daily[k]?P.daily[k].answered:0;}));
+  const spark=days.map(d=>{
+    const k=d.toISOString().slice(0,10);const v=P.daily[k]?P.daily[k].answered:0;
+    const h=Math.round(v/maxd*72);
+    return `<div class="col"><div class="colbar" style="height:${h}px" title="${v} answers"></div><div class="colday">${["S","M","T","W","T","F","S"][d.getDay()]}</div></div>`;
+  }).join("");
+
+  const li=(x)=>{
+    const a=Math.round(x.acc*100);
+    return `<div class="list-item"><div><div class="da">${esc(x.it.da)}</div><div class="en">${esc(x.it.en)}</div></div>
+      <span class="acc-tag ${a>=70?'acc-good':'acc-bad'}">${a}%</span></div>`;
+  };
+  return `<div class="h1">📊 Your Statistics</div>
+    <p class="sub">${P.sessions} sessions played</p>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num" style="color:var(--accent)">${learned}</div><div class="lbl">Total learned</div></div>
+      <div class="stat-box"><div class="num" style="color:var(--blue)">${acc}%</div><div class="lbl">Accuracy</div></div>
+      <div class="stat-box"><div class="num" style="color:#ff8f5e">🔥 ${P.bestStreak}</div><div class="lbl">Best streak</div></div>
+      <div class="stat-box"><div class="num" style="color:var(--gold)">${P.xp}</div><div class="lbl">Total XP</div></div>
+      <div class="stat-box"><div class="num">${catsDone}/${catsTot}</div><div class="lbl">Categories done</div></div>
+      <div class="stat-box"><div class="num">${Math.round(learned/totItems*100)}%</div><div class="lbl">Overall mastery</div></div>
+    </div>
+    <div class="section-title">📅 Daily progress (answers / day)</div>
+    <div class="card"><div class="spark">${spark}</div></div>
+    <div class="section-title">🩹 Weakest phrases</div>
+    <div class="card">${weakest.length?weakest.map(li).join(""):'<p class="muted center" style="margin:6px">Play a few rounds to see your weak spots.</p>'}</div>
+    <div class="section-title">💪 Strongest phrases</div>
+    <div class="card">${strongest.length?strongest.map(li).join(""):'<p class="muted center" style="margin:6px">No data yet — start practicing!</p>'}</div>
+    <div class="section-title">⚙️ Data</div>
+    <button class="btn ghost small" onclick="resetAll()">Reset all progress</button>`;
+}
+function resetAll(){ if(confirm("Reset ALL progress, XP and streaks?")){P=blankProgress();save();toast("Progress reset");go('home');} }
+
+/* =========================================================
+   BADGES
+========================================================= */
+function screenBadges(){
+  const cells=ACHS.map(a=>{const un=P.badges.includes(a.id);
+    return `<div class="ach ${un?'un':''}"><div class="aico">${a.ico}</div><div class="aname">${a.name}</div></div>`;}).join("");
+  const got=P.badges.length;
+  return `<div class="h1">🏅 Achievements</div>
+    <p class="sub">${got}/${ACHS.length} badges earned</p>
+    <div class="card" style="margin-bottom:18px">${bar(Math.round(got/ACHS.length*100))}</div>
+    <div class="badge-grid">${cells}</div>`;
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+render();
+</script>
+</body>
+</html>

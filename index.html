@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Danish Learning Games</title>
+<meta name="description" content="A collection of interactive games for learning Danish — vocabulary, grammar, phrases, verbs, prepositions and more." />
+<style>
+  /* =========================================================================
+     THEME — edit these CSS variables to recolor the whole dashboard
+     ========================================================================= */
+  :root {
+    --bg:            #dceeff;
+    --bg-soft:       #c9e4ff;
+    --surface:       #ffffff;
+    --surface-2:     #f9fafc;
+    --border:        #e6e8ef;
+    --text:          #1e2330;
+    --text-soft:     #5b6173;
+    --text-faint:    #8b91a3;
+
+    --brand:         #58cc02;   /* Duolingo-style green */
+    --brand-dark:    #46a302;
+    --brand-soft:    #e8f8d8;
+    --accent:        #1cb0f6;   /* friendly blue */
+    --accent-soft:   #e3f4fe;
+    --dk-red:        #c8102e;   /* Danish flag red */
+
+    --shadow-sm: 0 1px 2px rgba(20,25,40,.06), 0 1px 3px rgba(20,25,40,.05);
+    --shadow-md: 0 6px 16px rgba(20,25,40,.08), 0 2px 6px rgba(20,25,40,.05);
+    --shadow-lg: 0 16px 40px rgba(20,25,40,.14);
+
+    --radius:   18px;
+    --radius-sm:12px;
+    --maxw:     1180px;
+    --font: 'Nunito', 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* Dark mode — applied when <html data-theme="dark"> (toggle) or by OS preference */
+  :root[data-theme="dark"] {
+    --bg:            #0f1320;
+    --bg-soft:       #141a2b;
+    --surface:       #1a2030;
+    --surface-2:     #20283b;
+    --border:        #2a3348;
+    --text:          #eef1f7;
+    --text-soft:     #aab2c5;
+    --text-faint:    #7b859b;
+    --brand-soft:    #1f3315;
+    --accent-soft:   #102a3a;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-md: 0 6px 18px rgba(0,0,0,.45);
+    --shadow-lg: 0 18px 44px rgba(0,0,0,.55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0f1320; --bg-soft:#141a2b; --surface:#1a2030; --surface-2:#20283b;
+      --border:#2a3348; --text:#eef1f7; --text-soft:#aab2c5; --text-faint:#7b859b;
+      --brand-soft:#1f3315; --accent-soft:#102a3a;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 6px 18px rgba(0,0,0,.45); --shadow-lg:0 18px 44px rgba(0,0,0,.55);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    transition: background .25s ease, color .25s ease;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Header ---------- */
+  header.site {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: saturate(1.2);
+  }
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 1.25rem; }
+  .logo .flag {
+    position: relative; overflow: hidden;
+    width: 40px; height: 40px; border-radius: 14px; flex: none;
+    background: var(--dk-red);
+    box-shadow: var(--shadow-sm);
+  }
+  .logo .flag::before { content: ""; position: absolute; top: 0; left: 15px; width: 9px; height: 100%; background: #fff; }
+  .logo .flag::after  { content: ""; position: absolute; left: 0; top: 15px; width: 100%; height: 9px; background: #fff; }
+  .logo small { display:block; font-weight:700; font-size:.72rem; color: var(--text-faint); letter-spacing:.04em; text-transform:uppercase; }
+  .spacer { flex: 1; }
+  .theme-btn {
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+    width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.1rem;
+    display: grid; place-items: center; transition: transform .15s ease, background .2s ease;
+  }
+  .theme-btn:hover { transform: translateY(-1px); background: var(--bg-soft); }
+
+  /* ---------- Hero / intro — pixel-art SMB1-style sky banner ---------- */
+  .hero {
+    --p: 9px; /* one pixel-art unit; resize the whole scene by changing this */
+    position: relative; overflow: hidden;
+    margin: 20px 0 8px; padding: 38px 20px;
+    border-radius: var(--radius); min-height: 150px;
+    display: flex; align-items: center; justify-content: center;
+    background: #5c94fc; box-shadow: var(--shadow-md);
+  }
+  .hero h1 {
+    position: relative; z-index: 1; text-align: center;
+    font-size: clamp(1.5rem, 3.5vw, 2.1rem); line-height: 1.1; margin: 0; font-weight: 900; letter-spacing: -.01em;
+    color: #fff;
+    text-shadow: 2px 2px 0 #1e2330, -2px 2px 0 #1e2330, 2px -2px 0 #1e2330, -2px -2px 0 #1e2330, 0 4px 0 rgba(0,0,0,.25);
+  }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+
+  .cloud {
+    position: absolute; width: var(--p); height: var(--p); background: #fff; transform-origin: top left;
+    box-shadow:
+      var(--p) 0 #fff, calc(2*var(--p)) 0 #fff,
+      calc(-1*var(--p)) var(--p) #fff, 0 var(--p) #fff, var(--p) var(--p) #fff, calc(2*var(--p)) var(--p) #fff, calc(3*var(--p)) var(--p) #fff,
+      calc(-2*var(--p)) calc(2*var(--p)) #fff, calc(-1*var(--p)) calc(2*var(--p)) #fff, 0 calc(2*var(--p)) #fff, var(--p) calc(2*var(--p)) #fff, calc(2*var(--p)) calc(2*var(--p)) #fff, calc(3*var(--p)) calc(2*var(--p)) #fff, calc(4*var(--p)) calc(2*var(--p)) #fff;
+  }
+  .cloud-1 { top: 16px; left: 8%; }
+  .cloud-2 { top: 30px; left: 62%; transform: scale(.8); opacity: .9; }
+
+  .hill {
+    position: absolute; bottom: 16px; width: var(--p); height: var(--p); background: #4aa342; transform-origin: bottom left;
+    box-shadow:
+      var(--p) 0 #4aa342, calc(2*var(--p)) 0 #4aa342, calc(3*var(--p)) 0 #4aa342, calc(4*var(--p)) 0 #4aa342, calc(5*var(--p)) 0 #4aa342, calc(6*var(--p)) 0 #4aa342, calc(7*var(--p)) 0 #4aa342,
+      var(--p) calc(-1*var(--p)) #4aa342, calc(2*var(--p)) calc(-1*var(--p)) #4aa342, calc(3*var(--p)) calc(-1*var(--p)) #4aa342, calc(4*var(--p)) calc(-1*var(--p)) #4aa342, calc(5*var(--p)) calc(-1*var(--p)) #4aa342, calc(6*var(--p)) calc(-1*var(--p)) #4aa342,
+      calc(2*var(--p)) calc(-2*var(--p)) #4aa342, calc(3*var(--p)) calc(-2*var(--p)) #4aa342, calc(4*var(--p)) calc(-2*var(--p)) #4aa342, calc(5*var(--p)) calc(-2*var(--p)) #4aa342,
+      calc(3*var(--p)) calc(-3*var(--p)) #4aa342, calc(4*var(--p)) calc(-3*var(--p)) #4aa342;
+  }
+  .hill-1 { left: 4%; }
+  .hill-2 { left: 70%; transform: scale(1.15); opacity: .9; }
+
+  .ground {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 16px;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 2px, transparent 2px var(--p)),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 8px),
+      #c2710f;
+  }
+
+  .flagpole { position: absolute; bottom: 16px; left: 88%; width: 3px; height: calc(8*var(--p)); background: #e4e8ee; }
+  .flag { position: absolute; top: 0; left: 3px; width: calc(3*var(--p)); height: calc(2*var(--p)); background: #c8102e; }
+  .flag::before { content: ""; position: absolute; top: 0; left: calc(.9*var(--p)); width: calc(.6*var(--p)); height: 100%; background: #fff; }
+  .flag::after  { content: ""; position: absolute; left: 0; top: calc(.7*var(--p)); width: 100%; height: calc(.6*var(--p)); background: #fff; }
+
+  /* ---------- Controls (search + filters) ---------- */
+  .controls { margin: 30px 0 8px; display: flex; flex-direction: column; gap: 16px; }
+  .search {
+    display: flex; align-items: center; gap: 10px; background: var(--surface);
+    border: 2px solid var(--border); border-radius: 14px; padding: 4px 14px; box-shadow: var(--shadow-sm);
+    transition: border-color .2s ease, box-shadow .2s ease; max-width: 460px;
+  }
+  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .search input { border: none; outline: none; background: transparent; color: var(--text); font: inherit; font-size: 1rem; padding: 11px 0; width: 100%; }
+  .search .ico { color: var(--text-faint); font-size: 1.05rem; }
+
+  /* ---------- Section heading ---------- */
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin: 34px 0 16px; }
+  .section-head h2 { font-size: 1.25rem; font-weight: 900; margin: 0; }
+  .section-head .count { color: var(--text-faint); font-weight: 700; font-size: .9rem; }
+
+  /* ---------- Cards grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .card {
+    position: relative; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; gap: 12px; cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    text-decoration: none; color: inherit; overflow: hidden;
+  }
+  .card::before { content:""; position:absolute; inset:0 0 auto 0; height:4px; background: linear-gradient(90deg, var(--brand), var(--accent)); opacity:.0; transition: opacity .18s ease; }
+  .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: transparent; }
+  .card:hover::before { opacity: 1; }
+  .card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .card .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card .emoji { font-size: 1.9rem; line-height: 1; }
+  .badges { display: flex; gap: 7px; flex-wrap: wrap; }
+  .badge { font-size: .72rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; letter-spacing: .02em; }
+  .badge.type  { background: var(--accent-soft); color: var(--accent); }
+  .badge.level { background: var(--brand-soft); color: var(--brand-dark); }
+  :root[data-theme="dark"] .badge.level { color: #9fe06a; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .badge.level { color:#9fe06a; } }
+
+  .card h3 { font-size: 1.16rem; font-weight: 900; margin: 2px 0 0; letter-spacing: -.01em; }
+  .card p.desc { color: var(--text-soft); font-size: .94rem; margin: 0; flex: 1; }
+  .card .open {
+    margin-top: 6px; align-self: flex-start; background: var(--brand); color: #fff; font: inherit; font-weight: 800;
+    border: none; border-radius: 12px; padding: 11px 20px; font-size: .95rem; cursor: pointer;
+    box-shadow: 0 4px 0 var(--brand-dark); transition: transform .12s ease, box-shadow .12s ease; text-decoration: none;
+  }
+  .card:hover .open { transform: translateY(-1px); box-shadow: 0 5px 0 var(--brand-dark); }
+  .card .open:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--brand-dark); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-soft); }
+  .empty .big { font-size: 2.4rem; margin-bottom: 8px; }
+
+  footer.site { margin: 56px 0 40px; color: var(--text-faint); font-size: .88rem; text-align: center; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 720px) {
+    .hero { padding: 28px 16px; min-height: 120px; }
+    .cloud-2, .hill-2, .flagpole { display: none; }
+  }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="site">
+    <div class="wrap topbar">
+      <div class="logo">
+        <span class="flag" aria-hidden="true"></span>
+        <span>Danish Learning Games<small>Interactive practice collection</small></span>
+      </div>
+      <span class="spacer"></span>
+      <button class="theme-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero">
+      <div class="hero-bg" aria-hidden="true">
+        <span class="cloud cloud-1"></span>
+        <span class="cloud cloud-2"></span>
+        <span class="hill hill-1"></span>
+        <span class="hill hill-2"></span>
+        <span class="ground"></span>
+        <span class="flagpole"><span class="flag"></span></span>
+      </div>
+      <h1>Learn Danish by playing</h1>
+    </section>
+
+    <!-- Search -->
+    <section class="controls">
+      <label class="search">
+        <span class="ico">🔍</span>
+        <input id="search" type="search" placeholder="Search games by title or description…" autocomplete="off" aria-label="Search games" />
+      </label>
+    </section>
+
+    <!-- Games -->
+    <section>
+      <div class="section-head"><h2>Games</h2><span class="count" id="allCount"></span></div>
+      <div class="grid" id="games"></div>
+      <div class="empty" id="empty" hidden>
+        <div class="big">🔎</div>
+        <p>No games match your search. Try a different word.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <p>Danish Learning Games</p>
+    </div>
+  </footer>
+
+<script>
+/* ===========================================================================
+   1) GAME DATA  —  👉 EDIT THIS ARRAY TO ADD / CHANGE GAMES
+   ---------------------------------------------------------------------------
+   Each game is one object:
+     {
+       title:       "Game name shown on the card",
+       description: "One short sentence describing the game.",
+       category:    "Vocabulary" | "Grammar" | "Phrases" | "Verbs" | "Prepositions" | "Antonyms",
+       level:       "A1" | "A2" | "B1" | "B2"  (or a range like "B1–B2"),
+       type:        "Vocabulary" / "Grammar" / ... (free label shown as a badge),
+       url:         "./folder/file.html"   <-- RELATIVE path to the game (see note),
+       emoji:       "🎯"  (optional icon on the card),
+       recommended: true   (optional — shows the game in the Recommended section)
+     }
+
+   📁 PATHS: links are RELATIVE to this index.html, so the whole folder works
+   on any server path. When you rename or move a game, update its "url" here.
+   =========================================================================== */
+const games = [
+  {
+    title: "Danske Antonymer",
+    description: "Practice common Danish antonyms through interactive quiz exercises and match-up rounds.",
+    category: "Antonyms",
+    level: "B1–B2",
+    type: "Vocabulary",
+    url: "./danish-antonyms-game.html",   // 👈 update path if you rename the file
+    emoji: "🔁",
+    recommended: true
+  },
+  {
+    title: "Verb-glosekort",
+    description: "Flip through Danish verbs and drill their forms with a fast, focused flashcard trainer.",
+    category: "Verbs",
+    level: "A2–B1",
+    type: "Verbs",
+    url: "./danish_flashcards/danish_flashcards_game/index.html",
+    emoji: "🃏",
+    recommended: true
+  },
+  {
+    title: "Magiske Verber",
+    description: "Train Danish verb conjugation across tenses in a playful, game-style workout.",
+    category: "Verbs",
+    level: "A2–B1",
+    type: "Verbs",
+    url: "./magiske_verber.html",
+    emoji: "✨"
+  },
+  {
+    title: "Præpositionstest",
+    description: "Master tricky Danish prepositions (i, på, til, af …) with targeted practice questions.",
+    category: "Prepositions",
+    level: "A2–B1",
+    type: "Grammar",
+    url: "./dansk-praepositioner.html",
+    emoji: "📍",
+    recommended: true
+  },
+  {
+    title: "Dansk Mester — Frasebygger",
+    description: "Build and learn everyday Danish phrases step by step, from greetings to small talk.",
+    category: "Phrases",
+    level: "A1–A2",
+    type: "Phrases",
+    url: "./danske-phraser/dansk-mester.html",
+    emoji: "💬"
+  },
+  {
+    title: "En/Et-træner",
+    description: "Stop guessing noun gender — practice en- and et-words until they feel automatic.",
+    category: "Grammar",
+    level: "A1–A2",
+    type: "Grammar",
+    url: "./en%20og%20et/index.html",
+    emoji: "🎲",
+    recommended: true
+  },
+  {
+    title: "Konjunktionsknus",
+    description: "Connect Danish sentences with the right conjunctions in a fast match-and-clear game.",
+    category: "Grammar",
+    level: "B1",
+    type: "Grammar",
+    url: "./konjunktioner/konjunktioner.html",
+    emoji: "🍬"
+  },
+  {
+    title: "Ordstillingsdetektiven",
+    description: "Crack Danish sentence structure and the V2 rule by reordering scrambled sentences.",
+    category: "Grammar",
+    level: "B1–B2",
+    type: "Grammar",
+    url: "./ordstilling-detektiv/index.html",
+    emoji: "🕵️"
+  },
+  {
+    title: "Forbindenor — Gitterprotokol",
+    description: "A word-connection grid puzzle: link related Danish words against the clock.",
+    category: "Vocabulary",
+    level: "B1",
+    type: "Vocabulary",
+    url: "./forbindenor/Forbindenor.html",
+    emoji: "🧩"
+  },
+  {
+    title: "Idiomjægeren",
+    description: "Hunt down Danish idioms and learn what they really mean in a treasure-hunt quiz.",
+    category: "Phrases",
+    level: "B2",
+    type: "Phrases",
+    url: "./idiomjaeger.html",
+    emoji: "🎯"
+  }
+];
+
+/* ===========================================================================
+   2) RENDER LOGIC — usually no need to edit below this line
+   =========================================================================== */
+const $ = (sel) => document.querySelector(sel);
+let searchTerm = "";
+
+// ---- One card's HTML ----
+function cardHTML(g) {
+  return `
+    <a class="card" href="${g.url}" aria-label="Open ${g.title}">
+      <div class="row">
+        <span class="emoji">${g.emoji || "🎮"}</span>
+        <div class="badges">
+          <span class="badge type">${g.type}</span>
+          <span class="badge level">${g.level}</span>
+        </div>
+      </div>
+      <h3>${g.title}</h3>
+      <p class="desc">${g.description}</p>
+      <span class="open">Open Game →</span>
+    </a>`;
+}
+
+// ---- Render the games grid ----
+function renderGames() {
+  const term = searchTerm.trim().toLowerCase();
+  const list = games.filter(g => !term ||
+    g.title.toLowerCase().includes(term) ||
+    g.description.toLowerCase().includes(term));
+
+  $("#games").innerHTML = list.map(cardHTML).join("");
+  $("#allCount").textContent = list.length + (list.length === 1 ? " game" : " games");
+  $("#empty").hidden = list.length !== 0;
+}
+
+// ---- Search box ----
+$("#search").addEventListener("input", (e) => {
+  searchTerm = e.target.value;
+  renderGames();
+});
+
+// ---- Dark mode toggle (remembers choice for the session) ----
+const themeBtn = $("#themeBtn");
+function setTheme(mode) {
+  document.documentElement.setAttribute("data-theme", mode);
+  themeBtn.textContent = mode === "dark" ? "☀️" : "🌙";
+}
+themeBtn.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  const isDark = current === "dark" ||
+    (current !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  setTheme(isDark ? "light" : "dark");
+});
+
+// ---- Init ----
+renderGames();
+</script>
+</body>
+</html>

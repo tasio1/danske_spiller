@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magiske Verber — Dansk Verbumtræning</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=MedievalSharp&display=swap');
+
+:root{
+  --bg:#0b1020;
+  --bg2:#161a33;
+  --parch:#efe2c0;
+  --parch2:#e3d2a6;
+  --ink:#2a1d0e;
+  --gold:#d4af37;
+  --gold2:#f3d77a;
+  --maroon:#7b1f2b;
+  --maroon2:#a83440;
+  --green:#2e7d52;
+  --red:#b03a3a;
+  --purple:#3a2a63;
+  --text:#f4ecd8;
+  --muted:#cbbfa2;
+  --amber:#ffae57;       /* lantern glow from the castle scene */
+  --display:'Cinzel Decorative', 'Cinzel', serif;
+  --heading:'Cinzel', serif;
+  --body:'IM Fell English', 'EB Garamond', Georgia, serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);
+  color:var(--text);
+  min-height:100vh;
+  /* Fallback gradient (used if the image file is missing) */
+  background-color:#0a0e1c;
+  background-image:
+    linear-gradient(180deg,#0b1020 0%, #0d1226 60%, #0a0e1c 100%);
+  overflow-x:hidden;
+}
+/* Castle photo background — drop the image into this folder as "hogwarts.jpg".
+   A dark scrim keeps text readable; the image sits behind everything. */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-2;
+  background:
+    linear-gradient(180deg, rgba(6,9,20,.55) 0%, rgba(6,9,20,.72) 55%, rgba(4,6,14,.92) 100%),
+    url('hogwarts.jpg') center 20% / cover no-repeat;
+  filter:saturate(1.05) contrast(1.02);
+}
+/* Soft vignette + moonlight bloom on top of the photo */
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 24% 18%, rgba(150,170,230,.18) 0%, transparent 60%),
+    radial-gradient(1200px 900px at 50% 120%, rgba(0,0,0,.55) 0%, transparent 60%);
+}
+/* twinkling stars */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:twinkle 3s infinite ease-in-out}
+@keyframes twinkle{0%,100%{opacity:.08}50%{opacity:.6}}
+
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 16px 60px}
+
+h1,h2,h3,.title{font-family:var(--heading);letter-spacing:.5px}
+
+.crest{text-align:center;margin:6px 0 2px}
+.crest .spark{font-size:30px;filter:drop-shadow(0 0 10px var(--amber))}
+h1{
+  font-family:var(--display);
+  text-align:center;font-size:clamp(30px,7.4vw,50px);margin:.1em 0 .05em;
+  color:var(--gold2);font-weight:900;
+  text-shadow:0 0 22px rgba(255,174,87,.35), 0 0 8px rgba(212,175,55,.55), 0 3px 0 #00000088;
+}
+.subtitle{text-align:center;color:var(--muted);font-style:italic;margin:0 0 16px;font-size:clamp(14px,3.6vw,18px);font-family:var(--body);letter-spacing:.3px}
+
+.panel{
+  background:linear-gradient(180deg, rgba(18,22,44,.74), rgba(10,13,30,.82));
+  -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+  border:1px solid rgba(212,175,55,.28);
+  border-radius:16px;
+  padding:18px 16px;
+  box-shadow:0 14px 50px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,220,150,.06);
+}
+
+/* Buttons */
+.btn{
+  cursor:pointer;border:none;font-family:var(--heading);font-weight:700;
+  border-radius:12px;padding:14px 18px;font-size:16px;color:#fff;
+  background:linear-gradient(180deg,var(--maroon2),var(--maroon));
+  border:1px solid #c79a3f55;
+  box-shadow:0 4px 0 #4d121a, 0 6px 18px rgba(0,0,0,.35);
+  transition:transform .08s ease, box-shadow .08s ease, filter .15s;
+  width:100%;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #4d121a}
+.btn.gold{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#3a2a06;box-shadow:0 4px 0 #8c6f1d,0 6px 18px rgba(0,0,0,.35)}
+.btn.gold:active{box-shadow:0 1px 0 #8c6f1d}
+.btn.ghost{background:linear-gradient(180deg,#2a3160,#222a52);box-shadow:0 4px 0 #161b38}
+.btn.ghost:active{box-shadow:0 1px 0 #161b38}
+.btn.sm{padding:10px 12px;font-size:14px;width:auto}
+
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+@media (max-width:480px){.menu-grid{grid-template-columns:1fr}}
+.game-card{
+  text-align:left;display:flex;gap:12px;align-items:center;
+  background:linear-gradient(180deg, rgba(28,35,72,.72), rgba(18,22,44,.78));
+  border:1px solid rgba(120,130,190,.35);border-radius:14px;padding:14px;cursor:pointer;
+  transition:transform .1s, border-color .15s, box-shadow .15s;
+}
+.game-card:hover{transform:translateY(-3px);border-color:var(--amber);box-shadow:0 8px 26px rgba(0,0,0,.5), 0 0 18px rgba(255,174,87,.18)}
+.game-card .ico{font-size:28px;width:44px;text-align:center;flex:0 0 auto;filter:drop-shadow(0 0 8px rgba(255,174,87,.5))}
+.game-card .gc-t{font-family:var(--heading);font-weight:700;color:var(--gold2);font-size:16px}
+.game-card .gc-d{color:var(--muted);font-size:13px;margin-top:2px}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.center{text-align:center}
+
+/* difficulty */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+@media (max-width:520px){.diff-grid{grid-template-columns:1fr}}
+.diff{
+  cursor:pointer;border-radius:14px;padding:16px 12px;text-align:center;
+  background:linear-gradient(180deg, rgba(28,35,72,.72), rgba(18,22,44,.78));border:2px solid rgba(120,130,190,.35);transition:.15s;
+}
+.diff:hover{border-color:var(--amber);transform:translateY(-2px)}
+.diff.active{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(212,175,55,.25)}
+.diff .dn{font-family:var(--heading);font-weight:700;color:var(--gold2);font-size:18px}
+.diff .dl{color:var(--muted);font-size:13px;margin-top:4px}
+.diff .ds{font-size:24px}
+
+/* progress bar */
+.bar-wrap{margin:14px 0 6px}
+.bar{height:14px;border-radius:10px;background:#0c1126;border:1px solid #2c335f;overflow:hidden}
+.bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s ease}
+.bar-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:6px}
+
+/* HUD */
+.hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.chip{background:rgba(17,21,43,.7);border:1px solid rgba(120,130,190,.35);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--text)}
+.chip b{color:var(--gold2)}
+.chip.streak b{color:#ff9d5c}
+.timer-chip b{color:#7be0a0}
+
+/* question */
+.q-instruction{color:var(--amber);font-family:var(--body);font-style:italic;font-size:15px;margin-bottom:6px;text-align:center;letter-spacing:.3px}
+.q-prompt{
+  font-family:var(--body);
+  font-size:clamp(21px,5.4vw,29px);line-height:1.5;text-align:center;margin:10px 0 6px;
+  color:#fbf3e0;font-weight:400;text-shadow:0 1px 10px rgba(0,0,0,.5);
+}
+.q-prompt .pre{display:block;color:var(--muted);font-size:.78em;font-style:italic;margin-bottom:6px}
+.q-prompt .blank{color:var(--gold2);font-weight:500;border-bottom:3px dotted var(--gold);padding:0 6px}
+.q-chain{font-family:var(--heading);letter-spacing:1px}
+.q-chain .blank{color:var(--gold2)}
+
+.options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+.opt{
+  cursor:pointer;text-align:center;font-size:18px;padding:14px;border-radius:12px;
+  background:linear-gradient(180deg,#222a52,#1a2044);border:2px solid #343d72;color:#fff;
+  transition:transform .08s, border-color .15s, background .2s;font-family:var(--body);
+}
+.opt:hover:not(.locked){border-color:var(--gold);transform:translateY(-2px)}
+.opt.correct{background:linear-gradient(180deg,#2e7d52,#225e3e);border-color:#54d18b;animation:pop .35s}
+.opt.wrong{background:linear-gradient(180deg,#9e3030,#7d2424);border-color:#e87c7c;animation:shake .35s}
+.opt.locked{cursor:default;opacity:.85}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}60%{transform:translateX(7px)}}
+
+.feedback{margin-top:14px;border-radius:12px;padding:14px;display:none;animation:fade .3s}
+.feedback.show{display:block}
+.feedback.ok{background:rgba(46,125,82,.16);border:1px solid #2e7d52}
+.feedback.no{background:rgba(176,58,58,.16);border:1px solid #b03a3a}
+.feedback .fb-h{font-family:var(--heading);font-weight:700;font-size:18px;margin-bottom:4px}
+.feedback.ok .fb-h{color:#7be0a0}
+.feedback.no .fb-h{color:#ff9d8a}
+.feedback .fb-en{color:var(--gold2);font-style:italic;margin-top:6px}
+.feedback .fb-ex{color:var(--text);margin-top:6px;font-size:15px}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.stat{background:rgba(17,21,43,.68);border:1px solid rgba(212,175,55,.25);border-radius:14px;padding:14px;text-align:center}
+.stat .sv{font-family:var(--heading);font-size:28px;color:var(--gold2)}
+.stat .sl{color:var(--muted);font-size:13px;margin-top:2px}
+.verb-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vtag{background:#1c2348;border:1px solid #343d72;border-radius:999px;padding:6px 12px;font-size:14px}
+.vtag.weak{border-color:#b03a3a;color:#ffb3a8}
+.vtag.strong{border-color:#2e7d52;color:#9be7bd}
+.section-h{font-family:var(--heading);color:var(--gold2);margin:18px 0 4px;font-size:18px;border-bottom:1px solid #2c335f;padding-bottom:6px}
+.mastery-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.mastery-row .ml{width:80px;color:var(--muted);font-size:14px}
+.mastery-row .bar{flex:1}
+.mastery-row .mp{width:48px;text-align:right;color:var(--gold2);font-size:14px}
+
+.hidden{display:none!important}
+.fadein{animation:fade .35s}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;font-style:italic}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(40px);z-index:50;
+  background:linear-gradient(180deg,var(--gold2),var(--gold));color:#3a2a06;font-family:var(--heading);font-weight:700;
+  padding:12px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:.35s}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.badge{display:inline-block;background:#1c2348;border:1px solid var(--gold);color:var(--gold2);border-radius:999px;padding:3px 10px;font-size:12px;margin:3px;font-family:var(--heading)}
+.back-link{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:14px;margin-bottom:8px}
+.back-link:hover{color:var(--gold2)}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="wrap">
+  <div class="crest"><span class="spark">✦ ⚡ ✦</span></div>
+  <h1>Magiske Verber</h1>
+  <p class="subtitle">Trylleskolen for danske udsagnsord · Practise Danish verbs</p>
+
+  <!-- MENU -->
+  <div id="screen-menu" class="panel fadein">
+    <div class="bar-wrap">
+      <div class="bar"><i id="menuBar"></i></div>
+      <div class="bar-meta"><span id="menuBarLabel">Din mestring</span><span id="menuBarPct">0%</span></div>
+    </div>
+    <div class="menu-grid" id="menuGrid"></div>
+    <div class="row">
+      <button class="btn gold sm" onclick="showStats()">📜 Statistik</button>
+      <button class="btn ghost sm" onclick="startReview()">🪄 Gennemse fejl</button>
+      <button class="btn ghost sm" onclick="resetProgress()">↺ Nulstil</button>
+    </div>
+    <p class="foot" id="poolInfo"></p>
+  </div>
+
+  <!-- DIFFICULTY -->
+  <div id="screen-diff" class="panel hidden">
+    <span class="back-link" onclick="goMenu()">‹ Tilbage til hovedmenu</span>
+    <h2 class="center title" id="diffTitle" style="color:var(--gold2)"></h2>
+    <p class="center" style="color:var(--muted);margin:.2em 0 0" id="diffDesc"></p>
+    <div class="diff-grid" id="diffGrid"></div>
+    <div class="row"><button class="btn gold" id="diffStart" onclick="beginGame()">Begynd ⚡</button></div>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="panel hidden">
+    <span class="back-link" onclick="quitGame()">‹ Forlad spil</span>
+    <div class="hud">
+      <span class="chip" id="hudGame"></span>
+      <span class="chip" id="hudProgress"></span>
+      <span class="chip streak">Stime <b id="hudStreak">0</b> 🔥</span>
+      <span class="chip timer-chip hidden" id="hudTimerChip">Tid <b id="hudTimer">60</b>s</span>
+    </div>
+    <div class="bar-wrap"><div class="bar"><i id="gameBar"></i></div></div>
+    <div id="qArea"></div>
+    <div class="feedback" id="feedback">
+      <div class="fb-h" id="fbHead"></div>
+      <div class="fb-ex" id="fbExplain"></div>
+    </div>
+    <div class="row hidden" id="nextRow"><button class="btn gold" id="nextBtn" onclick="nextQuestion()">Næste ⚡</button></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="panel hidden center">
+    <div class="crest"><span class="spark">🏆</span></div>
+    <h2 class="title" style="color:var(--gold2)" id="resTitle">Runde fuldført!</h2>
+    <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr;margin-top:14px">
+      <div class="stat"><div class="sv" id="resScore">0</div><div class="sl">Rigtige</div></div>
+      <div class="stat"><div class="sv" id="resAcc">0%</div><div class="sl">Præcision</div></div>
+      <div class="stat"><div class="sv" id="resStreak">0</div><div class="sl">Bedste stime</div></div>
+    </div>
+    <div id="resBadges" style="margin-top:14px"></div>
+    <div class="row">
+      <button class="btn gold" onclick="replaySame()">Spil igen ⚡</button>
+      <button class="btn ghost" onclick="goMenu()">Hovedmenu</button>
+      <button class="btn" onclick="showStats()">Statistik 📜</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="screen-stats" class="panel hidden">
+    <span class="back-link" onclick="goMenu()">‹ Tilbage til hovedmenu</span>
+    <h2 class="center title" style="color:var(--gold2)">📜 Din Tryllebog</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="sv" id="stAcc">0%</div><div class="sl">Samlet præcision</div></div>
+      <div class="stat"><div class="sv" id="stTotal">0</div><div class="sl">Spørgsmål i alt</div></div>
+      <div class="stat"><div class="sv" id="stStreak">0</div><div class="sl">Bedste stime</div></div>
+      <div class="stat"><div class="sv" id="stGames">0/8</div><div class="sl">Fuldførte spil</div></div>
+    </div>
+
+    <div class="section-h">Mestring pr. niveau</div>
+    <div id="masteryBox"></div>
+
+    <div class="section-h">⚠️ Svageste verber</div>
+    <div class="verb-tags" id="weakBox"><span style="color:var(--muted)">Endnu ingen data — spil lidt først.</span></div>
+
+    <div class="section-h">⭐ Stærkeste verber</div>
+    <div class="verb-tags" id="strongBox"><span style="color:var(--muted)">Endnu ingen data.</span></div>
+
+    <div class="row">
+      <button class="btn gold" onclick="startReview()">🪄 Gennemse fejl (<span id="missCount">0</span>)</button>
+      <button class="btn ghost" onclick="goMenu()">Hovedmenu</button>
+    </div>
+  </div>
+
+  <p class="foot">Magiske Verber · Lavet til danske verbumtrollinger ⚡ · Fremskridt gemmes lokalt på din enhed</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   MAGISKE VERBER — Danish verb training app
+   ============================================================ */
+
+/* ---------- Fisher-Yates shuffle ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function uniq(a){return [...new Set(a)];}
+
+/* ---------- VERB DATABASE ----------
+   inf: infinitive, pr: present (nutid), pa: past (datid),
+   pp: perfect participle (kort tillægsform), aux: 'har'|'er',
+   en: english gloss, irr: irregular flag
+*/
+const V = {
+  // ---- required irregulars ----
+  'gå':     {pr:'går',     pa:'gik',     pp:'gået',    aux:'er', en:'go/walk', irr:true},
+  'se':     {pr:'ser',     pa:'så',      pp:'set',     aux:'har',en:'see',     irr:true},
+  'få':     {pr:'får',     pa:'fik',     pp:'fået',    aux:'har',en:'get',     irr:true},
+  'tage':   {pr:'tager',   pa:'tog',     pp:'taget',   aux:'har',en:'take',    irr:true},
+  'komme':  {pr:'kommer',  pa:'kom',     pp:'kommet',  aux:'er', en:'come',    irr:true},
+  'skrive': {pr:'skriver', pa:'skrev',   pp:'skrevet', aux:'har',en:'write',   irr:true},
+  'drikke': {pr:'drikker', pa:'drak',    pp:'drukket', aux:'har',en:'drink',   irr:true},
+  'spise':  {pr:'spiser',  pa:'spiste',  pp:'spist',   aux:'har',en:'eat',     irr:false},
+  'sige':   {pr:'siger',   pa:'sagde',   pp:'sagt',    aux:'har',en:'say',     irr:true},
+  'være':   {pr:'er',      pa:'var',     pp:'været',   aux:'har',en:'be',      irr:true},
+  'blive':  {pr:'bliver',  pa:'blev',    pp:'blevet',  aux:'er', en:'become/stay',irr:true},
+  'gøre':   {pr:'gør',     pa:'gjorde',  pp:'gjort',   aux:'har',en:'do',      irr:true},
+  'give':   {pr:'giver',   pa:'gav',     pp:'givet',   aux:'har',en:'give',    irr:true},
+  'finde':  {pr:'finder',  pa:'fandt',   pp:'fundet',  aux:'har',en:'find',    irr:true},
+  'holde':  {pr:'holder',  pa:'holdt',   pp:'holdt',   aux:'har',en:'hold/keep',irr:true},
+  'sove':   {pr:'sover',   pa:'sov',     pp:'sovet',   aux:'har',en:'sleep',   irr:true},
+  'løbe':   {pr:'løber',   pa:'løb',     pp:'løbet',   aux:'har',en:'run',     irr:true},
+  'læse':   {pr:'læser',   pa:'læste',   pp:'læst',    aux:'har',en:'read',    irr:false},
+  'sælge':  {pr:'sælger',  pa:'solgte',  pp:'solgt',   aux:'har',en:'sell',    irr:true},
+  'bringe': {pr:'bringer', pa:'bragte',  pp:'bragt',   aux:'har',en:'bring',   irr:true},
+  // ---- extra irregulars ----
+  'hjælpe': {pr:'hjælper', pa:'hjalp',   pp:'hjulpet', aux:'har',en:'help',    irr:true},
+  'forstå': {pr:'forstår', pa:'forstod', pp:'forstået',aux:'har',en:'understand',irr:true},
+  'stå':    {pr:'står',    pa:'stod',    pp:'stået',   aux:'har',en:'stand',   irr:true},
+  'ligge':  {pr:'ligger',  pa:'lå',      pp:'ligget',  aux:'har',en:'lie/be located',irr:true},
+  'sidde':  {pr:'sidder',  pa:'sad',     pp:'siddet',  aux:'har',en:'sit',     irr:true},
+  'vide':   {pr:'ved',     pa:'vidste',  pp:'vidst',   aux:'har',en:'know',    irr:true},
+  'spørge': {pr:'spørger', pa:'spurgte', pp:'spurgt',  aux:'har',en:'ask',     irr:true},
+  'følge':  {pr:'følger',  pa:'fulgte',  pp:'fulgt',   aux:'har',en:'follow',  irr:true},
+  'vælge':  {pr:'vælger',  pa:'valgte',  pp:'valgt',   aux:'har',en:'choose',  irr:true},
+  'lægge':  {pr:'lægger',  pa:'lagde',   pp:'lagt',    aux:'har',en:'put/lay', irr:true},
+  'synge':  {pr:'synger',  pa:'sang',    pp:'sunget',  aux:'har',en:'sing',    irr:true},
+  'rejse':  {pr:'rejser',  pa:'rejste',  pp:'rejst',   aux:'er', en:'travel',  irr:false},
+  // ---- regular workhorses ----
+  'arbejde':{pr:'arbejder',pa:'arbejdede',pp:'arbejdet',aux:'har',en:'work',  irr:false},
+  'spille': {pr:'spiller', pa:'spillede',pp:'spillet', aux:'har',en:'play',    irr:false},
+  'bo':     {pr:'bor',     pa:'boede',   pp:'boet',    aux:'har',en:'live/reside',irr:false},
+  'lave':   {pr:'laver',   pa:'lavede',  pp:'lavet',   aux:'har',en:'make/do', irr:false},
+  'købe':   {pr:'køber',   pa:'købte',   pp:'købt',    aux:'har',en:'buy',     irr:false},
+  'tale':   {pr:'taler',   pa:'talte',   pp:'talt',    aux:'har',en:'speak',   irr:false},
+  'høre':   {pr:'hører',   pa:'hørte',   pp:'hørt',    aux:'har',en:'hear',    irr:false},
+  'vente':  {pr:'venter',  pa:'ventede', pp:'ventet',  aux:'har',en:'wait',    irr:false},
+  'møde':   {pr:'møder',   pa:'mødte',   pp:'mødt',    aux:'har',en:'meet',    irr:false},
+  'betale': {pr:'betaler', pa:'betalte', pp:'betalt',  aux:'har',en:'pay',     irr:false},
+  'begynde':{pr:'begynder',pa:'begyndte',pp:'begyndt', aux:'har',en:'begin',   irr:false},
+  'lære':   {pr:'lærer',   pa:'lærte',   pp:'lært',    aux:'har',en:'learn/teach',irr:false},
+  'bruge':  {pr:'bruger',  pa:'brugte',  pp:'brugt',   aux:'har',en:'use',     irr:false},
+  'tænke':  {pr:'tænker',  pa:'tænkte',  pp:'tænkt',   aux:'har',en:'think',   irr:false},
+  'sende':  {pr:'sender',  pa:'sendte',  pp:'sendt',   aux:'har',en:'send',    irr:false},
+  'besøge': {pr:'besøger', pa:'besøgte', pp:'besøgt',  aux:'har',en:'visit',   irr:false},
+  'ringe':  {pr:'ringer',  pa:'ringede', pp:'ringet',  aux:'har',en:'call/ring',irr:false},
+  'huske':  {pr:'husker',  pa:'huskede', pp:'husket',  aux:'har',en:'remember',irr:false},
+  'lukke':  {pr:'lukker',  pa:'lukkede', pp:'lukket',  aux:'har',en:'close',   irr:false},
+  'åbne':   {pr:'åbner',   pa:'åbnede',  pp:'åbnet',   aux:'har',en:'open',    irr:false},
+  'hente':  {pr:'henter',  pa:'hentede', pp:'hentet',  aux:'har',en:'fetch/pick up',irr:false}
+};
+
+/* ---------- SENTENCE ENTRIES ----------
+   v: verb key. lvl: 1=Easy(A1) 2=Medium(A2/B1) 3=Hard(B1/B2).
+   Use [v] as the placeholder for the verb form in each tense.
+   present sentence starts with subject (verb mid, lowercase).
+   past sentence starts with a time adverbial (V2 inversion).
+   perfect sentence hard-codes the correct auxiliary.
+*/
+const ENTRIES = [
+  // skrive
+  {v:'skrive',lvl:1,p:'Jeg [v] en mail til min chef.',d:'I går [v] jeg en mail til min chef.',pf:'Jeg har [v] en mail til min chef.',en:'I write an email to my boss.'},
+  {v:'skrive',lvl:2,p:'Hun [v] en stil i skolen.',d:'I sidste uge [v] hun en lang stil.',pf:'Hun har [v] en god stil.',en:'She writes an essay at school.'},
+  // læse
+  {v:'læse',lvl:1,p:'Jeg [v] en bog hver aften.',d:'I aftes [v] jeg en spændende bog.',pf:'Jeg har [v] hele bogen.',en:'I read a book every evening.'},
+  {v:'læse',lvl:2,p:'Chefen [v] alle e-mails om morgenen.',d:'I morges [v] chefen din besked.',pf:'Chefen har [v] din besked.',en:'The boss reads all emails in the morning.'},
+  // spise
+  {v:'spise',lvl:1,p:'Vi [v] aftensmad klokken seks.',d:'I aftes [v] vi sammen med familien.',pf:'Vi har [v] aftensmad.',en:'We eat dinner at six.'},
+  {v:'spise',lvl:1,p:'Børnene [v] morgenmad i køkkenet.',d:'I morges [v] børnene havregryn.',pf:'Børnene har [v] morgenmad.',en:'The children eat breakfast in the kitchen.'},
+  // drikke
+  {v:'drikke',lvl:1,p:'Jeg [v] kaffe hver morgen.',d:'I morges [v] jeg te i stedet.',pf:'Jeg har [v] alt for meget kaffe.',en:'I drink coffee every morning.'},
+  {v:'drikke',lvl:2,p:'Gæsterne [v] vand til maden.',d:'Til festen [v] gæsterne rødvin.',pf:'Gæsterne har [v] kaffe efter maden.',en:'The guests drink water with the meal.'},
+  // gå (aux er)
+  {v:'gå',lvl:1,p:'Jeg [v] på arbejde klokken otte.',d:'I går [v] jeg på arbejde.',pf:'Jeg er [v] på arbejde.',en:'I go to work at eight.'},
+  {v:'gå',lvl:2,p:'Børnene [v] i skole hver dag.',d:'I mandags [v] børnene i skole.',pf:'Børnene er [v] i skole.',en:'The children walk to school every day.'},
+  // komme (aux er)
+  {v:'komme',lvl:1,p:'Min mor [v] på besøg i weekenden.',d:'I weekenden [v] min mor på besøg.',pf:'Min mor er [v] på besøg.',en:'My mother comes to visit at the weekend.'},
+  {v:'komme',lvl:2,p:'Toget [v] til tiden om morgenen.',d:'I morges [v] toget for sent.',pf:'Toget er [v] for sent i dag.',en:'The train comes on time in the morning.'},
+  // se
+  {v:'se',lvl:1,p:'Vi [v] en film om aftenen.',d:'I går [v] vi en god film.',pf:'Vi har [v] filmen to gange.',en:'We watch a film in the evening.'},
+  {v:'se',lvl:2,p:'Turisterne [v] mange seværdigheder.',d:'På ferien [v] vi Eiffeltårnet.',pf:'Vi har [v] mange smukke steder.',en:'The tourists see many sights.'},
+  // tage
+  {v:'tage',lvl:1,p:'Jeg [v] toget til arbejde.',d:'I går [v] jeg bussen i stedet.',pf:'Jeg har [v] toget hjem.',en:'I take the train to work.'},
+  {v:'tage',lvl:2,p:'Hun [v] billeder på rejsen.',d:'På ferien [v] hun mange billeder.',pf:'Hun har [v] hundrede billeder.',en:'She takes pictures on the trip.'},
+  // få
+  {v:'få',lvl:2,p:'Hun [v] en ny opgave hver uge.',d:'I går [v] hun en svær opgave.',pf:'Hun har [v] en ny opgave.',en:'She gets a new task every week.'},
+  {v:'få',lvl:1,p:'Jeg [v] et brev fra banken.',d:'I går [v] jeg et brev fra banken.',pf:'Jeg har [v] et vigtigt brev.',en:'I get a letter from the bank.'},
+  // give
+  {v:'give',lvl:2,p:'Lederen [v] os feedback på mødet.',d:'På mødet [v] lederen os feedback.',pf:'Lederen har [v] os god feedback.',en:'The manager gives us feedback at the meeting.'},
+  {v:'give',lvl:1,p:'Jeg [v] min ven en gave.',d:'Til fødselsdagen [v] jeg ham en bog.',pf:'Jeg har [v] ham en gave.',en:'I give my friend a present.'},
+  // sige
+  {v:'sige',lvl:2,p:'Han [v] altid sin mening.',d:'På mødet [v] han ikke noget.',pf:'Han har [v] sin mening klart.',en:'He always says his opinion.'},
+  {v:'sige',lvl:1,p:'Læreren [v] godmorgen til klassen.',d:'I morges [v] læreren godmorgen.',pf:'Læreren har [v] det flere gange.',en:'The teacher says good morning to the class.'},
+  // være
+  {v:'være',lvl:1,p:'Jeg [v] træt i dag.',d:'I går [v] jeg syg og blev hjemme.',pf:'Jeg har [v] meget træt på det sidste.',en:'I am tired today.'},
+  {v:'være',lvl:2,p:'Vejret [v] dårligt om vinteren.',d:'I sidste uge [v] vejret rigtig koldt.',pf:'Vejret har [v] dårligt hele ugen.',en:'The weather is bad in winter.'},
+  // blive (aux er)
+  {v:'blive',lvl:2,p:'Vejret [v] bedre om sommeren.',d:'I sidste uge [v] det pludselig koldt.',pf:'Vejret er [v] meget bedre.',en:'The weather becomes better in summer.'},
+  {v:'blive',lvl:3,p:'Hun [v] læge efter studiet.',d:'Sidste år [v] hun færdig som læge.',pf:'Hun er [v] en dygtig læge.',en:'She becomes a doctor after her studies.'},
+  // gøre
+  {v:'gøre',lvl:2,p:'Jeg [v] altid mit bedste.',d:'I går [v] jeg rent i hele huset.',pf:'Jeg har [v] mit arbejde færdigt.',en:'I always do my best.'},
+  {v:'gøre',lvl:3,p:'Holdet [v] et godt stykke arbejde.',d:'På projektet [v] holdet en stor indsats.',pf:'Holdet har [v] det godt i år.',en:'The team does a good job.'},
+  // finde
+  {v:'finde',lvl:2,p:'Jeg [v] aldrig mine nøgler.',d:'I morges [v] jeg endelig mine nøgler.',pf:'Jeg har [v] mine nøgler igen.',en:'I never find my keys.'},
+  {v:'finde',lvl:3,p:'Forskerne [v] nye løsninger.',d:'Sidste år [v] de en vigtig løsning.',pf:'De har [v] en god løsning.',en:'The researchers find new solutions.'},
+  // holde
+  {v:'holde',lvl:3,p:'Vi [v] møde hver mandag.',d:'I mandags [v] vi et langt møde.',pf:'Vi har [v] et vigtigt møde i dag.',en:'We hold a meeting every Monday.'},
+  {v:'holde',lvl:2,p:'Bussen [v] ved stoppestedet.',d:'Før i tiden [v] bussen længere.',pf:'Bussen har [v] stille i ti minutter.',en:'The bus stops at the bus stop.'},
+  // sove
+  {v:'sove',lvl:1,p:'Barnet [v] hele natten.',d:'I nat [v] barnet rigtig godt.',pf:'Barnet har [v] hele natten.',en:'The child sleeps all night.'},
+  {v:'sove',lvl:2,p:'Jeg [v] altid godt om vinteren.',d:'I weekenden [v] jeg længe.',pf:'Jeg har [v] dårligt på det sidste.',en:'I always sleep well in winter.'},
+  // løbe
+  {v:'løbe',lvl:2,p:'Jeg [v] en tur i parken.',d:'I går [v] jeg ti kilometer.',pf:'Jeg har [v] en lang tur i dag.',en:'I run in the park.'},
+  {v:'løbe',lvl:3,p:'Hun [v] maraton hvert år.',d:'Sidste år [v] hun sit første maraton.',pf:'Hun har [v] tre maratonløb.',en:'She runs a marathon every year.'},
+  // sælge
+  {v:'sælge',lvl:3,p:'Firmaet [v] mange produkter.',d:'Sidste år [v] firmaet rekordmange varer.',pf:'Firmaet har [v] alle billetterne.',en:'The company sells many products.'},
+  {v:'sælge',lvl:2,p:'Han [v] sin gamle cykel.',d:'I sidste uge [v] han sin bil.',pf:'Han har [v] sit gamle hus.',en:'He sells his old bicycle.'},
+  // bringe
+  {v:'bringe',lvl:3,p:'Posten [v] pakker hver dag.',d:'I går [v] posten en stor pakke.',pf:'Posten har [v] dit brev.',en:'The mail brings parcels every day.'},
+  // hjælpe
+  {v:'hjælpe',lvl:3,p:'Jeg [v] min søster med lektier.',d:'I går [v] jeg min nabo med flytningen.',pf:'Jeg har [v] min ven mange gange.',en:'I help my sister with homework.'},
+  {v:'hjælpe',lvl:2,p:'Kollegerne [v] hinanden på arbejdet.',d:'På projektet [v] de hinanden meget.',pf:'De har [v] mig med rapporten.',en:'The colleagues help each other at work.'},
+  // forstå
+  {v:'forstå',lvl:3,p:'Jeg [v] ikke spørgsmålet.',d:'Til eksamen [v] jeg endelig opgaven.',pf:'Jeg har [v] reglerne nu.',en:'I do not understand the question.'},
+  // stå
+  {v:'stå',lvl:3,p:'Bilen [v] i garagen.',d:'I går [v] bilen ude på vejen.',pf:'Vasen har [v] på bordet hele dagen.',en:'The car stands in the garage.'},
+  // ligge
+  {v:'ligge',lvl:3,p:'Byen [v] ved kysten.',d:'Dengang [v] huset midt i skoven.',pf:'Bogen har [v] på bordet hele ugen.',en:'The town lies by the coast.'},
+  // sidde
+  {v:'sidde',lvl:3,p:'Vi [v] i sofaen og hygger.',d:'I aftes [v] vi længe og snakkede.',pf:'Jeg har [v] ved skrivebordet hele dagen.',en:'We sit on the sofa and relax.'},
+  // vide
+  {v:'vide',lvl:3,p:'Jeg [v] ikke svaret.',d:'Dengang [v] jeg ikke vejen.',pf:'Jeg har [v] det hele tiden.',en:'I do not know the answer.'},
+  // spørge
+  {v:'spørge',lvl:3,p:'Eleven [v] læreren om hjælp.',d:'Til timen [v] eleven om hjælp.',pf:'Eleven har [v] om lov til at gå.',en:'The pupil asks the teacher for help.'},
+  // følge
+  {v:'følge',lvl:3,p:'Jeg [v] altid nyhederne.',d:'I sidste uge [v] jeg sagen tæt.',pf:'Jeg har [v] din gode rådgivning.',en:'I always follow the news.'},
+  // vælge
+  {v:'vælge',lvl:3,p:'Vi [v] en ny formand i dag.',d:'Sidste år [v] vi en ny formand.',pf:'Vi har [v] den bedste løsning.',en:'We choose a new chairman today.'},
+  // lægge
+  {v:'lægge',lvl:3,p:'Jeg [v] bøgerne på bordet.',d:'I morges [v] jeg nøglerne i tasken.',pf:'Jeg har [v] en plan for ugen.',en:'I put the books on the table.'},
+  // synge
+  {v:'synge',lvl:2,p:'Koret [v] en smuk sang.',d:'Til koncerten [v] koret tre sange.',pf:'Koret har [v] for fuldt hus.',en:'The choir sings a beautiful song.'},
+  // rejse (aux er)
+  {v:'rejse',lvl:2,p:'Vi [v] til Spanien om sommeren.',d:'Sidste sommer [v] vi til Italien.',pf:'Vi er [v] meget i år.',en:'We travel to Spain in the summer.'},
+  // arbejde
+  {v:'arbejde',lvl:1,p:'Jeg [v] på et kontor i byen.',d:'I går [v] jeg hjemmefra.',pf:'Jeg har [v] her i fem år.',en:'I work in an office in the city.'},
+  {v:'arbejde',lvl:2,p:'Hun [v] som sygeplejerske.',d:'Sidste år [v] hun på et hospital.',pf:'Hun har [v] hårdt hele ugen.',en:'She works as a nurse.'},
+  // spille
+  {v:'spille',lvl:1,p:'Børnene [v] fodbold i parken.',d:'I går [v] vi kort hele aftenen.',pf:'Vi har [v] et godt spil.',en:'The children play football in the park.'},
+  {v:'spille',lvl:2,p:'Han [v] klaver hver dag.',d:'Til festen [v] bandet musik.',pf:'Han har [v] klaver i ti år.',en:'He plays the piano every day.'},
+  // bo
+  {v:'bo',lvl:1,p:'Vi [v] i en lille lejlighed.',d:'Dengang [v] vi på landet.',pf:'Jeg har [v] i København i tre år.',en:'We live in a small flat.'},
+  // lave
+  {v:'lave',lvl:1,p:'Jeg [v] mad til familien.',d:'I aftes [v] jeg suppe.',pf:'Jeg har [v] aftensmad.',en:'I make food for the family.'},
+  {v:'lave',lvl:2,p:'Eleverne [v] deres lektier.',d:'I går [v] de en stor opgave.',pf:'De har [v] alle øvelserne.',en:'The pupils do their homework.'},
+  // købe
+  {v:'købe',lvl:1,p:'Jeg [v] brød i supermarkedet.',d:'I går [v] jeg en ny jakke.',pf:'Jeg har [v] gaver til jul.',en:'I buy bread at the supermarket.'},
+  {v:'købe',lvl:2,p:'De [v] et hus uden for byen.',d:'Sidste år [v] de en ny bil.',pf:'De har [v] møbler til stuen.',en:'They buy a house outside the city.'},
+  // tale
+  {v:'tale',lvl:2,p:'Jeg [v] dansk og engelsk.',d:'På mødet [v] hun længe.',pf:'Vi har [v] om sagen.',en:'I speak Danish and English.'},
+  // høre
+  {v:'høre',lvl:1,p:'Jeg [v] musik i toget.',d:'I går [v] jeg en god podcast.',pf:'Jeg har [v] den nyhed.',en:'I listen to music on the train.'},
+  {v:'høre',lvl:2,p:'Hun [v] altid godt efter.',d:'Til foredraget [v] vi om klimaet.',pf:'Jeg har [v] rygtet.',en:'She always listens carefully.'},
+  // vente
+  {v:'vente',lvl:1,p:'Jeg [v] på bussen.',d:'I morges [v] jeg i ti minutter.',pf:'Jeg har [v] længe på dig.',en:'I wait for the bus.'},
+  // møde
+  {v:'møde',lvl:2,p:'Jeg [v] min ven i byen.',d:'I går [v] jeg en gammel kollega.',pf:'Jeg har [v] mange nye mennesker.',en:'I meet my friend in town.'},
+  // betale
+  {v:'betale',lvl:2,p:'Jeg [v] regningen hver måned.',d:'I går [v] jeg for maden.',pf:'Jeg har [v] huslejen.',en:'I pay the bill every month.'},
+  // begynde
+  {v:'begynde',lvl:2,p:'Filmen [v] klokken otte.',d:'I går [v] kurset endelig.',pf:'Mødet har [v] uden mig.',en:'The film begins at eight.'},
+  // lære
+  {v:'lære',lvl:2,p:'Jeg [v] dansk på et kursus.',d:'Sidste år [v] jeg at svømme.',pf:'Jeg har [v] mange nye ord.',en:'I learn Danish in a course.'},
+  // bruge
+  {v:'bruge',lvl:2,p:'Jeg [v] computeren på arbejdet.',d:'I går [v] jeg hele dagen på rapporten.',pf:'Jeg har [v] mange penge i denne måned.',en:'I use the computer at work.'},
+  // tænke
+  {v:'tænke',lvl:2,p:'Jeg [v] tit på fremtiden.',d:'I går [v] jeg meget over sagen.',pf:'Jeg har [v] over dit forslag.',en:'I often think about the future.'},
+  // sende
+  {v:'sende',lvl:2,p:'Jeg [v] en pakke til min ven.',d:'I går [v] jeg en e-mail til kunden.',pf:'Jeg har [v] dig beskeden.',en:'I send a parcel to my friend.'},
+  // besøge
+  {v:'besøge',lvl:2,p:'Vi [v] min bedstemor om søndagen.',d:'I weekenden [v] vi vores familie.',pf:'Vi har [v] det nye museum.',en:'We visit my grandmother on Sundays.'},
+  // ringe
+  {v:'ringe',lvl:1,p:'Jeg [v] til min mor hver dag.',d:'I går [v] jeg til lægen.',pf:'Jeg har [v] til banken.',en:'I call my mother every day.'},
+  // huske
+  {v:'huske',lvl:2,p:'Jeg [v] altid hendes fødselsdag.',d:'I morges [v] jeg ikke min nøgle.',pf:'Jeg har [v] at købe mælk.',en:'I always remember her birthday.'},
+  // lukke
+  {v:'lukke',lvl:1,p:'Jeg [v] vinduet om aftenen.',d:'I går [v] butikken tidligt.',pf:'Jeg har [v] døren.',en:'I close the window in the evening.'},
+  // åbne
+  {v:'åbne',lvl:1,p:'Butikken [v] klokken ti.',d:'I morges [v] jeg alle vinduerne.',pf:'De har [v] en ny café i byen.',en:'The shop opens at ten.'},
+  // hente
+  {v:'hente',lvl:1,p:'Jeg [v] børnene i børnehaven.',d:'I går [v] jeg en pakke på posthuset.',pf:'Jeg har [v] dig ved stationen.',en:'I pick up the children from kindergarten.'}
+];
+
+/* ---------- option builder: ensures 3 distinct options incl. correct ---------- */
+function buildOptions(correct, verbKey){
+  const v = V[verbKey];
+  const stem = verbKey.endsWith('e') ? verbKey.slice(0,-1) : verbKey;
+  const distractPool = uniq([v.pr, v.pa, v.pp, stem+'ede', stem+'er', stem+'et', stem+'te'])
+    .filter(x => x && x !== correct);
+  const opts = [correct];
+  for(const d of shuffle(distractPool)){
+    if(opts.length>=3) break;
+    if(!opts.includes(d)) opts.push(d);
+  }
+  // pad if still short (very rare)
+  let k=0; while(opts.length<3){ opts.push(correct+'·'+(k++)); }
+  const shuffled = shuffle(opts);
+  return {options:shuffled, correctIndex:shuffled.indexOf(correct)};
+}
+
+const TENSE_NAME = {nutid:'Nutid (present)', datid:'Datid (past)', forn:'Førnutid (perfect)'};
+const fill = (tpl, form) => tpl.replace('[v]', form);
+const blankHtml = (tpl) => tpl.replace('[v]', '<span class="blank">_____</span>');
+
+/* ---------- QUESTION POOL GENERATION ---------- */
+const QUESTIONS = [];
+let qid = 0;
+function addQ(q){ q.id = qid++; QUESTIONS.push(q); }
+
+ENTRIES.forEach(e=>{
+  const v = V[e.v];
+  const inf = e.v;
+  const presText = fill(e.p, v.pr);
+  const pastText = fill(e.d, v.pa);
+  const perfText = fill(e.pf, v.pp);
+
+  // GAME 1 — Verb Form Arena (past blank)
+  {
+    const o = buildOptions(v.pa, inf);
+    addQ({game:'arena',lvl:e.lvl,verb:inf,
+      instruction:'Vælg den rigtige verbumform.',
+      prompt:blankHtml(e.d),
+      options:o.options,correct:o.correctIndex,
+      explanation:`Datid (past) af "${inf}" er "${v.pa}". Tidsudtrykket peger på fortiden.`,
+      en:e.en});
+  }
+  // GAME 1 — Verb Form Arena (present blank) variant
+  {
+    const o = buildOptions(v.pr, inf);
+    addQ({game:'arena',lvl:e.lvl,verb:inf,
+      instruction:'Vælg den rigtige verbumform.',
+      prompt:blankHtml(e.p),
+      options:o.options,correct:o.correctIndex,
+      explanation:`Nutid (present) af "${inf}" er "${v.pr}".`,
+      en:e.en});
+  }
+  // GAME 2 — Time Machine (present -> past)
+  {
+    const o = buildOptions(v.pa, inf);
+    addQ({game:'timemachine',lvl:e.lvl,verb:inf,
+      instruction:'Tidsmaskinen flytter sætningen til I GÅR. Vælg den rigtige form.',
+      prompt:`<span class="pre">Nutid: ${presText}</span>${blankHtml(e.d)}`,
+      options:o.options,correct:o.correctIndex,
+      explanation:`Når tiden flyttes til fortiden, bliver "${v.pr}" til datid "${v.pa}".`,
+      en:e.en});
+  }
+  // GAME 2b — Time Machine (present -> perfect) for medium/hard
+  if(e.lvl>=2){
+    const o = buildOptions(v.pp, inf);
+    addQ({game:'timemachine',lvl:e.lvl,verb:inf,
+      instruction:`Byg førnutid med "${v.aux}". Vælg den rigtige form.`,
+      prompt:`<span class="pre">Nutid: ${presText}</span>${blankHtml(e.pf)}`,
+      options:o.options,correct:o.correctIndex,
+      explanation:`Førnutid (perfect) = ${v.aux} + tillægsform: "${v.aux} ${v.pp}".`,
+      en:e.en});
+  }
+  // GAME 3 — Perfect Tense Builder
+  {
+    const o = buildOptions(v.pp, inf);
+    addQ({game:'perfect',lvl:e.lvl,verb:inf,
+      instruction:`Byg førnutid. Hvilken form står efter "${v.aux}"?`,
+      prompt:blankHtml(e.pf),
+      options:o.options,correct:o.correctIndex,
+      explanation:`Førnutid bruger ${v.aux} + kort tillægsform: "${v.aux} ${v.pp}". (${inf} → ${v.pr} → ${v.pa} → ${v.pp})`,
+      en:e.en});
+  }
+  // GAME 5 — Sentence Repair (show wrong present form in a past sentence)
+  {
+    const wrongSentence = fill(e.d, v.pr); // present form where past is needed
+    const o = buildOptions(v.pa, inf);
+    addQ({game:'repair',lvl:e.lvl,verb:inf,
+      instruction:'Find fejlen! Verbet står i forkert tid. Vælg den rigtige form.',
+      prompt:`<span class="pre">Forkert: ${wrongSentence}</span>${blankHtml(e.d)}`,
+      options:o.options,correct:o.correctIndex,
+      explanation:`Sætningen handler om fortiden, så "${v.pr}" skal være datid "${v.pa}". Rigtigt: ${pastText}`,
+      en:e.en});
+  }
+  // GAME 6 — Verb Detective (identify tense) — three variants
+  const detectVariants = [
+    {text:presText, t:'nutid', form:v.pr},
+    {text:pastText, t:'datid', form:v.pa},
+    {text:perfText, t:'forn', form:`${v.aux} ${v.pp}`}
+  ];
+  detectVariants.forEach(dv=>{
+    const order = ['nutid','datid','forn'];
+    addQ({game:'detective',lvl:e.lvl,verb:inf,
+      instruction:'Læs sætningen. Hvilken tid er verbet i?',
+      prompt:`<span style="font-weight:500">${dv.text}</span>`,
+      options:order.map(t=>TENSE_NAME[t]),
+      correct:order.indexOf(dv.t),
+      explanation:`Verbet "${dv.form}" er i ${TENSE_NAME[dv.t].toLowerCase()}.`,
+      en:e.en});
+  });
+});
+
+/* GAME 4 — Irregular Verb Lab (from irregular verbs directly) */
+Object.keys(V).forEach(inf=>{
+  const v = V[inf];
+  if(!v.irr) return;
+  const lvl = 2; // irregulars sit at medium baseline; hard ones flagged below
+  const hard = ['bringe','sælge','forstå','ligge','vide','spørge','følge','vælge','lægge','synge','hjælpe'];
+  const useLvl = hard.includes(inf) ? 3 : 2;
+  // fill past in chain
+  {
+    const o = buildOptions(v.pa, inf);
+    addQ({game:'irregular',lvl:useLvl,verb:inf,
+      instruction:'Udfyld kæden. Hvad er DATID?',
+      prompt:`<span class="q-chain">${inf} → ${v.pr} → <span class="blank">_____</span> → ${v.pp}</span>`,
+      options:o.options,correct:o.correctIndex,
+      explanation:`Bøjning: ${inf} → ${v.pr} → ${v.pa} → ${v.pp}. Et uregelmæssigt verbum.`,
+      en:V[inf].en});
+  }
+  // fill participle in chain
+  {
+    const o = buildOptions(v.pp, inf);
+    addQ({game:'irregular',lvl:useLvl,verb:inf,
+      instruction:'Udfyld kæden. Hvad er TILLÆGSFORMEN (perfektum)?',
+      prompt:`<span class="q-chain">${inf} → ${v.pr} → ${v.pa} → <span class="blank">_____</span></span>`,
+      options:o.options,correct:o.correctIndex,
+      explanation:`Bøjning: ${inf} → ${v.pr} → ${v.pa} → ${v.pp}. Bruges som "${v.aux} ${v.pp}".`,
+      en:V[inf].en});
+  }
+});
+
+/* ---------- GAME METADATA ---------- */
+const GAMES = {
+  arena:       {n:'Verb Form Arena',     ico:'⚔️', d:'Vælg den rigtige verbumform i sætningen.'},
+  timemachine: {n:'Time Machine Challenge',ico:'⏳', d:'Sætningen skifter tid — vælg den rigtige form.'},
+  perfect:     {n:'Perfect Tense Builder',ico:'🏗️', d:'Byg førnutid med har/er + tillægsform.'},
+  irregular:   {n:'Irregular Verb Lab',  ico:'🧪', d:'Træn de vigtige uregelmæssige verber.'},
+  repair:      {n:'Sentence Repair',     ico:'🔧', d:'Find og ret den forkerte verbumform.'},
+  detective:   {n:'Verb Detective',      ico:'🔍', d:'Læs sætningen og find tiden.'},
+  speed:       {n:'Speed Verb Duel',     ico:'⚡', d:'Så mange spørgsmål som muligt på 60 sekunder.'},
+  mixed:       {n:'Mixed Verb Review',   ico:'🎲', d:'Tilfældige spørgsmål fra alle spil og tider.'}
+};
+const GAME_ORDER = ['arena','timemachine','perfect','irregular','repair','detective','speed','mixed'];
+const DIFFS = {
+  easy:  {n:'Nem',    lvl:1, sym:'🪶', label:'A1'},
+  medium:{n:'Mellem', lvl:2, sym:'🔮', label:'A2 / B1'},
+  hard:  {n:'Svær',   lvl:3, sym:'🐉', label:'B1 / B2'}
+};
+
+/* ---------- PROGRESS (localStorage) ---------- */
+const LS_KEY = 'magiske_verber_v1';
+const defaultProgress = () => ({
+  total:0, correct:0, bestStreak:0,
+  perVerb:{}, perDiff:{easy:{t:0,c:0},medium:{t:0,c:0},hard:{t:0,c:0}},
+  completed:{}, mistakes:[]
+});
+let P = loadProgress();
+function loadProgress(){
+  try{ const r = JSON.parse(localStorage.getItem(LS_KEY)); return r && r.perDiff ? r : defaultProgress(); }
+  catch(e){ return defaultProgress(); }
+}
+function saveProgress(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(P)); }catch(e){} }
+
+/* ---------- SESSION STATE ---------- */
+let S = null; // current round
+
+/* ---------- DOM helpers ---------- */
+const $ = id => document.getElementById(id);
+function showScreen(name){
+  ['menu','diff','game','result','stats'].forEach(s=>$('screen-'+s).classList.add('hidden'));
+  $('screen-'+name).classList.remove('hidden');
+  $('screen-'+name).classList.remove('fadein'); void $('screen-'+name).offsetWidth; $('screen-'+name).classList.add('fadein');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600); }
+
+/* ---------- BUILD MENU ---------- */
+function buildMenu(){
+  const grid = $('menuGrid'); grid.innerHTML='';
+  GAME_ORDER.forEach(key=>{
+    const g = GAMES[key];
+    const done = P.completed[key] ? ' ✓' : '';
+    const card = document.createElement('div');
+    card.className='game-card';
+    card.onclick=()=>openDiff(key);
+    card.innerHTML=`<div class="ico">${g.ico}</div><div><div class="gc-t">${g.n}${done?'<span style="color:#7be0a0">'+done+'</span>':''}</div><div class="gc-d">${g.d}</div></div>`;
+    grid.appendChild(card);
+  });
+  updateMenuBar();
+  $('poolInfo').textContent = `📚 ${QUESTIONS.length} spørgsmål · ${Object.keys(V).length} verber · nutid, datid & førnutid`;
+}
+function overallMastery(){
+  let t=0,c=0; for(const d of ['easy','medium','hard']){ t+=P.perDiff[d].t; c+=P.perDiff[d].c; }
+  return t? Math.round(c/t*100):0;
+}
+function updateMenuBar(){
+  const m = overallMastery();
+  $('menuBar').style.width = m+'%';
+  $('menuBarPct').textContent = m+'%';
+}
+
+/* ---------- DIFFICULTY SCREEN ---------- */
+let pendingGame = null;
+function openDiff(gameKey){
+  pendingGame = gameKey;
+  selectedDiff = selectedDiff || 'easy';
+  const g = GAMES[gameKey];
+  $('diffTitle').textContent = `${g.ico} ${g.n}`;
+  $('diffDesc').textContent = g.d;
+  const grid = $('diffGrid'); grid.innerHTML='';
+  Object.keys(DIFFS).forEach(dk=>{
+    const d = DIFFS[dk];
+    const el = document.createElement('div');
+    el.className='diff'+(selectedDiff===dk?' active':'');
+    el.onclick=()=>{ selectedDiff=dk; document.querySelectorAll('.diff').forEach(x=>x.classList.remove('active')); el.classList.add('active'); };
+    el.innerHTML=`<div class="ds">${d.sym}</div><div class="dn">${d.n}</div><div class="dl">${d.label}</div>`;
+    grid.appendChild(el);
+  });
+  showScreen('diff');
+}
+let selectedDiff = 'easy';
+
+/* ---------- BUILD A ROUND ---------- */
+const ROUND_LEN = 10;
+function buildRound(gameKey, diffKey){
+  const lvl = DIFFS[diffKey].lvl;
+  let pool;
+  if(gameKey==='mixed'){
+    pool = QUESTIONS.slice(); // all games, all levels
+  } else if(gameKey==='speed'){
+    pool = QUESTIONS.filter(q=>q.lvl===lvl && q.game!=='detective'); // quick-answer types
+    if(pool.length<8) pool = QUESTIONS.filter(q=>q.lvl===lvl);
+  } else {
+    pool = QUESTIONS.filter(q=>q.game===gameKey && q.lvl===lvl);
+    if(pool.length<ROUND_LEN){ // widen by neighbouring levels if a game lacks items at that level
+      pool = QUESTIONS.filter(q=>q.game===gameKey);
+    }
+  }
+  const chosen = shuffle(pool);
+  const len = gameKey==='speed' ? Math.min(pool.length,200) : Math.min(ROUND_LEN, chosen.length);
+  return chosen.slice(0, gameKey==='speed'? chosen.length : len);
+}
+
+/* ---------- BEGIN GAME ---------- */
+function beginGame(){
+  startRound(pendingGame, selectedDiff, false);
+}
+function startRound(gameKey, diffKey, isReview){
+  const queue = isReview ? buildReviewQueue() : buildRound(gameKey, diffKey);
+  if(queue.length===0){ toast('Ingen spørgsmål — prøv et andet niveau'); return; }
+  S = {
+    game:gameKey, diff:diffKey, review:isReview,
+    queue, idx:0, correct:0, answered:0, streak:0, bestStreak:0,
+    speed: gameKey==='speed' && !isReview,
+    timeLeft:60, timer:null, locked:false
+  };
+  $('hudTimerChip').classList.toggle('hidden', !S.speed);
+  $('hudGame').textContent = (isReview?'🪄 Gennemse fejl':(GAMES[gameKey].ico+' '+GAMES[gameKey].n));
+  if(S.speed){ startTimer(); }
+  showScreen('game');
+  renderQuestion();
+}
+function startTimer(){
+  S.timeLeft=60; $('hudTimer').textContent=60;
+  S.timer = setInterval(()=>{
+    S.timeLeft--; $('hudTimer').textContent=S.timeLeft;
+    if(S.timeLeft<=0){ clearInterval(S.timer); endRound(); }
+  },1000);
+}
+
+/* ---------- RENDER QUESTION ---------- */
+function renderQuestion(){
+  const q = S.queue[S.idx];
+  S.locked=false;
+  $('feedback').className='feedback';
+  $('nextRow').classList.add('hidden');
+  const total = S.speed ? '∞' : S.queue.length;
+  $('hudProgress').textContent = `${S.idx+1} / ${total}`;
+  $('hudStreak').textContent = S.streak;
+  $('gameBar').style.width = S.speed ? Math.min(100,(S.timeLeft/60*100))+'%' : ((S.idx)/S.queue.length*100)+'%';
+
+  const area = $('qArea');
+  area.innerHTML = `
+    <div class="q-instruction">${q.instruction}</div>
+    <div class="q-prompt">${q.prompt}</div>
+    <div class="options" id="opts"></div>`;
+  const opts = $('opts');
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement('div');
+    b.className='opt'; b.textContent=opt;
+    b.onclick=()=>answer(i,b);
+    opts.appendChild(b);
+  });
+}
+
+/* ---------- ANSWER ---------- */
+const OK_MSGS = ['Godt klaret!','Flot arbejde!','Du bliver bedre!'];
+const NO_MSGS = ['Prøv igen!','Næsten!','Du bliver bedre!'];
+function answer(i, el){
+  if(S.locked) return;
+  S.locked=true;
+  const q = S.queue[S.idx];
+  const correct = (i===q.correct);
+  const opts = [...document.querySelectorAll('.opt')];
+  opts.forEach((o,idx)=>{ o.classList.add('locked');
+    if(idx===q.correct) o.classList.add('correct');
+    if(idx===i && !correct) o.classList.add('wrong');
+  });
+  // record
+  S.answered++;
+  recordResult(q, correct);
+  if(correct){
+    S.correct++; S.streak++; if(S.streak>S.bestStreak) S.bestStreak=S.streak;
+    if(S.streak>0 && S.streak%5===0) toast('🔥 '+S.streak+' i træk!');
+  } else {
+    S.streak=0;
+  }
+  $('hudStreak').textContent=S.streak;
+
+  // feedback
+  const fb=$('feedback'); const fbh=$('fbHead'); const fbx=$('fbExplain');
+  fb.className='feedback show '+(correct?'ok':'no');
+  fbh.textContent = correct? pick(OK_MSGS) : pick(NO_MSGS);
+  fbx.textContent = correct ? q.explanation : ('❌ ' + q.explanation);
+
+  if(S.speed){
+    // brief pause then auto-advance
+    setTimeout(()=>nextQuestion(), 750);
+  } else {
+    $('nextRow').classList.remove('hidden');
+    const last = (S.idx >= S.queue.length-1);
+    $('nextBtn').textContent = last ? 'Se resultat 🏆' : 'Næste ⚡';
+  }
+}
+
+function recordResult(q, correct){
+  P.total++; if(correct) P.correct++;
+  const dk = S.review ? (['easy','medium','hard'][q.lvl-1]) : S.diff;
+  if(P.perDiff[dk]){ P.perDiff[dk].t++; if(correct) P.perDiff[dk].c++; }
+  if(S.bestStreak>P.bestStreak) P.bestStreak=S.bestStreak;
+  // per verb
+  if(q.verb){
+    if(!P.perVerb[q.verb]) P.perVerb[q.verb]={c:0,w:0};
+    if(correct) P.perVerb[q.verb].c++; else P.perVerb[q.verb].w++;
+  }
+  // mistakes log
+  if(!correct){
+    P.mistakes = P.mistakes.filter(m=>m.id!==q.id);
+    P.mistakes.push({id:q.id});
+    if(P.mistakes.length>60) P.mistakes.shift();
+  } else if(S.review){
+    // mastered a review item -> remove from mistakes
+    P.mistakes = P.mistakes.filter(m=>m.id!==q.id);
+  }
+  saveProgress();
+}
+
+/* ---------- NEXT / END ---------- */
+function nextQuestion(){
+  if(S.speed){
+    S.idx++;
+    if(S.idx>=S.queue.length){ S.queue = S.queue.concat(shuffle(buildRound('speed',S.diff))); }
+    renderQuestion();
+    return;
+  }
+  if(S.idx >= S.queue.length-1){ endRound(); return; }
+  S.idx++; renderQuestion();
+}
+function endRound(){
+  if(S.timer) clearInterval(S.timer);
+  // mark game completed
+  if(!S.review){ P.completed[S.game]=true; saveProgress(); }
+  const acc = S.answered? Math.round(S.correct/S.answered*100):0;
+  $('resScore').textContent = S.correct + (S.speed? '':' / '+S.answered);
+  $('resAcc').textContent = acc+'%';
+  $('resStreak').textContent = S.bestStreak;
+  $('resTitle').textContent = S.review ? 'Gennemgang fuldført!' : (S.speed? 'Tiden er gået! ⚡':'Runde fuldført!');
+  // badges
+  const badges=[];
+  if(acc===100 && S.answered>=5) badges.push('🏅 Perfekt runde');
+  if(S.bestStreak>=8) badges.push('🔥 Stime på '+S.bestStreak);
+  if(S.speed) badges.push('⚡ '+S.correct+' på 60 sek');
+  if(acc>=80) badges.push('✨ Troldmandsniveau');
+  $('resBadges').innerHTML = badges.map(b=>`<span class="badge">${b}</span>`).join('');
+  updateMenuBar();
+  showScreen('result');
+}
+function replaySame(){
+  if(S.review){ startReview(); return; }
+  startRound(S.game, S.diff, false);
+}
+function quitGame(){ if(S&&S.timer) clearInterval(S.timer); goMenu(); }
+
+/* ---------- REVIEW MISTAKES ---------- */
+function buildReviewQueue(){
+  const ids = new Set(P.mistakes.map(m=>m.id));
+  return shuffle(QUESTIONS.filter(q=>ids.has(q.id))).slice(0,15);
+}
+function startReview(){
+  if(P.mistakes.length===0){ toast('Ingen fejl at gennemse — flot! ✨'); return; }
+  startRound(null, null, true);
+}
+
+/* ---------- STATS ---------- */
+function showStats(){
+  const acc = P.total? Math.round(P.correct/P.total*100):0;
+  $('stAcc').textContent=acc+'%';
+  $('stTotal').textContent=P.total;
+  $('stStreak').textContent=P.bestStreak;
+  $('stGames').textContent=Object.keys(P.completed).length+'/8';
+  $('missCount').textContent=P.mistakes.length;
+  // mastery per level
+  const mb=$('masteryBox'); mb.innerHTML='';
+  ['easy','medium','hard'].forEach(dk=>{
+    const d=P.perDiff[dk]; const pct=d.t?Math.round(d.c/d.t*100):0;
+    mb.innerHTML+=`<div class="mastery-row"><span class="ml">${DIFFS[dk].sym} ${DIFFS[dk].n}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="mp">${pct}%</span></div>`;
+  });
+  // weakest / strongest verbs
+  const arr = Object.keys(P.perVerb).map(k=>{
+    const o=P.perVerb[k]; const tot=o.c+o.w; return {v:k, tot, rate:tot?o.c/tot:0, w:o.w};
+  }).filter(x=>x.tot>=2);
+  const weak = arr.filter(x=>x.w>0).sort((a,b)=>a.rate-b.rate).slice(0,8);
+  const strong = arr.slice().sort((a,b)=>b.rate-a.rate || b.tot-a.tot).slice(0,8);
+  $('weakBox').innerHTML = weak.length? weak.map(x=>`<span class="vtag weak">${x.v} <small>(${Math.round(x.rate*100)}%)</small></span>`).join('') : '<span style="color:var(--muted)">Endnu ingen svage verber — godt gået!</span>';
+  $('strongBox').innerHTML = strong.length? strong.map(x=>`<span class="vtag strong">${x.v} <small>(${Math.round(x.rate*100)}%)</small></span>`).join('') : '<span style="color:var(--muted)">Endnu ingen data.</span>';
+  showScreen('stats');
+}
+
+/* ---------- NAV ---------- */
+function goMenu(){ if(S&&S.timer) clearInterval(S.timer); buildMenu(); showScreen('menu'); }
+function resetProgress(){
+  if(confirm('Nulstil alt fremskridt? Dette kan ikke fortrydes.')){
+    P=defaultProgress(); saveProgress(); buildMenu(); toast('Fremskridt nulstillet');
+  }
+}
+
+/* ---------- STARS ---------- */
+(function(){
+  const s=$('stars'); let html='';
+  for(let i=0;i<70;i++){
+    const x=Math.random()*100, y=Math.random()*100, d=(Math.random()*3).toFixed(2), sz=(Math.random()*1.6+0.6).toFixed(1);
+    html+=`<div class="star" style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;animation-delay:${d}s"></div>`;
+  }
+  s.innerHTML=html;
+})();
+
+/* ---------- KEYBOARD ---------- */
+document.addEventListener('keydown',e=>{
+  if($('screen-game').classList.contains('hidden')) return;
+  if(['1','2','3'].includes(e.key)){
+    const opts=document.querySelectorAll('.opt'); const i=+e.key-1;
+    if(opts[i] && !S.locked) opts[i].click();
+  } else if(e.key==='Enter'){
+    if(!$('nextRow').classList.contains('hidden')) $('nextBtn').click();
+  }
+});
+
+/* ---------- INIT ---------- */
+buildMenu();
+showScreen('menu');
+console.log('Magiske Verber loaded. Questions:', QUESTIONS.length);
+</script>
+</body>
+</html>

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordenes Vidunderland · Dansk Ordtræner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Tangerine:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2b1d3a;            /* deep aubergine */
+    --parch:#f5ead0;          /* parchment */
+    --parch-2:#ece0bf;
+    --gold:#c79a3a;
+    --gold-2:#e7c768;
+    --rose:#a8132b;           /* queen of hearts red */
+    --rose-2:#c4324a;
+    --teal:#15534c;           /* wonderland green */
+    --teal-2:#1d6f63;
+    --plum:#5b2a6b;
+    --muted:#6c5a52;
+    --ok:#1d6f63;
+    --bad:#a8132b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'EB Garamond',Georgia,serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:26px 14px 70px;
+    display:flex;justify-content:center;align-items:flex-start;
+    background:
+      radial-gradient(circle at 20% 12%, rgba(120,60,140,.35), transparent 45%),
+      radial-gradient(circle at 82% 78%, rgba(20,110,90,.40), transparent 50%),
+      linear-gradient(160deg,#1a0f2b 0%, #14233a 55%, #0e2b27 100%);
+    background-attachment:fixed;
+  }
+  /* faint card-suit pattern overlay */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;
+    background-image:
+      radial-gradient(circle at 25px 25px, #fff 2px, transparent 3px),
+      radial-gradient(circle at 75px 75px, #fff 2px, transparent 3px);
+    background-size:100px 100px;
+  }
+
+  .book{
+    position:relative;width:100%;max-width:600px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.4), transparent 30%),
+      repeating-linear-gradient(0deg, rgba(150,110,60,.05) 0 2px, transparent 2px 26px),
+      var(--parch);
+    border-radius:14px;
+    border:1px solid rgba(120,80,40,.4);
+    box-shadow:0 0 0 8px rgba(199,154,58,.25), 0 26px 70px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  /* ornate gold frame */
+  .book::after{
+    content:"";position:absolute;inset:10px;border:2px solid var(--gold);
+    border-radius:8px;pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(199,154,58,.4);
+  }
+
+  header{
+    text-align:center;padding:26px 26px 16px;position:relative;
+  }
+  .eyebrow{font-family:'Tangerine',cursive;font-size:2rem;color:var(--rose);line-height:.7;margin-bottom:2px}
+  header h1{
+    font-family:'Cinzel Decorative',serif;font-weight:900;
+    font-size:1.65rem;margin:.1em 0 .15em;color:var(--ink);letter-spacing:.5px;
+    text-shadow:0 1px 0 rgba(255,255,255,.5);
+  }
+  header .quote{font-style:italic;color:var(--muted);font-size:1.02rem;margin:0}
+  .rule{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 2px;color:var(--gold)}
+  .rule::before,.rule::after{content:"";height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .rule::after{background:linear-gradient(90deg,var(--gold),transparent)}
+
+  .home-btn{
+    position:absolute;top:22px;left:22px;display:none;
+    background:var(--teal);color:#f5ead0;border:1px solid var(--gold);
+    padding:7px 13px;border-radius:8px;font-family:'EB Garamond';font-size:.95rem;cursor:pointer;
+  }
+  .home-btn:hover{background:var(--teal-2)}
+
+  .stage{padding:8px 26px 30px;position:relative;z-index:1}
+
+  /* ---------- MENU ---------- */
+  .menu-grid{display:grid;gap:13px;margin-top:6px}
+  .mode-card{
+    display:flex;align-items:center;gap:15px;width:100%;text-align:left;cursor:pointer;
+    background:linear-gradient(180deg,#fff8e8,#f0e3c2);
+    border:1.5px solid var(--gold);border-radius:12px;padding:14px 16px;
+    transition:transform .15s, box-shadow .15s;
+    font-family:'EB Garamond',serif;
+  }
+  .mode-card:hover{transform:translateY(-3px) rotate(-.3deg);box-shadow:0 12px 26px rgba(40,20,10,.35)}
+  .emblem{flex:0 0 52px;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+  .emblem svg{width:46px;height:46px}
+  .mode-card h3{margin:0 0 2px;font-family:'Cinzel Decorative',serif;font-size:1.02rem;color:var(--ink)}
+  .mode-card p{margin:0;font-size:.96rem;color:var(--muted);font-style:italic}
+  .count-note{text-align:center;margin-top:16px;color:var(--muted);font-style:italic;font-size:.95rem}
+
+  /* ---------- GENERIC GAME ---------- */
+  .topbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px}
+  .pill{background:#fff8e8;border:1px solid var(--gold);border-radius:999px;padding:5px 14px;font-size:.95rem;font-weight:500}
+  .pill.streak{color:var(--rose)}
+  .pill.timer{color:var(--teal)}
+  .pill.timer.low{color:var(--rose);font-weight:700}
+  #progress-bar{height:8px;background:rgba(120,80,40,.2);border-radius:6px;overflow:hidden;margin-bottom:20px;border:1px solid rgba(120,80,40,.25)}
+  #progress{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .35s}
+
+  .prompt{text-align:center}
+  .hint{font-style:italic;color:var(--muted);min-height:1.2rem;margin-bottom:4px;font-size:1rem}
+  .word{font-family:'Cinzel Decorative',serif;font-size:2.1rem;font-weight:700;margin:8px 0 6px;color:var(--ink);word-break:break-word}
+  .word .art{font-family:'EB Garamond';color:var(--rose);font-weight:500;font-size:1.4rem;font-style:italic}
+  .translation{font-style:italic;color:var(--teal);font-size:1.05rem;min-height:1.2rem;margin-bottom:18px}
+
+  .buttons{display:flex;gap:14px;margin:8px 0 16px}
+  .btn-big{
+    flex:1;font-family:'Cinzel Decorative',serif;font-size:1.4rem;font-weight:700;padding:16px 0;border-radius:12px;cursor:pointer;color:#f7ecd2;
+    border:1.5px solid var(--gold);transition:transform .12s,opacity .2s;
+  }
+  .btn-big:active{transform:scale(.97)}
+  #btnEn{background:linear-gradient(180deg,var(--teal-2),var(--teal))}
+  #btnEt{background:linear-gradient(180deg,var(--plum),#3f1d4c)}
+  .btn-big:disabled{opacity:.5;cursor:default}
+
+  .answer-row{display:flex;gap:10px;margin:6px 0 14px}
+  .answer-row input{
+    flex:1;font-family:'EB Garamond',serif;font-size:1.25rem;padding:13px 16px;border:1.5px solid var(--gold);
+    border-radius:12px;text-align:center;outline:none;background:#fffdf6;color:var(--ink);
+  }
+  .answer-row input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(168,19,43,.12)}
+  .answer-row button{
+    border:1.5px solid var(--gold);background:var(--rose);color:#f7ecd2;padding:0 22px;border-radius:12px;
+    font-family:'Cinzel Decorative',serif;font-size:1rem;cursor:pointer;
+  }
+
+  /* MC options */
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 12px}
+  .opt{
+    padding:15px 10px;border:1.5px solid var(--gold);border-radius:12px;background:#fff8e8;cursor:pointer;
+    font-size:1.15rem;font-family:'EB Garamond',serif;transition:transform .1s, background .15s;
+  }
+  .opt:hover:not(.locked){transform:translateY(-2px);background:#fff}
+  .opt.correct{background:var(--teal);color:#f7ecd2;border-color:var(--teal)}
+  .opt.wrong{background:var(--rose);color:#f7ecd2;border-color:var(--rose)}
+  .opt.locked{cursor:default}
+
+  /* flashcard */
+  .flash{
+    margin:6px auto 14px;max-width:360px;min-height:200px;cursor:pointer;perspective:1200px;
+  }
+  .flash-inner{position:relative;width:100%;min-height:200px;transition:transform .5s;transform-style:preserve-3d}
+  .flash.flipped .flash-inner{transform:rotateY(180deg)}
+  .flash-face{
+    position:absolute;inset:0;backface-visibility:hidden;border:1.5px solid var(--gold);border-radius:14px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;
+    background:linear-gradient(180deg,#fff8e8,#efe1bf);box-shadow:0 8px 18px rgba(40,20,10,.25);
+  }
+  .flash-back{transform:rotateY(180deg);background:linear-gradient(180deg,#eafaf3,#d9efe4)}
+  .flash-face .big{font-family:'Cinzel Decorative',serif;font-size:1.9rem;color:var(--ink)}
+  .flash-face .sub{font-style:italic;color:var(--teal);font-size:1.05rem;margin-top:6px}
+  .flash-face .tag{position:absolute;top:10px;right:14px;font-style:italic;color:var(--muted);font-size:.85rem}
+  .flash-tip{text-align:center;font-style:italic;color:var(--muted);margin-bottom:10px}
+
+  /* matching */
+  .match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:6px 0 12px}
+  .match-col{display:flex;flex-direction:column;gap:10px}
+  .match-tile{
+    padding:13px 8px;border:1.5px solid var(--gold);border-radius:10px;background:#fff8e8;cursor:pointer;
+    text-align:center;font-size:1.08rem;transition:background .15s,transform .1s;
+  }
+  .match-tile:hover:not(.done){background:#fff}
+  .match-tile.sel{background:var(--gold-2);transform:scale(1.03)}
+  .match-tile.done{background:var(--teal);color:#f7ecd2;border-color:var(--teal);cursor:default;opacity:.85}
+  .match-tile.err{background:var(--rose);color:#f7ecd2}
+
+  #message{text-align:center;font-size:1.1rem;min-height:1.6rem;margin:4px 0;font-weight:500}
+  #message small{display:block;font-weight:400;color:var(--muted);font-style:italic;margin-top:3px}
+  #next{
+    display:none;margin:6px auto 0;width:100%;padding:13px 0;border:1.5px solid var(--gold);border-radius:12px;cursor:pointer;
+    background:var(--gold);color:#3a2410;font-family:'Cinzel Decorative',serif;font-size:1.05rem;
+  }
+
+  /* sub-menu (style picker) */
+  .submenu{display:grid;gap:12px;margin-top:8px}
+
+  /* ---------- END ---------- */
+  .end{text-align:center;padding:10px 0}
+  .end .big{font-size:3rem;margin:4px 0}
+  .end h2{font-family:'Cinzel Decorative',serif;margin:0 0 4px;color:var(--ink)}
+  .end p{color:var(--muted);font-style:italic;margin:4px 0}
+  .end .grade{font-size:1.15rem;margin:12px 0;color:var(--teal)}
+  .end-actions{display:flex;gap:12px;margin-top:18px}
+  .end-actions button{flex:1;padding:13px 0;border:1.5px solid var(--gold);border-radius:12px;cursor:pointer;font-family:'Cinzel Decorative',serif;font-size:1rem}
+  .btn-primary{background:var(--rose);color:#f7ecd2}
+  .btn-soft{background:#fff8e8;color:var(--ink)}
+
+  .hidden{display:none}
+  @media(max-width:600px){
+    header h1{font-size:1.3rem}
+    .word{font-size:1.75rem}
+    .options{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="book">
+  <button class="home-btn" id="homeBtn">← Tilbage</button>
+  <header>
+    <div class="eyebrow">Velkommen til</div>
+    <h1>Ordenes Vidunderland</h1>
+    <p class="quote" id="quote">"Hvor skal jeg gå hen herfra?" – "Det afhænger af, hvor du vil hen."</p>
+    <div class="rule">♠ ♥ ♣ ♦</div>
+  </header>
+  <div class="stage">
+
+    <!-- MENU -->
+    <section id="menu">
+      <div class="menu-grid">
+        <button class="mode-card" data-mode="enet">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><text x="24" y="30" font-family="Cinzel Decorative,serif" font-size="14" font-weight="700" text-anchor="middle" fill="#a8132b">?</text><path d="M24 4 a20 20 0 0 1 0 40" fill="none" stroke="#15534c" stroke-width="2"/></svg>
+          </span>
+          <span><h3>En eller et?</h3><p>Larvens evige spørgsmål – vælg artiklen</p></span>
+        </button>
+        <button class="mode-card" data-mode="definite">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><rect x="9" y="7" width="30" height="34" rx="4" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><text x="24" y="30" font-family="Cinzel Decorative,serif" font-size="13" text-anchor="middle" fill="#a8132b">-en</text></svg>
+          </span>
+          <span><h3>Bestemt form</h3><p>en bil → <em>bilen</em>, et hus → <em>huset</em></p></span>
+        </button>
+        <button class="mode-card" data-mode="plural">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><rect x="7" y="10" width="24" height="28" rx="3" fill="#efe1bf" stroke="#c79a3a" stroke-width="2"/><rect x="15" y="6" width="24" height="28" rx="3" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><text x="27" y="24" font-family="Cinzel Decorative,serif" font-size="12" text-anchor="middle" fill="#15534c">-er</text></svg>
+          </span>
+          <span><h3>Flertal</h3><p>en bil → <em>biler</em>, et hus → <em>huse</em></p></span>
+        </button>
+        <button class="mode-card" data-mode="sentence">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><path d="M24 6c8 0 14 5 14 11s-6 11-14 11c-2 0-4-.3-6-.8L10 40l1-7c-4-2-7-6-7-10C4 11 14 6 24 6z" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><text x="24" y="22" font-size="11" text-anchor="middle" fill="#a8132b">___</text></svg>
+          </span>
+          <span><h3>Dronningens gåder</h3><p>Udfyld hullet i sætningen – bestemt/ubestemt</p></span>
+        </button>
+        <button class="mode-card" data-mode="opposites">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><rect x="6" y="9" width="16" height="30" rx="3" fill="#eafaf3" stroke="#c79a3a" stroke-width="2"/><rect x="26" y="9" width="16" height="30" rx="3" fill="#fdeef0" stroke="#c79a3a" stroke-width="2"/><path d="M24 6v36" stroke="#c79a3a" stroke-width="2" stroke-dasharray="3 3"/></svg>
+          </span>
+          <span><h3>Spejlordene</h3><p>100 modsætninger · <em>god ↔ dårlig</em></p></span>
+        </button>
+        <button class="mode-card" data-mode="synonyms">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><circle cx="18" cy="24" r="13" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><circle cx="30" cy="24" r="13" fill="rgba(199,154,58,.25)" stroke="#15534c" stroke-width="2"/></svg>
+          </span>
+          <span><h3>Tvillingordene</h3><p>100 synonymer · <em>glad = lykkelig</em></p></span>
+        </button>
+        <button class="mode-card" data-mode="speed">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><path d="M24 26V16M24 26l7 4" stroke="#a8132b" stroke-width="2" stroke-linecap="round"/><rect x="20" y="3" width="8" height="5" rx="2" fill="#c79a3a"/><path d="M24 8v3" stroke="#c79a3a" stroke-width="2"/></svg>
+          </span>
+          <span><h3>Den Hvide Kanins ræs</h3><p>"Jeg kommer for sent!" – en/et på 60 sek.</p></span>
+        </button>
+      </div>
+      <div class="count-note">♦ <span id="wordCount">0</span> navneord · 100 modsætninger · 100 synonymer ♦</div>
+    </section>
+
+    <!-- STYLE SUBMENU (opposites/synonyms) -->
+    <section id="submenu" class="hidden">
+      <div class="submenu">
+        <button class="mode-card" data-style="mc">
+          <span class="emblem"><svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="6" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><path d="M16 24l5 5 11-12" fill="none" stroke="#15534c" stroke-width="3" stroke-linecap="round"/></svg></span>
+          <span><h3>Quiz</h3><p>Vælg det rigtige ord blandt fire</p></span>
+        </button>
+        <button class="mode-card" data-style="flash">
+          <span class="emblem"><svg viewBox="0 0 48 48"><rect x="7" y="12" width="34" height="24" rx="4" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><path d="M24 12v24" stroke="#c79a3a" stroke-width="2" stroke-dasharray="3 3"/></svg></span>
+          <span><h3>Vendekort</h3><p>Vend kortet og se parret</p></span>
+        </button>
+        <button class="mode-card" data-style="match">
+          <span class="emblem"><svg viewBox="0 0 48 48"><circle cx="15" cy="15" r="7" fill="#eafaf3" stroke="#c79a3a" stroke-width="2"/><circle cx="33" cy="33" r="7" fill="#fdeef0" stroke="#c79a3a" stroke-width="2"/><path d="M20 18l8 12" stroke="#15534c" stroke-width="2"/></svg></span>
+          <span><h3>Find par</h3><p>Match ordene med deres partner</p></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section id="game" class="hidden">
+      <div class="topbar">
+        <span class="pill" id="scorePill">Point: 0 / 0</span>
+        <span class="pill streak" id="streakPill">🔥 0</span>
+        <span class="pill timer hidden" id="timerPill">⏱ 60</span>
+      </div>
+      <div id="progress-bar"><div id="progress"></div></div>
+
+      <div class="prompt">
+        <div class="hint" id="hint"></div>
+        <div class="word" id="word">&nbsp;</div>
+        <div class="translation" id="trans"></div>
+      </div>
+
+      <div class="buttons hidden" id="enetButtons">
+        <button class="btn-big" id="btnEn">en</button>
+        <button class="btn-big" id="btnEt">et</button>
+      </div>
+
+      <div class="answer-row hidden" id="typeRow">
+        <input type="text" id="answerInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Skriv her...">
+        <button id="submitBtn">Svar</button>
+      </div>
+
+      <div class="options hidden" id="optionsBox"></div>
+
+      <div class="flash hidden" id="flashCard">
+        <div class="flash-inner">
+          <div class="flash-face"><span class="tag" id="flashTagF"></span><span class="big" id="flashFront"></span><span class="sub" id="flashFrontT"></span></div>
+          <div class="flash-face flash-back"><span class="tag" id="flashTagB"></span><span class="big" id="flashBack"></span><span class="sub" id="flashBackT"></span></div>
+        </div>
+      </div>
+      <div class="flash-tip hidden" id="flashTip">Tryk på kortet for at vende det</div>
+
+      <div class="match-wrap hidden" id="matchBox">
+        <div class="match-col" id="matchLeft"></div>
+        <div class="match-col" id="matchRight"></div>
+      </div>
+
+      <div id="message"></div>
+      <button id="next">Næste →</button>
+    </section>
+
+    <!-- END -->
+    <section id="end" class="hidden">
+      <div class="end">
+        <div class="big" id="endEmoji">🎉</div>
+        <h2 id="endTitle">Færdig!</h2>
+        <p id="endLine"></p>
+        <div class="grade" id="endGrade"></div>
+        <div class="end-actions">
+          <button class="btn-primary" id="againBtn">Igen</button>
+          <button class="btn-soft" id="menuBtn">Til menuen</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   NAVNEORD: w=ubestemt, a=artikel, d=bestemt ental, p=ubestemt flertal
+   (p=null for utællelige). Formerne er kontrolleret manuelt.
+   ===================================================================== */
+const DATA=[
+  {w:"mand",a:"en",d:"manden",p:"mænd"},{w:"kvinde",a:"en",d:"kvinden",p:"kvinder"},
+  {w:"dreng",a:"en",d:"drengen",p:"drenge"},{w:"pige",a:"en",d:"pigen",p:"piger"},
+  {w:"mor",a:"en",d:"moren",p:"mødre"},{w:"far",a:"en",d:"faren",p:"fædre"},
+  {w:"søster",a:"en",d:"søsteren",p:"søstre"},{w:"bror",a:"en",d:"broren",p:"brødre"},
+  {w:"søn",a:"en",d:"sønnen",p:"sønner"},{w:"datter",a:"en",d:"datteren",p:"døtre"},
+  {w:"tante",a:"en",d:"tanten",p:"tanter"},{w:"onkel",a:"en",d:"onklen",p:"onkler"},
+  {w:"nabo",a:"en",d:"naboen",p:"naboer"},{w:"ven",a:"en",d:"vennen",p:"venner"},
+  {w:"veninde",a:"en",d:"veninden",p:"veninder"},{w:"kollega",a:"en",d:"kollegaen",p:"kolleger"},
+  {w:"lærer",a:"en",d:"læreren",p:"lærere"},{w:"elev",a:"en",d:"eleven",p:"elever"},
+  {w:"chef",a:"en",d:"chefen",p:"chefer"},{w:"læge",a:"en",d:"lægen",p:"læger"},
+  {w:"advokat",a:"en",d:"advokaten",p:"advokater"},{w:"kunstner",a:"en",d:"kunstneren",p:"kunstnere"},
+  {w:"konge",a:"en",d:"kongen",p:"konger"},{w:"dronning",a:"en",d:"dronningen",p:"dronninger"},
+  {w:"barn",a:"et",d:"barnet",p:"børn"},{w:"menneske",a:"et",d:"mennesket",p:"mennesker"},
+  {w:"kat",a:"en",d:"katten",p:"katte"},{w:"hund",a:"en",d:"hunden",p:"hunde"},
+  {w:"fugl",a:"en",d:"fuglen",p:"fugle"},{w:"mus",a:"en",d:"musen",p:"mus"},
+  {w:"ko",a:"en",d:"koen",p:"køer"},{w:"hest",a:"en",d:"hesten",p:"heste"},
+  {w:"gris",a:"en",d:"grisen",p:"grise"},{w:"ged",a:"en",d:"geden",p:"geder"},
+  {w:"ulv",a:"en",d:"ulven",p:"ulve"},{w:"bjørn",a:"en",d:"bjørnen",p:"bjørne"},
+  {w:"ræv",a:"en",d:"ræven",p:"ræve"},{w:"løve",a:"en",d:"løven",p:"løver"},
+  {w:"tiger",a:"en",d:"tigeren",p:"tigre"},{w:"kanin",a:"en",d:"kaninen",p:"kaniner"},
+  {w:"and",a:"en",d:"anden",p:"ænder"},{w:"gås",a:"en",d:"gåsen",p:"gæs"},
+  {w:"fisk",a:"en",d:"fisken",p:"fisk"},{w:"abe",a:"en",d:"aben",p:"aber"},
+  {w:"bi",a:"en",d:"bien",p:"bier"},{w:"slange",a:"en",d:"slangen",p:"slanger"},
+  {w:"hare",a:"en",d:"haren",p:"harer"},{w:"får",a:"et",d:"fåret",p:"får"},
+  {w:"dyr",a:"et",d:"dyret",p:"dyr"},{w:"lam",a:"et",d:"lammet",p:"lam"},
+  {w:"insekt",a:"et",d:"insektet",p:"insekter"},{w:"egern",a:"et",d:"egernet",p:"egern"},
+  {w:"hånd",a:"en",d:"hånden",p:"hænder"},{w:"fod",a:"en",d:"foden",p:"fødder"},
+  {w:"arm",a:"en",d:"armen",p:"arme"},{w:"finger",a:"en",d:"fingeren",p:"fingre"},
+  {w:"næse",a:"en",d:"næsen",p:"næser"},{w:"mund",a:"en",d:"munden",p:"munde"},
+  {w:"mave",a:"en",d:"maven",p:"maver"},{w:"hals",a:"en",d:"halsen",p:"halse"},
+  {w:"tand",a:"en",d:"tanden",p:"tænder"},{w:"tunge",a:"en",d:"tungen",p:"tunger"},
+  {w:"skulder",a:"en",d:"skulderen",p:"skuldre"},{w:"ryg",a:"en",d:"ryggen",p:"rygge"},
+  {w:"ben",a:"et",d:"benet",p:"ben"},{w:"øje",a:"et",d:"øjet",p:"øjne"},
+  {w:"øre",a:"et",d:"øret",p:"ører"},{w:"hoved",a:"et",d:"hovedet",p:"hoveder"},
+  {w:"hjerte",a:"et",d:"hjertet",p:"hjerter"},{w:"knæ",a:"et",d:"knæet",p:"knæ"},
+  {w:"ansigt",a:"et",d:"ansigtet",p:"ansigter"},{w:"hår",a:"et",d:"håret",p:"hår"},
+  {w:"stol",a:"en",d:"stolen",p:"stole"},{w:"sofa",a:"en",d:"sofaen",p:"sofaer"},
+  {w:"seng",a:"en",d:"sengen",p:"senge"},{w:"lampe",a:"en",d:"lampen",p:"lamper"},
+  {w:"vase",a:"en",d:"vasen",p:"vaser"},{w:"plante",a:"en",d:"planten",p:"planter"},
+  {w:"pude",a:"en",d:"puden",p:"puder"},{w:"dør",a:"en",d:"døren",p:"døre"},
+  {w:"væg",a:"en",d:"væggen",p:"vægge"},{w:"trappe",a:"en",d:"trappen",p:"trapper"},
+  {w:"have",a:"en",d:"haven",p:"haver"},{w:"kniv",a:"en",d:"kniven",p:"knive"},
+  {w:"gaffel",a:"en",d:"gaflen",p:"gafler"},{w:"ske",a:"en",d:"skeen",p:"skeer"},
+  {w:"tallerken",a:"en",d:"tallerkenen",p:"tallerkener"},{w:"skål",a:"en",d:"skålen",p:"skåle"},
+  {w:"flaske",a:"en",d:"flasken",p:"flasker"},{w:"kop",a:"en",d:"koppen",p:"kopper"},
+  {w:"ovn",a:"en",d:"ovnen",p:"ovne"},{w:"nøgle",a:"en",d:"nøglen",p:"nøgler"},
+  {w:"bord",a:"et",d:"bordet",p:"borde"},{w:"gulv",a:"et",d:"gulvet",p:"gulve"},
+  {w:"tag",a:"et",d:"taget",p:"tage"},{w:"vindue",a:"et",d:"vinduet",p:"vinduer"},
+  {w:"tæppe",a:"et",d:"tæppet",p:"tæpper"},{w:"fjernsyn",a:"et",d:"fjernsynet",p:"fjernsyn"},
+  {w:"skab",a:"et",d:"skabet",p:"skabe"},{w:"spejl",a:"et",d:"spejlet",p:"spejle"},
+  {w:"køkken",a:"et",d:"køkkenet",p:"køkkener"},{w:"glas",a:"et",d:"glasset",p:"glas"},
+  {w:"værelse",a:"et",d:"værelset",p:"værelser"},{w:"billede",a:"et",d:"billedet",p:"billeder"},
+  {w:"kage",a:"en",d:"kagen",p:"kager"},{w:"is",a:"en",d:"isen",p:"is"},
+  {w:"frugt",a:"en",d:"frugten",p:"frugter"},{w:"banan",a:"en",d:"bananen",p:"bananer"},
+  {w:"tomat",a:"en",d:"tomaten",p:"tomater"},{w:"agurk",a:"en",d:"agurken",p:"agurker"},
+  {w:"kartoffel",a:"en",d:"kartoflen",p:"kartofler"},{w:"gulerod",a:"en",d:"guleroden",p:"gulerødder"},
+  {w:"løg",a:"et",d:"løget",p:"løg"},{w:"æble",a:"et",d:"æblet",p:"æbler"},
+  {w:"æg",a:"et",d:"ægget",p:"æg"},{w:"brød",a:"et",d:"brødet",p:"brød"},
+  {w:"måltid",a:"et",d:"måltidet",p:"måltider"},{w:"vin",a:"en",d:"vinen",p:"vine"},
+  {w:"øl",a:"en",d:"øllen",p:"øl"},{w:"kaffe",a:"en",d:"kaffen",p:null},
+  {w:"mælk",a:"en",d:"mælken",p:null},{w:"vand",a:"et",d:"vandet",p:null},
+  {w:"sukker",a:"et",d:"sukkeret",p:null},{w:"salt",a:"et",d:"saltet",p:null},
+  {w:"skjorte",a:"en",d:"skjorten",p:"skjorter"},{w:"trøje",a:"en",d:"trøjen",p:"trøjer"},
+  {w:"jakke",a:"en",d:"jakken",p:"jakker"},{w:"frakke",a:"en",d:"frakken",p:"frakker"},
+  {w:"kjole",a:"en",d:"kjolen",p:"kjoler"},{w:"hat",a:"en",d:"hatten",p:"hatte"},
+  {w:"sko",a:"en",d:"skoen",p:"sko"},{w:"støvle",a:"en",d:"støvlen",p:"støvler"},
+  {w:"strømpe",a:"en",d:"strømpen",p:"strømper"},{w:"taske",a:"en",d:"tasken",p:"tasker"},
+  {w:"ring",a:"en",d:"ringen",p:"ringe"},{w:"bælte",a:"et",d:"bæltet",p:"bælter"},
+  {w:"slips",a:"et",d:"slipset",p:"slips"},{w:"ur",a:"et",d:"uret",p:"ure"},
+  {w:"tørklæde",a:"et",d:"tørklædet",p:"tørklæder"},
+  {w:"bil",a:"en",d:"bilen",p:"biler"},{w:"bus",a:"en",d:"bussen",p:"busser"},
+  {w:"cykel",a:"en",d:"cyklen",p:"cykler"},{w:"vej",a:"en",d:"vejen",p:"veje"},
+  {w:"gade",a:"en",d:"gaden",p:"gader"},{w:"bro",a:"en",d:"broen",p:"broer"},
+  {w:"båd",a:"en",d:"båden",p:"både"},{w:"by",a:"en",d:"byen",p:"byer"},
+  {w:"kirke",a:"en",d:"kirken",p:"kirker"},{w:"park",a:"en",d:"parken",p:"parker"},
+  {w:"butik",a:"en",d:"butikken",p:"butikker"},{w:"bank",a:"en",d:"banken",p:"banker"},
+  {w:"strand",a:"en",d:"stranden",p:"strande"},{w:"skov",a:"en",d:"skoven",p:"skove"},
+  {w:"sø",a:"en",d:"søen",p:"søer"},{w:"flod",a:"en",d:"floden",p:"floder"},
+  {w:"ø",a:"en",d:"øen",p:"øer"},{w:"tog",a:"et",d:"toget",p:"tog"},
+  {w:"fly",a:"et",d:"flyet",p:"fly"},{w:"skib",a:"et",d:"skibet",p:"skibe"},
+  {w:"hus",a:"et",d:"huset",p:"huse"},{w:"hjem",a:"et",d:"hjemmet",p:"hjem"},
+  {w:"hotel",a:"et",d:"hotellet",p:"hoteller"},{w:"museum",a:"et",d:"museet",p:"museer"},
+  {w:"teater",a:"et",d:"teatret",p:"teatre"},{w:"bibliotek",a:"et",d:"biblioteket",p:"biblioteker"},
+  {w:"kontor",a:"et",d:"kontoret",p:"kontorer"},{w:"hospital",a:"et",d:"hospitalet",p:"hospitaler"},
+  {w:"hav",a:"et",d:"havet",p:"have"},{w:"bjerg",a:"et",d:"bjerget",p:"bjerge"},
+  {w:"land",a:"et",d:"landet",p:"lande"},{w:"slot",a:"et",d:"slottet",p:"slotte"},
+  {w:"torv",a:"et",d:"torvet",p:"torve"},
+  {w:"dag",a:"en",d:"dagen",p:"dage"},{w:"uge",a:"en",d:"ugen",p:"uger"},
+  {w:"måned",a:"en",d:"måneden",p:"måneder"},{w:"morgen",a:"en",d:"morgenen",p:"morgener"},
+  {w:"aften",a:"en",d:"aftenen",p:"aftener"},{w:"nat",a:"en",d:"natten",p:"nætter"},
+  {w:"sommer",a:"en",d:"sommeren",p:"somre"},{w:"vinter",a:"en",d:"vinteren",p:"vintre"},
+  {w:"sol",a:"en",d:"solen",p:"sole"},{w:"måne",a:"en",d:"månen",p:"måner"},
+  {w:"stjerne",a:"en",d:"stjernen",p:"stjerner"},{w:"sky",a:"en",d:"skyen",p:"skyer"},
+  {w:"vind",a:"en",d:"vinden",p:"vinde"},{w:"storm",a:"en",d:"stormen",p:"storme"},
+  {w:"år",a:"et",d:"året",p:"år"},{w:"minut",a:"et",d:"minuttet",p:"minutter"},
+  {w:"sekund",a:"et",d:"sekundet",p:"sekunder"},{w:"øjeblik",a:"et",d:"øjeblikket",p:"øjeblikke"},
+  {w:"lyn",a:"et",d:"lynet",p:"lyn"},{w:"træ",a:"et",d:"træet",p:"træer"},
+  {w:"blad",a:"et",d:"bladet",p:"blade"},
+  {w:"idé",a:"en",d:"idéen",p:"idéer"},{w:"plan",a:"en",d:"planen",p:"planer"},
+  {w:"fejl",a:"en",d:"fejlen",p:"fejl"},{w:"drøm",a:"en",d:"drømmen",p:"drømme"},
+  {w:"bog",a:"en",d:"bogen",p:"bøger"},{w:"pen",a:"en",d:"pennen",p:"penne"},
+  {w:"blyant",a:"en",d:"blyanten",p:"blyanter"},{w:"avis",a:"en",d:"avisen",p:"aviser"},
+  {w:"telefon",a:"en",d:"telefonen",p:"telefoner"},{w:"computer",a:"en",d:"computeren",p:"computere"},
+  {w:"kasse",a:"en",d:"kassen",p:"kasser"},{w:"skole",a:"en",d:"skolen",p:"skoler"},
+  {w:"klasse",a:"en",d:"klassen",p:"klasser"},{w:"opgave",a:"en",d:"opgaven",p:"opgaver"},
+  {w:"sang",a:"en",d:"sangen",p:"sange"},{w:"historie",a:"en",d:"historien",p:"historier"},
+  {w:"film",a:"en",d:"filmen",p:"film"},{w:"sætning",a:"en",d:"sætningen",p:"sætninger"},
+  {w:"stemme",a:"en",d:"stemmen",p:"stemmer"},{w:"problem",a:"et",d:"problemet",p:"problemer"},
+  {w:"svar",a:"et",d:"svaret",p:"svar"},{w:"spørgsmål",a:"et",d:"spørgsmålet",p:"spørgsmål"},
+  {w:"ord",a:"et",d:"ordet",p:"ord"},{w:"navn",a:"et",d:"navnet",p:"navne"},
+  {w:"brev",a:"et",d:"brevet",p:"breve"},{w:"kort",a:"et",d:"kortet",p:"kort"},
+  {w:"sprog",a:"et",d:"sproget",p:"sprog"},{w:"spil",a:"et",d:"spillet",p:"spil"},
+  {w:"møde",a:"et",d:"mødet",p:"møder"},{w:"projekt",a:"et",d:"projektet",p:"projekter"},
+  {w:"job",a:"et",d:"jobbet",p:"job"},{w:"firma",a:"et",d:"firmaet",p:"firmaer"},
+  {w:"universitet",a:"et",d:"universitetet",p:"universiteter"},{w:"fag",a:"et",d:"faget",p:"fag"},
+  {w:"tal",a:"et",d:"tallet",p:"tal"},{w:"sted",a:"et",d:"stedet",p:"steder"}
+];
+const _seen=new Set();
+const WORDS=DATA.filter(o=>{if(_seen.has(o.w))return false;_seen.add(o.w);return true;});
+
+/* =====================================================================
+   100 MODSÆTNINGER (antonymer) – a/b ord + engelske oversættelser
+   ===================================================================== */
+const OPPOSITES=[
+  {a:"god",b:"dårlig",ta:"good",tb:"bad"},{a:"stor",b:"lille",ta:"big",tb:"small"},
+  {a:"høj",b:"lav",ta:"high",tb:"low"},{a:"lang",b:"kort",ta:"long",tb:"short"},
+  {a:"hurtig",b:"langsom",ta:"fast",tb:"slow"},{a:"varm",b:"kold",ta:"warm",tb:"cold"},
+  {a:"ny",b:"gammel",ta:"new",tb:"old"},{a:"ung",b:"gammel",ta:"young",tb:"old"},
+  {a:"tidlig",b:"sen",ta:"early",tb:"late"},{a:"nem",b:"svær",ta:"easy",tb:"hard"},
+  {a:"tung",b:"let",ta:"heavy",tb:"light"},{a:"lys",b:"mørk",ta:"light",tb:"dark"},
+  {a:"stærk",b:"svag",ta:"strong",tb:"weak"},{a:"rig",b:"fattig",ta:"rich",tb:"poor"},
+  {a:"glad",b:"trist",ta:"happy",tb:"sad"},{a:"sjov",b:"kedelig",ta:"fun",tb:"boring"},
+  {a:"ren",b:"beskidt",ta:"clean",tb:"dirty"},{a:"tør",b:"våd",ta:"dry",tb:"wet"},
+  {a:"fuld",b:"tom",ta:"full",tb:"empty"},{a:"åben",b:"lukket",ta:"open",tb:"closed"},
+  {a:"rigtig",b:"forkert",ta:"right",tb:"wrong"},{a:"sand",b:"falsk",ta:"true",tb:"false"},
+  {a:"dyr",b:"billig",ta:"expensive",tb:"cheap"},{a:"blød",b:"hård",ta:"soft",tb:"hard"},
+  {a:"tyk",b:"tynd",ta:"thick",tb:"thin"},{a:"bred",b:"smal",ta:"wide",tb:"narrow"},
+  {a:"dyb",b:"lav",ta:"deep",tb:"shallow"},{a:"fjern",b:"nær",ta:"far",tb:"near"},
+  {a:"flittig",b:"doven",ta:"diligent",tb:"lazy"},{a:"modig",b:"bange",ta:"brave",tb:"afraid"},
+  {a:"sund",b:"syg",ta:"healthy",tb:"sick"},{a:"levende",b:"død",ta:"alive",tb:"dead"},
+  {a:"vågen",b:"sovende",ta:"awake",tb:"asleep"},{a:"venlig",b:"uvenlig",ta:"friendly",tb:"unfriendly"},
+  {a:"høflig",b:"uhøflig",ta:"polite",tb:"rude"},{a:"smuk",b:"grim",ta:"beautiful",tb:"ugly"},
+  {a:"sød",b:"sur",ta:"sweet",tb:"sour"},{a:"frisk",b:"træt",ta:"fresh",tb:"tired"},
+  {a:"klog",b:"dum",ta:"clever",tb:"stupid"},{a:"sikker",b:"usikker",ta:"sure",tb:"unsure"},
+  {a:"mulig",b:"umulig",ta:"possible",tb:"impossible"},{a:"fri",b:"fanget",ta:"free",tb:"captured"},
+  {a:"ledig",b:"optaget",ta:"vacant",tb:"occupied"},{a:"enig",b:"uenig",ta:"agreeing",tb:"disagreeing"},
+  {a:"tilfreds",b:"utilfreds",ta:"satisfied",tb:"dissatisfied"},{a:"vigtig",b:"ligegyldig",ta:"important",tb:"unimportant"},
+  {a:"travl",b:"rolig",ta:"busy",tb:"calm"},{a:"højlydt",b:"stille",ta:"loud",tb:"quiet"},
+  {a:"simpel",b:"kompliceret",ta:"simple",tb:"complicated"},{a:"moderne",b:"gammeldags",ta:"modern",tb:"old-fashioned"},
+  {a:"fremtid",b:"fortid",ta:"future",tb:"past"},{a:"begyndelse",b:"slutning",ta:"beginning",tb:"end"},
+  {a:"ven",b:"fjende",ta:"friend",tb:"enemy"},{a:"krig",b:"fred",ta:"war",tb:"peace"},
+  {a:"dag",b:"nat",ta:"day",tb:"night"},{a:"morgen",b:"aften",ta:"morning",tb:"evening"},
+  {a:"sommer",b:"vinter",ta:"summer",tb:"winter"},{a:"nord",b:"syd",ta:"north",tb:"south"},
+  {a:"øst",b:"vest",ta:"east",tb:"west"},{a:"venstre",b:"højre",ta:"left",tb:"right"},
+  {a:"op",b:"ned",ta:"up",tb:"down"},{a:"ind",b:"ud",ta:"in",tb:"out"},
+  {a:"foran",b:"bagved",ta:"in front",tb:"behind"},{a:"over",b:"under",ta:"over",tb:"under"},
+  {a:"først",b:"sidst",ta:"first",tb:"last"},{a:"mere",b:"mindre",ta:"more",tb:"less"},
+  {a:"mange",b:"få",ta:"many",tb:"few"},{a:"alt",b:"intet",ta:"everything",tb:"nothing"},
+  {a:"altid",b:"aldrig",ta:"always",tb:"never"},{a:"her",b:"der",ta:"here",tb:"there"},
+  {a:"inde",b:"ude",ta:"inside",tb:"outside"},{a:"ja",b:"nej",ta:"yes",tb:"no"},
+  {a:"spørgsmål",b:"svar",ta:"question",tb:"answer"},{a:"begynde",b:"slutte",ta:"to begin",tb:"to end"},
+  {a:"komme",b:"gå",ta:"to come",tb:"to go"},{a:"åbne",b:"lukke",ta:"to open",tb:"to close"},
+  {a:"købe",b:"sælge",ta:"to buy",tb:"to sell"},{a:"give",b:"tage",ta:"to give",tb:"to take"},
+  {a:"vinde",b:"tabe",ta:"to win",tb:"to lose"},{a:"huske",b:"glemme",ta:"to remember",tb:"to forget"},
+  {a:"elske",b:"hade",ta:"to love",tb:"to hate"},{a:"græde",b:"grine",ta:"to cry",tb:"to laugh"},
+  {a:"spørge",b:"svare",ta:"to ask",tb:"to answer"},{a:"tale",b:"tie",ta:"to speak",tb:"to be silent"},
+  {a:"stå",b:"sidde",ta:"to stand",tb:"to sit"},{a:"sove",b:"vågne",ta:"to sleep",tb:"to wake"},
+  {a:"leve",b:"dø",ta:"to live",tb:"to die"},{a:"starte",b:"stoppe",ta:"to start",tb:"to stop"},
+  {a:"løfte",b:"sænke",ta:"to lift",tb:"to lower"},{a:"samle",b:"sprede",ta:"to gather",tb:"to scatter"},
+  {a:"stige",b:"falde",ta:"to rise",tb:"to fall"},{a:"offentlig",b:"privat",ta:"public",tb:"private"},
+  {a:"fælles",b:"personlig",ta:"shared",tb:"personal"},{a:"naturlig",b:"kunstig",ta:"natural",tb:"artificial"},
+  {a:"skarp",b:"sløv",ta:"sharp",tb:"dull"},{a:"fin",b:"grov",ta:"fine",tb:"coarse"},
+  {a:"glat",b:"ru",ta:"smooth",tb:"rough"},{a:"lige",b:"kroget",ta:"straight",tb:"crooked"},
+  {a:"moden",b:"umoden",ta:"ripe",tb:"unripe"},{a:"mæt",b:"sulten",ta:"full (sated)",tb:"hungry"}
+];
+
+/* =====================================================================
+   100 SYNONYMER – a/b ord, t=fælles engelsk betydning
+   ===================================================================== */
+const SYNONYMS=[
+  {a:"glad",b:"lykkelig",t:"happy"},{a:"stor",b:"kæmpe",t:"big / huge"},
+  {a:"lille",b:"bitte",t:"small / tiny"},{a:"hurtig",b:"rap",t:"fast / quick"},
+  {a:"dum",b:"tåbelig",t:"stupid / foolish"},{a:"klog",b:"intelligent",t:"clever"},
+  {a:"smuk",b:"køn",t:"beautiful / pretty"},{a:"grim",b:"hæslig",t:"ugly / hideous"},
+  {a:"bange",b:"skræmt",t:"afraid / scared"},{a:"vred",b:"sur",t:"angry / cross"},
+  {a:"træt",b:"udmattet",t:"tired / exhausted"},{a:"sjov",b:"morsom",t:"funny / amusing"},
+  {a:"kedelig",b:"træls",t:"boring / dull"},{a:"svær",b:"vanskelig",t:"difficult / hard"},
+  {a:"nem",b:"let",t:"easy"},{a:"rig",b:"velhavende",t:"rich / wealthy"},
+  {a:"fattig",b:"nødlidende",t:"poor / needy"},{a:"stærk",b:"kraftig",t:"strong / powerful"},
+  {a:"svag",b:"spinkel",t:"weak / frail"},{a:"kvik",b:"rask",t:"quick / brisk"},
+  {a:"begynde",b:"starte",t:"to begin / to start"},{a:"slutte",b:"afslutte",t:"to end / to finish"},
+  {a:"tale",b:"snakke",t:"to talk / to speak"},{a:"se",b:"kigge",t:"to see / to look"},
+  {a:"gå",b:"spadsere",t:"to walk / to stroll"},{a:"løbe",b:"spurte",t:"to run / to sprint"},
+  {a:"lave",b:"fremstille",t:"to make / to produce"},{a:"vælge",b:"udvælge",t:"to choose / to select"},
+  {a:"hjælpe",b:"bistå",t:"to help / to assist"},{a:"ønske",b:"begære",t:"to wish / to desire"},
+  {a:"tænke",b:"overveje",t:"to think / to consider"},{a:"forstå",b:"fatte",t:"to understand / to grasp"},
+  {a:"svare",b:"besvare",t:"to answer / to reply"},{a:"fortælle",b:"berette",t:"to tell / to recount"},
+  {a:"spørge",b:"forhøre",t:"to ask / to inquire"},{a:"købe",b:"anskaffe",t:"to buy / to acquire"},
+  {a:"bo",b:"leve",t:"to live / to reside"},{a:"rejse",b:"drage",t:"to travel / to journey"},
+  {a:"komme",b:"ankomme",t:"to come / to arrive"},{a:"slutte",b:"ende",t:"to end / to finish"},
+  {a:"hus",b:"bolig",t:"house / dwelling"},{a:"bil",b:"vogn",t:"car / vehicle"},
+  {a:"barn",b:"unge",t:"child / kid"},{a:"ven",b:"kammerat",t:"friend / mate"},
+  {a:"job",b:"arbejde",t:"job / work"},{a:"fejl",b:"brøler",t:"mistake / blunder"},
+  {a:"problem",b:"vanskelighed",t:"problem / difficulty"},{a:"idé",b:"tanke",t:"idea / thought"},
+  {a:"mål",b:"formål",t:"goal / purpose"},{a:"svar",b:"respons",t:"answer / response"},
+  {a:"begyndelse",b:"start",t:"beginning / start"},{a:"slutning",b:"afslutning",t:"ending"},
+  {a:"glæde",b:"fryd",t:"joy / delight"},{a:"sorg",b:"bedrøvelse",t:"sorrow / grief"},
+  {a:"frygt",b:"angst",t:"fear / anxiety"},{a:"mod",b:"tapperhed",t:"courage / bravery"},
+  {a:"ro",b:"fred",t:"calm / peace"},{a:"larm",b:"støj",t:"noise / din"},
+  {a:"lys",b:"skær",t:"light / glow"},{a:"mørke",b:"mulm",t:"darkness / gloom"},
+  {a:"mange",b:"talrige",t:"many / numerous"},{a:"få",b:"sparsomme",t:"few / sparse"},
+  {a:"ofte",b:"hyppigt",t:"often / frequently"},{a:"sjældent",b:"fåtalligt",t:"rarely"},
+  {a:"altid",b:"bestandigt",t:"always / constantly"},{a:"måske",b:"muligvis",t:"maybe / possibly"},
+  {a:"meget",b:"yderst",t:"very / extremely"},{a:"lidt",b:"smule",t:"a little / a bit"},
+  {a:"hele",b:"samtlige",t:"whole / entire"},{a:"næsten",b:"cirka",t:"almost / approximately"},
+  {a:"dejlig",b:"skøn",t:"lovely / wonderful"},{a:"farlig",b:"risikabel",t:"dangerous / risky"},
+  {a:"sikker",b:"tryg",t:"safe / secure"},{a:"vigtig",b:"væsentlig",t:"important / essential"},
+  {a:"mærkelig",b:"underlig",t:"strange / odd"},{a:"almindelig",b:"sædvanlig",t:"ordinary / usual"},
+  {a:"speciel",b:"særlig",t:"special / particular"},{a:"berømt",b:"kendt",t:"famous / well-known"},
+  {a:"moderne",b:"nutidig",t:"modern / contemporary"},{a:"gammel",b:"ældgammel",t:"old / ancient"},
+  {a:"ny",b:"frisk",t:"new / fresh"},{a:"ægte",b:"autentisk",t:"genuine / authentic"},
+  {a:"falsk",b:"uægte",t:"fake / false"},{a:"hurtigt",b:"straks",t:"quickly / at once"},
+  {a:"langsomt",b:"adstadigt",t:"slowly"},{a:"dygtig",b:"kompetent",t:"skilled / competent"},
+  {a:"doven",b:"lad",t:"lazy / idle"},{a:"flittig",b:"arbejdsom",t:"diligent / hard-working"},
+  {a:"venlig",b:"rar",t:"kind / nice"},{a:"uvenlig",b:"barsk",t:"unfriendly / harsh"},
+  {a:"ærlig",b:"oprigtig",t:"honest / sincere"},{a:"løgn",b:"usandhed",t:"lie / untruth"},
+  {a:"sand",b:"korrekt",t:"true / correct"},{a:"stilhed",b:"tavshed",t:"silence / quietness"},
+  {a:"tøj",b:"beklædning",t:"clothes / clothing"},{a:"mad",b:"føde",t:"food / nourishment"},
+  {a:"penge",b:"mønt",t:"money / coin"},{a:"by",b:"købstad",t:"town / city"},
+  {a:"vej",b:"gade",t:"road / street"},{a:"tid",b:"stund",t:"time / while"}
+];
+
+/* =====================================================================
+   DRONNINGENS GÅDER – udfyld hullet i den rigtige form
+   ===================================================================== */
+const SENTENCES=[
+  {s:"Jeg har ___ derhjemme.",lemma:"hund",form:"ubestemt ental",answer:"en hund",en:"I have a dog at home."},
+  {s:"___ gøede hele natten.",lemma:"hund",form:"bestemt ental",answer:"hunden",en:"The dog barked all night."},
+  {s:"Der løber to ___ på vejen.",lemma:"hund",form:"ubestemt flertal",answer:"hunde",en:"Two dogs are running on the road."},
+  {s:"___ i parken er meget glade.",lemma:"hund",form:"bestemt flertal",answer:"hundene",en:"The dogs in the park are very happy."},
+  {s:"Hun købte ___ i går.",lemma:"bil",form:"ubestemt ental",answer:"en bil",en:"She bought a car yesterday."},
+  {s:"___ står ude foran huset.",lemma:"bil",form:"bestemt ental",answer:"bilen",en:"The car is parked in front of the house."},
+  {s:"Vejen er fuld af ___ .",lemma:"bil",form:"ubestemt flertal",answer:"biler",en:"The road is full of cars."},
+  {s:"___ på parkeringspladsen er dyre.",lemma:"bil",form:"bestemt flertal",answer:"bilerne",en:"The cars in the parking lot are expensive."},
+  {s:"Vi bor i ___ ved stranden.",lemma:"hus",form:"ubestemt ental",answer:"et hus",en:"We live in a house by the beach."},
+  {s:"___ er malet hvidt.",lemma:"hus",form:"bestemt ental",answer:"huset",en:"The house is painted white."},
+  {s:"Der bygges mange nye ___ i byen.",lemma:"hus",form:"ubestemt flertal",answer:"huse",en:"Many new houses are being built in town."},
+  {s:"___ på vejen er gamle.",lemma:"hus",form:"bestemt flertal",answer:"husene",en:"The houses on the road are old."},
+  {s:"Må jeg få ___ , tak?",lemma:"æble",form:"ubestemt ental",answer:"et æble",en:"May I have an apple, please?"},
+  {s:"___ på bordet er rødt.",lemma:"æble",form:"bestemt ental",answer:"æblet",en:"The apple on the table is red."},
+  {s:"Hun spiser to ___ hver dag.",lemma:"æble",form:"ubestemt flertal",answer:"æbler",en:"She eats two apples every day."},
+  {s:"___ i kurven er grønne.",lemma:"æble",form:"bestemt flertal",answer:"æblerne",en:"The apples in the basket are green."},
+  {s:"Jeg læser ___ om dagen.",lemma:"bog",form:"ubestemt ental",answer:"en bog",en:"I read a book during the day."},
+  {s:"___ ligger på bordet.",lemma:"bog",form:"bestemt ental",answer:"bogen",en:"The book is on the table."},
+  {s:"Han har skrevet tre ___ .",lemma:"bog",form:"ubestemt flertal",answer:"bøger",en:"He has written three books."},
+  {s:"___ på hylden er støvede.",lemma:"bog",form:"bestemt flertal",answer:"bøgerne",en:"The books on the shelf are dusty."},
+  {s:"Der sidder ___ i træet.",lemma:"fugl",form:"ubestemt ental",answer:"en fugl",en:"There is a bird in the tree."},
+  {s:"___ synger smukt.",lemma:"fugl",form:"bestemt ental",answer:"fuglen",en:"The bird sings beautifully."},
+  {s:"Hun har ___ på fem år.",lemma:"barn",form:"ubestemt ental",answer:"et barn",en:"She has a five-year-old child."},
+  {s:"___ græder.",lemma:"barn",form:"bestemt ental",answer:"barnet",en:"The child is crying."},
+  {s:"Jeg så mange ___ i haven.",lemma:"barn",form:"ubestemt flertal",answer:"børn",en:"I saw many children in the garden."},
+  {s:"___ leger i haven.",lemma:"barn",form:"bestemt flertal",answer:"børnene",en:"The children are playing in the garden."},
+  {s:"Vi drak ___ på caféen.",lemma:"kaffe",form:"ubestemt ental",answer:"en kaffe",en:"We drank a coffee at the café."},
+  {s:"___ er for varm.",lemma:"kaffe",form:"bestemt ental",answer:"kaffen",en:"The coffee is too hot."},
+  {s:"Der står ___ ved døren.",lemma:"mand",form:"ubestemt ental",answer:"en mand",en:"There is a man at the door."},
+  {s:"___ ved døren venter på dig.",lemma:"mand",form:"bestemt ental",answer:"manden",en:"The man at the door is waiting for you."},
+  {s:"Jeg mødte to ___ på gaden.",lemma:"mand",form:"ubestemt flertal",answer:"mænd",en:"I met two men on the street."},
+  {s:"___ på billedet er gamle.",lemma:"mand",form:"bestemt flertal",answer:"mændene",en:"The men in the picture are old."},
+  {s:"Kan jeg låne ___ ?",lemma:"telefon",form:"ubestemt ental",answer:"en telefon",en:"Can I borrow a phone?"},
+  {s:"___ ringer hele tiden.",lemma:"telefon",form:"bestemt ental",answer:"telefonen",en:"The phone keeps ringing."},
+  {s:"Der lå tre ___ på bordet.",lemma:"nøgle",form:"ubestemt flertal",answer:"nøgler",en:"There were three keys on the table."},
+  {s:"___ passer ikke til døren.",lemma:"nøgle",form:"bestemt flertal",answer:"nøglerne",en:"The keys don't fit the door."}
+];
+
+/* ===================== APP STATE ===================== */
+const $=id=>document.getElementById(id);
+const sections={menu:$("menu"),submenu:$("submenu"),game:$("game"),end:$("end")};
+const homeBtn=$("homeBtn");
+const enetButtons=$("enetButtons"),typeRow=$("typeRow"),optionsBox=$("optionsBox");
+const flashCard=$("flashCard"),flashTip=$("flashTip"),matchBox=$("matchBox");
+const btnEn=$("btnEn"),btnEt=$("btnEt"),answerInput=$("answerInput"),submitBtn=$("submitBtn");
+const wordEl=$("word"),hintEl=$("hint"),transEl=$("trans"),messageEl=$("message");
+const scorePill=$("scorePill"),streakPill=$("streakPill"),timerPill=$("timerPill");
+const progressEl=$("progress"),nextBtn=$("next");
+$("wordCount").textContent=WORDS.length;
+
+const ROUND_LEN=15, SPEED_TIME=60, MATCH_PAIRS=5;
+const quotes=[
+  '"Hvor skal jeg gå hen herfra?" – "Det afhænger af, hvor du vil hen."',
+  '"Vi er alle skøre her."',
+  '"Det nytter ikke at gå tilbage til i går – jeg var en anden person dengang."',
+  '"Hvor langt er det til evigheden?" – "Nogle gange kun et sekund."',
+  '"Forestil dig seks umulige ting før morgenmaden."'
+];
+
+let mode=null, category=null, style=null;
+let queue=[], idx=0, correct=0, streak=0, bestStreak=0, answered=false, current=null;
+let timer=null, timeLeft=0, speedCorrect=0;
+let matchSel=null, matchDone=0, matchTotal=0;
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function norm(s){return s.trim().toLowerCase().replace(/\s+/g," ");}
+const praise=["Storartet!","Pragtfuldt!","Vidunderligt!","Helt rigtigt!","Fortræffeligt!","Bravo!","Sådan!"];
+const consol=["Øv!","Næsten!","Prøv igen!","Det var drilsk.","Du klarer den næste!"];
+
+/* ===================== NAVIGATION ===================== */
+function show(name){for(const k in sections)sections[k].classList.toggle("hidden",k!==name);}
+document.querySelectorAll("#menu .mode-card").forEach(c=>c.addEventListener("click",()=>chooseMode(c.dataset.mode)));
+document.querySelectorAll("#submenu .mode-card").forEach(c=>c.addEventListener("click",()=>startPairGame(c.dataset.style)));
+homeBtn.addEventListener("click",toMenu);
+$("menuBtn").addEventListener("click",toMenu);
+$("againBtn").addEventListener("click",()=>{ if(category) startPairGame(style); else startMode(mode); });
+
+function toMenu(){
+  stopTimer();
+  category=null;style=null;
+  homeBtn.style.display="none";
+  $("quote").textContent=pick(quotes);
+  show("menu");
+}
+function chooseMode(m){
+  if(m==="opposites"||m==="synonyms"){
+    category=m;
+    homeBtn.style.display="block";
+    show("submenu");
+  }else{
+    category=null;
+    startMode(m);
+  }
+}
+
+/* ===================== CLASSIC + SENTENCE MODES ===================== */
+function startMode(m){
+  mode=m;style=null;
+  homeBtn.style.display="block";
+  idx=0;correct=0;streak=0;bestStreak=0;answered=false;speedCorrect=0;
+  hideAllInputs();
+
+  let pool;
+  if(m==="plural") pool=WORDS.filter(o=>o.p);
+  else if(m==="sentence") pool=SENTENCES;
+  else pool=WORDS;
+  queue=shuffle(pool);
+  if(m!=="speed") queue=queue.slice(0, m==="sentence"?Math.min(12,queue.length):ROUND_LEN);
+
+  const typed=(m==="definite"||m==="plural"||m==="sentence");
+  enetButtons.classList.toggle("hidden", typed);
+  typeRow.classList.toggle("hidden", !typed);
+  timerPill.classList.toggle("hidden", m!=="speed");
+  transEl.textContent="";
+
+  if(m==="speed"){timeLeft=SPEED_TIME;startTimer();}
+  show("game");updateStats();showQuestion();
+}
+
+function hideAllInputs(){
+  enetButtons.classList.add("hidden");typeRow.classList.add("hidden");
+  optionsBox.classList.add("hidden");flashCard.classList.add("hidden");
+  flashTip.classList.add("hidden");matchBox.classList.add("hidden");
+  nextBtn.style.display="none";nextBtn.textContent="Næste →";
+  messageEl.innerHTML="";transEl.textContent="";
+}
+
+function startTimer(){
+  timerPill.textContent="⏱ "+timeLeft;timerPill.classList.remove("low");
+  timer=setInterval(()=>{
+    timeLeft--;timerPill.textContent="⏱ "+timeLeft;
+    if(timeLeft<=10)timerPill.classList.add("low");
+    if(timeLeft<=0){stopTimer();finishSpeed();}
+  },1000);
+}
+function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
+
+function updateStats(){
+  if(mode==="speed")scorePill.textContent="Rigtige: "+speedCorrect;
+  else if(style==="match"){scorePill.textContent="Par: "+matchDone+" / "+matchTotal;progressEl.style.width=(matchTotal?matchDone/matchTotal*100:0)+"%";}
+  else if(style==="flash"){scorePill.textContent="Kort: "+(idx+1)+" / "+queue.length;progressEl.style.width=((idx+1)/queue.length*100)+"%";}
+  else{scorePill.textContent="Point: "+correct+" / "+queue.length;progressEl.style.width=(idx/queue.length*100)+"%";}
+  streakPill.textContent="🔥 "+streak;
+}
+
+function showQuestion(){
+  answered=false;messageEl.innerHTML="";messageEl.style.color="";nextBtn.style.display="none";transEl.textContent="";
+  if(mode!=="speed" && idx>=queue.length){finishRound();return;}
+
+  let item = mode==="speed" ? pick(WORDS) : queue[idx];
+  current=item;
+  // standard ordstil (kan overskrives nedenfor)
+  wordEl.style.fontFamily="'Cinzel Decorative',serif";wordEl.style.fontSize="2.1rem";
+
+  if(mode==="enet"||mode==="speed"){
+    hintEl.textContent="Hvilken artikel?";wordEl.textContent=item.w;
+    btnEn.disabled=false;btnEt.disabled=false;
+  }else if(mode==="definite"){
+    hintEl.innerHTML="Skriv i <b>bestemt form</b> (ental)";
+    wordEl.innerHTML='<span class="art">'+item.a+'</span> '+item.w;
+    resetInput();
+  }else if(mode==="plural"){
+    hintEl.innerHTML="Skriv i <b>flertal</b> (ubestemt)";
+    wordEl.innerHTML='<span class="art">'+item.a+'</span> '+item.w;
+    resetInput();
+  }else if(mode==="sentence"){
+    hintEl.innerHTML="Udfyld: <b>"+item.form+"</b> af <em>"+item.lemma+"</em>";
+    wordEl.innerHTML=item.s.replace("___",'<span style="color:#a8132b">_____</span>');
+    wordEl.style.fontFamily="'EB Garamond',serif";wordEl.style.fontSize="1.45rem";
+    resetInput();
+  }
+}
+function resetInput(){answerInput.value="";answerInput.disabled=false;submitBtn.disabled=false;setTimeout(()=>answerInput.focus(),30);}
+
+function answerArticle(sel){
+  if(answered)return;answered=true;
+  const ok=sel===current.a;
+  register(ok,current.a+" "+current.w);
+  btnEn.disabled=true;btnEt.disabled=true;
+  if(mode==="speed"){setTimeout(()=>{if(timer)showQuestion();},520);}
+  else{idx++;updateStats();nextBtn.style.display="block";}
+}
+function submitTyped(){
+  if(answered)return;
+  const val=norm(answerInput.value);if(!val)return;answered=true;
+  let target,full;
+  if(mode==="definite"){target=current.d;full=current.a+" "+current.w+" → "+current.d;}
+  else if(mode==="plural"){target=current.p;full=current.a+" "+current.w+" → "+current.p;}
+  else{target=current.answer;full=current.answer+(current.en?'  ('+current.en+')':'');}
+  const ok=norm(target)===val;
+  register(ok,target,full);
+  answerInput.disabled=true;submitBtn.disabled=true;idx++;updateStats();nextBtn.style.display="block";
+}
+function register(ok,answerTxt,full){
+  if(ok){
+    correct++;if(mode==="speed")speedCorrect++;
+    streak++;bestStreak=Math.max(bestStreak,streak);
+    messageEl.style.color="var(--ok)";
+    if(mode==="speed")messageEl.innerHTML=pick(praise);
+    else messageEl.innerHTML=pick(praise)+" <b>"+(full||answerTxt)+"</b>";
+  }else{
+    streak=0;messageEl.style.color="var(--bad)";
+    messageEl.innerHTML=pick(consol)+" Det rigtige svar: <b>"+(full||answerTxt)+"</b>.";
+  }
+  updateStats();
+}
+
+/* ===================== OPPOSITES / SYNONYMS ===================== */
+function pairData(){return category==="opposites"?OPPOSITES:SYNONYMS;}
+function glossOf(p,which){ // english gloss
+  if(category==="synonyms")return p.t;
+  return which==="a"?p.ta:p.tb;
+}
+function startPairGame(st){
+  style=st;mode=null;answered=false;
+  idx=0;correct=0;streak=0;bestStreak=0;
+  homeBtn.style.display="block";
+  hideAllInputs();
+  timerPill.classList.add("hidden");
+
+  queue=shuffle(pairData());
+  if(st!=="match")queue=queue.slice(0,12);
+
+  show("game");
+  if(st==="mc")initMC();
+  else if(st==="flash")initFlash();
+  else initMatch();
+}
+
+/* --- Multiple choice --- */
+function initMC(){
+  optionsBox.classList.remove("hidden");
+  updateStats();mcQuestion();
+}
+function mcQuestion(){
+  answered=false;messageEl.innerHTML="";transEl.textContent="";nextBtn.style.display="none";
+  if(idx>=queue.length){finishRound();return;}
+  const p=queue[idx];current=p;
+  // randomly ask for partner of a or b
+  const askA=Math.random()<0.5;
+  const promptWord=askA?p.a:p.b;
+  const answer=askA?p.b:p.a;
+  current._ans=answer;
+  hintEl.textContent=category==="opposites"?"Find modsætningen til:":"Find synonymet til:";
+  wordEl.textContent=promptWord;
+  wordEl.style.fontFamily="'Cinzel Decorative',serif";wordEl.style.fontSize="2.1rem";
+  transEl.textContent=askA?glossOf(p,"a"):glossOf(p,"b");
+  // distractors – unikke og forskellige fra svaret
+  const used=new Set([answer]);
+  const others=[];
+  for(const x of shuffle(pairData())){
+    if(others.length>=3)break;
+    if(x===p)continue;
+    const cand=Math.random()<0.5?x.a:x.b;
+    if(used.has(cand))continue;
+    used.add(cand);others.push(cand);
+  }
+  const opts=shuffle([answer,...others]);
+  optionsBox.innerHTML="";
+  opts.forEach(o=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.addEventListener("click",()=>mcAnswer(b,o));optionsBox.appendChild(b);
+  });
+}
+function mcAnswer(btn,chosen){
+  if(answered)return;answered=true;
+  const ok=chosen===current._ans;
+  [...optionsBox.children].forEach(b=>{
+    b.classList.add("locked");
+    if(b.textContent===current._ans)b.classList.add("correct");
+    if(b===btn&&!ok)b.classList.add("wrong");
+  });
+  const p=current;
+  if(ok){correct++;streak++;bestStreak=Math.max(bestStreak,streak);messageEl.style.color="var(--ok)";messageEl.innerHTML=pick(praise);}
+  else{streak=0;messageEl.style.color="var(--bad)";messageEl.innerHTML=pick(consol);}
+  // show full pair + translations
+  const gloss=category==="opposites"?(p.ta+" ↔ "+p.tb):p.t;
+  messageEl.innerHTML+='<small><b>'+p.a+'</b> '+(category==="opposites"?"↔":"=")+' <b>'+p.b+'</b> · '+gloss+'</small>';
+  idx++;updateStats();nextBtn.style.display="block";
+}
+
+/* --- Flashcards --- */
+function initFlash(){
+  flashCard.classList.remove("hidden");flashTip.classList.remove("hidden");
+  hintEl.textContent=category==="opposites"?"Modsætninger – vend kortet":"Synonymer – vend kortet";
+  wordEl.textContent="";transEl.textContent="";
+  flashCard.onclick=()=>flashCard.classList.toggle("flipped");
+  updateStats();flashShow();
+  nextBtn.style.display="block";nextBtn.textContent="Næste kort →";
+}
+function flashShow(){
+  if(idx>=queue.length){finishRound();return;}
+  const p=queue[idx];
+  flashCard.classList.remove("flipped");
+  const conj=category==="opposites"?"modsætning":"synonym";
+  $("flashTagF").textContent=conj;$("flashTagB").textContent=conj;
+  $("flashFront").textContent=p.a;$("flashFrontT").textContent=glossOf(p,"a");
+  $("flashBack").textContent=p.b;$("flashBackT").textContent=glossOf(p,"b");
+  updateStats();
+}
+
+/* --- Matching --- */
+function initMatch(){
+  matchBox.classList.remove("hidden");
+  hintEl.textContent=category==="opposites"?"Match ordene med deres modsætning":"Match ordene med deres synonym";
+  wordEl.textContent="";transEl.textContent="";
+  nextBtn.style.display="none";
+  matchDone=0;matchSel=null;
+  buildMatchBatch();
+}
+function buildMatchBatch(){
+  const batch=shuffle(pairData()).slice(0,MATCH_PAIRS);
+  matchTotal=batch.length;matchDone=0;matchSel=null;
+  const left=batch.map((p,i)=>({txt:p.a,id:i}));
+  const right=batch.map((p,i)=>({txt:p.b,id:i}));
+  renderMatchCol($("matchLeft"),shuffle(left));
+  renderMatchCol($("matchRight"),shuffle(right));
+  updateStats();
+}
+function renderMatchCol(col,items){
+  col.innerHTML="";
+  items.forEach(it=>{
+    const t=document.createElement("div");t.className="match-tile";t.textContent=it.txt;t.dataset.id=it.id;
+    t.addEventListener("click",()=>matchClick(t));col.appendChild(t);
+  });
+}
+function matchClick(tile){
+  if(tile.classList.contains("done"))return;
+  if(!matchSel){matchSel=tile;tile.classList.add("sel");return;}
+  if(matchSel===tile){tile.classList.remove("sel");matchSel=null;return;}
+  // need one from each column: check different parent
+  if(matchSel.parentElement===tile.parentElement){
+    matchSel.classList.remove("sel");matchSel=tile;tile.classList.add("sel");return;
+  }
+  const ok=matchSel.dataset.id===tile.dataset.id;
+  if(ok){
+    matchSel.classList.add("done");tile.classList.add("done");
+    matchSel.classList.remove("sel");matchSel=null;matchDone++;
+    streak++;bestStreak=Math.max(bestStreak,streak);updateStats();
+    if(matchDone>=matchTotal){
+      messageEl.style.color="var(--ok)";messageEl.innerHTML=pick(praise)+" Alle par fundet!";
+      nextBtn.style.display="block";nextBtn.textContent="Nye par →";
+    }
+  }else{
+    streak=0;updateStats();
+    const a=matchSel,b=tile;a.classList.add("err");b.classList.add("err");a.classList.remove("sel");
+    const x=a,y=b;matchSel=null;
+    setTimeout(()=>{x.classList.remove("err");y.classList.remove("err");},650);
+  }
+}
+
+/* ===================== NEXT BUTTON ===================== */
+nextBtn.addEventListener("click",()=>{
+  if(style==="flash"){idx++;flashShow();}
+  else if(style==="match"){messageEl.innerHTML="";nextBtn.style.display="none";buildMatchBatch();}
+  else if(style==="mc"){mcQuestion();}
+  else{showQuestion();}
+});
+
+/* ===================== END ===================== */
+function finishRound(){
+  stopTimer();
+  if(style==="flash"){
+    showEnd(null,"Du gennemgik alle "+queue.length+" kort","Godt studeret! 🔮",false,true);return;
+  }
+  const total=queue.length, pct=Math.round(correct/total*100);
+  showEnd(pct,correct+" / "+total+" rigtige","Bedste stime: "+bestStreak+" 🔥");
+}
+function finishSpeed(){
+  answered=true;btnEn.disabled=true;btnEt.disabled=true;
+  showEnd(null,speedCorrect+" rigtige på "+SPEED_TIME+" sek.","Bedste stime: "+bestStreak+" 🔥",true);
+}
+function showEnd(pct,line,sub,isSpeed,isFlash){
+  show("end");
+  $("endLine").textContent=line;
+  let emoji="🎉",title="Vidunderligt!",grade=sub;
+  if(isFlash){emoji="🔮";title="Færdig med kortene!";}
+  else if(isSpeed){
+    if(speedCorrect>=25){emoji="🐇";title="Hurtigere end Kaninen!";}
+    else if(speedCorrect>=15){emoji="⏱";title="Flot tempo!";}
+    else{emoji="💪";title="Bliv ved!";}
+  }else{
+    if(pct>=90){emoji="👑";title="Dronningen er imponeret!";}
+    else if(pct>=70){emoji="🎉";title="Vidunderligt!";}
+    else if(pct>=50){emoji="🍄";title="Godt på vej!";}
+    else{emoji="💪";title="Øvelse gør mester!";}
+    grade=pct+"% rigtige · "+sub;
+  }
+  $("endEmoji").textContent=emoji;$("endTitle").textContent=title;$("endGrade").textContent=grade;
+}
+
+/* ===================== EVENTS ===================== */
+btnEn.addEventListener("click",()=>answerArticle("en"));
+btnEt.addEventListener("click",()=>answerArticle("et"));
+submitBtn.addEventListener("click",submitTyped);
+answerInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.stopPropagation();submitTyped();}});
+document.addEventListener("keydown",e=>{
+  if(sections.game.classList.contains("hidden"))return;
+  if(!answered&&(mode==="enet"||mode==="speed")){
+    if(e.key==="1"||e.key==="ArrowLeft")answerArticle("en");
+    if(e.key==="2"||e.key==="ArrowRight")answerArticle("et");
+  }
+  if(e.key==="Enter"&&nextBtn.style.display==="block"&&document.activeElement!==answerInput)nextBtn.click();
+});
+
+toMenu();
+</script>
+</body>
+</html>

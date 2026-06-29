@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idiomjæger — Dansk Idiom Skattejagt</title>
+<style>
+:root{
+  --parchment:#f3e3c3;
+  --parchment-dark:#e6cfa0;
+  --ink:#3a2c18;
+  --ink-soft:#5e4a2e;
+  --map-sea:#1f6b6b;
+  --map-sea-dark:#134f52;
+  --gold:#c8941f;
+  --gold-light:#f0c14b;
+  --red:#b5362e;
+  --green:#3f8f4a;
+  --green-dark:#2c6b35;
+  --shadow:rgba(40,25,5,0.35);
+  --a2:#3f8f4a; --b1:#2f80b5; --b2:#b5701f; --c1:#9b3b8f;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Georgia','Times New Roman',serif;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,0.06), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(0,0,0,0.18), transparent 45%),
+    linear-gradient(160deg,var(--map-sea),var(--map-sea-dark));
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px;
+}
+.wrap{width:min(640px,100%);}
+header.app{
+  text-align:center;margin:6px 0 14px;color:var(--parchment);
+}
+header.app h1{
+  margin:0;font-size:2.1rem;letter-spacing:1px;
+  text-shadow:2px 2px 0 var(--map-sea-dark),0 4px 10px rgba(0,0,0,.4);
+}
+header.app h1 .compass{display:inline-block;animation:spin 14s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+header.app p{margin:4px 0 0;font-style:italic;opacity:.9;font-size:.95rem;}
+
+.panel{
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(160,120,60,0.05) 27px),
+    linear-gradient(180deg,var(--parchment),var(--parchment-dark));
+  border:3px solid #8a6a35;
+  border-radius:14px;
+  box-shadow:0 10px 34px var(--shadow),inset 0 0 50px rgba(180,140,80,.25);
+  padding:18px;
+  position:relative;
+  animation:fade-in .35s ease;
+}
+.panel::before,.panel::after{
+  content:"";position:absolute;width:16px;height:16px;border:2px solid var(--gold);
+  opacity:.7;
+}
+.panel::before{top:6px;left:6px;border-right:none;border-bottom:none;}
+.panel::after{bottom:6px;right:6px;border-left:none;border-top:none;}
+@keyframes fade-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+h2.section-title{
+  margin:0 0 12px;text-align:center;font-size:1.35rem;color:var(--ink);
+  border-bottom:2px dashed #b08a4a;padding-bottom:8px;
+}
+
+/* Top bar */
+.topbar{
+  display:flex;gap:8px;align-items:center;justify-content:space-between;
+  margin-bottom:12px;flex-wrap:wrap;
+}
+.coins{
+  background:var(--ink);color:var(--gold-light);border-radius:20px;
+  padding:5px 14px;font-weight:bold;font-size:.9rem;box-shadow:0 2px 6px var(--shadow);
+}
+.coins span{color:#fff;}
+
+/* Buttons */
+.btn{
+  cursor:pointer;border:2px solid #7a5b2a;border-radius:10px;
+  padding:12px 16px;font-size:1rem;font-weight:bold;font-family:inherit;
+  background:linear-gradient(180deg,#fff6e0,var(--parchment-dark));
+  color:var(--ink);transition:transform .08s,box-shadow .12s,background .15s;
+  box-shadow:0 3px 0 #7a5b2a,0 4px 8px var(--shadow);
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 #7a5b2a,0 8px 14px var(--shadow);}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #7a5b2a;}
+.btn.primary{background:linear-gradient(180deg,var(--gold-light),var(--gold));color:#3a2c18;border-color:#8a6512;box-shadow:0 3px 0 #8a6512,0 4px 8px var(--shadow);}
+.btn.primary:hover{box-shadow:0 5px 0 #8a6512,0 8px 14px var(--shadow);}
+.btn.ghost{background:transparent;box-shadow:none;border-style:dashed;}
+.btn.ghost:hover{background:rgba(255,255,255,.3);transform:none;}
+.btn.small{padding:7px 12px;font-size:.85rem;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.menu-grid .btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 10px;text-align:center;}
+.menu-grid .btn .ico{font-size:1.7rem;}
+.menu-grid .btn .sub{font-weight:normal;font-size:.72rem;opacity:.75;}
+@media(max-width:420px){.menu-grid{grid-template-columns:1fr;}}
+
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.row.between{justify-content:space-between;}
+.center{text-align:center;}
+.mt{margin-top:14px;}
+.mb{margin-bottom:14px;}
+.hidden{display:none!important;}
+
+/* Filters / selects */
+select,input[type=text]{
+  font-family:inherit;font-size:.95rem;padding:8px 10px;border-radius:8px;
+  border:2px solid #8a6a35;background:#fff8ea;color:var(--ink);
+}
+label.flt{display:flex;flex-direction:column;gap:3px;font-size:.78rem;font-weight:bold;color:var(--ink-soft);}
+
+/* Stat / progress */
+.hp-bar{height:14px;background:#d8c194;border-radius:8px;overflow:hidden;border:2px solid #8a6a35;}
+.hp-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .4s;}
+.lives{font-size:1.2rem;letter-spacing:2px;}
+
+/* Game card */
+.q-prompt{
+  font-size:1.3rem;text-align:center;margin:10px 0 16px;font-weight:bold;
+  background:#fff8ea;border:2px dashed #b08a4a;border-radius:10px;padding:16px;line-height:1.5;
+}
+.q-sub{font-size:.85rem;font-style:italic;color:var(--ink-soft);display:block;margin-top:6px;font-weight:normal;}
+.choices{display:grid;gap:10px;}
+.choice{
+  text-align:left;width:100%;
+}
+.choice.correct{background:linear-gradient(180deg,#bfe6c2,var(--green))!important;color:#0e3a18;border-color:var(--green-dark)!important;animation:pop .35s;}
+.choice.wrong{background:linear-gradient(180deg,#eab4ae,var(--red))!important;color:#fff;border-color:#7d231d!important;animation:shake .35s;}
+@keyframes pop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+
+.feedback{margin-top:14px;text-align:center;min-height:24px;font-weight:bold;font-size:1.05rem;}
+.feedback.good{color:var(--green-dark);}
+.feedback.bad{color:var(--red);}
+.explain{
+  margin-top:10px;background:#fff8ea;border-left:4px solid var(--gold);border-radius:6px;
+  padding:10px 12px;font-size:.9rem;text-align:left;animation:fade-in .3s;
+}
+.explain b{color:var(--ink);}
+
+.progress-line{font-size:.82rem;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+
+/* Dictionary / learn list */
+.list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow-y:auto;padding:4px;}
+.idiom-card{
+  background:#fff8ea;border:2px solid #c9a85f;border-radius:10px;padding:12px 14px;
+  box-shadow:0 2px 6px var(--shadow);
+}
+.idiom-card h3{margin:0 0 4px;font-size:1.1rem;color:var(--ink);}
+.idiom-card .meaning{font-weight:bold;color:var(--ink-soft);margin-bottom:6px;}
+.idiom-card .ex{font-style:italic;font-size:.9rem;margin-top:6px;}
+.idiom-card .tr{font-size:.85rem;color:var(--ink-soft);}
+.tag{display:inline-block;font-size:.68rem;font-weight:bold;color:#fff;border-radius:10px;padding:2px 8px;margin-right:5px;vertical-align:middle;}
+.tag.cat{background:#7a5b2a;}
+.lvl-badge{display:inline-block;font-size:.66rem;font-weight:bold;color:#fff;border-radius:6px;padding:2px 7px;}
+.lvl-A2{background:var(--a2);} .lvl-B1{background:var(--b1);} .lvl-B2{background:var(--b2);} .lvl-C1{background:var(--c1);}
+.mastered-dot{color:var(--gold);font-size:1rem;}
+.related{margin-top:8px;font-size:.8rem;color:var(--ink-soft);}
+.related b{color:var(--ink);}
+
+/* Memory / match grids */
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:520px){.mem-grid{grid-template-columns:repeat(3,1fr);}}
+.mem-card{
+  aspect-ratio:3/4;border-radius:8px;border:2px solid #7a5b2a;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-size:.72rem;padding:5px;font-weight:bold;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#3a2c18;
+  transition:transform .2s;
+}
+.mem-card .face{display:none;}
+.mem-card.flipped{background:#fff8ea;color:var(--ink);}
+.mem-card.flipped .back{display:none;}
+.mem-card.flipped .face{display:block;}
+.mem-card.matched{background:linear-gradient(135deg,#bfe6c2,var(--green));color:#0e3a18;cursor:default;opacity:.85;}
+.mem-card .back{font-size:1.5rem;}
+
+.match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.match-col{display:flex;flex-direction:column;gap:8px;}
+.match-item{
+  border:2px solid #7a5b2a;border-radius:8px;padding:10px;cursor:pointer;font-size:.85rem;
+  background:#fff8ea;transition:all .15s;text-align:center;
+}
+.match-item.sel{background:var(--gold-light);border-color:var(--gold);transform:scale(1.02);}
+.match-item.done{background:linear-gradient(180deg,#bfe6c2,var(--green));color:#0e3a18;cursor:default;opacity:.7;}
+.match-item.miss{animation:shake .35s;}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-box{background:#fff8ea;border:2px solid #c9a85f;border-radius:10px;padding:12px;text-align:center;}
+.stat-box .num{font-size:1.7rem;font-weight:bold;color:var(--gold);text-shadow:1px 1px 0 #7a5b2a;}
+.stat-box .lbl{font-size:.74rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
+.bar-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.8rem;}
+.bar-row .name{width:130px;flex-shrink:0;}
+.bar-track{flex:1;height:12px;background:#d8c194;border-radius:6px;overflow:hidden;border:1px solid #8a6a35;}
+.bar-val{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));}
+.bar-row .pct{width:38px;text-align:right;font-weight:bold;}
+
+/* Achievements */
+.badge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(max-width:420px){.badge-grid{grid-template-columns:1fr;}}
+.badge{
+  display:flex;gap:10px;align-items:center;background:#fff8ea;border:2px solid #c9a85f;
+  border-radius:10px;padding:10px;opacity:.45;filter:grayscale(.7);transition:all .3s;
+}
+.badge.un{opacity:1;filter:none;border-color:var(--gold);box-shadow:0 0 12px rgba(200,148,31,.5);}
+.badge .ico{font-size:1.8rem;}
+.badge .t{font-weight:bold;font-size:.9rem;}
+.badge .d{font-size:.72rem;color:var(--ink-soft);}
+
+/* Toast */
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);
+  background:var(--ink);color:var(--gold-light);padding:14px 22px;border-radius:30px;
+  font-weight:bold;box-shadow:0 6px 24px rgba(0,0,0,.5);z-index:50;border:2px solid var(--gold);
+  transition:transform .4s cubic-bezier(.2,1.4,.4,1);text-align:center;max-width:90vw;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Particles */
+.particle{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:60;animation:burst .7s ease-out forwards;}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0;}}
+
+.text-input-row{display:flex;gap:8px;margin-top:6px;}
+.text-input-row input{flex:1;}
+
+.timer-big{font-size:1.5rem;font-weight:bold;text-align:center;color:var(--red);}
+.scrollnote{font-size:.72rem;text-align:center;color:var(--ink-soft);font-style:italic;margin-top:6px;}
+.empty{text-align:center;padding:30px 10px;color:var(--ink-soft);font-style:italic;}
+.foot{text-align:center;color:var(--parchment);opacity:.7;font-size:.75rem;margin:14px 0 4px;}
+.kbd{background:#fff8ea;border:1px solid #b08a4a;border-radius:4px;padding:1px 6px;font-size:.8rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <h1><span class="compass">🧭</span> Idiomjæger</h1>
+    <p>Den danske idiom-skattejagt · A2 → C1</p>
+  </header>
+  <div id="app"></div>
+  <div class="foot">Fremgang gemmes automatisk på din enhed.</div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   IDIOMJÆGER — Danish idiom learning game
+   Single-file. Data + engine + UI below.
+   ============================================================ */
+
+/* ---------- CATEGORIES ---------- */
+const CATS = [
+  "Everyday Life","Work & Meetings","Feelings & Emotions","Relationships",
+  "Decision Making","Success & Failure","Problems & Challenges","Time",
+  "Money","Communication","Society & News","Very Danish Expressions",
+  "Humor & Informal Speech"
+];
+const CAT_ICON = {
+  "Everyday Life":"🏡","Work & Meetings":"💼","Feelings & Emotions":"❤️","Relationships":"🤝",
+  "Decision Making":"⚖️","Success & Failure":"🏆","Problems & Challenges":"⚠️","Time":"⏳",
+  "Money":"💰","Communication":"💬","Society & News":"📰","Very Danish Expressions":"🇩🇰",
+  "Humor & Informal Speech":"😄"
+};
+
+/* ---------- IDIOM DATABASE ----------
+   d=danish, m=english meaning, x=explanation, e=danish example,
+   t=english translation, l=level, c=category, k=keyword (for fill-in games) */
+const DATA = [
+/* ===== EVERYDAY LIFE ===== */
+{d:"Ingen ko på isen",m:"No need to worry",x:"The situation is under control; there's no problem.",e:"Der er ingen ko på isen. Vi har stadig god tid.",t:"There's no need to worry. We still have plenty of time.",l:"A2",c:"Everyday Life",k:"ko"},
+{d:"Tage det med ro",m:"Take it easy",x:"Stay calm and don't stress.",e:"Tag det nu med ro, vi når det hele.",t:"Just take it easy, we'll get it all done.",l:"A2",c:"Everyday Life",k:"ro"},
+{d:"Slå to fluer med ét smæk",m:"Kill two birds with one stone",x:"Solve two problems with a single action.",e:"Hvis jeg handler på vej hjem, slår jeg to fluer med ét smæk.",t:"If I shop on my way home, I kill two birds with one stone.",l:"B1",c:"Everyday Life",k:"fluer"},
+{d:"Springe over hvor gærdet er lavest",m:"Take the easy way out",x:"Choose the easiest option instead of doing it properly.",e:"Han springer altid over, hvor gærdet er lavest, i stedet for at læse ordentligt op.",t:"He always takes the easy way out instead of studying properly.",l:"B2",c:"Everyday Life",k:"gærdet"},
+{d:"Gøre en lang historie kort",m:"To make a long story short",x:"Skip the details and get to the point.",e:"For at gøre en lang historie kort: vi blev enige til sidst.",t:"To make a long story short: we agreed in the end.",l:"B1",c:"Everyday Life",k:"kort"},
+{d:"Have en finger med i spillet",m:"To have a hand in it",x:"Be involved in or partly responsible for something.",e:"Jeg tror, chefen havde en finger med i spillet, da han fik jobbet.",t:"I think the boss had a hand in it when he got the job.",l:"B2",c:"Everyday Life",k:"finger"},
+{d:"Få noget på plads",m:"To get something sorted",x:"Arrange or settle something so it is in order.",e:"Lad os lige få detaljerne på plads, før vi går videre.",t:"Let's get the details sorted before we move on.",l:"A2",c:"Everyday Life",k:"plads"},
+{d:"Det er ingen sag",m:"It's no trouble at all",x:"Something is very easy to do.",e:"At skifte et dæk? Det er ingen sag.",t:"Changing a tyre? It's no trouble at all.",l:"A2",c:"Everyday Life",k:"sag"},
+{d:"Stå op med det forkerte ben først",m:"To get out of bed on the wrong side",x:"To be in a bad mood from the start of the day.",e:"Hun er sur i dag – hun er vist stået op med det forkerte ben.",t:"She's grumpy today – she must have got out of bed on the wrong side.",l:"B1",c:"Everyday Life",k:"ben"},
+{d:"Køre træt i noget",m:"To grow weary of something",x:"To lose energy or motivation for something over time.",e:"Jeg er ved at køre træt i den lange pendling.",t:"I'm growing weary of the long commute.",l:"B2",c:"Everyday Life",k:"træt"},
+{d:"Det går som smurt",m:"It's going smoothly",x:"Everything is working without problems.",e:"Efter lidt øvelse går det hele som smurt.",t:"After a bit of practice it's all going smoothly.",l:"B2",c:"Everyday Life",k:"smurt"},
+{d:"Have hænderne fulde",m:"To have one's hands full",x:"To be very busy with responsibilities.",e:"Med tre børn har hun hænderne fulde.",t:"With three kids she has her hands full.",l:"B1",c:"Everyday Life",k:"hænderne"},
+{d:"Lige om hjørnet",m:"Just around the corner",x:"Very close in time or distance.",e:"Sommerferien er lige om hjørnet.",t:"The summer holiday is just around the corner.",l:"A2",c:"Everyday Life",k:"hjørnet"},
+
+/* ===== WORK & MEETINGS ===== */
+{d:"Have mange bolde i luften",m:"To juggle many things at once",x:"To handle several tasks or projects at the same time.",e:"Som projektleder har hun mange bolde i luften til daglig.",t:"As a project manager she juggles many things every day.",l:"B1",c:"Work & Meetings",k:"bolde"},
+{d:"Komme til sagen",m:"To get to the point",x:"To start talking about what really matters.",e:"Vi har ikke lang tid, så lad os komme til sagen.",t:"We don't have much time, so let's get to the point.",l:"B1",c:"Work & Meetings",k:"sagen"},
+{d:"Trække i samme retning",m:"To pull in the same direction",x:"To work together toward a common goal.",e:"Hvis vi skal lykkes, må alle trække i samme retning.",t:"If we're to succeed, everyone must pull in the same direction.",l:"B2",c:"Work & Meetings",k:"retning"},
+{d:"Lægge hovedet på blokken",m:"To stick one's neck out",x:"To take a personal risk by vouching for something.",e:"Jeg lægger gerne hovedet på blokken for, at planen holder.",t:"I'll happily stick my neck out that the plan will hold.",l:"B2",c:"Work & Meetings",k:"blokken"},
+{d:"Tage hatten af for nogen",m:"To take one's hat off to someone",x:"To show great respect or admiration.",e:"Jeg tager hatten af for det stykke arbejde, du har lavet.",t:"I take my hat off to the work you've done.",l:"B2",c:"Work & Meetings",k:"hatten"},
+{d:"Skære igennem",m:"To cut through / make a firm decision",x:"To end discussion and decide clearly.",e:"Til sidst måtte chefen skære igennem og træffe valget.",t:"In the end the boss had to cut through and make the call.",l:"B2",c:"Work & Meetings",k:"igennem"},
+{d:"Gå planken ud",m:"To go all the way / see it through",x:"To carry something through to the very end.",e:"Vi har lovet kunden det, så nu går vi planken ud.",t:"We promised the client, so now we'll see it through.",l:"B2",c:"Work & Meetings",k:"planken"},
+{d:"Lægge sig fladt ned",m:"To fully admit a mistake / apologise",x:"To openly take the blame without excuses.",e:"Firmaet lagde sig fladt ned og undskyldte fejlen.",t:"The company fully admitted the mistake and apologised.",l:"B2",c:"Work & Meetings",k:"fladt"},
+{d:"Tage teten",m:"To take the lead",x:"To take charge and set the direction.",e:"Nogen må tage teten, ellers sker der ingenting.",t:"Someone has to take the lead, or nothing will happen.",l:"C1",c:"Work & Meetings",k:"teten"},
+{d:"Have rygdækning",m:"To have backing / support",x:"To have support from those above you.",e:"Jeg tør godt sige det, for jeg har rygdækning fra ledelsen.",t:"I dare say it because I have backing from management.",l:"B2",c:"Work & Meetings",k:"rygdækning"},
+{d:"Køre noget i stilling",m:"To get something into position",x:"To prepare something carefully so it's ready to launch.",e:"Vi kører projektet i stilling, inden vi præsenterer det.",t:"We're getting the project into position before presenting it.",l:"C1",c:"Work & Meetings",k:"stilling"},
+{d:"Sætte noget i søen",m:"To launch / set something in motion",x:"To start up a new initiative or project.",e:"De har sat et nyt uddannelsesprojekt i søen.",t:"They've launched a new training project.",l:"B2",c:"Work & Meetings",k:"søen"},
+/* ===== FEELINGS & EMOTIONS ===== */
+{d:"Have is i maven",m:"To keep one's cool",x:"To stay calm and composed under pressure.",e:"Peter har virkelig is i maven under stressende møder.",t:"Peter really keeps his cool during stressful meetings.",l:"B1",c:"Feelings & Emotions",k:"is"},
+{d:"Slå koldt vand i blodet",m:"To calm down / not panic",x:"To stop worrying and react calmly.",e:"Slå nu koldt vand i blodet – det er ikke så slemt.",t:"Just calm down – it's not that bad.",l:"B2",c:"Feelings & Emotions",k:"koldt"},
+{d:"Gå over gevind",m:"To go overboard / too far",x:"To lose control or do far more than reasonable.",e:"Han gik helt over gevind af glæde, da han vandt.",t:"He completely went overboard with joy when he won.",l:"B2",c:"Feelings & Emotions",k:"gevind"},
+{d:"Have sommerfugle i maven",m:"To have butterflies in one's stomach",x:"To feel nervous excitement before something.",e:"Jeg har sommerfugle i maven før eksamen.",t:"I have butterflies in my stomach before the exam.",l:"B1",c:"Feelings & Emotions",k:"sommerfugle"},
+{d:"Tage sig sammen",m:"To pull oneself together",x:"To gather one's strength and act despite difficulty.",e:"Nu må du tage dig sammen og komme i gang.",t:"Now you have to pull yourself together and get started.",l:"B1",c:"Feelings & Emotions",k:"sammen"},
+{d:"Få kolde fødder",m:"To get cold feet",x:"To lose courage and back out at the last moment.",e:"Han fik kolde fødder og aflyste hele rejsen.",t:"He got cold feet and cancelled the whole trip.",l:"B1",c:"Feelings & Emotions",k:"fødder"},
+{d:"Være helt ude af den",m:"To be beside oneself",x:"To be very upset or distressed.",e:"Hun var helt ude af den, da hunden blev væk.",t:"She was beside herself when the dog went missing.",l:"B2",c:"Feelings & Emotions",k:"ude"},
+{d:"Bide i det sure æble",m:"To bite the bullet",x:"To accept something unpleasant that can't be avoided.",e:"Jeg må vist bide i det sure æble og ringe til tandlægen.",t:"I'd better bite the bullet and call the dentist.",l:"B2",c:"Feelings & Emotions",k:"æble"},
+{d:"Få blod på tanden",m:"To get a taste for it",x:"To become eager and motivated after a first success.",e:"Efter den første sejr fik holdet blod på tanden.",t:"After the first win the team got a real taste for it.",l:"B2",c:"Feelings & Emotions",k:"blod"},
+{d:"Være på dybt vand",m:"To be out of one's depth",x:"To be in a situation one can't handle.",e:"Til mødet følte jeg mig på dybt vand med alle tallene.",t:"At the meeting I felt out of my depth with all the figures.",l:"B2",c:"Feelings & Emotions",k:"dybt"},
+{d:"Tabe ansigt",m:"To lose face",x:"To lose respect or be embarrassed in front of others.",e:"Han ville ikke indrømme fejlen af frygt for at tabe ansigt.",t:"He wouldn't admit the mistake for fear of losing face.",l:"B2",c:"Feelings & Emotions",k:"ansigt"},
+{d:"Have en klods om benet",m:"To have a burden holding one back",x:"Something that limits your freedom or weighs you down.",e:"Det store huslån er en klods om benet.",t:"The big mortgage is a real burden holding us back.",l:"B2",c:"Feelings & Emotions",k:"klods"},
+
+/* ===== RELATIONSHIPS ===== */
+{d:"Komme på bølgelængde",m:"To be on the same wavelength",x:"To understand each other well and click.",e:"Vi kom hurtigt på bølgelængde og blev gode venner.",t:"We quickly got on the same wavelength and became good friends.",l:"B2",c:"Relationships",k:"bølgelængde"},
+{d:"Stå på god fod med nogen",m:"To be on good terms with someone",x:"To have a friendly relationship with someone.",e:"Jeg står på god fod med mine naboer.",t:"I'm on good terms with my neighbours.",l:"B2",c:"Relationships",k:"fod"},
+{d:"Holde hånden over nogen",m:"To protect / shield someone",x:"To support or cover for someone.",e:"Læreren holdt hånden over den nye elev.",t:"The teacher took the new pupil under her wing.",l:"B2",c:"Relationships",k:"hånden"},
+{d:"Give nogen en kurv",m:"To turn someone down",x:"To reject someone's romantic interest.",e:"Hun gav ham en kurv, da han spurgte, om de skulle ud.",t:"She turned him down when he asked her out.",l:"B2",c:"Relationships",k:"kurv"},
+{d:"Stikke hovederne sammen",m:"To put heads together",x:"To discuss something closely in a small group.",e:"Lad os stikke hovederne sammen og finde en løsning.",t:"Let's put our heads together and find a solution.",l:"B2",c:"Relationships",k:"hovederne"},
+{d:"Være ført bag lyset",m:"To be deceived / misled",x:"To be tricked into believing something false.",e:"Kunderne følte sig ført bag lyset af reklamen.",t:"The customers felt deceived by the advertisement.",l:"B2",c:"Relationships",k:"lyset"},
+{d:"Trække på samme hammel",m:"To pull together",x:"To cooperate toward the same goal.",e:"I en familie må man trække på samme hammel.",t:"In a family you have to pull together.",l:"C1",c:"Relationships",k:"hammel"},
+{d:"Ramme plet",m:"To hit the mark",x:"To say or do exactly the right thing.",e:"Med den gave ramte du virkelig plet.",t:"With that gift you really hit the mark.",l:"B1",c:"Relationships",k:"plet"},
+{d:"Have en finger med i alt",m:"To meddle in everything",x:"To involve oneself in everyone's business.",e:"Tante Lis skal have en finger med i alt i familien.",t:"Aunt Lis has to meddle in everything in the family.",l:"B2",c:"Relationships",k:"alt"},
+{d:"Ryge i totterne på hinanden",m:"To get into a fight with each other",x:"To start quarrelling fiercely.",e:"De to brødre ryger tit i totterne på hinanden.",t:"The two brothers often get into fights with each other.",l:"C1",c:"Relationships",k:"totterne"},
+
+/* ===== DECISION MAKING ===== */
+{d:"Springe ud i det",m:"To take the plunge",x:"To finally commit to something despite uncertainty.",e:"Efter lang tids tøven sprang de ud i det og købte huset.",t:"After much hesitation they took the plunge and bought the house.",l:"B1",c:"Decision Making",k:"ud"},
+{d:"Sove på det",m:"To sleep on it",x:"To wait until the next day before deciding.",e:"Jeg vil lige sove på det, før jeg siger ja.",t:"I'll just sleep on it before I say yes.",l:"B1",c:"Decision Making",k:"sove"},
+{d:"Smede mens jernet er varmt",m:"To strike while the iron is hot",x:"To act while the opportunity is good.",e:"Tilbuddet er godt nu, så lad os smede, mens jernet er varmt.",t:"The offer is good now, so let's strike while the iron is hot.",l:"B2",c:"Decision Making",k:"jernet"},
+{d:"Tage bladet fra munden",m:"To speak one's mind",x:"To finally say openly what one thinks.",e:"Til sidst tog hun bladet fra munden og sagde sin mening.",t:"Finally she spoke her mind and said what she thought.",l:"B2",c:"Decision Making",k:"bladet"},
+{d:"Lægge alle æg i én kurv",m:"To put all eggs in one basket",x:"To risk everything on a single option.",e:"Du bør ikke lægge alle æg i én kurv, når du investerer.",t:"You shouldn't put all your eggs in one basket when investing.",l:"B2",c:"Decision Making",k:"æg"},
+{d:"Veje sine ord",m:"To weigh one's words",x:"To choose what one says carefully.",e:"I sådan en sag må man veje sine ord.",t:"In a case like that you have to weigh your words.",l:"B2",c:"Decision Making",k:"ord"},
+{d:"Gøre kort proces",m:"To make short work of it",x:"To deal with something quickly and decisively.",e:"Chefen gjorde kort proces og afviste forslaget.",t:"The boss made short work of it and rejected the proposal.",l:"B2",c:"Decision Making",k:"proces"},
+{d:"Sætte hårdt mod hårdt",m:"To meet force with force",x:"To respond to toughness with equal toughness.",e:"Forhandlerne satte hårdt mod hårdt og gav sig ikke.",t:"The negotiators met force with force and didn't budge.",l:"C1",c:"Decision Making",k:"hårdt"},
+{d:"Tage skeen i den anden hånd",m:"To change one's ways",x:"To start doing things differently and better.",e:"Efter advarslen tog han skeen i den anden hånd.",t:"After the warning he changed his ways.",l:"C1",c:"Decision Making",k:"skeen"},
+{d:"Trække en streg i sandet",m:"To draw a line in the sand",x:"To set a firm limit that won't be crossed.",e:"Nu trækker vi en streg i sandet – ikke mere overarbejde.",t:"Now we draw a line in the sand – no more overtime.",l:"B2",c:"Decision Making",k:"streg"},
+/* ===== SUCCESS & FAILURE ===== */
+{d:"Ramme hovedet på sømmet",m:"To hit the nail on the head",x:"To describe something exactly right.",e:"Du ramte hovedet på sømmet med den analyse.",t:"You hit the nail on the head with that analysis.",l:"B2",c:"Success & Failure",k:"sømmet"},
+{d:"Få vind i sejlene",m:"To get a tailwind / gain momentum",x:"To start succeeding and pick up speed.",e:"Efter den gode anmeldelse fik bandet vind i sejlene.",t:"After the good review the band got the wind in their sails.",l:"B2",c:"Success & Failure",k:"sejlene"},
+{d:"Komme godt fra start",m:"To get off to a good start",x:"To begin something successfully.",e:"Holdet kom godt fra start og scorede tidligt.",t:"The team got off to a good start and scored early.",l:"B1",c:"Success & Failure",k:"start"},
+{d:"Kaste håndklædet i ringen",m:"To throw in the towel",x:"To give up after a struggle.",e:"Da regnskabet ikke hang sammen, kastede han håndklædet i ringen.",t:"When the accounts didn't add up, he threw in the towel.",l:"B2",c:"Success & Failure",k:"håndklædet"},
+{d:"Gå i vasken",m:"To fall through",x:"For a plan to fail or not happen.",e:"Hele aftalen gik i vasken i sidste øjeblik.",t:"The whole deal fell through at the last minute.",l:"B2",c:"Success & Failure",k:"vasken"},
+{d:"Gå i fisk",m:"To go wrong / fall apart",x:"For something to break down or fail.",e:"Planen gik i fisk, da bussen blev aflyst.",t:"The plan fell apart when the bus was cancelled.",l:"B2",c:"Success & Failure",k:"fisk"},
+{d:"Stå med håret i postkassen",m:"To be left in an awkward mess",x:"To end up in a ridiculous, exposed situation.",e:"Da leverandøren svigtede, stod vi med håret i postkassen.",t:"When the supplier let us down, we were left in an awkward mess.",l:"C1",c:"Success & Failure",k:"håret"},
+{d:"Score kassen",m:"To make a fortune",x:"To earn a lot of money quickly.",e:"De scorede kassen, da de solgte firmaet.",t:"They made a fortune when they sold the company.",l:"B2",c:"Success & Failure",k:"kassen"},
+{d:"Vinde med længder",m:"To win by a mile",x:"To win clearly and convincingly.",e:"Vores forslag vandt med længder i afstemningen.",t:"Our proposal won by a mile in the vote.",l:"B2",c:"Success & Failure",k:"længder"},
+{d:"Det gik over stok og sten",m:"It went headlong / chaotically",x:"Something happened very fast and roughly.",e:"Da alarmen lød, gik det over stok og sten ud ad døren.",t:"When the alarm went off, everyone rushed headlong out the door.",l:"C1",c:"Success & Failure",k:"stok"},
+{d:"Bide i græsset",m:"To bite the dust",x:"To fail badly or be defeated.",e:"Mange startups bider i græsset det første år.",t:"Many startups bite the dust in the first year.",l:"C1",c:"Success & Failure",k:"græsset"},
+
+/* ===== PROBLEMS & CHALLENGES ===== */
+{d:"Stikke en kæp i hjulet",m:"To put a spoke in the wheel",x:"To deliberately get in the way of a plan.",e:"De nye regler stak en kæp i hjulet for projektet.",t:"The new rules put a spoke in the wheel of the project.",l:"B2",c:"Problems & Challenges",k:"kæp"},
+{d:"Have en høne at plukke med nogen",m:"To have a bone to pick with someone",x:"To have a complaint to settle with someone.",e:"Jeg har en høne at plukke med dig om regningen.",t:"I have a bone to pick with you about the bill.",l:"B2",c:"Problems & Challenges",k:"høne"},
+{d:"Sidde i saksen",m:"To be in a tight spot",x:"To be caught in a difficult situation.",e:"Uden kvittering sidder jeg virkelig i saksen.",t:"Without the receipt I'm really in a tight spot.",l:"B2",c:"Problems & Challenges",k:"saksen"},
+{d:"Træde i spinaten",m:"To put one's foot in it",x:"To make an embarrassing blunder.",e:"Jeg trådte i spinaten og glemte hendes navn.",t:"I put my foot in it and forgot her name.",l:"B2",c:"Problems & Challenges",k:"spinaten"},
+{d:"Stå med ryggen mod muren",m:"To have one's back against the wall",x:"To be in a desperate position with no easy way out.",e:"Med deadline i morgen står vi med ryggen mod muren.",t:"With the deadline tomorrow our backs are against the wall.",l:"B2",c:"Problems & Challenges",k:"ryggen"},
+{d:"Gøre en myg til en elefant",m:"To make a mountain out of a molehill",x:"To exaggerate a small problem.",e:"Slap af – du gør en myg til en elefant.",t:"Relax – you're making a mountain out of a molehill.",l:"B2",c:"Problems & Challenges",k:"myg"},
+{d:"Save den gren over, man selv sidder på",m:"To saw off the branch one is sitting on",x:"To harm oneself through one's own actions.",e:"Ved at lyve for chefen saver han den gren over, han selv sidder på.",t:"By lying to the boss he's sawing off the branch he's sitting on.",l:"C1",c:"Problems & Challenges",k:"gren"},
+{d:"Komme i fedtefadet",m:"To get into trouble",x:"To end up in a difficult or embarrassing situation.",e:"Han kom i fedtefadet, da fejlen blev opdaget.",t:"He got into trouble when the mistake was discovered.",l:"C1",c:"Problems & Challenges",k:"fedtefadet"},
+{d:"Tage tyren ved hornene",m:"To take the bull by the horns",x:"To confront a difficulty directly and bravely.",e:"Hun tog tyren ved hornene og ringede selv til kunden.",t:"She took the bull by the horns and called the client herself.",l:"B1",c:"Problems & Challenges",k:"hornene"},
+{d:"Slå skår i glæden",m:"To put a damper on things",x:"To spoil an otherwise happy occasion.",e:"Regnen slog lidt skår i glæden til festen.",t:"The rain put a bit of a damper on the party.",l:"C1",c:"Problems & Challenges",k:"skår"},
+{d:"Gå som katten om den varme grød",m:"To beat around the bush",x:"To avoid getting to the difficult point.",e:"Hold op med at gå som katten om den varme grød og sig det ligeud.",t:"Stop beating around the bush and just say it.",l:"B2",c:"Problems & Challenges",k:"grød"},
+
+/* ===== TIME ===== */
+{d:"I ellevte time",m:"At the eleventh hour",x:"At the very last possible moment.",e:"Aftalen kom på plads i ellevte time.",t:"The deal came together at the eleventh hour.",l:"B2",c:"Time",k:"ellevte"},
+{d:"Det er på høje tid",m:"It's high time",x:"Something should have been done already.",e:"Det er på høje tid, at vi får malet huset.",t:"It's high time we got the house painted.",l:"B1",c:"Time",k:"tid"},
+{d:"Tiden flyver",m:"Time flies",x:"Time passes very quickly.",e:"Tiden flyver, når man hygger sig.",t:"Time flies when you're having fun.",l:"A2",c:"Time",k:"flyver"},
+{d:"Hen ad vejen",m:"As we go along / gradually",x:"Bit by bit over time.",e:"Vi finder ud af detaljerne hen ad vejen.",t:"We'll figure out the details as we go along.",l:"B1",c:"Time",k:"vejen"},
+{d:"Der er lang vej igen",m:"There's a long way to go",x:"Much still remains before something is done.",e:"Projektet er begyndt, men der er lang vej igen.",t:"The project has started, but there's a long way to go.",l:"B1",c:"Time",k:"vej"},
+{d:"Når enden er god, er alting godt",m:"All's well that ends well",x:"If the outcome is good, earlier trouble doesn't matter.",e:"Vi var forsinkede, men når enden er god, er alting godt.",t:"We were late, but all's well that ends well.",l:"B1",c:"Time",k:"enden"},
+{d:"På et splitsekund",m:"In a split second",x:"In an extremely short moment.",e:"Ulykken skete på et splitsekund.",t:"The accident happened in a split second.",l:"B1",c:"Time",k:"splitsekund"},
+{d:"Få tiden til at gå",m:"To pass the time",x:"To keep oneself occupied while waiting.",e:"Vi spillede kort for at få tiden til at gå.",t:"We played cards to pass the time.",l:"A2",c:"Time",k:"tiden"},
+{d:"Tage en dag ad gangen",m:"To take one day at a time",x:"To deal with life gradually without worrying ahead.",e:"Efter operationen tager hun en dag ad gangen.",t:"After the operation she takes one day at a time.",l:"B1",c:"Time",k:"dag"},
+{d:"Trække i langdrag",m:"To drag on",x:"To take much longer than expected.",e:"Forhandlingerne trak i langdrag i flere måneder.",t:"The negotiations dragged on for several months.",l:"B2",c:"Time",k:"langdrag"},
+/* ===== MONEY ===== */
+{d:"Spare op til en regnvejrsdag",m:"To save for a rainy day",x:"To put money aside for hard times.",e:"Det er klogt at spare op til en regnvejrsdag.",t:"It's wise to save for a rainy day.",l:"B2",c:"Money",k:"regnvejrsdag"},
+{d:"Stramme livremmen",m:"To tighten one's belt",x:"To spend less money than usual.",e:"Efter jul må vi stramme livremmen lidt.",t:"After Christmas we have to tighten our belts a bit.",l:"B2",c:"Money",k:"livremmen"},
+{d:"Det koster det hvide ud af øjnene",m:"To cost an arm and a leg",x:"To be extremely expensive.",e:"En lejlighed i centrum koster det hvide ud af øjnene.",t:"A flat in the centre costs an arm and a leg.",l:"B2",c:"Money",k:"hvide"},
+{d:"Være flad",m:"To be broke",x:"To have no money left.",e:"Jeg er helt flad indtil lønnen kommer.",t:"I'm completely broke until payday.",l:"B1",c:"Money",k:"flad"},
+{d:"Vende hver en krone",m:"To count every penny",x:"To watch one's spending very carefully.",e:"Som studerende må man vende hver en krone.",t:"As a student you have to count every penny.",l:"B2",c:"Money",k:"krone"},
+{d:"Smide penge ud af vinduet",m:"To throw money out the window",x:"To waste money on something pointless.",e:"At leje det dyre udstyr er at smide penge ud af vinduet.",t:"Renting that expensive gear is throwing money out the window.",l:"B2",c:"Money",k:"vinduet"},
+{d:"Sætte tæring efter næring",m:"To cut your coat according to your cloth",x:"To spend no more than you can afford.",e:"Vi må sætte tæring efter næring og droppe ferien i år.",t:"We have to cut our coat according to our cloth and skip the holiday this year.",l:"C1",c:"Money",k:"tæring"},
+{d:"Tjene penge som skidt",m:"To make money hand over fist",x:"To earn a huge amount of money.",e:"Firmaet tjener penge som skidt på den nye app.",t:"The company is making money hand over fist on the new app.",l:"C1",c:"Money",k:"skidt"},
+{d:"Have penge på kistebunden",m:"To have money put aside",x:"To have savings in reserve.",e:"Heldigvis havde de lidt penge på kistebunden.",t:"Luckily they had a little money put aside.",l:"C1",c:"Money",k:"kistebunden"},
+{d:"Slå sig løs",m:"To splash out / let loose",x:"To spend freely and enjoy oneself.",e:"Til fødselsdagen slog vi os løs på en fin restaurant.",t:"For the birthday we splashed out at a fancy restaurant.",l:"B2",c:"Money",k:"løs"},
+
+/* ===== COMMUNICATION ===== */
+{d:"Tale lige ud af posen",m:"To speak frankly",x:"To say exactly what one thinks without holding back.",e:"Lad mig tale lige ud af posen: forslaget dur ikke.",t:"Let me speak frankly: the proposal won't work.",l:"B2",c:"Communication",k:"posen"},
+{d:"Snakke udenom",m:"To talk around the issue",x:"To avoid answering directly.",e:"Du snakker udenom – svar nu på spørgsmålet.",t:"You're talking around the issue – just answer the question.",l:"B2",c:"Communication",k:"udenom"},
+{d:"Lægge ordene i munden på nogen",m:"To put words in someone's mouth",x:"To claim someone said something they didn't.",e:"Du lægger mig ord i munden – det sagde jeg ikke.",t:"You're putting words in my mouth – I didn't say that.",l:"B2",c:"Communication",k:"munden"},
+{d:"Tale for døve øren",m:"To fall on deaf ears",x:"To speak without anyone listening or acting.",e:"Mine advarsler talte for døve øren.",t:"My warnings fell on deaf ears.",l:"B2",c:"Communication",k:"døve"},
+{d:"Lægge kortene på bordet",m:"To put one's cards on the table",x:"To be open and honest about one's intentions.",e:"Nu lægger jeg kortene på bordet og fortæller sandheden.",t:"Now I'll put my cards on the table and tell the truth.",l:"B2",c:"Communication",k:"kortene"},
+{d:"Holde kortene tæt ind til kroppen",m:"To keep one's cards close to one's chest",x:"To keep one's plans secret.",e:"Direktøren holder kortene tæt ind til kroppen før opkøbet.",t:"The director is keeping his cards close to his chest before the takeover.",l:"C1",c:"Communication",k:"tæt"},
+{d:"Sige rent ud",m:"To say outright",x:"To state something plainly and directly.",e:"Hun sagde rent ud, at hun var uenig.",t:"She said outright that she disagreed.",l:"B1",c:"Communication",k:"rent"},
+{d:"Have ordet i sin magt",m:"To have a way with words",x:"To be very good at speaking and persuading.",e:"Som taler har han virkelig ordet i sin magt.",t:"As a speaker he really has a way with words.",l:"C1",c:"Communication",k:"magt"},
+{d:"Skære noget ud i pap",m:"To spell something out plainly",x:"To explain something in the simplest possible way.",e:"Skal jeg skære det ud i pap for dig?",t:"Do I have to spell it out for you?",l:"B2",c:"Communication",k:"pap"},
+{d:"Slå et slag for noget",m:"To make a case for something",x:"To argue in favour of something.",e:"Jeg vil gerne slå et slag for mere genbrug.",t:"I'd like to make a case for more recycling.",l:"B2",c:"Communication",k:"slag"},
+{d:"Tale over sig",m:"To say too much / let something slip",x:"To accidentally reveal something one shouldn't.",e:"Han talte over sig og røbede overraskelsen.",t:"He let it slip and gave away the surprise.",l:"C1",c:"Communication",k:"over"},
+
+/* ===== SOCIETY & NEWS ===== */
+{d:"Stikke hovedet i busken",m:"To bury one's head in the sand",x:"To ignore a problem instead of facing it.",e:"Politikerne kan ikke bare stikke hovedet i busken.",t:"The politicians can't just bury their heads in the sand.",l:"B2",c:"Society & News",k:"busken"},
+{d:"Feje noget ind under gulvtæppet",m:"To sweep something under the rug",x:"To hide a problem rather than deal with it.",e:"Sagen blev fejet ind under gulvtæppet i årevis.",t:"The case was swept under the rug for years.",l:"B2",c:"Society & News",k:"gulvtæppet"},
+{d:"Det er en varm kartoffel",m:"It's a hot potato",x:"A sensitive issue no one wants to handle.",e:"Skattereformen er en varm kartoffel for regeringen.",t:"The tax reform is a hot potato for the government.",l:"B2",c:"Society & News",k:"kartoffel"},
+{d:"Gå under radaren",m:"To fly under the radar",x:"To stay unnoticed.",e:"Den lille virksomhed gik under radaren i mange år.",t:"The small company flew under the radar for many years.",l:"B2",c:"Society & News",k:"radaren"},
+{d:"Sætte dagsordenen",m:"To set the agenda",x:"To decide which topics get attention.",e:"Klimaet sætter dagsordenen i debatten lige nu.",t:"The climate is setting the agenda in the debate right now.",l:"B2",c:"Society & News",k:"dagsordenen"},
+{d:"Råbe vagt i gevær",m:"To sound the alarm",x:"To loudly warn that something is wrong.",e:"Forskerne råber vagt i gevær om forureningen.",t:"The scientists are sounding the alarm about the pollution.",l:"C1",c:"Society & News",k:"vagt"},
+{d:"Vende kåben efter vinden",m:"To turn one's coat with the wind",x:"To change opinion to whatever is convenient.",e:"Han vender kåben efter vinden alt efter, hvem der lytter.",t:"He turns his coat with the wind depending on who's listening.",l:"C1",c:"Society & News",k:"kåben"},
+{d:"Sætte tingene på spidsen",m:"To push things to the extreme",x:"To exaggerate to make a point.",e:"For at sætte tingene på spidsen: skal vi forbyde alt?",t:"To push things to the extreme: should we ban everything?",l:"C1",c:"Society & News",k:"spidsen"},
+{d:"Ramme en nerve",m:"To strike a nerve",x:"To touch on something emotionally sensitive for many.",e:"Filmen ramte en nerve i hele landet.",t:"The film struck a nerve across the whole country.",l:"B2",c:"Society & News",k:"nerve"},
+{d:"Skyde papegøjen",m:"To hit the jackpot",x:"To have a stroke of great luck.",e:"Med det job har han virkelig skudt papegøjen.",t:"With that job he's really hit the jackpot.",l:"C1",c:"Society & News",k:"papegøjen"},
+/* ===== VERY DANISH EXPRESSIONS ===== */
+{d:"Pyt med det",m:"Never mind / let it go",x:"A very Danish way to shrug off small annoyances.",e:"Mælken er sur? Pyt med det, vi køber ny.",t:"The milk's gone off? Never mind, we'll buy more.",l:"A2",c:"Very Danish Expressions",k:"pyt"},
+{d:"Tak for kaffe!",m:"Well, I never! / Good grief!",x:"An exclamation of surprise or mild dismay.",e:"Tak for kaffe, hvor er det dyrt blevet!",t:"Good grief, how expensive it's become!",l:"B2",c:"Very Danish Expressions",k:"kaffe"},
+{d:"Klap lige hesten",m:"Hold your horses",x:"Tell someone to slow down or calm down.",e:"Klap lige hesten – vi har ikke besluttet noget endnu.",t:"Hold your horses – we haven't decided anything yet.",l:"B1",c:"Very Danish Expressions",k:"hesten"},
+{d:"Det blæser en halv pelikan",m:"It's blowing a gale",x:"A colourful way to say it's extremely windy.",e:"Tag en jakke på – det blæser en halv pelikan udenfor.",t:"Put on a jacket – it's blowing a gale outside.",l:"C1",c:"Very Danish Expressions",k:"pelikan"},
+{d:"Så er den ged barberet",m:"That's that sorted",x:"Said when a task is finally finished.",e:"Sidste kasse er pakket – så er den ged barberet!",t:"The last box is packed – that's that sorted!",l:"C1",c:"Very Danish Expressions",k:"ged"},
+{d:"Det er hen i vejret",m:"It's nonsense / way off",x:"Something is completely wrong or absurd.",e:"Hans forklaring var helt hen i vejret.",t:"His explanation was complete nonsense.",l:"B2",c:"Very Danish Expressions",k:"vejret"},
+{d:"En rød tråd",m:"A common thread / running theme",x:"A clear theme that connects everything throughout.",e:"Der er en rød tråd gennem hele hendes forfatterskab.",t:"There's a clear common thread through all her writing.",l:"B2",c:"Very Danish Expressions",k:"tråd"},
+{d:"Hold da helt ferie",m:"Wow / well I'll be",x:"A mild Danish exclamation of amazement.",e:"Hold da helt ferie, hvor har du gjort det godt!",t:"Wow, you've done really well!",l:"B1",c:"Very Danish Expressions",k:"ferie"},
+{d:"Det kører på skinner",m:"It's running like clockwork",x:"Everything is going perfectly smoothly.",e:"Efter opstarten kører forretningen på skinner.",t:"After the start-up the business runs like clockwork.",l:"B2",c:"Very Danish Expressions",k:"skinner"},
+{d:"Tage benene på nakken",m:"To take to one's heels",x:"To run away as fast as possible.",e:"Da hunden gøede, tog ungerne benene på nakken.",t:"When the dog barked, the kids took to their heels.",l:"B2",c:"Very Danish Expressions",k:"nakken"},
+{d:"Have rejst sig på den forkerte side",m:"Got up on the wrong side of the bed",x:"To be grumpy for no clear reason.",e:"Undskyld, jeg er vist rejst mig på den forkerte side i dag.",t:"Sorry, I think I got up on the wrong side of the bed today.",l:"B1",c:"Very Danish Expressions",k:"side"},
+{d:"Det er ikke nogen sag",m:"It's a piece of cake",x:"Something is very easy to do.",e:"At samle reolen er ikke nogen sag.",t:"Assembling the shelf is a piece of cake.",l:"A2",c:"Very Danish Expressions",k:"nogen"},
+
+/* ===== HUMOR & INFORMAL SPEECH ===== */
+{d:"Have en skrue løs",m:"To have a screw loose",x:"To be a bit crazy or eccentric.",e:"Han bader i havet om vinteren – han har en skrue løs!",t:"He swims in the sea in winter – he's got a screw loose!",l:"B2",c:"Humor & Informal Speech",k:"skrue"},
+{d:"Være en hund efter noget",m:"To be crazy about something",x:"To be very fond of or eager for something.",e:"Min lillebror er en hund efter is.",t:"My little brother is crazy about ice cream.",l:"B2",c:"Humor & Informal Speech",k:"hund"},
+{d:"Være på spanden",m:"To be in a fix / in trouble",x:"To be in a bad or hopeless situation.",e:"Uden bil er vi virkelig på spanden herude.",t:"Without a car we're really in a fix out here.",l:"B2",c:"Humor & Informal Speech",k:"spanden"},
+{d:"Have ben i næsen",m:"To have backbone",x:"To be assertive and not let others push you around.",e:"Den nye leder har ben i næsen.",t:"The new manager has real backbone.",l:"B2",c:"Humor & Informal Speech",k:"næsen"},
+{d:"Være helt til rotterne",m:"To be totally wrecked / done for",x:"To be completely worn out or ruined.",e:"Efter flytningen var jeg helt til rotterne.",t:"After the move I was totally wrecked.",l:"C1",c:"Humor & Informal Speech",k:"rotterne"},
+{d:"Det er for vildt",m:"That's wild / amazing",x:"A casual exclamation of amazement (good or bad).",e:"Har du løbet et maraton? Det er for vildt!",t:"You ran a marathon? That's amazing!",l:"B1",c:"Humor & Informal Speech",k:"vildt"},
+{d:"Være fra den",m:"To be out of it / overwhelmed",x:"To be confused, exhausted or beside oneself.",e:"Jeg var helt fra den efter den lange nattevagt.",t:"I was completely out of it after the long night shift.",l:"B2",c:"Humor & Informal Speech",k:"fra"},
+{d:"Tisse i bukserne for at holde varmen",m:"A short-term fix that makes things worse",x:"A solution that helps for a moment but worsens the problem.",e:"At låne for at betale gæld er at tisse i bukserne for at holde varmen.",t:"Borrowing to pay off debt is a short-term fix that makes things worse.",l:"C1",c:"Humor & Informal Speech",k:"bukserne"},
+{d:"Være lige i skabet",m:"To be spot on",x:"To be exactly right or perfect.",e:"Din timing var lige i skabet.",t:"Your timing was spot on.",l:"C1",c:"Humor & Informal Speech",k:"skabet"},
+{d:"Få sig en gang på frakken",m:"To get a telling-off / a beating",x:"To be scolded or roughed up (informal).",e:"Holdet fik sig en gang på frakken i anden halvleg.",t:"The team got a real hammering in the second half.",l:"C1",c:"Humor & Informal Speech",k:"frakken"},
+{d:"Hold nu kæft, hvor er det godt",m:"Damn, that's good",x:"Very informal exclamation of strong approval.",e:"Hold nu kæft, hvor er den kage god!",t:"Damn, that cake is good!",l:"B1",c:"Humor & Informal Speech",k:"kæft"},
+
+/* ===== EXTRA EVERYDAY/MIXED (B2-C1 native depth) ===== */
+{d:"Slå hovedet på sømmet",m:"To hit the nail on the head",x:"To get something exactly right (variant phrasing).",e:"Med det forslag slog du hovedet på sømmet.",t:"With that suggestion you hit the nail on the head.",l:"B2",c:"Communication",k:"sømmet"},
+{d:"Komme op på hesten igen",m:"To get back on the horse",x:"To recover and try again after a setback.",e:"Efter fyringen kom hun hurtigt op på hesten igen.",t:"After being laid off she quickly got back on the horse.",l:"B2",c:"Success & Failure",k:"hesten"},
+{d:"Have rygraden i orden",m:"To have one's priorities/integrity in order",x:"To have firm moral backbone.",e:"En god leder har rygraden i orden.",t:"A good leader has their integrity in order.",l:"C1",c:"Work & Meetings",k:"rygraden"},
+{d:"Skyde med spredehagl",m:"To take a scattergun approach",x:"To aim broadly and unfocused instead of targeting.",e:"Reklamen skyder med spredehagl i stedet for at ramme målgruppen.",t:"The ad takes a scattergun approach instead of hitting the target group.",l:"C1",c:"Work & Meetings",k:"spredehagl"},
+{d:"Tage kegler",m:"To make a big impression",x:"To impress people greatly.",e:"Hendes tale tog virkelig kegler hos publikum.",t:"Her speech really made a big impression on the audience.",l:"C1",c:"Success & Failure",k:"kegler"},
+{d:"Have noget på hjerte",m:"To have something one needs to say",x:"To have a heartfelt message to share.",e:"Hun rejste sig, fordi hun havde noget på hjerte.",t:"She stood up because she had something she needed to say.",l:"B2",c:"Communication",k:"hjerte"},
+{d:"Lade stå til",m:"To let things slide / drift",x:"To do nothing and let events take their course.",e:"Man kan ikke bare lade stå til, når tallene falder.",t:"You can't just let things slide when the numbers are dropping.",l:"B2",c:"Decision Making",k:"stå"},
+{d:"Stikke af med sejren",m:"To run away with the victory",x:"To win clearly and decisively.",e:"Det lille hold stak af med sejren til alles overraskelse.",t:"The small team ran away with the victory to everyone's surprise.",l:"B2",c:"Success & Failure",k:"sejren"},
+{d:"Sætte sig på bagbenene",m:"To dig one's heels in / resist",x:"To firmly refuse or object.",e:"Beboerne satte sig på bagbenene mod byggeplanen.",t:"The residents dug their heels in against the building plan.",l:"C1",c:"Society & News",k:"bagbenene"},
+{d:"Tage røven på nogen",m:"To rip someone off / fool them",x:"To cheat or trick someone (informal).",e:"Den sælger prøvede at tage røven på os.",t:"That salesman tried to rip us off.",l:"C1",c:"Humor & Informal Speech",k:"røven"},
+/* ===== ADDITIONAL AUTHENTIC IDIOMS ===== */
+{d:"Gå rent ind",m:"To go down well",x:"To be received very positively.",e:"Den nye kampagne gik rent ind hos de unge.",t:"The new campaign went down really well with young people.",l:"B2",c:"Success & Failure",k:"rent"},
+{d:"Have hjertet på rette sted",m:"To have one's heart in the right place",x:"To have good intentions.",e:"Han laver fejl, men han har hjertet på rette sted.",t:"He makes mistakes, but his heart is in the right place.",l:"B2",c:"Relationships",k:"hjertet"},
+{d:"Det er en by i Rusland",m:"It's all Greek to me",x:"Something one understands nothing about.",e:"Skat og moms er en by i Rusland for mig.",t:"Tax and VAT are all Greek to me.",l:"C1",c:"Communication",k:"Rusland"},
+{d:"Gribe i egen barm",m:"To look at one's own faults first",x:"To examine one's own behaviour before blaming others.",e:"Før du kritiserer, så grib lige i egen barm.",t:"Before you criticise, look at your own faults first.",l:"C1",c:"Relationships",k:"barm"},
+{d:"Kaste sig ud i det",m:"To throw oneself into it",x:"To start something energetically.",e:"Hun kastede sig ud i det nye projekt med det samme.",t:"She threw herself into the new project right away.",l:"B1",c:"Decision Making",k:"kaste"},
+{d:"Stå last og brast med nogen",m:"To stand by someone through thick and thin",x:"To stay loyal no matter what.",e:"Vennerne stod last og brast med ham i den svære tid.",t:"His friends stood by him through thick and thin in the hard times.",l:"C1",c:"Relationships",k:"last"},
+{d:"Tage fusen på nogen",m:"To pull a fast one on someone",x:"To trick or outsmart someone.",e:"De tog fusen på os med den falske rabat.",t:"They pulled a fast one on us with the fake discount.",l:"C1",c:"Humor & Informal Speech",k:"fusen"},
+{d:"Have en finger på pulsen",m:"To have a finger on the pulse",x:"To stay well informed about current developments.",e:"En god journalist har en finger på pulsen.",t:"A good journalist keeps a finger on the pulse.",l:"B2",c:"Society & News",k:"pulsen"},
+{d:"Komme i hus",m:"To get something safely done",x:"To complete or secure something successfully.",e:"Til sidst kom aftalen i hus.",t:"In the end the deal got safely done.",l:"B2",c:"Work & Meetings",k:"hus"},
+{d:"Slå plat på noget",m:"To cash in / exploit something",x:"To take unfair advantage of a situation for gain.",e:"Nogle firmaer slår plat på folks frygt.",t:"Some companies cash in on people's fear.",l:"C1",c:"Money",k:"plat"},
+{d:"Holde lav profil",m:"To keep a low profile",x:"To avoid drawing attention to oneself.",e:"Efter skandalen holdt han lav profil.",t:"After the scandal he kept a low profile.",l:"B2",c:"Society & News",k:"profil"},
+{d:"Have noget i ærmet",m:"To have something up one's sleeve",x:"To have a secret plan or surprise ready.",e:"Jeg tror, hun har noget i ærmet til mødet.",t:"I think she has something up her sleeve for the meeting.",l:"B2",c:"Work & Meetings",k:"ærmet"},
+{d:"Gå op i en højere enhed",m:"To dissolve into nothing / fall apart",x:"For plans or things to come to nothing.",e:"Hele planen gik op i en højere enhed.",t:"The whole plan just fell apart.",l:"C1",c:"Problems & Challenges",k:"enhed"},
+{d:"Være ude i hampen",m:"To be way off / mistaken",x:"To be completely wrong about something.",e:"Hans gæt var helt ude i hampen.",t:"His guess was way off.",l:"C1",c:"Humor & Informal Speech",k:"hampen"},
+{d:"Tage livtag med noget",m:"To grapple with something",x:"To tackle a difficult challenge head-on.",e:"Kommunen tager livtag med trafikproblemerne.",t:"The municipality is grappling with the traffic problems.",l:"C1",c:"Problems & Challenges",k:"livtag"},
+{d:"Have det som blommen i et æg",m:"To be in clover / very comfortable",x:"To live very comfortably and happily.",e:"I det nye hus har de det som blommen i et æg.",t:"In the new house they're living in clover.",l:"C1",c:"Everyday Life",k:"blommen"},
+{d:"Gå i hundene",m:"To go to the dogs",x:"To deteriorate or fall into ruin.",e:"Uden vedligehold går huset i hundene.",t:"Without upkeep the house will go to the dogs.",l:"C1",c:"Problems & Challenges",k:"hundene"},
+{d:"Brænde sine broer",m:"To burn one's bridges",x:"To destroy relationships so there's no going back.",e:"Sig ikke op i vrede – du skal ikke brænde dine broer.",t:"Don't quit in anger – you shouldn't burn your bridges.",l:"B2",c:"Work & Meetings",k:"broer"},
+];
+// assign stable id by index
+DATA.forEach((d,i)=>d.id=i);
+
+/* ============================================================
+   STATE & PERSISTENCE
+   ============================================================ */
+const SAVE_KEY='idiomjaeger_v1';
+const DEFAULT_STATE=()=>({idiom:{},totalAns:0,totalCorrect:0,streak:0,longest:0,coins:0,daily:{},ach:[],ctxWin:false,natWin:false});
+let S=load();
+function load(){
+  try{const r=localStorage.getItem(SAVE_KEY);if(r)return Object.assign(DEFAULT_STATE(),JSON.parse(r));}catch(e){}
+  return DEFAULT_STATE();
+}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+function ist(id){if(!S.idiom[id])S.idiom[id]={box:0,seen:0,correct:0,wrong:0};return S.idiom[id];}
+function isMastered(id){return ist(id).box>=4;}
+function masteredCount(){return DATA.filter(d=>isMastered(d.id)).length;}
+function accuracy(){return S.totalAns?Math.round(S.totalCorrect/S.totalAns*100):0;}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+
+/* record an answer: updates SRS, stats, streak, coins, achievements */
+function recordAnswer(id,correct){
+  const st=ist(id);st.seen++;
+  const wasMastered=st.box>=4;
+  if(correct){st.correct++;st.box=Math.min(5,st.box+1);S.totalCorrect++;S.streak++;S.coins+=10;
+    if(S.streak>S.longest)S.longest=S.streak;}
+  else{st.wrong++;st.box=Math.max(0,st.box-1);S.streak=0;}
+  S.totalAns++;
+  const dk=todayKey();S.daily[dk]=(S.daily[dk]||0)+1;
+  if(!wasMastered&&st.box>=4){newlyMastered(id);}
+  checkAchievements();
+  save();
+}
+let _justMastered=null;
+function newlyMastered(id){_justMastered=id;}
+
+/* ============================================================
+   SRS / POOL HELPERS
+   ============================================================ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function sample(arr,n){return shuffle(arr.slice()).slice(0,n);}
+function weightOf(id){const st=S.idiom[id];if(!st||st.seen===0)return 4;return Math.max(1,6-st.box*1.2)+(st.wrong>st.correct?2:0);}
+function pickWeighted(pool,exclude){
+  const cand=pool.filter(d=>!exclude||!exclude.has(d.id));
+  const src=cand.length?cand:pool;
+  let total=0;const ws=src.map(d=>{const w=weightOf(d.id);total+=w;return w;});
+  let r=Math.random()*total;
+  for(let i=0;i<src.length;i++){r-=ws[i];if(r<=0)return src[i];}
+  return src[src.length-1];
+}
+function weakIdioms(){return DATA.filter(d=>{const s=S.idiom[d.id];return s&&s.seen>0&&(s.box<=1||s.wrong>s.correct);});}
+function strongIdioms(){return DATA.filter(d=>{const s=S.idiom[d.id];return s&&s.box>=4;});}
+
+/* distractors */
+function otherMeanings(idiom,pool,n){
+  const opts=shuffle(DATA.filter(d=>d.id!==idiom.id&&d.m!==idiom.m));
+  const pref=opts.filter(d=>d.c===idiom.c);const rest=opts.filter(d=>d.c!==idiom.c);
+  return [...pref,...rest].slice(0,n).map(d=>d.m);
+}
+function otherIdioms(idiom,pool,n){
+  const opts=shuffle(DATA.filter(d=>d.id!==idiom.id&&d.d!==idiom.d));
+  const pref=opts.filter(d=>d.c===idiom.c);const rest=opts.filter(d=>d.c!==idiom.c);
+  return [...pref,...rest].slice(0,n).map(d=>d.d);
+}
+
+/* ============================================================
+   UI HELPERS
+   ============================================================ */
+const app=document.getElementById('app');
+const MOTIVATE=["Flot fundet! 🏴‍☠️","Skat fundet!","Idiom afsløret!","Fremragende arbejde!","Native-niveau!","Bliv ved med at jage!","Stort fund!"];
+function motivate(){return MOTIVATE[Math.floor(Math.random()*MOTIVATE.length)];}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function lvlBadge(l){return`<span class="lvl-badge lvl-${l}">${l}</span>`;}
+function catTag(c){return`<span class="tag cat">${CAT_ICON[c]||''} ${esc(c)}</span>`;}
+
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+function burst(x,y,colors){colors=colors||['#f0c14b','#c8941f','#3f8f4a','#fff'];for(let i=0;i<14;i++){const p=document.createElement('div');p.className='particle';const ang=Math.random()*Math.PI*2,dist=40+Math.random()*70;p.style.cssText=`left:${x}px;top:${y}px;background:${colors[i%colors.length]};--dx:${Math.cos(ang)*dist}px;--dy:${Math.sin(ang)*dist}px`;document.body.appendChild(p);p.addEventListener('animationend',()=>p.remove());}}
+function burstAt(el){if(!el)return;const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);}
+
+function topbar(extra){return`<div class="topbar"><button class="btn small ghost" onclick="goMenu()">⟵ Menu</button><div class="coins">💰 <span>${S.coins}</span> guld</div></div>${extra||''}`;}
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+const ACHS=[
+  {id:'first',ico:'🥇',t:'Første Idiom',d:'Svar rigtigt på dit første idiom',test:()=>S.totalCorrect>=1},
+  {id:'m25',ico:'🗺️',t:'25 Idiomer Lært',d:'Mestr 25 idiomer',test:()=>masteredCount()>=25},
+  {id:'m50',ico:'🧭',t:'50 Idiomer Lært',d:'Mestr 50 idiomer',test:()=>masteredCount()>=50},
+  {id:'m100',ico:'👑',t:'100 Idiomer Lært',d:'Mestr 100 idiomer',test:()=>masteredCount()>=100},
+  {id:'explorer',ico:'🔍',t:'Idiom Explorer',d:'Mød mindst 60 forskellige idiomer',test:()=>Object.values(S.idiom).filter(s=>s.seen>0).length>=60},
+  {id:'streak',ico:'🔥',t:'På Jagt',d:'Opnå en stime på 15 i træk',test:()=>S.longest>=15},
+  {id:'ctx',ico:'🎯',t:'Context Master',d:'Gennemfør Context Master-runden',test:()=>S.ctxWin},
+  {id:'native',ico:'🎓',t:'Native Speaker',d:'Bestå Native Speaker Challenge',test:()=>S.natWin},
+  {id:'expert',ico:'🇩🇰',t:'Danish Expression Expert',d:'Mestr alle "Very Danish"-idiomer',test:()=>DATA.filter(d=>d.c==='Very Danish Expressions').every(d=>isMastered(d.id))},
+];
+function checkAchievements(){let unlocked=[];ACHS.forEach(a=>{if(!S.ach.includes(a.id)&&a.test()){S.ach.push(a.id);unlocked.push(a);}});if(unlocked.length){setTimeout(()=>toast(`🏆 Badge låst op: ${unlocked[0].t}`),700);}}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function goMenu(){renderMenu();}
+
+function renderMenu(){
+  app.innerHTML=`
+  <div class="panel">
+    ${topbar()}
+    <h2 class="section-title">⚓ Vælg din jagt</h2>
+    <div class="progress-line">Mestrede skatte: <b>${masteredCount()}</b> / ${DATA.length} · Nøjagtighed: <b>${accuracy()}%</b> · Stime: <b>${S.streak}</b> 🔥</div>
+    <div class="menu-grid">
+      <button class="btn primary" onclick="renderLearn()"><span class="ico">📖</span>Lærings-tilstand<span class="sub">Bladr & studér</span></button>
+      <button class="btn" onclick="renderPractice()"><span class="ico">🎯</span>Øve-tilstand<span class="sub">Bland alle modes</span></button>
+      <button class="btn" onclick="renderGames()"><span class="ico">🎮</span>Spil<span class="sub">13 spiltyper</span></button>
+      <button class="btn" onclick="startWeak()"><span class="ico">🔁</span>Svage Idiomer<span class="sub">${weakIdioms().length} til repetition</span></button>
+      <button class="btn" onclick="renderStats()"><span class="ico">📊</span>Statistik<span class="sub">Din fremgang</span></button>
+      <button class="btn" onclick="renderDict()"><span class="ico">📜</span>Idiom-ordbog<span class="sub">Alle ${DATA.length} idiomer</span></button>
+    </div>
+    <div class="center mt"><button class="btn small ghost" onclick="renderAch()">🏆 Badges (${S.ach.length}/${ACHS.length})</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   FILTER CONTROL (shared by learn & dictionary)
+   ============================================================ */
+let FILT={cat:'all',lvl:'all',mast:'all',q:''};
+function filterControls(onChange){
+  return`<div class="row mb" style="gap:10px">
+    <label class="flt">Kategori<select id="fCat">${['all',...CATS].map(c=>`<option value="${c}" ${FILT.cat===c?'selected':''}>${c==='all'?'Alle':c}</option>`).join('')}</select></label>
+    <label class="flt">Niveau<select id="fLvl">${['all','A2','B1','B2','C1'].map(l=>`<option value="${l}" ${FILT.lvl===l?'selected':''}>${l==='all'?'Alle':l}</option>`).join('')}</select></label>
+    <label class="flt">Status<select id="fMast">
+      <option value="all" ${FILT.mast==='all'?'selected':''}>Alle</option>
+      <option value="yes" ${FILT.mast==='yes'?'selected':''}>Mestrede</option>
+      <option value="no" ${FILT.mast==='no'?'selected':''}>Ikke mestrede</option>
+    </select></label>
+  </div>
+  <input type="text" id="fQ" placeholder="🔎 Søg idiom eller betydning..." value="${esc(FILT.q)}" style="width:100%;margin-bottom:10px">`;
+}
+function bindFilters(cb){
+  ['fCat','fLvl','fMast'].forEach(idn=>{const el=document.getElementById(idn);if(el)el.onchange=()=>{FILT.cat=document.getElementById('fCat').value;FILT.lvl=document.getElementById('fLvl').value;FILT.mast=document.getElementById('fMast').value;cb();};});
+  const q=document.getElementById('fQ');if(q)q.oninput=()=>{FILT.q=q.value;cb();};
+}
+function applyFilter(){
+  return DATA.filter(d=>{
+    if(FILT.cat!=='all'&&d.c!==FILT.cat)return false;
+    if(FILT.lvl!=='all'&&d.l!==FILT.lvl)return false;
+    if(FILT.mast==='yes'&&!isMastered(d.id))return false;
+    if(FILT.mast==='no'&&isMastered(d.id))return false;
+    if(FILT.q){const s=FILT.q.toLowerCase();if(!(d.d.toLowerCase().includes(s)||d.m.toLowerCase().includes(s)))return false;}
+    return true;
+  });
+}
+
+/* ============================================================
+   LEARN MODE & DICTIONARY
+   ============================================================ */
+function relatedFor(idiom){return DATA.filter(d=>d.c===idiom.c&&d.id!==idiom.id).slice(0,3);}
+function idiomCardHTML(d,full){
+  const rel=full?relatedFor(d):[];
+  return`<div class="idiom-card">
+    <h3>${isMastered(d.id)?'<span class="mastered-dot">★</span> ':''}${esc(d.d)}</h3>
+    <div>${catTag(d.c)} ${lvlBadge(d.l)}</div>
+    <div class="meaning">${esc(d.m)}</div>
+    <div style="font-size:.88rem">${esc(d.x)}</div>
+    <div class="ex">🗣️ "${esc(d.e)}"</div>
+    <div class="tr">→ ${esc(d.t)}</div>
+    ${full&&rel.length?`<div class="related"><b>Beslægtede:</b> ${rel.map(r=>esc(r.d)).join(' · ')}</div>`:''}
+  </div>`;
+}
+function renderLearn(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">📖 Lærings-tilstand</h2>${filterControls()}<div id="learnList" class="list"></div></div>`;
+  const draw=()=>{const r=applyFilter();document.getElementById('learnList').innerHTML=r.length?r.map(d=>idiomCardHTML(d,true)).join(''):'<div class="empty">Ingen idiomer matcher filteret.</div>';};
+  bindFilters(draw);draw();
+}
+function renderDict(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">📜 Idiom-ordbog</h2>${filterControls()}<div class="progress-line" id="dictCount"></div><div id="dictList" class="list"></div></div>`;
+  const draw=()=>{const r=applyFilter();document.getElementById('dictCount').textContent=`${r.length} idiomer`;document.getElementById('dictList').innerHTML=r.length?r.map(d=>idiomCardHTML(d,true)).join(''):'<div class="empty">Ingen idiomer matcher filteret.</div>';};
+  bindFilters(draw);draw();
+}
+
+/* ============================================================
+   GAMES MENU
+   ============================================================ */
+const GAMES=[
+  {id:'idiomHunter',ico:'🏹',t:'Idiom Hunter',d:'Match idiom → betydning'},
+  {id:'meaningHunter',ico:'🎣',t:'Meaning Hunter',d:'Match betydning → idiom'},
+  {id:'exampleDetective',ico:'🕵️',t:'Example Detective',d:'Find idiomet i sætningen'},
+  {id:'fillMissing',ico:'✏️',t:'Fill the Missing',d:'Udfyld det manglende ord'},
+  {id:'complete',ico:'🧩',t:'Complete the Expression',d:'Fuldfør udtrykket'},
+  {id:'memory',ico:'🃏',t:'Idiom Memory Cards',d:'Vend & match par'},
+  {id:'match',ico:'🔗',t:'Match Pairs',d:'Forbind idiom & betydning'},
+  {id:'category',ico:'📂',t:'Category Challenge',d:'Øv én kategori'},
+  {id:'timed',ico:'⏱️',t:'Timed Hunt',d:'60 sekunders jagt'},
+  {id:'survival',ico:'💀',t:'Idiom Survival',d:'Ét forkert = liv tabt'},
+  {id:'context',ico:'🎯',t:'Context Master',d:'Vælg idiom til situationen'},
+  {id:'native',ico:'🎓',t:'Native Speaker',d:'Avancerede B2–C1 idiomer'},
+  {id:'mixed',ico:'🌀',t:'Mixed Review',d:'Tilfældigt fra alt'},
+];
+function renderGames(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">🎮 Spil — 13 jagter</h2><div class="menu-grid">
+  ${GAMES.map(g=>`<button class="btn" onclick="launchGame('${g.id}')"><span class="ico">${g.ico}</span>${g.t}<span class="sub">${g.d}</span></button>`).join('')}
+  </div></div>`;
+}
+function renderPractice(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">🎯 Øve-tilstand</h2>
+  <p class="center" style="font-size:.95rem">En blandet runde, der bruger spaced repetition — svage idiomer dukker oftere op. 12 spørgsmål på tværs af spiltyper.</p>
+  <div class="center mt"><button class="btn primary" onclick="startPractice()">Start øvelse ⚔️</button></div></div>`;
+}
+
+/* ============================================================
+   QUESTION BUILDERS (return {promptHTML, options:[{text,correct}], id})
+   ============================================================ */
+function mcq(correctText,distractors){
+  const opts=shuffle([{text:correctText,correct:true},...distractors.map(x=>({text:x,correct:false}))]);
+  return opts;
+}
+function bIdiomMeaning(d){return{id:d.id,promptHTML:`<div>${esc(d.d)}<span class="q-sub">Hvad betyder idiomet?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
+function bMeaningIdiom(d){return{id:d.id,promptHTML:`<div>"${esc(d.m)}"<span class="q-sub">Hvilket idiom passer?</span></div>`,options:mcq(d.d,otherIdioms(d,null,3))};}
+function bExampleDetective(d){return{id:d.id,promptHTML:`<div style="font-size:1.05rem">🗣️ "${esc(d.e)}"<span class="q-sub">Hvad betyder idiomet i sætningen?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
+function bContext(d){return{id:d.id,promptHTML:`<div style="font-size:1.02rem">Situation: <i>${esc(d.x)}</i><span class="q-sub">Hvilket dansk idiom passer bedst?</span></div>`,options:mcq(d.d,otherIdioms(d,null,3))};}
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function blankWord(sentence,word){
+  const re=new RegExp('(^|[^a-zA-ZæøåÆØÅ0-9])('+escRe(word)+')(?=[^a-zA-ZæøåÆØÅ0-9]|$)','i');
+  if(re.test(sentence))return sentence.replace(re,(m,p1)=>p1+'_____');
+  return null;
+}
+function lastWord(idiom){const parts=idiom.replace(/[.,!?]/g,'').trim().split(/\s+/);return parts[parts.length-1];}
+function normTxt(s){return s.toLowerCase().replace(/[.,!?'"]/g,'').trim();}
+
+/* ============================================================
+   MCQ SESSION ENGINE
+   ============================================================ */
+let Q=null;
+function startQuiz(cfg){
+  Q={cfg,i:0,score:0,lives:cfg.lives||0,answered:false,timeLeft:cfg.timer||0,timerH:null,used:new Set()};
+  if(cfg.timer){Q.timerH=setInterval(()=>{Q.timeLeft--;const t=document.getElementById('timerBig');if(t)t.textContent='⏱️ '+Q.timeLeft+'s';if(Q.timeLeft<=0)endQuiz();},1000);}
+  nextQuestion();
+}
+function nextQuestion(){
+  if(Q.cfg.total&&Q.i>=Q.cfg.total){return endQuiz();}
+  const d=pickWeighted(Q.cfg.pool,Q.used);Q.used.add(d.id);if(Q.used.size>=Q.cfg.pool.length)Q.used.clear();
+  Q.current=Q.cfg.build(d);Q.answered=false;
+  renderQuestion();
+}
+function renderQuestion(){
+  const c=Q.cfg,q=Q.current;
+  const total=c.total?` / ${c.total}`:'';
+  const lives=c.lives?`<span class="lives">${'❤️'.repeat(Q.lives)}${'🖤'.repeat(Math.max(0,(c.lives)-Q.lives))}</span>`:'';
+  const timer=c.timer?`<div class="timer-big" id="timerBig">⏱️ ${Q.timeLeft}s</div>`:'';
+  app.innerHTML=`<div class="panel">${topbar()}
+    <h2 class="section-title">${c.ico} ${c.title}</h2>
+    <div class="row between progress-line"><span>Spørgsmål ${Q.i+1}${total}</span><span>Point: <b>${Q.score}</b></span>${lives?'<span>'+lives+'</span>':''}</div>
+    ${timer}
+    <div class="q-prompt">${q.promptHTML}</div>
+    <div class="choices" id="choices">${q.options.map((o,idx)=>`<button class="btn choice" data-i="${idx}">${String.fromCharCode(65+idx)}) ${esc(o.text)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div><div id="explainSlot"></div>
+    <div class="center mt hidden" id="nextWrap"><button class="btn primary" id="nextBtn">Næste ⟶</button></div>
+  </div>`;
+  document.querySelectorAll('#choices .choice').forEach(b=>b.onclick=()=>answer(parseInt(b.dataset.i),b));
+  const nb=document.getElementById('nextBtn');if(nb)nb.onclick=()=>{Q.i++;nextQuestion();};
+}
+function answer(idx,btn){
+  if(Q.answered)return;Q.answered=true;
+  const q=Q.current,opt=q.options[idx],d=DATA[q.id];
+  const correct=opt.correct;
+  document.querySelectorAll('#choices .choice').forEach((b,i)=>{b.disabled=true;if(q.options[i].correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');});
+  recordAnswer(q.id,correct);
+  const fb=document.getElementById('fb');
+  if(correct){fb.textContent=motivate()+' 🪙 +10';fb.className='feedback good';burstAt(btn);}
+  else{fb.textContent='Ikke helt — '+esc(d.d);fb.className='feedback bad';}
+  if(_justMastered===q.id){toast('🏆 Skat låst op! "'+esc(d.d)+'" mestret!');_justMastered=null;}
+  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b> — ${esc(d.m)}<br>${esc(d.x)}<br><i>"${esc(d.e)}"</i> → ${esc(d.t)}</div>`;
+  if(correct)Q.score++;
+  if(Q.cfg.lives){if(!correct){Q.lives--;if(Q.lives<=0){document.getElementById('nextWrap').classList.remove('hidden');document.getElementById('nextBtn').textContent='Se resultat ⟶';document.getElementById('nextBtn').onclick=endQuiz;return;}}}
+  document.getElementById('nextWrap').classList.remove('hidden');
+}
+function endQuiz(){
+  if(Q.timerH)clearInterval(Q.timerH);
+  const c=Q.cfg;const answered=Q.cfg.timer?Q.i:(Q.i+(Q.answered?1:0));
+  const total=c.total||answered||1;
+  const pct=Math.round(Q.score/(c.timer?Math.max(1,Q.answered?Q.i+1:Q.i):total)*100);
+  if(c.onEnd)c.onEnd(Q.score,total,pct);
+  let msg=pct>=80?'Native-niveau forståelse! 🎓':pct>=50?'Godt jaget! 🏴‍☠️':'Bliv ved med at jage! 💪';
+  app.innerHTML=`<div class="panel center">${topbar()}
+    <h2 class="section-title">${c.ico} Runde slut</h2>
+    <div style="font-size:3rem">🏆</div>
+    <div class="stat-box" style="max-width:240px;margin:10px auto"><div class="num">${Q.score}</div><div class="lbl">rigtige svar${c.timer?' på 60s':''}</div></div>
+    <p style="font-size:1.1rem"><b>${msg}</b></p>
+    <p class="progress-line">Nøjagtighed: ${accuracy()}% · Guld: 💰 ${S.coins}</p>
+    <div class="row" style="justify-content:center"><button class="btn primary" onclick="launchGame('${c.gid}')">Spil igen 🔁</button><button class="btn" onclick="renderGames()">Andre spil</button><button class="btn ghost" onclick="goMenu()">Menu</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   TEXT-INPUT SESSION (Fill Missing / Complete Expression)
+   ============================================================ */
+let T=null;
+function startText(cfg){
+  // pre-filter pool to items that can be blanked
+  const pool=cfg.pool.filter(cfg.canUse);
+  T={cfg:Object.assign({},cfg,{pool}),i:0,score:0,used:new Set()};
+  nextText();
+}
+function nextText(){
+  if(T.i>=T.cfg.total){return endText();}
+  const d=pickWeighted(T.cfg.pool,T.used);T.used.add(d.id);if(T.used.size>=T.cfg.pool.length)T.used.clear();
+  T.current=T.cfg.make(d);renderText();
+}
+function renderText(){
+  const c=T.cfg,q=T.current;
+  app.innerHTML=`<div class="panel">${topbar()}
+    <h2 class="section-title">${c.ico} ${c.title}</h2>
+    <div class="row between progress-line"><span>Spørgsmål ${T.i+1} / ${c.total}</span><span>Point: <b>${T.score}</b></span></div>
+    <div class="q-prompt">${q.promptHTML}</div>
+    <div class="text-input-row"><input type="text" id="txtIn" placeholder="Skriv det manglende ord..." autocomplete="off"><button class="btn primary" id="txtGo">Svar</button></div>
+    <div class="feedback" id="fb"></div><div id="explainSlot"></div>
+    <div class="center mt hidden" id="nextWrap"><button class="btn primary" id="nextBtn">Næste ⟶</button></div>
+  </div>`;
+  const inp=document.getElementById('txtIn');inp.focus();
+  const go=()=>checkText();
+  document.getElementById('txtGo').onclick=go;
+  inp.onkeydown=e=>{if(e.key==='Enter')go();};
+  document.getElementById('nextBtn').onclick=()=>{T.i++;nextText();};
+}
+function checkText(){
+  if(T.answered)return;
+  const q=T.current,d=DATA[q.id];const val=normTxt(document.getElementById('txtIn').value);
+  if(!val)return;
+  T.answered=true;
+  const correct=val===normTxt(q.answer);
+  recordAnswer(q.id,correct);
+  document.getElementById('txtIn').disabled=true;document.getElementById('txtGo').disabled=true;
+  const fb=document.getElementById('fb');
+  if(correct){fb.textContent=motivate()+' 🪙 +10';fb.className='feedback good';burstAt(document.getElementById('txtGo'));T.score++;}
+  else{fb.textContent='Det rigtige ord var: "'+esc(q.answer)+'"';fb.className='feedback bad';}
+  if(_justMastered===q.id){toast('🏆 Skat låst op! "'+esc(d.d)+'" mestret!');_justMastered=null;}
+  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b> — ${esc(d.m)}<br><i>"${esc(d.e)}"</i> → ${esc(d.t)}</div>`;
+  document.getElementById('nextWrap').classList.remove('hidden');
+  T.answered=false;
+}
+function endText(){
+  const c=T.cfg,pct=Math.round(T.score/c.total*100);
+  let msg=pct>=80?'Native-niveau! 🎓':pct>=50?'Godt klaret! 🏴‍☠️':'Bliv ved! 💪';
+  app.innerHTML=`<div class="panel center">${topbar()}<h2 class="section-title">${c.ico} Runde slut</h2>
+    <div style="font-size:3rem">🏆</div>
+    <div class="stat-box" style="max-width:240px;margin:10px auto"><div class="num">${T.score}/${c.total}</div><div class="lbl">rigtige</div></div>
+    <p><b>${msg}</b></p>
+    <div class="row" style="justify-content:center"><button class="btn primary" onclick="launchGame('${c.gid}')">Spil igen 🔁</button><button class="btn ghost" onclick="renderGames()">Andre spil</button></div></div>`;
+}
+
+/* ============================================================
+   MEMORY CARDS
+   ============================================================ */
+let MEM=null;
+function startMemory(pool){
+  const picks=sample(pool,6);
+  let cards=[];picks.forEach(d=>{cards.push({pid:d.id,kind:'d',text:d.d});cards.push({pid:d.id,kind:'m',text:d.m});});
+  shuffle(cards);
+  MEM={cards,flipped:[],matched:0,moves:0,pool};
+  renderMemory();
+}
+function renderMemory(){
+  app.innerHTML=`<div class="panel">${topbar()}
+    <h2 class="section-title">🃏 Idiom Memory</h2>
+    <div class="progress-line">Par fundet: <b>${MEM.matched}</b>/6 · Træk: ${MEM.moves}</div>
+    <div class="mem-grid" id="memGrid">
+      ${MEM.cards.map((c,i)=>`<div class="mem-card${c.matched?' matched':''}${MEM.flipped.includes(i)?' flipped':''}" data-i="${i}"><span class="back">⚜️</span><span class="face">${esc(c.text)}</span></div>`).join('')}
+    </div>
+    <div class="scrollnote">Vend to kort og find idiom + betydning.</div></div>`;
+  document.querySelectorAll('#memGrid .mem-card').forEach(el=>el.onclick=()=>memFlip(parseInt(el.dataset.i)));
+}
+function memFlip(i){
+  const c=MEM.cards[i];
+  if(c.matched||MEM.flipped.includes(i)||MEM.flipped.length>=2)return;
+  MEM.flipped.push(i);renderMemory();
+  if(MEM.flipped.length===2){
+    MEM.moves++;
+    const[a,b]=MEM.flipped;const ca=MEM.cards[a],cb=MEM.cards[b];
+    if(ca.pid===cb.pid&&ca.kind!==cb.kind){
+      ca.matched=cb.matched=true;MEM.matched++;MEM.flipped=[];
+      recordAnswer(ca.pid,true);
+      const burstCard=document.querySelector(`.mem-card[data-i="${a}"]`);burstAt(burstCard);
+      if(_justMastered===ca.pid){toast('🏆 "'+esc(DATA[ca.pid].d)+'" mestret!');_justMastered=null;}
+      setTimeout(()=>{if(MEM.matched>=6)endMemory();else renderMemory();},450);
+    }else{
+      setTimeout(()=>{MEM.flipped=[];renderMemory();},850);
+    }
+  }
+}
+function endMemory(){
+  app.innerHTML=`<div class="panel center">${topbar()}<h2 class="section-title">🃏 Færdig!</h2>
+  <div style="font-size:3rem">🎉</div><p><b>Alle par fundet på ${MEM.moves} træk!</b></p>
+  <div class="row" style="justify-content:center"><button class="btn primary" onclick="launchGame('memory')">Igen 🔁</button><button class="btn ghost" onclick="renderGames()">Andre spil</button></div></div>`;
+}
+
+/* ============================================================
+   MATCH PAIRS
+   ============================================================ */
+let MP=null;
+function startMatch(pool){
+  const picks=sample(pool,5);
+  MP={picks,left:shuffle(picks.slice()),right:shuffle(picks.slice()),selL:null,done:0};
+  renderMatch();
+}
+function renderMatch(){
+  app.innerHTML=`<div class="panel">${topbar()}
+    <h2 class="section-title">🔗 Match Pairs</h2>
+    <div class="progress-line">Forbundet: <b>${MP.done}</b>/5 — tryk et idiom og dets betydning</div>
+    <div class="match-cols">
+      <div class="match-col" id="colL">${MP.left.map(d=>`<div class="match-item" data-id="${d.id}" data-side="L">${esc(d.d)}</div>`).join('')}</div>
+      <div class="match-col" id="colR">${MP.right.map(d=>`<div class="match-item" data-id="${d.id}" data-side="R">${esc(d.m)}</div>`).join('')}</div>
+    </div></div>`;
+  document.querySelectorAll('.match-item').forEach(el=>el.onclick=()=>matchClick(el));
+}
+function matchClick(el){
+  if(el.classList.contains('done'))return;
+  const side=el.dataset.side,id=parseInt(el.dataset.id);
+  if(side==='L'){document.querySelectorAll('#colL .match-item').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');MP.selL=id;return;}
+  if(MP.selL===null)return;
+  if(id===MP.selL){
+    document.querySelectorAll(`.match-item[data-id="${id}"]`).forEach(x=>{x.classList.add('done');x.classList.remove('sel');});
+    recordAnswer(id,true);MP.done++;burstAt(el);
+    if(_justMastered===id){toast('🏆 "'+esc(DATA[id].d)+'" mestret!');_justMastered=null;}
+    MP.selL=null;
+    if(MP.done>=5)setTimeout(endMatch,400);
+  }else{
+    recordAnswer(MP.selL,false);
+    el.classList.add('miss');setTimeout(()=>el.classList.remove('miss'),400);
+    document.querySelectorAll('#colL .match-item').forEach(x=>x.classList.remove('sel'));MP.selL=null;
+  }
+}
+function endMatch(){
+  app.innerHTML=`<div class="panel center">${topbar()}<h2 class="section-title">🔗 Færdig!</h2>
+  <div style="font-size:3rem">🎉</div><p><b>Alle par forbundet!</b></p>
+  <div class="row" style="justify-content:center"><button class="btn primary" onclick="launchGame('match')">Igen 🔁</button><button class="btn ghost" onclick="renderGames()">Andre spil</button></div></div>`;
+}
+
+/* ============================================================
+   CATEGORY PICKER
+   ============================================================ */
+function renderCategoryPick(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">📂 Vælg kategori</h2>
+  <div class="menu-grid">${CATS.map(c=>{const n=DATA.filter(d=>d.c===c).length;return`<button class="btn" onclick="startCategory('${c.replace(/'/g,"\\'")}')"><span class="ico">${CAT_ICON[c]}</span>${c}<span class="sub">${n} idiomer</span></button>`;}).join('')}</div></div>`;
+}
+function startCategory(cat){
+  const pool=DATA.filter(d=>d.c===cat);
+  startQuiz({gid:'category',ico:CAT_ICON[cat]||'📂',title:cat,pool,build:bIdiomMeaning,total:Math.min(10,pool.length)});
+}
+
+/* ============================================================
+   LAUNCH DISPATCHER
+   ============================================================ */
+function mixedBuild(d){const fns=[bIdiomMeaning,bMeaningIdiom,bExampleDetective,bContext];return fns[Math.floor(Math.random()*fns.length)](d);}
+function launchGame(id){
+  switch(id){
+    case'idiomHunter':return startQuiz({gid:id,ico:'🏹',title:'Idiom Hunter',pool:DATA,build:bIdiomMeaning,total:10});
+    case'meaningHunter':return startQuiz({gid:id,ico:'🎣',title:'Meaning Hunter',pool:DATA,build:bMeaningIdiom,total:10});
+    case'exampleDetective':return startQuiz({gid:id,ico:'🕵️',title:'Example Detective',pool:DATA,build:bExampleDetective,total:10});
+    case'fillMissing':return startText({gid:id,ico:'✏️',title:'Fill the Missing',pool:DATA,total:8,
+      canUse:d=>!!blankWord(d.e,d.k),
+      make:d=>({id:d.id,answer:d.k,promptHTML:`<div style="font-size:1.05rem">${esc(blankWord(d.e,d.k))}<span class="q-sub">Udfyld det manglende ord (${d.m})</span></div>`})});
+    case'complete':return startText({gid:id,ico:'🧩',title:'Complete the Expression',pool:DATA,total:8,
+      canUse:d=>d.d.trim().split(/\s+/).length>=2,
+      make:d=>{const w=lastWord(d.d);const shown=d.d.replace(new RegExp(escRe(w)+'\\s*$'),'_____');return{id:d.id,answer:w,promptHTML:`<div>${esc(shown)}<span class="q-sub">Fuldfør udtrykket — betyder: ${esc(d.m)}</span></div>`};}});
+    case'memory':return startMemory(DATA);
+    case'match':return startMatch(DATA);
+    case'category':return renderCategoryPick();
+    case'timed':return startQuiz({gid:id,ico:'⏱️',title:'Timed Hunt',pool:DATA,build:bIdiomMeaning,timer:60});
+    case'survival':return startQuiz({gid:id,ico:'💀',title:'Idiom Survival',pool:DATA,build:bIdiomMeaning,lives:3});
+    case'context':return startQuiz({gid:id,ico:'🎯',title:'Context Master',pool:DATA,build:bContext,total:10,onEnd:(s,t,p)=>{if(p>=70){S.ctxWin=true;checkAchievements();save();}}});
+    case'native':{const pool=DATA.filter(d=>d.l==='B2'||d.l==='C1');return startQuiz({gid:id,ico:'🎓',title:'Native Speaker',pool,build:bIdiomMeaning,total:10,onEnd:(s,t,p)=>{if(p>=70){S.natWin=true;checkAchievements();save();}}});}
+    case'mixed':return startQuiz({gid:id,ico:'🌀',title:'Mixed Review',pool:DATA,build:mixedBuild,total:12});
+  }
+}
+function startPractice(){startQuiz({gid:'mixed',ico:'⚔️',title:'Øve-tilstand',pool:DATA,build:mixedBuild,total:12});}
+function startWeak(){
+  const pool=weakIdioms();
+  if(pool.length<4){toast('Spil lidt mere først — så finder vi dine svage idiomer! 🔁');return;}
+  startQuiz({gid:'mixed',ico:'🔁',title:'Svage Idiomer',pool,build:bIdiomMeaning,total:Math.min(10,pool.length)});
+}
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+function renderStats(){
+  const seen=Object.values(S.idiom).filter(s=>s.seen>0).length;
+  const weak=DATA.map(d=>({d,s:S.idiom[d.id]})).filter(o=>o.s&&o.s.seen>=2).sort((a,b)=>(a.s.correct/Math.max(1,a.s.seen))-(b.s.correct/Math.max(1,b.s.seen)));
+  const weakest=weak.slice(0,5),strongest=weak.slice().reverse().filter(o=>o.s.correct>0).slice(0,5);
+  const catBars=CATS.map(c=>{const items=DATA.filter(d=>d.c===c);const m=items.filter(d=>isMastered(d.id)).length;return{name:c,pct:Math.round(m/items.length*100),m,n:items.length};});
+  const lvls=['A2','B1','B2','C1'].map(l=>{const items=DATA.filter(d=>d.l===l);const m=items.filter(d=>isMastered(d.id)).length;return{name:l,pct:items.length?Math.round(m/items.length*100):0,m,n:items.length};});
+  const today=S.daily[todayKey()]||0;
+  app.innerHTML=`<div class="panel">${topbar()}
+    <h2 class="section-title">📊 Statistik</h2>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num">${masteredCount()}</div><div class="lbl">Idiomer lært</div></div>
+      <div class="stat-box"><div class="num">${accuracy()}%</div><div class="lbl">Nøjagtighed</div></div>
+      <div class="stat-box"><div class="num">${S.streak}</div><div class="lbl">Stime nu</div></div>
+      <div class="stat-box"><div class="num">${S.longest}</div><div class="lbl">Længste stime</div></div>
+      <div class="stat-box"><div class="num">${seen}</div><div class="lbl">Mødt mindst 1x</div></div>
+      <div class="stat-box"><div class="num">${today}</div><div class="lbl">Svar i dag</div></div>
+    </div>
+    <h3 style="margin:14px 0 6px">Kategori-mestring</h3>
+    ${catBars.map(b=>`<div class="bar-row"><span class="name">${CAT_ICON[b.name]} ${b.name}</span><span class="bar-track"><span class="bar-val" style="width:${b.pct}%"></span></span><span class="pct">${b.pct}%</span></div>`).join('')}
+    <h3 style="margin:14px 0 6px">Niveau-mestring</h3>
+    ${lvls.map(b=>`<div class="bar-row"><span class="name">${lvlBadge(b.name)} ${b.m}/${b.n}</span><span class="bar-track"><span class="bar-val" style="width:${b.pct}%"></span></span><span class="pct">${b.pct}%</span></div>`).join('')}
+    <h3 style="margin:14px 0 6px">🪙 Svageste idiomer</h3>
+    ${weakest.length?weakest.map(o=>`<div style="font-size:.85rem;margin:3px 0">• <b>${esc(o.d.d)}</b> — ${Math.round(o.s.correct/o.s.seen*100)}% (${o.s.correct}/${o.s.seen})</div>`).join(''):'<div class="empty">Spil mere for at se data.</div>'}
+    <h3 style="margin:14px 0 6px">⭐ Stærkeste idiomer</h3>
+    ${strongest.length?strongest.map(o=>`<div style="font-size:.85rem;margin:3px 0">• <b>${esc(o.d.d)}</b> — ${Math.round(o.s.correct/o.s.seen*100)}%</div>`).join(''):'<div class="empty">Spil mere for at se data.</div>'}
+    <div class="center mt"><button class="btn small ghost" onclick="resetProgress()">Nulstil fremgang</button></div>
+  </div>`;
+}
+function resetProgress(){if(confirm('Nulstil al fremgang, guld og badges?')){S=DEFAULT_STATE();save();toast('Fremgang nulstillet.');goMenu();}}
+
+/* ============================================================
+   ACHIEVEMENTS VIEW
+   ============================================================ */
+function renderAch(){
+  app.innerHTML=`<div class="panel">${topbar()}<h2 class="section-title">🏆 Badges & Skatte</h2>
+  <div class="progress-line">${S.ach.length} af ${ACHS.length} låst op</div>
+  <div class="badge-grid">${ACHS.map(a=>{const un=S.ach.includes(a.id);return`<div class="badge${un?' un':''}"><span class="ico">${a.ico}</span><span><span class="t">${a.t} ${un?'✓':''}</span><br><span class="d">${a.d}</span></span></div>`;}).join('')}</div></div>`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderMenu();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danish Verb Flashcards Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar showing the list of verbs -->
+        <aside class="sidebar">
+            <h2>Verb List</h2>
+            <ul id="verb-list">
+                <!-- Verb items will be populated here dynamically -->
+            </ul>
+        </aside>
+
+        <!-- Main content showing the card and controls -->
+        <section class="main-content">
+            <div class="scoreboard">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div class="score-row">
+                    <div class="progress-info">
+                        <span id="card-number">Card 1 of 1</span>
+                        <span id="remaining">Remaining: 0</span>
+                    </div>
+                    <div class="score-info">
+                        <span id="correct-count">Correct: 0</span>
+                        <span id="wrong-count">Wrong: 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrapper">
+                <!-- Card will be injected here -->
+            </div>
+
+            <div class="action-buttons">
+                <button id="wrong-btn" class="wrong">Got it wrong</button>
+                <button id="right-btn" class="right">Got it right</button>
+            </div>
+
+            <div class="restart">
+                <button id="restart-btn">Start over</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danish Word Order Detective 🕵️</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Libre+Franklin:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --ink:#1a1410; --paper:#f3e9d2; --paper2:#e7d9b8;
+  --gold:#c79a3b; --gold2:#e9c46a; --amber:#d98324;
+  --red:#a33a2a; --red2:#c44536; --green:#3a7d44; --green2:#52a363;
+  --blue:#2a5d7c; --muted:#8a7a5c; --line:#3a2f22;
+  --shadow:rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:'Libre Franklin',system-ui,sans-serif;
+  color:var(--paper);
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #2a2118 0%, transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, #241c14 0%, transparent 55%),
+    linear-gradient(160deg,#15110c 0%,#1d1710 50%,#120e0a 100%);
+  background-attachment:fixed;
+  display:flex;justify-content:center;
+  padding:18px 12px 60px;
+}
+.wrap{width:min(720px,98vw)}
+
+/* ---------- header ---------- */
+.masthead{text-align:center;margin-bottom:14px;position:relative}
+.masthead h1{
+  font-family:'Special Elite',monospace;
+  font-size:clamp(22px,5.5vw,38px);
+  letter-spacing:1px;margin:0;color:var(--gold2);
+  text-shadow:0 2px 0 #000, 0 0 24px rgba(201,154,59,.35);
+}
+.masthead .tag{
+  font-family:'Special Elite',monospace;color:var(--muted);
+  font-size:clamp(11px,2.6vw,14px);letter-spacing:3px;text-transform:uppercase;margin-top:4px;
+}
+.rank{
+  display:inline-block;margin-top:8px;font-family:'Special Elite',monospace;font-size:12px;
+  color:var(--ink);background:linear-gradient(180deg,var(--gold2),var(--gold));
+  padding:4px 14px;border-radius:20px;border:2px solid #8a6a22;
+  box-shadow:0 3px 0 #6e5418;letter-spacing:.5px;
+}
+
+/* ---------- card shell ---------- */
+.card{
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.015) 0 2px,transparent 2px 4px),
+    linear-gradient(180deg,var(--paper) 0%,var(--paper2) 100%);
+  color:var(--ink);
+  border-radius:8px;
+  padding:20px;
+  box-shadow:0 22px 50px var(--shadow), inset 0 0 0 2px rgba(58,47,34,.25), inset 0 0 60px rgba(120,90,40,.12);
+  border:1px solid #4a3a26;
+  position:relative;
+}
+.card::after{
+  content:"";position:absolute;inset:0;border-radius:8px;pointer-events:none;
+  box-shadow:inset 0 0 80px rgba(60,40,15,.18);
+}
+
+/* ---------- MAP screen ---------- */
+.intro-line{font-family:'Special Elite',monospace;color:var(--line);text-align:center;font-size:13px;letter-spacing:1px;margin:0 0 6px}
+.tiers{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.tier-pill{font-family:'Special Elite',monospace;font-size:11px;padding:3px 10px;border-radius:14px;border:1.5px solid;letter-spacing:1px}
+.t-a1{color:var(--green);border-color:var(--green)}
+.t-a2{color:var(--blue);border-color:var(--blue)}
+.t-b1{color:var(--amber);border-color:var(--amber)}
+.t-b2{color:var(--red);border-color:var(--red)}
+
+.map{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:520px){.map{grid-template-columns:1fr}}
+.casebtn{
+  position:relative;text-align:left;cursor:pointer;border:none;
+  background:linear-gradient(180deg,#fbf3df,#efe1c2);
+  border:1.5px solid #6a542c;
+  border-radius:7px;padding:13px 14px 13px 52px;color:var(--ink);
+  box-shadow:0 5px 0 #b59a64, 0 8px 14px rgba(0,0,0,.28);
+  transition:transform .08s, box-shadow .08s, filter .15s;font-family:inherit;
+}
+.casebtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 0 #b59a64,0 12px 18px rgba(0,0,0,.3)}
+.casebtn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #b59a64}
+.casebtn:disabled{filter:grayscale(.7) brightness(.92);cursor:not-allowed;opacity:.78}
+.casebtn .num{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  font-family:'Special Elite',monospace;font-weight:700;font-size:15px;color:#fff;
+  background:radial-gradient(circle at 30% 25%,#6f5a34,#3a2c16);border:2px solid #2a2010;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.3);
+}
+.casebtn.done .num{background:radial-gradient(circle at 30% 25%,#52a363,#2c6b3a)}
+.casebtn .ct{font-family:'Special Elite',monospace;font-size:15px;line-height:1.15;display:block}
+.casebtn .cf{font-size:11.5px;color:#6a5630;margin-top:3px;display:block;font-weight:600}
+.casebtn .lvl{position:absolute;top:8px;right:10px;font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;padding:1px 7px;border-radius:10px;color:#fff}
+.lb-a1{background:var(--green)}.lb-a2{background:var(--blue)}.lb-b1{background:var(--amber)}.lb-b2{background:var(--red2)}
+.lock{position:absolute;right:12px;bottom:10px;font-size:15px;opacity:.6}
+.stamp{
+  position:absolute;right:8px;bottom:6px;transform:rotate(-14deg);
+  font-family:'Special Elite',monospace;font-weight:700;font-size:15px;
+  color:var(--red2);border:2.5px solid var(--red2);border-radius:6px;padding:1px 7px;
+  text-transform:uppercase;letter-spacing:1px;opacity:.85;
+  box-shadow:0 0 0 1px rgba(163,58,42,.2);
+}
+.casebtn .best{position:absolute;left:52px;bottom:7px;font-size:10px;color:#8a7a4c;font-family:'Special Elite',monospace}
+
+.final-card{grid-column:1/-1;text-align:center;padding:16px 14px}
+.final-card .ct{font-size:18px}
+.final-card.locked{filter:grayscale(.7) brightness(.92)}
+.progress-note{text-align:center;font-family:'Special Elite',monospace;color:var(--line);font-size:12px;margin:14px 0 4px;letter-spacing:1px}
+.bar{height:10px;background:#cdb888;border-radius:8px;overflow:hidden;border:1px solid #8a7448;margin:6px auto 0;max-width:380px}
+.bar > div{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--gold2),var(--green2));transition:width .6s}
+.reset{display:block;margin:16px auto 0;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit}
+
+/* ---------- CASE / PLAY screen ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{font-family:'Special Elite',monospace;background:#2a2114;color:var(--gold2);border:1px solid #6a542c;border-radius:6px;padding:6px 11px;cursor:pointer;font-size:12px}
+.back:hover{background:#352a18}
+.hud{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.stat{background:#efe1c2;border:1px solid #b59a64;border-radius:6px;padding:4px 9px;text-align:center;min-width:52px}
+.stat .l{font-family:'Special Elite',monospace;font-size:8.5px;letter-spacing:1px;color:#8a6a30;text-transform:uppercase}
+.stat .v{font-family:'Special Elite',monospace;font-size:16px;font-weight:700;color:var(--ink);line-height:1}
+.lives{font-size:15px;letter-spacing:1px}
+
+.casehead{border-bottom:2px dashed #9a7f4e;padding-bottom:10px;margin-bottom:12px}
+.casehead .file{font-family:'Special Elite',monospace;font-size:11px;color:var(--red2);letter-spacing:2px}
+.casehead h2{font-family:'Special Elite',monospace;margin:3px 0 6px;font-size:clamp(18px,4.6vw,25px);color:var(--ink)}
+.casehead .story{font-size:13.5px;line-height:1.55;color:#4a3a22;font-style:italic}
+.casehead .focus{margin-top:8px;font-size:12px;color:#6a542c;font-weight:700}
+
+.qbar{height:8px;background:#cdb888;border-radius:6px;overflow:hidden;border:1px solid #9a7f4e;margin:12px 0}
+.qbar > div{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--green2));transition:width .4s}
+
+.prompt{font-family:'Special Elite',monospace;font-size:12px;color:var(--red2);letter-spacing:1px;margin-bottom:6px}
+.en{font-size:14px;color:#5a4830;margin-bottom:14px;font-style:italic}
+.en b{color:var(--ink);font-style:normal}
+
+/* answer slots */
+.answer{
+  min-height:56px;display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+  padding:12px;border-radius:7px;margin-bottom:12px;
+  background:repeating-linear-gradient(90deg,#e3d3ab 0 28px,#dccba0 28px 30px);
+  border:2px dashed #9a7f4e;
+}
+.answer.empty::before{content:"Tap the words below in the correct order…";color:#9a8050;font-style:italic;font-size:13px}
+.answer.ok{border-color:var(--green);background:#d9ebcf}
+.answer.no{border-color:var(--red2);background:#f0d4cb}
+
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.tile{
+  font-family:'Special Elite',monospace;font-size:clamp(14px,3.8vw,17px);
+  background:linear-gradient(180deg,#fffaf0,#efe0bf);
+  color:var(--ink);border:1.5px solid #7a6030;border-radius:6px;
+  padding:9px 13px;cursor:pointer;box-shadow:0 3px 0 #b59a64;
+  transition:transform .06s, box-shadow .06s, opacity .15s;
+}
+.tile:hover{transform:translateY(-1px)}
+.tile:active{transform:translateY(2px);box-shadow:0 1px 0 #b59a64}
+.tile.used{opacity:0;pointer-events:none;width:0;padding:0;margin:0;border:0}
+.tile.inans{box-shadow:0 3px 0 #9ab57e;background:linear-gradient(180deg,#f3f7ea,#dfe9cf)}
+.tile.locked{pointer-events:none}
+
+.controls{display:flex;gap:9px;margin-top:4px}
+.btn{
+  flex:1;font-family:'Special Elite',monospace;font-size:14px;letter-spacing:.5px;
+  border:none;border-radius:7px;padding:12px;cursor:pointer;color:#fff;
+  box-shadow:0 4px 0 rgba(0,0,0,.3);transition:transform .07s, box-shadow .07s, filter .15s;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.btn.check{background:linear-gradient(180deg,#cf9a3f,#a8761f)}
+.btn.clear{flex:0 0 auto;background:linear-gradient(180deg,#7a6030,#574321)}
+.btn.next{background:linear-gradient(180deg,#52a363,#2c6b3a);width:100%}
+.btn:disabled{filter:grayscale(.6) brightness(.85);cursor:not-allowed}
+
+/* explanation panel */
+.explain{margin-top:13px;border-radius:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease, opacity .3s}
+.explain.show{max-height:600px;opacity:1}
+.explain .inner{padding:14px 15px;border:2px solid;border-radius:8px}
+.explain.good .inner{background:#dcecd2;border-color:var(--green)}
+.explain.bad .inner{background:#f1d9d0;border-color:var(--red2)}
+.explain .verdict{font-family:'Special Elite',monospace;font-size:15px;margin-bottom:7px}
+.explain.good .verdict{color:var(--green)}
+.explain.bad .verdict{color:var(--red2)}
+.explain .sol{font-family:'Special Elite',monospace;font-size:17px;color:var(--ink);margin-bottom:4px}
+.explain .tr{font-size:13px;color:#5a4830;font-style:italic;margin-bottom:9px}
+.explain .why{font-size:13px;line-height:1.55;color:#3a2c18}
+.explain .why b{color:var(--red2)}
+
+/* case complete */
+.complete{text-align:center;padding:14px 6px}
+.complete .bigstamp{
+  display:inline-block;font-family:'Special Elite',monospace;font-weight:700;font-size:30px;
+  color:var(--red2);border:5px solid var(--red2);border-radius:12px;padding:8px 22px;
+  transform:rotate(-9deg);margin:6px 0 16px;letter-spacing:2px;
+  box-shadow:0 0 0 2px rgba(163,58,42,.25);animation:slam .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes slam{0%{transform:rotate(-9deg) scale(2.4);opacity:0}60%{opacity:1}100%{transform:rotate(-9deg) scale(1)}}
+.complete h2{font-family:'Special Elite',monospace;color:var(--ink);margin:4px 0}
+.complete p{color:#5a4830;font-size:14px;line-height:1.5}
+.complete .score{font-family:'Special Elite',monospace;font-size:22px;color:var(--amber);margin:10px 0}
+
+/* timer for final */
+.timer{font-family:'Special Elite',monospace;background:#2a2114;color:var(--gold2);border:1px solid #6a542c;border-radius:6px;padding:4px 9px;font-size:14px}
+.timer.warn{color:#ff7a5c;animation:pulse .6s infinite alternate}
+@keyframes pulse{to{opacity:.5}}
+
+.footnote{text-align:center;color:var(--muted);font-size:11px;margin-top:16px;font-family:'Special Elite',monospace;letter-spacing:1px}
+.flash{position:fixed;left:50%;top:30%;transform:translateX(-50%);z-index:50;font-family:'Special Elite',monospace;font-size:34px;color:var(--gold2);text-shadow:0 2px 0 #000;pointer-events:none;opacity:0}
+.flash.show{animation:fl 1s ease-out}
+@keyframes fl{0%{opacity:0;transform:translateX(-50%) scale(.5)}30%{opacity:1;transform:translateX(-50%) scale(1.15)}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <h1>🕵️ Danish Word Order Detective</h1>
+    <div class="tag">Ordstillings&shy;detektiven — 12 Cases · A1 → B2</div>
+    <div class="rank" id="rankBadge">Rank: Trainee Detective</div>
+  </div>
+
+  <!-- ================= MAP ================= -->
+  <div class="card" id="mapScreen">
+    <p class="intro-line">// CASE FILES — CITY POLICE, GRAMMAR DIVISION //</p>
+    <div class="tiers">
+      <span class="tier-pill t-a1">A1 · Cases 1–3</span>
+      <span class="tier-pill t-a2">A2 · Cases 4–6</span>
+      <span class="tier-pill t-b1">B1 · Cases 7–10</span>
+      <span class="tier-pill t-b2">B2 · Cases 11–12</span>
+    </div>
+    <div class="map" id="mapGrid"></div>
+    <p class="progress-note" id="progNote">Cases solved: 0 / 12</p>
+    <div class="bar"><div id="progBar"></div></div>
+    <button class="reset" id="resetBtn">Reset all progress</button>
+  </div>
+
+  <!-- ================= PLAY ================= -->
+  <div class="card hidden" id="playScreen">
+    <div class="topbar">
+      <button class="back" id="backBtn">‹ Case Map</button>
+      <span class="timer hidden" id="timer">⏱ 0:00</span>
+      <div class="hud">
+        <div class="stat"><div class="l">Score</div><div class="v" id="scoreV">0</div></div>
+        <div class="stat"><div class="l">Streak</div><div class="v" id="streakV">0</div></div>
+        <div class="stat"><div class="l">Lives</div><div class="v lives" id="livesV">❤❤❤</div></div>
+      </div>
+    </div>
+
+    <div class="casehead" id="caseHead"></div>
+    <div class="qbar"><div id="qFill"></div></div>
+
+    <div id="qArea">
+      <div class="prompt" id="promptLbl">▸ REBUILD THE STATEMENT</div>
+      <div class="en" id="enLine"></div>
+      <div class="answer empty" id="answer"></div>
+      <div class="pool" id="pool"></div>
+      <div class="controls">
+        <button class="btn clear" id="clearBtn">⟲ Clear</button>
+        <button class="btn check" id="checkBtn" disabled>🔍 Examine</button>
+      </div>
+      <div class="explain" id="explain"><div class="inner">
+        <div class="verdict" id="verdict"></div>
+        <div class="sol" id="sol"></div>
+        <div class="tr" id="trLine"></div>
+        <div class="why" id="why"></div>
+        <button class="btn next" id="nextBtn" style="margin-top:12px">Next ▸</button>
+      </div></div>
+    </div>
+
+    <div class="complete hidden" id="completeArea"></div>
+  </div>
+
+  <div class="footnote">Built for Danish learners · click words to rebuild each statement</div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script>
+/* =========================================================
+   DATA — 12 cases. Each sentence: da (correct order) + en.
+   Tokens = da.split(" "). Commas attach to the word before.
+   All sentences reviewed for V2, ikke/adverb placement,
+   subordinate-clause order, logic and natural usage.
+   ========================================================= */
+const CASES = [
+{
+ n:1, title:"The Missing Coffee", cefr:"A1", lvl:"lb-a1",
+ focus:"Subject + Verb + Object",
+ story:"The break-room coffee has vanished, and Chief Madsen is furious. Every witness gives a plain statement — but their words are jumbled. Restore each basic sentence to reopen the canteen.",
+ grammarTip:"Danish main clauses follow <b>Subject → Verb → Object</b>. The verb comes second, right after the subject. Keep it simple and direct.",
+ sents:[
+  {da:"Jeg drikker kaffe", en:"I drink coffee"},
+  {da:"Han læser en bog", en:"He reads a book"},
+  {da:"Vi spiller fodbold", en:"We play football"},
+  {da:"Hun spiser et æble", en:"She eats an apple"},
+  {da:"De ser en film", en:"They watch a film"},
+  {da:"Jeg køber mælk", en:"I buy milk"},
+  {da:"Børnene tegner billeder", en:"The children draw pictures"},
+  {da:"Manden kører bilen", en:"The man drives the car"},
+  {da:"Pigen synger en sang", en:"The girl sings a song"},
+  {da:"Vi besøger bedstemor", en:"We visit grandma"},
+  {da:"Læreren retter opgaver", en:"The teacher corrects assignments"},
+  {da:"Jeg skriver en email", en:"I write an email"},
+  {da:"Hun maler væggen", en:"She paints the wall"},
+  {da:"De bygger et hus", en:"They build a house"},
+  {da:"Drengen kaster bolden", en:"The boy throws the ball"},
+  {da:"Min mor laver mad", en:"My mum makes food"},
+  {da:"Vi drikker te", en:"We drink tea"},
+  {da:"Han spiser morgenmad", en:"He eats breakfast"},
+  {da:"Jeg åbner vinduet", en:"I open the window"},
+  {da:"Pigen læser avisen", en:"The girl reads the newspaper"},
+  {da:"Vi vasker bilen", en:"We wash the car"},
+  {da:"Han lukker døren", en:"He closes the door"},
+  {da:"Jeg elsker musik", en:"I love music"},
+  {da:"De planter blomster", en:"They plant flowers"},
+  {da:"Far laver kaffe", en:"Dad makes coffee"}
+ ]
+},
+{
+ n:2, title:"The Lost Timeline", cefr:"A1", lvl:"lb-a1",
+ focus:"Time expressions first → V2",
+ story:"A suspect's diary survives, but every entry begins with a time — and the rest of the words have scattered. Rebuild the timeline to learn where he really was.",
+ grammarTip:"When a <b>time expression starts the sentence</b>, the verb must stay in <b>second position</b> (the V2 rule). The subject then moves <i>after</i> the verb: <b>I går · købte · jeg</b> …",
+ sents:[
+  {da:"I går købte jeg en bil", en:"Yesterday I bought a car"},
+  {da:"I dag arbejder hun hjemme", en:"Today she works from home"},
+  {da:"I morgen rejser vi", en:"Tomorrow we travel"},
+  {da:"I aften ser vi en film", en:"Tonight we watch a film"},
+  {da:"I weekenden besøger jeg min familie", en:"At the weekend I visit my family"},
+  {da:"Om sommeren tager vi til Spanien", en:"In summer we go to Spain"},
+  {da:"I sidste uge mødte jeg chefen", en:"Last week I met the boss"},
+  {da:"Næste år flytter de til Aarhus", en:"Next year they move to Aarhus"},
+  {da:"Om morgenen drikker jeg kaffe", en:"In the morning I drink coffee"},
+  {da:"I går aftes spiste vi på restaurant", en:"Last night we ate at a restaurant"},
+  {da:"Hver dag cykler jeg til arbejde", en:"Every day I cycle to work"},
+  {da:"Nu begynder mødet", en:"Now the meeting begins"},
+  {da:"I dag regner det", en:"Today it rains"},
+  {da:"Om vinteren sner det ofte", en:"In winter it often snows"},
+  {da:"I går læste jeg en spændende bog", en:"Yesterday I read an exciting book"},
+  {da:"På mandag starter kurset", en:"On Monday the course starts"},
+  {da:"I sommer rejste vi til Italien", en:"This summer we travelled to Italy"},
+  {da:"Senere taler vi om planen", en:"Later we'll talk about the plan"},
+  {da:"I går vandt holdet kampen", en:"Yesterday the team won the match"},
+  {da:"I morgen sender jeg rapporten", en:"Tomorrow I send the report"},
+  {da:"Om eftermiddagen henter hun børnene", en:"In the afternoon she picks up the children"},
+  {da:"Hver weekend handler vi ind", en:"Every weekend we go shopping"},
+  {da:"I dag har vi et vigtigt møde", en:"Today we have an important meeting"},
+  {da:"I aftes så jeg nyhederne", en:"Last night I watched the news"},
+  {da:"Næste uge starter jeg på et nyt job", en:"Next week I start a new job"}
+ ]
+},
+{
+ n:3, title:"The Copenhagen Heist", cefr:"A1", lvl:"lb-a1",
+ focus:"Place expressions first → V2",
+ story:"A daring museum heist in Copenhagen. Surveillance notes describe where everyone was — but the place comes first in every line. Apply the V2 rule to pin down each location.",
+ grammarTip:"A <b>place expression</b> in front position triggers the same V2 inversion as time: verb second, subject third — <b>I København · arbejder · han</b>.",
+ sents:[
+  {da:"I København arbejder han", en:"In Copenhagen he works"},
+  {da:"På kontoret sidder de", en:"In the office they sit"},
+  {da:"Hjemme ser jeg tv", en:"At home I watch tv"},
+  {da:"I skolen lærer børnene matematik", en:"At school the children learn maths"},
+  {da:"På stationen venter mange mennesker", en:"At the station many people wait"},
+  {da:"I parken leger børnene", en:"In the park the children play"},
+  {da:"I supermarkedet køber vi mad", en:"In the supermarket we buy food"},
+  {da:"I Danmark cykler folk meget", en:"In Denmark people cycle a lot"},
+  {da:"På arbejdet holder vi møde", en:"At work we hold a meeting"},
+  {da:"I byen er der mange butikker", en:"In the city there are many shops"},
+  {da:"På stranden leger børnene", en:"On the beach the children play"},
+  {da:"I køkkenet laver hun mad", en:"In the kitchen she makes food"},
+  {da:"På universitetet studerer han jura", en:"At the university he studies law"},
+  {da:"I haven planter vi blomster", en:"In the garden we plant flowers"},
+  {da:"På hospitalet arbejder min søster", en:"At the hospital my sister works"},
+  {da:"I lufthavnen venter passagererne", en:"In the airport the passengers wait"},
+  {da:"Udenfor regner det", en:"Outside it rains"},
+  {da:"På biblioteket læser de studerende", en:"At the library the students read"},
+  {da:"I Aarhus bor mine bedsteforældre", en:"In Aarhus my grandparents live"},
+  {da:"På torvet mødes vi klokken to", en:"At the square we meet at two"},
+  {da:"I bilen lytter vi til musik", en:"In the car we listen to music"},
+  {da:"På restauranten bestiller vi mad", en:"At the restaurant we order food"},
+  {da:"I stuen hænger et stort maleri", en:"In the living room hangs a large painting"},
+  {da:"På kontoret drikker vi meget kaffe", en:"At the office we drink a lot of coffee"},
+  {da:"I toget arbejder mange pendlere", en:"On the train many commuters work"}
+ ]
+},
+{
+ n:4, title:"The Secret Report", cefr:"A2", lvl:"lb-a2",
+ focus:"Negation with ikke",
+ story:"A leaked report claims certain people were NOT where they said. Every statement hinges on one little word: <i>ikke</i>. Place it correctly to confirm each denial.",
+ grammarTip:"In a main clause, <b>ikke</b> comes <i>after</i> the finite verb: <b>Jeg kommer ikke</b>. If the sentence starts with a time/place, ikke goes after the subject: <b>I dag arbejder jeg ikke</b>.",
+ sents:[
+  {da:"Jeg kommer ikke i morgen", en:"I'm not coming tomorrow"},
+  {da:"Hun arbejder ikke hjemme", en:"She doesn't work from home"},
+  {da:"Vi spiser ikke kød", en:"We don't eat meat"},
+  {da:"Han taler ikke engelsk", en:"He doesn't speak English"},
+  {da:"De bor ikke i København", en:"They don't live in Copenhagen"},
+  {da:"Jeg drikker ikke alkohol", en:"I don't drink alcohol"},
+  {da:"Børnene sover ikke endnu", en:"The children aren't asleep yet"},
+  {da:"Hun forstår ikke spørgsmålet", en:"She doesn't understand the question"},
+  {da:"Vi rejser ikke i år", en:"We're not travelling this year"},
+  {da:"Jeg kender ikke svaret", en:"I don't know the answer"},
+  {da:"Han ryger ikke længere", en:"He doesn't smoke anymore"},
+  {da:"De vasker ikke bilen i dag", en:"They're not washing the car today"},
+  {da:"Min chef er ikke på kontoret", en:"My boss isn't in the office"},
+  {da:"Jeg har ikke tid nu", en:"I don't have time now"},
+  {da:"Vi ser ikke tv om aftenen", en:"We don't watch tv in the evening"},
+  {da:"Hun løber ikke hver dag", en:"She doesn't run every day"},
+  {da:"Toget kører ikke i dag", en:"The train isn't running today"},
+  {da:"Jeg forstår ikke tysk", en:"I don't understand German"},
+  {da:"De spiller ikke fodbold om vinteren", en:"They don't play football in winter"},
+  {da:"Han læser ikke avisen", en:"He doesn't read the newspaper"},
+  {da:"Vi køber ikke en ny bil", en:"We're not buying a new car"},
+  {da:"Butikken åbner ikke i dag", en:"The shop doesn't open today"},
+  {da:"Jeg arbejder ikke om søndagen", en:"I don't work on Sundays"},
+  {da:"Hun bor ikke alene", en:"She doesn't live alone"},
+  {da:"I dag arbejder jeg ikke", en:"Today I'm not working"},
+  {da:"I morgen kommer han ikke", en:"Tomorrow he isn't coming"}
+ ]
+},
+{
+ n:5, title:"The Witness Statements", cefr:"A2", lvl:"lb-a2",
+ focus:"Frequency adverbs",
+ story:"Three witnesses describe routines — what someone <i>always</i>, <i>often</i> or <i>never</i> does. The adverb is the clue. Slot it into the right spot to verify their habits.",
+ grammarTip:"Frequency adverbs (<b>altid, ofte, sjældent, normalt, aldrig</b>) sit in the same slot as ikke — <i>after the finite verb</i>: <b>Jeg besøger ofte …</b>. After a fronted phrase they follow the subject: <b>Om morgenen drikker jeg altid …</b>.",
+ sents:[
+  {da:"Jeg besøger ofte mine forældre", en:"I often visit my parents"},
+  {da:"Hun kommer altid til tiden", en:"She always arrives on time"},
+  {da:"Vi ser sjældent tv", en:"We rarely watch tv"},
+  {da:"Han drikker normalt te om morgenen", en:"He normally drinks tea in the morning"},
+  {da:"De spiser aldrig kød", en:"They never eat meat"},
+  {da:"Jeg cykler altid til arbejde", en:"I always cycle to work"},
+  {da:"Hun læser ofte bøger", en:"She often reads books"},
+  {da:"Vi rejser sjældent om vinteren", en:"We rarely travel in winter"},
+  {da:"Han kommer aldrig for sent", en:"He's never late"},
+  {da:"Børnene leger altid efter skole", en:"The children always play after school"},
+  {da:"Jeg drikker normalt kaffe", en:"I normally drink coffee"},
+  {da:"De besøger ofte deres bedsteforældre", en:"They often visit their grandparents"},
+  {da:"Hun arbejder ofte sent", en:"She often works late"},
+  {da:"Vi spiser altid sammen om aftenen", en:"We always eat together in the evening"},
+  {da:"Han ser sjældent film", en:"He rarely watches films"},
+  {da:"Jeg glemmer aldrig en aftale", en:"I never forget an appointment"},
+  {da:"Toget er ofte forsinket", en:"The train is often delayed"},
+  {da:"Hun synger altid i bruseren", en:"She always sings in the shower"},
+  {da:"Vi handler normalt om lørdagen", en:"We normally shop on Saturdays"},
+  {da:"De taler sjældent om arbejde", en:"They rarely talk about work"},
+  {da:"Jeg står altid op klokken syv", en:"I always get up at seven"},
+  {da:"Han spiller ofte guitar", en:"He often plays guitar"},
+  {da:"Vi mødes ofte i weekenden", en:"We often meet at the weekend"},
+  {da:"Hun løber normalt om morgenen", en:"She normally runs in the morning"},
+  {da:"Børnene bliver sjældent syge", en:"The children rarely get sick"},
+  {da:"Om morgenen drikker jeg altid kaffe", en:"In the morning I always drink coffee"}
+ ]
+},
+{
+ n:6, title:"The Disappearing Suspect", cefr:"A2", lvl:"lb-a2",
+ focus:"Questions",
+ story:"The prime suspect has vanished. To track him down you must interrogate everyone — but your questions came out scrambled. Rebuild them to crack the case.",
+ grammarTip:"Two question types: <b>wh-questions</b> put the question word first, then the verb (<b>Hvor bor du?</b>). <b>Yes/no questions</b> put the <i>verb first</i> (<b>Drikker du kaffe?</b>).",
+ sents:[
+  {da:"Hvor bor du", en:"Where do you live?"},
+  {da:"Hvornår kommer han", en:"When is he coming?"},
+  {da:"Hvad arbejder hun med", en:"What does she work with?"},
+  {da:"Hvem er du", en:"Who are you?"},
+  {da:"Hvorfor græder barnet", en:"Why is the child crying?"},
+  {da:"Hvordan har du det", en:"How are you?"},
+  {da:"Hvor meget koster det", en:"How much does it cost?"},
+  {da:"Hvilken bus tager du", en:"Which bus do you take?"},
+  {da:"Drikker du kaffe", en:"Do you drink coffee?"},
+  {da:"Bor I i København", en:"Do you live in Copenhagen?"},
+  {da:"Kommer hun til festen", en:"Is she coming to the party?"},
+  {da:"Hvor ligger stationen", en:"Where is the station?"},
+  {da:"Hvornår starter mødet", en:"When does the meeting start?"},
+  {da:"Hvad hedder du", en:"What's your name?"},
+  {da:"Hvem ringer du til", en:"Who are you calling?"},
+  {da:"Hvorfor er du så glad", en:"Why are you so happy?"},
+  {da:"Hvordan kommer jeg til lufthavnen", en:"How do I get to the airport?"},
+  {da:"Spiser I kød", en:"Do you eat meat?"},
+  {da:"Hvor arbejder din far", en:"Where does your father work?"},
+  {da:"Hvad laver børnene", en:"What are the children doing?"},
+  {da:"Hvornår rejser I", en:"When are you travelling?"},
+  {da:"Taler du dansk", en:"Do you speak Danish?"},
+  {da:"Hvem laver mad i aften", en:"Who's cooking tonight?"},
+  {da:"Hvor gammel er du", en:"How old are you?"},
+  {da:"Hvad koster billetten", en:"What does the ticket cost?"},
+  {da:"Forstår du spørgsmålet", en:"Do you understand the question?"}
+ ]
+},
+{
+ n:7, title:"The Hidden Message", cefr:"B1", lvl:"lb-b1",
+ focus:"Modal verbs",
+ story:"A coded message reveals what the suspects <i>can</i>, <i>must</i> and <i>want</i> to do. Modal verbs hold the key — decode each line by placing the main verb at the end.",
+ grammarTip:"With a modal (<b>kan, skal, vil, må, bør</b>) the <i>modal</i> takes second position and the main verb goes to the <b>end</b> as an infinitive: <b>Jeg · kan · tale dansk</b>. Ikke sits between them: <b>Han kan ikke komme</b>.",
+ sents:[
+  {da:"Jeg kan tale dansk", en:"I can speak Danish"},
+  {da:"Hun skal arbejde i morgen", en:"She has to work tomorrow"},
+  {da:"Vi vil gerne hjælpe", en:"We'd like to help"},
+  {da:"Du må ikke ryge her", en:"You mustn't smoke here"},
+  {da:"Du bør spise mere frugt", en:"You should eat more fruit"},
+  {da:"Han kan ikke komme i dag", en:"He can't come today"},
+  {da:"Jeg skal til lægen i morgen", en:"I have to go to the doctor tomorrow"},
+  {da:"Vi vil rejse til Norge", en:"We want to travel to Norway"},
+  {da:"Børnene må gerne se tv", en:"The children are allowed to watch tv"},
+  {da:"Du bør drikke mere vand", en:"You should drink more water"},
+  {da:"Hun kan spille klaver", en:"She can play the piano"},
+  {da:"Jeg vil gerne bestille en kaffe", en:"I'd like to order a coffee"},
+  {da:"Vi skal mødes klokken tre", en:"We're meeting at three"},
+  {da:"Han må arbejde i weekenden", en:"He has to work at the weekend"},
+  {da:"Du kan tage bussen", en:"You can take the bus"},
+  {da:"I morgen skal jeg til tandlæge", en:"Tomorrow I have to go to the dentist"},
+  {da:"Vi bør hjælpe hinanden", en:"We should help each other"},
+  {da:"Hun vil ikke spise grøntsager", en:"She doesn't want to eat vegetables"},
+  {da:"Jeg kan ikke finde mine nøgler", en:"I can't find my keys"},
+  {da:"Må jeg låne din pen", en:"May I borrow your pen?"},
+  {da:"Vi skal købe ind i dag", en:"We have to go shopping today"},
+  {da:"Du må ikke parkere her", en:"You can't park here"},
+  {da:"Han skal læse til eksamen", en:"He has to study for the exam"},
+  {da:"Kan du hjælpe mig", en:"Can you help me?"},
+  {da:"Vi vil gerne se filmen", en:"We'd like to see the film"},
+  {da:"Du bør ringe til din mor", en:"You should call your mum"}
+ ]
+},
+{
+ n:8, title:"The Locked Archive", cefr:"B1", lvl:"lb-b1",
+ focus:"Perfect tense (har + participle)",
+ story:"Behind a locked archive door lie records of what already happened. Each entry uses <i>har</i> + a past participle. Reconstruct the history to open the vault.",
+ grammarTip:"The perfect tense = <b>har</b> (second position) + the <b>past participle at the end</b>: <b>Jeg · har · købt en bil</b>. Adverbs like ikke/aldrig come before the participle: <b>Jeg har ikke set …</b>.",
+ sents:[
+  {da:"Jeg har købt en bil", en:"I have bought a car"},
+  {da:"Hun har besøgt Aarhus", en:"She has visited Aarhus"},
+  {da:"Vi har arbejdet hele dagen", en:"We have worked all day"},
+  {da:"Han har læst bogen", en:"He has read the book"},
+  {da:"De har spist morgenmad", en:"They have eaten breakfast"},
+  {da:"Jeg har glemt min nøgle", en:"I have forgotten my key"},
+  {da:"Hun har boet i Danmark i ti år", en:"She has lived in Denmark for ten years"},
+  {da:"Vi har set den film", en:"We have seen that film"},
+  {da:"Han har skrevet en rapport", en:"He has written a report"},
+  {da:"Jeg har drukket for meget kaffe", en:"I have drunk too much coffee"},
+  {da:"De har bygget et nyt hus", en:"They have built a new house"},
+  {da:"Hun har lært dansk", en:"She has learned Danish"},
+  {da:"Vi har vundet kampen", en:"We have won the match"},
+  {da:"Han har rejst til mange lande", en:"He has travelled to many countries"},
+  {da:"Jeg har lavet mad til alle", en:"I have made food for everyone"},
+  {da:"Børnene har sovet godt", en:"The children have slept well"},
+  {da:"Hun har sendt en email", en:"She has sent an email"},
+  {da:"Vi har talt med chefen", en:"We have talked to the boss"},
+  {da:"Han har mistet sit job", en:"He has lost his job"},
+  {da:"Jeg har ikke set ham i dag", en:"I haven't seen him today"},
+  {da:"De har købt en ny lejlighed", en:"They have bought a new apartment"},
+  {da:"Hun har taget toget", en:"She has taken the train"},
+  {da:"Vi har spist på den restaurant", en:"We have eaten at that restaurant"},
+  {da:"I dag har jeg arbejdet hjemme", en:"Today I have worked from home"},
+  {da:"Han har aldrig været i Norge", en:"He has never been to Norway"},
+  {da:"Jeg har lige ringet til dig", en:"I have just called you"}
+ ]
+},
+{
+ n:9, title:"The False Alibi", cefr:"B1", lvl:"lb-b1",
+ focus:"Subordinate clauses with fordi",
+ story:"A suspect's alibi falls apart in the 'because' clause. Subordinate word order is different — and that's where the lie hides. Rebuild each explanation to expose it.",
+ grammarTip:"In a <b>fordi</b> (because) clause, there is <i>no</i> V2 inversion: it stays <b>subject → verb</b>. Crucially, adverbs like <b>ikke</b> move <i>before</i> the verb: <b>…, fordi jeg ikke er glad</b>.",
+ sents:[
+  {da:"Jeg bliver hjemme, fordi jeg er syg", en:"I'm staying home because I'm sick"},
+  {da:"Hun arbejder sent, fordi projektet er vigtigt", en:"She works late because the project is important"},
+  {da:"Vi tager paraply med, fordi det regner", en:"We bring an umbrella because it's raining"},
+  {da:"Han er træt, fordi han har arbejdet hele dagen", en:"He's tired because he has worked all day"},
+  {da:"Jeg drikker kaffe, fordi jeg er træt", en:"I drink coffee because I'm tired"},
+  {da:"De bliver hjemme, fordi børnene er syge", en:"They stay home because the children are sick"},
+  {da:"Hun smiler, fordi hun er glad", en:"She smiles because she's happy"},
+  {da:"Vi køber en ny bil, fordi den gamle er gået i stykker", en:"We buy a new car because the old one has broken down"},
+  {da:"Jeg lærer dansk, fordi jeg bor i Danmark", en:"I'm learning Danish because I live in Denmark"},
+  {da:"Han løber hver dag, fordi han vil være sund", en:"He runs every day because he wants to be healthy"},
+  {da:"Vi spiser ude, fordi køkkenet bliver renoveret", en:"We eat out because the kitchen is being renovated"},
+  {da:"Hun er glad, fordi hun har fået et nyt job", en:"She's happy because she got a new job"},
+  {da:"Jeg kommer for sent, fordi bussen var forsinket", en:"I'm late because the bus was delayed"},
+  {da:"De rejser til Spanien, fordi de elsker solen", en:"They travel to Spain because they love the sun"},
+  {da:"Han bliver hjemme, fordi han ikke har det godt", en:"He stays home because he doesn't feel well"},
+  {da:"Jeg køber ikke bilen, fordi den er for dyr", en:"I'm not buying the car because it's too expensive"},
+  {da:"Vi tager toget, fordi det er hurtigere", en:"We take the train because it's faster"},
+  {da:"Hun ringer til lægen, fordi hun har ondt i hovedet", en:"She calls the doctor because she has a headache"},
+  {da:"Børnene er glade, fordi det er ferie", en:"The children are happy because it's the holidays"},
+  {da:"Jeg går tidligt i seng, fordi jeg skal op klokken seks", en:"I go to bed early because I have to get up at six"},
+  {da:"Han køber blomster, fordi det er hans kones fødselsdag", en:"He buys flowers because it's his wife's birthday"},
+  {da:"Vi bliver inde, fordi det sner", en:"We stay inside because it's snowing"},
+  {da:"Hun arbejder ikke i dag, fordi hun er på ferie", en:"She's not working today because she's on holiday"},
+  {da:"Jeg er sulten, fordi jeg ikke har spist", en:"I'm hungry because I haven't eaten"},
+  {da:"De flytter, fordi de har fået et større hus", en:"They're moving because they got a bigger house"}
+ ]
+},
+{
+ n:10, title:"The Shadow Network", cefr:"B1", lvl:"lb-b1",
+ focus:"Advanced conjunctions (selvom, når, hvis, mens)",
+ story:"A hidden network communicates in conditional code: <i>if</i> this, <i>when</i> that, <i>even though</i> the other. When the clue-clause comes first, the main clause flips. Untangle the network.",
+ grammarTip:"When a subordinate clause (<b>selvom, når, hvis, mens</b>) comes <i>first</i>, the whole clause fills front position — so the main clause must invert: comma, then <b>verb before subject</b>: <b>Hvis du har tid, kan vi mødes</b>.",
+ sents:[
+  {da:"Selvom det regner, går jeg en tur", en:"Even though it's raining, I'm going for a walk"},
+  {da:"Når mødet er slut, tager vi hjem", en:"When the meeting is over, we go home"},
+  {da:"Hvis du har tid, kan vi mødes", en:"If you have time, we can meet"},
+  {da:"Mens jeg laver mad, læser han avisen", en:"While I cook, he reads the newspaper"},
+  {da:"Hvis det bliver nødvendigt, ringer jeg til dig", en:"If it becomes necessary, I'll call you"},
+  {da:"Når jeg kommer hjem, spiser vi aftensmad", en:"When I get home, we eat dinner"},
+  {da:"Selvom han er træt, arbejder han videre", en:"Even though he's tired, he keeps working"},
+  {da:"Mens børnene sover, ser vi en film", en:"While the children sleep, we watch a film"},
+  {da:"Hvis vejret er godt, tager vi på stranden", en:"If the weather is good, we go to the beach"},
+  {da:"Når ferien starter, rejser vi til Italien", en:"When the holiday starts, we travel to Italy"},
+  {da:"Selvom det er dyrt, køber vi huset", en:"Even though it's expensive, we buy the house"},
+  {da:"Hvis du er syg, bør du blive hjemme", en:"If you're sick, you should stay home"},
+  {da:"Når jeg er på arbejde, drikker jeg meget kaffe", en:"When I'm at work, I drink a lot of coffee"},
+  {da:"Mens vi venter, kan vi tale sammen", en:"While we wait, we can talk"},
+  {da:"Selvom hun er optaget, hjælper hun altid", en:"Even though she's busy, she always helps"},
+  {da:"Hvis toget er forsinket, tager jeg en taxa", en:"If the train is delayed, I'll take a taxi"},
+  {da:"Når solen skinner, leger børnene udenfor", en:"When the sun shines, the children play outside"},
+  {da:"Mens jeg sover, passer naboen hunden", en:"While I sleep, the neighbour looks after the dog"},
+  {da:"Hvis du vil, kan du komme med", en:"If you want, you can come along"},
+  {da:"Selvom det er sent, vil jeg gerne tale med dig", en:"Even though it's late, I'd like to talk to you"},
+  {da:"Når vinteren kommer, bliver dagene korte", en:"When winter comes, the days get short"},
+  {da:"Hvis vi skynder os, når vi toget", en:"If we hurry, we catch the train"},
+  {da:"Mens chefen er væk, arbejder vi hjemmefra", en:"While the boss is away, we work from home"},
+  {da:"Selvom jeg er nervøs, holder jeg talen", en:"Even though I'm nervous, I'll give the speech"},
+  {da:"Når mødet begynder, lukker vi døren", en:"When the meeting begins, we close the door"}
+ ]
+},
+{
+ n:11, title:"The Double Agent", cefr:"B2", lvl:"lb-b2",
+ focus:"Mixed sentence structures",
+ story:"One detective on the team is a double agent. Their reports mix everything — fronted phrases, modals, negation, subordinate clauses. Only a master of word order can spot the inconsistency.",
+ grammarTip:"These combine several rules at once. Watch the order: fronted phrase → verb second → subject → <b>adverb/ikke</b> → other verbs. Keep modal/auxiliary in slot 2 and push main verbs to the end.",
+ sents:[
+  {da:"I går kunne jeg ikke komme til mødet", en:"Yesterday I couldn't come to the meeting"},
+  {da:"På kontoret arbejder han stadig på rapporten", en:"At the office he's still working on the report"},
+  {da:"Hvis det bliver nødvendigt, kan vi ændre planen", en:"If it becomes necessary, we can change the plan"},
+  {da:"I morgen skal jeg ikke arbejde", en:"Tomorrow I don't have to work"},
+  {da:"Om vinteren rejser vi ofte til varmere lande", en:"In winter we often travel to warmer countries"},
+  {da:"Selvom han var syg, ville han ikke blive hjemme", en:"Even though he was sick, he didn't want to stay home"},
+  {da:"I dag har jeg desværre ikke tid", en:"Today I unfortunately don't have time"},
+  {da:"Når jeg er færdig, sender jeg dig rapporten", en:"When I'm done, I'll send you the report"},
+  {da:"På mødet kunne vi ikke blive enige", en:"At the meeting we couldn't agree"},
+  {da:"Hvis du vil, kan jeg hjælpe dig i morgen", en:"If you want, I can help you tomorrow"},
+  {da:"I sidste uge arbejdede jeg meget", en:"Last week I worked a lot"},
+  {da:"Hun vil gerne flytte, men hun har ikke råd", en:"She'd like to move, but she can't afford it"},
+  {da:"Om morgenen drikker han altid kaffe", en:"In the morning he always drinks coffee"},
+  {da:"Jeg kan ikke komme, fordi jeg skal arbejde", en:"I can't come because I have to work"},
+  {da:"Selvom det regnede, gik vi en lang tur", en:"Even though it rained, we went for a long walk"},
+  {da:"I aften vil jeg gerne se en film", en:"Tonight I'd like to watch a film"},
+  {da:"Når børnene er i skole, arbejder hun hjemme", en:"When the children are at school, she works from home"},
+  {da:"På ferien besøgte vi mange spændende steder", en:"On holiday we visited many exciting places"},
+  {da:"Hvis vejret bliver dårligt, aflyser vi turen", en:"If the weather gets bad, we'll cancel the trip"},
+  {da:"I morgen tidlig skal jeg til et vigtigt møde", en:"Tomorrow morning I have an important meeting"},
+  {da:"Han har aldrig været i udlandet før", en:"He has never been abroad before"},
+  {da:"Selvom hun arbejder meget, er hun altid glad", en:"Even though she works a lot, she's always happy"},
+  {da:"Når jeg har tid, læser jeg gerne en god bog", en:"When I have time, I like to read a good book"},
+  {da:"I dag kunne vi desværre ikke løse problemet", en:"Today we unfortunately couldn't solve the problem"},
+  {da:"Hvis du har spørgsmål, må du gerne ringe", en:"If you have questions, you're welcome to call"}
+ ]
+},
+{
+ n:12, title:"The Mastermind", cefr:"B2", lvl:"lb-b2",
+ focus:"B2 complex & multi-clause sentences",
+ story:"The final confrontation. The Mastermind speaks only in complex, multi-clause Danish — past conditionals, business reports, layered V2. Rebuild every statement to earn the title of Master Detective.",
+ grammarTip:"At B2, sentences chain clauses and use compound tenses. The principles hold: subordinate clause fronted ⇒ main clause inverts; auxiliary in slot 2, participle/infinitive last; adverbs before the non-finite verb.",
+ sents:[
+  {da:"Selvom virksomheden voksede hurtigt, lykkedes det ikke at øge indtjeningen", en:"Even though the company grew quickly, it didn't manage to increase earnings"},
+  {da:"Hvis projektet var blevet godkendt tidligere, kunne vi have leveret hurtigere", en:"If the project had been approved earlier, we could have delivered faster"},
+  {da:"Når rapporten er færdiggjort, sender jeg den til interessenterne", en:"When the report is finished, I'll send it to the stakeholders"},
+  {da:"Selvom mødet var langt, nåede vi ikke at træffe en beslutning", en:"Even though the meeting was long, we didn't manage to make a decision"},
+  {da:"Hvis vi havde haft mere tid, ville resultatet have været bedre", en:"If we'd had more time, the result would have been better"},
+  {da:"Da krisen ramte, måtte mange virksomheder lukke", en:"When the crisis hit, many companies had to close"},
+  {da:"Selvom efterspørgslen steg, valgte ledelsen ikke at ansætte flere", en:"Even though demand rose, management chose not to hire more"},
+  {da:"Når forhandlingerne er afsluttet, offentliggør vi aftalen", en:"When the negotiations are concluded, we'll announce the agreement"},
+  {da:"Hvis kunderne ikke er tilfredse, mister vi markedsandele", en:"If the customers aren't satisfied, we lose market share"},
+  {da:"Selvom han havde forberedt sig grundigt, blev han alligevel nervøs", en:"Even though he had prepared thoroughly, he still got nervous"},
+  {da:"Eftersom budgettet var begrænset, måtte vi udskyde investeringen", en:"Since the budget was limited, we had to postpone the investment"},
+  {da:"Når økonomien forbedres, stiger forbrugernes tillid", en:"When the economy improves, consumer confidence rises"},
+  {da:"Hvis loven bliver vedtaget, ændrer det hele branchen", en:"If the law is passed, it'll change the whole industry"},
+  {da:"Selvom konkurrencen er hård, klarer virksomheden sig godt", en:"Even though competition is tough, the company is doing well"},
+  {da:"Da rapporten blev offentliggjort, reagerede markedet kraftigt", en:"When the report was published, the market reacted strongly"},
+  {da:"Hvis vi vil nå målet, bliver vi nødt til at samarbejde", en:"If we want to reach the goal, we'll have to cooperate"},
+  {da:"Selvom prisen steg, fortsatte efterspørgslen med at vokse", en:"Even though the price rose, demand continued to grow"},
+  {da:"Når aftalen er underskrevet, kan projektet gå i gang", en:"When the agreement is signed, the project can begin"},
+  {da:"Eftersom mange var fraværende, blev mødet udskudt", en:"Since many were absent, the meeting was postponed"},
+  {da:"Hvis ledelsen havde lyttet til medarbejderne, var problemet blevet undgået", en:"If management had listened to the employees, the problem would have been avoided"},
+  {da:"Selvom teknologien er ny, har den allerede ændret markedet", en:"Even though the technology is new, it has already changed the market"},
+  {da:"Når renten stiger, bliver det dyrere at låne penge", en:"When interest rates rise, it becomes more expensive to borrow money"},
+  {da:"Hvis bestyrelsen godkender forslaget, begynder vi næste måned", en:"If the board approves the proposal, we'll start next month"},
+  {da:"Selvom resultaterne var skuffende, mistede investorerne ikke tålmodigheden", en:"Even though the results were disappointing, the investors didn't lose patience"}
+ ]
+}
+];
+
+const RANKS=["Trainee Detective","Junior Detective","Detective","Senior Detective","Inspector","Chief Inspector","Master Danish Grammar Detective"];
+
+/* ---------- progress (localStorage on the user's own machine) ---------- */
+const SKEY="dwod_progress_v1";
+function loadP(){try{return JSON.parse(localStorage.getItem(SKEY))||{}}catch(e){return{}}}
+function saveP(p){try{localStorage.setItem(SKEY,JSON.stringify(p))}catch(e){}}
+let prog=loadP();
+prog.solved=prog.solved||{};        // {caseN:true}
+prog.best=prog.best||{};            // {caseN: bestScorePct}
+prog.weak=prog.weak||{};            // {caseN: missCount} for adaptive final
+prog.finalBest=prog.finalBest||0;
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const flash=t=>{const f=$("flash");f.textContent=t;f.classList.remove("show");void f.offsetWidth;f.classList.add("show")};
+
+function solvedCount(){return CASES.filter(c=>prog.solved[c.n]).length}
+function allSolved(){return solvedCount()===CASES.length}
+function rankFor(){
+  const s=solvedCount();
+  if(prog.finalBest>=90) return RANKS[6];
+  const idx=Math.min(RANKS.length-2, Math.floor(s/2));
+  return RANKS[idx];
+}
+function caseUnlocked(n){ return n===1 || !!prog.solved[n-1]; }
+
+/* ========================================================= MAP ========= */
+function renderMap(){
+  $("rankBadge").textContent="Rank: "+rankFor();
+  const g=$("mapGrid"); g.innerHTML="";
+  CASES.forEach(c=>{
+    const unlocked=caseUnlocked(c.n), done=!!prog.solved[c.n];
+    const b=document.createElement("button");
+    b.className="casebtn"+(done?" done":"");
+    b.disabled=!unlocked;
+    b.innerHTML=
+      `<span class="num">${done?"✓":c.n}</span>`+
+      `<span class="lvl ${c.lvl}">${c.cefr}</span>`+
+      `<span class="ct">${c.title}</span>`+
+      `<span class="cf">${c.focus}</span>`+
+      (done?`<span class="stamp">Solved</span>`:"")+
+      (!unlocked?`<span class="lock">🔒</span>`:"")+
+      (done&&prog.best[c.n]?`<span class="best">best ${prog.best[c.n]}%</span>`:"");
+    if(unlocked) b.onclick=()=>startCase(c.n);
+    g.appendChild(b);
+  });
+  // final investigation
+  const f=document.createElement("button");
+  const fUnlocked=allSolved();
+  f.className="casebtn final-card"+(fUnlocked?"":" locked");
+  f.disabled=!fUnlocked;
+  f.innerHTML=`<span class="lvl lb-b2">FINAL</span>`+
+    `<span class="ct">🗝️ The Final Investigation</span>`+
+    `<span class="cf">100 mixed questions · adaptive · timed · all concepts</span>`+
+    (fUnlocked?(prog.finalBest?`<div class="best" style="position:static;margin-top:6px">best ${prog.finalBest}%</div>`:""):`<span class="lock" style="position:static;display:block;margin-top:6px">🔒 Solve all 12 cases to unlock</span>`);
+  if(fUnlocked) f.onclick=()=>startFinal();
+  g.appendChild(f);
+
+  const s=solvedCount();
+  $("progNote").textContent=`Cases solved: ${s} / 12`+(allSolved()?" · FINAL UNLOCKED":"");
+  $("progBar").style.width=(s/12*100)+"%";
+}
+$("resetBtn").onclick=()=>{
+  if(confirm("Reset all progress and stamps?")){prog={solved:{},best:{},weak:{},finalBest:0};saveP(prog);renderMap();}
+};
+$("backBtn").onclick=()=>{ stopTimer(); show("map"); renderMap(); };
+
+function show(which){
+  $("mapScreen").classList.toggle("hidden",which!=="map");
+  $("playScreen").classList.toggle("hidden",which!=="play");
+}
+
+/* ===================================================== GAME STATE ====== */
+let G=null; // current session
+
+function makeQueue(caseN){
+  const c=CASES.find(x=>x.n===caseN);
+  // pick 12 of the case's sentences, easier (earlier-indexed) first then a shuffle within
+  const picks=shuffle(c.sents).slice(0,12);
+  return picks;
+}
+
+function startCase(n){
+  const c=CASES.find(x=>x.n===n);
+  G={mode:"case", caseN:n, c, queue:makeQueue(n), i:0, score:0, streak:0, lives:3, correct:0, total:0};
+  $("timer").classList.add("hidden");
+  $("caseHead").innerHTML=
+    `<div class="file">CASE FILE #${String(n).padStart(2,"0")} · ${c.cefr}</div>`+
+    `<h2>${c.title}</h2>`+
+    `<div class="story">${c.story}</div>`+
+    `<div class="focus">🎯 Focus: ${c.focus}</div>`;
+  show("play"); renderHUD(); loadQuestion();
+}
+
+function startFinal(){
+  // 100 mixed, weighted toward weak areas
+  const pool=[];
+  CASES.forEach(c=>{
+    const w=1+(prog.weak[c.n]||0); // weight: more misses => more copies
+    c.sents.forEach(s=>{ for(let k=0;k<w;k++) pool.push({...s,caseN:c.n,cefr:c.cefr}); });
+  });
+  // sample 100 unique-ish (allow repeats from pool but try to vary)
+  const q=shuffle(pool).slice(0,100);
+  // order by difficulty (cefr) for ramping, but keep some mix
+  const rank={A1:0,A2:1,B1:2,B2:3};
+  q.sort((a,b)=>rank[a.cefr]-rank[b.cefr]+ (Math.random()-0.5));
+  G={mode:"final", caseN:0, c:null, queue:q, i:0, score:0, streak:0, lives:99, correct:0, total:0, time:0};
+  $("caseHead").innerHTML=
+    `<div class="file">SPECIAL DOSSIER · ALL LEVELS</div>`+
+    `<h2>🗝️ The Final Investigation</h2>`+
+    `<div class="story">100 mixed statements from every case. Difficulty rises, weak areas appear more often, and the clock is running. Prove you are the Master Detective.</div>`+
+    `<div class="focus">🎯 Adaptive · Timed · A1 → B2</div>`;
+  show("play"); renderHUD(); startTimer(); loadQuestion();
+}
+
+function renderHUD(){
+  $("scoreV").textContent=G.score;
+  $("streakV").textContent=G.streak;
+  $("livesV").textContent=G.mode==="final"?"∞":"❤".repeat(G.lives)+"♡".repeat(3-G.lives);
+}
+
+/* ---------- timer (final) ---------- */
+let timerInt=null;
+function startTimer(){
+  G.time=0; const el=$("timer"); el.classList.remove("hidden","warn");
+  timerInt=setInterval(()=>{
+    G.time++;
+    const m=Math.floor(G.time/60), s=G.time%60;
+    el.textContent=`⏱ ${m}:${String(s).padStart(2,"0")}`;
+  },1000);
+}
+function stopTimer(){ if(timerInt){clearInterval(timerInt);timerInt=null;} }
+
+/* ---------- load a question ---------- */
+let cur=null; // {tokens correct[], placed[], poolEls}
+function loadQuestion(){
+  $("completeArea").classList.add("hidden");
+  $("qArea").classList.remove("hidden");
+  $("explain").className="explain";
+  const total=G.queue.length;
+  $("qFill").style.width=(G.i/total*100)+"%";
+
+  const item=G.queue[G.i];
+  const tokens=item.da.split(" ");
+  cur={item, correct:tokens, placed:[], caseN:item.caseN||G.caseN};
+
+  $("promptLbl").textContent=G.mode==="final"
+    ? `▸ STATEMENT ${G.i+1} / ${total}  ·  ${item.cefr}`
+    : `▸ STATEMENT ${G.i+1} / ${total}`;
+  $("enLine").innerHTML=`Reconstruct in Danish: <b>“${item.en}”</b>`;
+
+  // answer slot
+  const ans=$("answer"); ans.className="answer empty"; ans.innerHTML="";
+  // pool
+  const pool=$("pool"); pool.innerHTML="";
+  shuffle(tokens.map((t,idx)=>({t,idx}))).forEach(o=>{
+    const el=document.createElement("button");
+    el.className="tile"; el.textContent=o.t; el.dataset.idx=o.idx;
+    el.onclick=()=>placeTile(el,o);
+    pool.appendChild(el);
+  });
+  $("checkBtn").disabled=true;
+  $("checkBtn").classList.remove("hidden");
+  $("clearBtn").classList.remove("hidden");
+  renderHUD();
+}
+
+function placeTile(el,o){
+  if(el.classList.contains("used")) return;
+  el.classList.add("used");
+  cur.placed.push(o.t);
+  const ans=$("answer"); ans.classList.remove("empty");
+  const chip=document.createElement("button");
+  chip.className="tile inans"; chip.textContent=o.t;
+  chip.onclick=()=>{ // return to pool
+    if(ans.classList.contains("locked"))return;
+    el.classList.remove("used");
+    chip.remove();
+    const k=cur.placed.indexOf(o.t); // remove first matching
+    // rebuild placed from remaining chips to stay accurate
+    cur.placed=[...ans.querySelectorAll(".tile")].map(c=>c.textContent);
+    if(cur.placed.length===0) ans.classList.add("empty");
+    $("checkBtn").disabled=cur.placed.length!==cur.correct.length;
+  };
+  ans.appendChild(chip);
+  $("checkBtn").disabled=cur.placed.length!==cur.correct.length;
+}
+
+$("clearBtn").onclick=()=>{
+  const ans=$("answer"); if(ans.classList.contains("locked"))return;
+  ans.innerHTML=""; ans.classList.add("empty");
+  cur.placed=[];
+  $("pool").querySelectorAll(".tile").forEach(t=>t.classList.remove("used"));
+  $("checkBtn").disabled=true;
+};
+
+$("checkBtn").onclick=()=>{
+  const built=[...$("answer").querySelectorAll(".tile")].map(c=>c.textContent);
+  cur.placed=built;
+  const ok=built.join(" ")===cur.correct.join(" ");
+  $("answer").classList.add("locked");
+  $("answer").classList.add(ok?"ok":"no");
+  $("checkBtn").classList.add("hidden");
+  $("clearBtn").classList.add("hidden");
+  G.total++;
+  if(ok){
+    G.correct++; G.streak++;
+    const pts=10+Math.min(G.streak,5)*2+(G.mode==="final"?5:0);
+    G.score+=pts;
+    if(G.streak>1&&G.streak%3===0) flash("🔥 x"+G.streak+" streak!");
+  }else{
+    G.streak=0;
+    const cn=cur.caseN;
+    prog.weak[cn]=(prog.weak[cn]||0)+1; saveP(prog);
+    if(G.mode!=="final"){ G.lives--; }
+  }
+  renderHUD();
+  showExplain(ok);
+};
+
+function showExplain(ok){
+  const c=CASES.find(x=>x.n===cur.caseN);
+  const ex=$("explain");
+  ex.className="explain show "+(ok?"good":"bad");
+  $("verdict").textContent=ok?"✓ Case logic confirmed!":"✗ The word order doesn't hold up.";
+  $("sol").textContent=cur.correct.join(" ");
+  $("trLine").textContent="“"+cur.item.en+"”";
+  $("why").innerHTML = (ok?"":"<b>Correct order shown above.</b> ")+ (c?c.grammarTip:"");
+  if(G.mode!=="final" && G.lives<=0){
+    $("nextBtn").textContent="See results ▸";
+  }else{
+    $("nextBtn").textContent = (G.i>=G.queue.length-1)?"Finish ▸":"Next ▸";
+  }
+}
+
+$("nextBtn").onclick=()=>{
+  if(G.mode!=="final" && G.lives<=0){ finishSession(); return; }
+  G.i++;
+  if(G.i>=G.queue.length){ finishSession(); }
+  else loadQuestion();
+};
+
+/* ---------- finish ---------- */
+function finishSession(){
+  stopTimer();
+  $("qArea").classList.add("hidden");
+  $("qFill").style.width="100%";
+  const pct=Math.round(G.correct/Math.max(1,G.total)*100);
+  const area=$("completeArea"); area.classList.remove("hidden");
+
+  if(G.mode==="case"){
+    const passed=G.lives>0 && pct>=60;
+    if(passed){
+      prog.solved[G.caseN]=true;
+      prog.best[G.caseN]=Math.max(prog.best[G.caseN]||0,pct);
+      saveP(prog);
+    }
+    const next=CASES.find(x=>x.n===G.caseN+1);
+    area.innerHTML=
+      (passed?`<div class="bigstamp">SOLVED</div>`:`<div class="bigstamp" style="color:#8a6a30;border-color:#8a6a30;transform:rotate(-4deg)">REOPEN</div>`)+
+      `<h2>${G.c.title}</h2>`+
+      `<div class="score">${G.correct} / ${G.total} correct · ${pct}%</div>`+
+      `<p>${passed
+        ? (next?`Case closed, Detective. <b>Case ${next.n}: ${next.title}</b> is now unlocked.`:`Outstanding — every case is solved! The <b>Final Investigation</b> awaits.`)
+        : `You ran low on leads. Score at least 60% (and keep a life) to stamp this case <b>Solved</b>. Try again — the words are shuffled fresh each time.`}</p>`+
+      `<div class="controls" style="margin-top:16px">
+         <button class="btn clear" id="againBtn">⟲ Retry case</button>
+         <button class="btn check" id="mapBtn2">Case Map ▸</button>
+       </div>`;
+    $("againBtn").onclick=()=>startCase(G.caseN);
+    $("mapBtn2").onclick=()=>{show("map");renderMap();};
+  }else{
+    prog.finalBest=Math.max(prog.finalBest,pct); saveP(prog);
+    const m=Math.floor(G.time/60),s=G.time%60;
+    const title = pct>=90?"🏆 MASTER DETECTIVE":pct>=70?"🥇 Ace Investigator":pct>=50?"🔎 Solid Sleuth":"📁 Keep Investigating";
+    area.innerHTML=
+      `<div class="bigstamp" style="${pct>=90?'':'color:#8a6a30;border-color:#8a6a30'}">${pct>=90?'MASTER':'CASE'}</div>`+
+      `<h2>${title}</h2>`+
+      `<div class="score">${G.correct} / ${G.total} · ${pct}%</div>`+
+      `<p>Time: <b>${m}:${String(s).padStart(2,"0")}</b> · Score: <b>${G.score}</b>${pct>=90?"<br>You have mastered Danish word order from A1 to B2. 🎉":"<br>The weak spots you missed will appear more often next time."}</p>`+
+      `<div class="controls" style="margin-top:16px">
+         <button class="btn clear" id="againBtn">⟲ Run again</button>
+         <button class="btn check" id="mapBtn2">Case Map ▸</button>
+       </div>`;
+    $("againBtn").onclick=()=>startFinal();
+    $("mapBtn2").onclick=()=>{show("map");renderMap();};
+  }
+}
+
+/* ---------- boot ---------- */
+renderMap();
+</script>
+</body>
+</html>

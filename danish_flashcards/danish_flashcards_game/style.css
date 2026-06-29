@@ -258,6 +258,7 @@ body {
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
 }
 .action-buttons button:hover { transform: translateY(-2px); }
+.action-buttons button.disabled { opacity: .45; cursor: default; pointer-events: none; transform: none; }
 
 .action-buttons button.wrong { background: linear-gradient(180deg, var(--wl-red), var(--wl-red-dark)); }
 .action-buttons button.wrong:hover { background: linear-gradient(180deg, #c8344f, var(--wl-red-dark)); }

@@ -898,21 +898,33 @@ function nextDrag(item){
 function nextMistake(item){
   session.n++;
   item=item||randItem(it=>it.err && it.err!==it.a && !(new RegExp("(^|\\s)"+it.err+"(\\s|[.,!?])").test(it.text)));
-  // build a wrong sentence by swapping the answer prep with err
-  const wrongText = item.text.replace(new RegExp("(^|[\\s])"+item.a+"([\\s.,!?])"), "$1"+item.err+"$2");
-  const words = wrongText.split(/(\s+)/);
+  // tokenize the ORIGINAL correct text and swap only the first occurrence of item.a,
+  // remembering its token index so grading checks position, not string value
+  // (a sentence can legitimately contain the distractor word elsewhere)
+  const rawWords = item.text.split(/(\s+)/);
+  let errIndex = -1;
+  const words = rawWords.map((w,i)=>{
+    if(errIndex===-1){
+      const clean=w.replace(/[.,!?]/g,"");
+      if(clean.toLowerCase()===item.a.toLowerCase()){
+        errIndex=i;
+        return item.err + w.slice(clean.length);
+      }
+    }
+    return w;
+  });
   exShell("🔍 Find fejlen", item.theme,
     '<p class="prompt">Én præposition er forkert. Tryk på det forkerte ord:</p>'+
     '<div class="sentence" id="msSent"></div>');
   const sent=document.getElementById("msSent");
   let answered=false;
-  words.forEach(w=>{
+  words.forEach((w,wi)=>{
     const clean=w.replace(/[.,!?]/g,"");
     if(/\S/.test(w) && PREPS.indexOf(clean.toLowerCase())>=0){
       const span=document.createElement("span");span.className="word";span.textContent=w;
       span.onclick=(e)=>{
         if(answered) return; answered=true;
-        const ok = clean.toLowerCase()===item.err.toLowerCase();
+        const ok = (wi===errIndex);
         document.querySelectorAll("#msSent .word").forEach(x=>x.onclick=null);
         if(ok){ span.classList.add("sel"); burst(e.clientX,e.clientY); }
         record(item.a,ok);

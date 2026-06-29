@@ -703,7 +703,7 @@ function choose(btn,word){
 
   // level up every 10 answered
   idx++;
-  if(idx%10===0){ level++; lives=Math.min(5,lives+1); }
+  if(idx%10===0){ level++; if(lives>0) lives=Math.min(5,lives+1); }
   updateHud();
   showRule(correct);
 

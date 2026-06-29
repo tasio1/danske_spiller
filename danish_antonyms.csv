@@ -64,7 +64,6 @@ No,English,English antonym,Danish,Danish antonym
 63,sit,stand,sidde,stå
 64,rise,fall,stige,falde
 65,wake,sleep,vågne,sove
-66,head,feet,hoved,fødder
 67,better,worse,bedre,værre
 68,more,less,mere,mindre
 69,larger,smaller,større,mindre
@@ -126,7 +125,6 @@ No,English,English antonym,Danish,Danish antonym
 125,significant,insignificant,væsentlig,ubetydelig
 126,major,minor,større,mindre
 127,superior,inferior,overlegen,underlegen
-128,high,low,høj,lav
 129,dominant,submissive,dominerende,underdanig
 130,wild,tame,vild,tam
 131,civilized,primitive,civiliseret,primitiv
@@ -209,7 +207,6 @@ No,English,English antonym,Danish,Danish antonym
 208,trustworthy,unreliable,troværdig,upålidelig
 209,dependable,inconsistent,pålidelig,inkonsekvent
 210,safe,dangerous,sikker,farlig
-211,secure,unsafe,sikker,usikker
 212,tight,loose,stram,løs
 213,respect,disrespect,respekt,respektløshed
 214,admiration,contempt,beundring,foragt
@@ -260,7 +257,6 @@ No,English,English antonym,Danish,Danish antonym
 259,micro,macro,mikro,makro
 260,miniature,gigantic,miniature,gigantisk
 261,petite,oversized,spinkel,overstørrelse
-262,broad,narrow,bred,smal
 263,wide,restricted,bred,begrænset
 264,expansive,limited,vidtstrakt,begrænset
 265,absolutely,relatively,absolut,relativt
@@ -297,7 +293,6 @@ No,English,English antonym,Danish,Danish antonym
 296,escalating,deescalating,eskalerende,deeskalerende
 297,constant,variable,konstant,variabel
 298,fixed,fluctuating,fast,svingende
-299,stable,volatile,stabil,ustabil
 300,receptive,resistant,modtagelig,modstandsdygtig
 301,responsive,unresponsive,lydhør,uimodtagelig
 302,sensitive,insensitive,følsom,ufølsom

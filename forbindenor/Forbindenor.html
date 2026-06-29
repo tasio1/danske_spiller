@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FORBINDENOR // Grid Protocol</title>
+<title>FORBINDEORD // Grid Protocol</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&display=swap');
 :root{
@@ -138,8 +138,8 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
 <div class="scan"></div>
 <div class="toast" id="toast"></div>
 <div class="wrap">
-  <h1>FORBIND<span class="o">ENOR</span></h1>
-  <div class="sub">Grid Protocol &middot; Danske forbinderord</div>
+  <h1>FORBIND<span class="o">EORD</span></h1>
+  <div class="sub">Grid Protocol &middot; Danske forbindeord</div>
   <div class="hud">
     <div class="chip score">Score<b id="score">0</b></div>
     <div class="chip streak">Streak<b id="streak">0</b></div>
@@ -601,7 +601,7 @@ function render(){
   $('reveal').classList.remove('show');
   $('next').classList.remove('show');
   $('tr').textContent=rec.en;
-  $('note').innerHTML=esc(rec.note).replace(/'([^']+)'/,"<b>$1</b>");
+  $('note').innerHTML=esc(rec.note).replace(/'([^']+)'/g,"<b>$1</b>");
   updateHud();
   $('bar').style.width=(state.i/records.length*100)+'%';
   $('count').textContent='Sekvens '+(state.i+1)+' / '+records.length;

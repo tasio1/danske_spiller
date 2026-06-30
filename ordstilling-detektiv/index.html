@@ -75,6 +75,11 @@ body{
 .t-b1{color:var(--amber);border-color:var(--amber)}
 .t-b2{color:var(--red);border-color:var(--red)}
 
+.lvlfilter{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.lvlfilter .tier-pill{cursor:pointer;background:none;font-family:'Special Elite',monospace;opacity:.55;transition:opacity .15s,transform .08s}
+.lvlfilter .tier-pill:hover{opacity:.85}
+.lvlfilter .tier-pill.active{opacity:1;box-shadow:0 0 0 2px rgba(0,0,0,.06) inset}
+
 .map{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 @media(max-width:520px){.map{grid-template-columns:1fr}}
 .casebtn{
@@ -244,6 +249,7 @@ body{
       <span class="tier-pill t-b1">B1 · Cases 7–10</span>
       <span class="tier-pill t-b2">B2 · Cases 11–12</span>
     </div>
+    <div class="lvlfilter" id="lvlFilter"></div>
     <div class="map" id="mapGrid"></div>
     <p class="progress-note" id="progNote">Cases solved: 0 / 12</p>
     <div class="bar"><div id="progBar"></div></div>
@@ -763,10 +769,27 @@ function rankFor(){
 function caseUnlocked(n){ return n===1 || !!prog.solved[n-1]; }
 
 /* ========================================================= MAP ========= */
+let lvlFilterValue="All"; // "All" | "A1" | "A2" | "B1" | "B2"
+
+function renderLvlFilter(){
+  const host=$("lvlFilter");
+  if(!host) return;
+  const levels=["All",...new Set(CASES.map(c=>c.cefr))];
+  host.innerHTML=levels.map(lv=>{
+    const cls=lv==="All" ? "" : " t-"+lv.toLowerCase();
+    const active=lv===lvlFilterValue ? " active" : "";
+    return `<button type="button" class="tier-pill${cls}${active}" data-lvl="${lv}">${lv}</button>`;
+  }).join("");
+  host.querySelectorAll("button[data-lvl]").forEach(btn=>{
+    btn.onclick=()=>{ lvlFilterValue=btn.getAttribute("data-lvl"); renderMap(); };
+  });
+}
+
 function renderMap(){
   $("rankBadge").textContent="Rank: "+rankFor();
+  renderLvlFilter();
   const g=$("mapGrid"); g.innerHTML="";
-  CASES.forEach(c=>{
+  CASES.filter(c=>lvlFilterValue==="All"||c.cefr===lvlFilterValue).forEach(c=>{
     const unlocked=caseUnlocked(c.n), done=!!prog.solved[c.n];
     const b=document.createElement("button");
     b.className="casebtn"+(done?" done":"");

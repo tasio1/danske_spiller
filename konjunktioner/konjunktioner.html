@@ -218,6 +218,11 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:14px;font-
       <span style="background:linear-gradient(135deg,#9b5de5,#3a86ff)">Ledsætning</span>
       <span style="background:linear-gradient(135deg,#19c3b2,#52d869)">Hv-ord</span>
     </div>
+    <label class="flt" style="display:block;margin-top:10px;font-size:13px">Niveau
+      <select id="lvlSelect" style="margin-left:6px;font-family:inherit;border-radius:8px;padding:4px 8px">
+        <option value="all">Alle niveauer</option>
+      </select>
+    </label>
     <button class="play" id="startBtn">Spil! 🎮</button>
     <p style="margin-top:12px;font-size:13px">Rekord: <b id="hiStart">0</b></p>
   </div>
@@ -238,38 +243,38 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:14px;font-
 <script>
 // ===== RULE DEFINITIONS (display word + explanation) =====
 const RULES = {
-  og:["og","<b>og</b> — hovedsætningskonjunktion. Betyder en <b>sideordning / tilføjelse</b>. Ordstilling efter: <b>SVA</b> (subjekt–verbum–adverbium)."],
-  men:["men","<b>men</b> — hovedsætningskonjunktion. Betyder en <b>modsætning</b>. Ordstilling efter: <b>SVA</b>."],
-  eller:["eller","<b>eller</b> — hovedsætningskonjunktion. Betyder et <b>alternativ</b>. Ordstilling efter: <b>SVA</b>."],
-  for:["for","<b>for</b> — hovedsætningskonjunktion. Betyder en <b>forklaring</b>. Ordstilling efter: <b>SVA</b>."],
-  saa_k:["så","<b>så</b> — hovedsætningskonjunktion. Betyder en <b>konsekvens</b> (= derfor). Ordstilling efter: <b>SVA</b>."],
-  at:["at","<b>at</b> — ledsætningskonjunktion. Indleder en <b>objektsætning</b>. Ordstilling: <b>SAV</b> (subjekt–adverbium–verbum)."],
-  om:["om","<b>om</b> — ledsætningskonjunktion. Indleder en <b>spørgende ledsætning</b> (ja/nej-spørgsmål). Ordstilling: <b>SAV</b>."],
-  fordi:["fordi","<b>fordi</b> — ledsætningskonjunktion. Betyder en <b>forklaring / årsag</b>. Ordstilling: <b>SAV</b>."],
-  eftersom:["eftersom","<b>eftersom</b> — ledsætningskonjunktion. Betyder en <b>forklaring / årsag</b> (ligesom fordi). Ordstilling: <b>SAV</b>."],
-  selvom:["selvom","<b>selvom</b> — ledsætningskonjunktion. Betyder en <b>modsætning / indrømmelse</b>. Ordstilling: <b>SAV</b>."],
-  da:["da","<b>da</b> — ledsætningskonjunktion. <b>Tid</b>: noget der skete ÉN gang i fortiden. (Kan også betyde forklaring/fordi.) Ordstilling: <b>SAV</b>."],
-  naar:["når","<b>når</b> — ledsætningskonjunktion. <b>Tid</b>: noget der altid sker, plejer at ske eller vil ske. Ordstilling: <b>SAV</b>."],
-  idet:["idet","<b>idet</b> — ledsætningskonjunktion. <b>Tid</b> (lige i samme øjeblik) eller <b>forklaring</b>. Ordstilling: <b>SAV</b>."],
-  mens:["mens","<b>mens</b> — ledsætningskonjunktion. <b>Tid</b> (samtidig med) eller en <b>modsætning</b>. Ordstilling: <b>SAV</b>."],
-  hvorimod:["hvorimod","<b>hvorimod</b> — ledsætningskonjunktion. Betyder en <b>modsætning</b>. Ordstilling: <b>SAV</b>."],
-  foer:["før","<b>før</b> — ledsætningskonjunktion. <b>Tid</b>: noget sker før noget andet. Ordstilling: <b>SAV</b>."],
-  inden:["inden","<b>inden</b> — ledsætningskonjunktion. <b>Tid</b>: noget sker inden noget andet. Ordstilling: <b>SAV</b>."],
-  indtil:["indtil","<b>indtil</b> — ledsætningskonjunktion. <b>Tid</b>: en periode der slutter ved et punkt. Ordstilling: <b>SAV</b>."],
-  siden:["siden","<b>siden</b> — ledsætningskonjunktion. <b>Tid</b>: en periode fra fortiden frem til nu. Ordstilling: <b>SAV</b>."],
-  dengang:["dengang","<b>dengang</b> — ledsætningskonjunktion. <b>Tid</b>: noget der skete for længe siden. Ordstilling: <b>SAV</b>."],
-  saa_h:["så","<b>så</b> — ledsætningskonjunktion. Betyder en <b>hensigt / formål</b> (forklarer hvorfor man gør noget). Ordstilling: <b>SAV</b>."],
-  der:["der","<b>der</b> — ledsætningskonjunktion (relativ). Bruges KUN som <b>subjekt</b> i relativsætningen. Ordstilling: <b>SAV</b>."],
-  som:["som","<b>som</b> — ledsætningskonjunktion (relativ). Bruges som <b>subjekt eller objekt</b>. Når der er objekt, kan man kun bruge 'som'. Ordstilling: <b>SAV</b>."],
-  end:["end","<b>end</b> — ledsætningskonjunktion. Bruges i en <b>sammenligning</b> efter en komparativ (bedre, større, mere …). Ordstilling: <b>SAV</b>."],
-  ligesom:["ligesom","<b>ligesom</b> — ledsætningskonjunktion. Betyder <b>på samme måde som</b>. Ordstilling: <b>SAV</b>."],
-  hvis:["hvis","<b>hvis</b> — ledsætningskonjunktion. Betyder en <b>betingelse</b>. Ordstilling: <b>SAV</b>."],
-  hvem:["hvem","<b>hvem</b> — hv-ord som konjunktion. Refererer til en <b>person</b>. Ordstilling: <b>SAV</b>."],
-  hvor:["hvor","<b>hvor</b> — hv-ord som konjunktion. Refererer til et <b>sted</b>. Ordstilling: <b>SAV</b>."],
-  hvornaar:["hvornår","<b>hvornår</b> — hv-ord som konjunktion. Refererer til <b>tid</b>. Ordstilling: <b>SAV</b>."],
-  hvorfor:["hvorfor","<b>hvorfor</b> — hv-ord som konjunktion. Refererer til en <b>årsag</b>. Ordstilling: <b>SAV</b>."],
-  hvad:["hvad","<b>hvad</b> — hv-ord som konjunktion. Refererer til en <b>genstand / ting</b>. Ordstilling: <b>SAV</b>."],
-  hvordan:["hvordan","<b>hvordan</b> — hv-ord som konjunktion. Refererer til en <b>måde</b>. Ordstilling: <b>SAV</b>."],
+  og:["og","<b>og</b> — hovedsætningskonjunktion. Betyder en <b>sideordning / tilføjelse</b>. Ordstilling efter: <b>SVA</b> (subjekt–verbum–adverbium).","A1"],
+  men:["men","<b>men</b> — hovedsætningskonjunktion. Betyder en <b>modsætning</b>. Ordstilling efter: <b>SVA</b>.","A1"],
+  eller:["eller","<b>eller</b> — hovedsætningskonjunktion. Betyder et <b>alternativ</b>. Ordstilling efter: <b>SVA</b>.","A1"],
+  for:["for","<b>for</b> — hovedsætningskonjunktion. Betyder en <b>forklaring</b>. Ordstilling efter: <b>SVA</b>.","A1"],
+  saa_k:["så","<b>så</b> — hovedsætningskonjunktion. Betyder en <b>konsekvens</b> (= derfor). Ordstilling efter: <b>SVA</b>.","A1"],
+  at:["at","<b>at</b> — ledsætningskonjunktion. Indleder en <b>objektsætning</b>. Ordstilling: <b>SAV</b> (subjekt–adverbium–verbum).","A2"],
+  om:["om","<b>om</b> — ledsætningskonjunktion. Indleder en <b>spørgende ledsætning</b> (ja/nej-spørgsmål). Ordstilling: <b>SAV</b>.","B1"],
+  fordi:["fordi","<b>fordi</b> — ledsætningskonjunktion. Betyder en <b>forklaring / årsag</b>. Ordstilling: <b>SAV</b>.","A2"],
+  eftersom:["eftersom","<b>eftersom</b> — ledsætningskonjunktion. Betyder en <b>forklaring / årsag</b> (ligesom fordi). Ordstilling: <b>SAV</b>.","B2"],
+  selvom:["selvom","<b>selvom</b> — ledsætningskonjunktion. Betyder en <b>modsætning / indrømmelse</b>. Ordstilling: <b>SAV</b>.","B2"],
+  da:["da","<b>da</b> — ledsætningskonjunktion. <b>Tid</b>: noget der skete ÉN gang i fortiden. (Kan også betyde forklaring/fordi.) Ordstilling: <b>SAV</b>.","A2"],
+  naar:["når","<b>når</b> — ledsætningskonjunktion. <b>Tid</b>: noget der altid sker, plejer at ske eller vil ske. Ordstilling: <b>SAV</b>.","A2"],
+  idet:["idet","<b>idet</b> — ledsætningskonjunktion. <b>Tid</b> (lige i samme øjeblik) eller <b>forklaring</b>. Ordstilling: <b>SAV</b>.","B2"],
+  mens:["mens","<b>mens</b> — ledsætningskonjunktion. <b>Tid</b> (samtidig med) eller en <b>modsætning</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvorimod:["hvorimod","<b>hvorimod</b> — ledsætningskonjunktion. Betyder en <b>modsætning</b>. Ordstilling: <b>SAV</b>.","B2"],
+  foer:["før","<b>før</b> — ledsætningskonjunktion. <b>Tid</b>: noget sker før noget andet. Ordstilling: <b>SAV</b>.","B1"],
+  inden:["inden","<b>inden</b> — ledsætningskonjunktion. <b>Tid</b>: noget sker inden noget andet. Ordstilling: <b>SAV</b>.","B2"],
+  indtil:["indtil","<b>indtil</b> — ledsætningskonjunktion. <b>Tid</b>: en periode der slutter ved et punkt. Ordstilling: <b>SAV</b>.","B2"],
+  siden:["siden","<b>siden</b> — ledsætningskonjunktion. <b>Tid</b>: en periode fra fortiden frem til nu. Ordstilling: <b>SAV</b>.","B2"],
+  dengang:["dengang","<b>dengang</b> — ledsætningskonjunktion. <b>Tid</b>: noget der skete for længe siden. Ordstilling: <b>SAV</b>.","B2"],
+  saa_h:["så","<b>så</b> — ledsætningskonjunktion. Betyder en <b>hensigt / formål</b> (forklarer hvorfor man gør noget). Ordstilling: <b>SAV</b>.","B2"],
+  der:["der","<b>der</b> — ledsætningskonjunktion (relativ). Bruges KUN som <b>subjekt</b> i relativsætningen. Ordstilling: <b>SAV</b>.","B1"],
+  som:["som","<b>som</b> — ledsætningskonjunktion (relativ). Bruges som <b>subjekt eller objekt</b>. Når der er objekt, kan man kun bruge 'som'. Ordstilling: <b>SAV</b>.","B1"],
+  end:["end","<b>end</b> — ledsætningskonjunktion. Bruges i en <b>sammenligning</b> efter en komparativ (bedre, større, mere …). Ordstilling: <b>SAV</b>.","B2"],
+  ligesom:["ligesom","<b>ligesom</b> — ledsætningskonjunktion. Betyder <b>på samme måde som</b>. Ordstilling: <b>SAV</b>.","B2"],
+  hvis:["hvis","<b>hvis</b> — ledsætningskonjunktion. Betyder en <b>betingelse</b>. Ordstilling: <b>SAV</b>.","A2"],
+  hvem:["hvem","<b>hvem</b> — hv-ord som konjunktion. Refererer til en <b>person</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvor:["hvor","<b>hvor</b> — hv-ord som konjunktion. Refererer til et <b>sted</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvornaar:["hvornår","<b>hvornår</b> — hv-ord som konjunktion. Refererer til <b>tid</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvorfor:["hvorfor","<b>hvorfor</b> — hv-ord som konjunktion. Refererer til en <b>årsag</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvad:["hvad","<b>hvad</b> — hv-ord som konjunktion. Refererer til en <b>genstand / ting</b>. Ordstilling: <b>SAV</b>.","B1"],
+  hvordan:["hvordan","<b>hvordan</b> — hv-ord som konjunktion. Refererer til en <b>måde</b>. Ordstilling: <b>SAV</b>.","B1"],
 };
 const HOVED = ["og","men","eller","for","saa_k"];
 const HV = ["hvem","hvor","hvornaar","hvorfor","hvad","hvordan"];
@@ -614,13 +619,13 @@ const RAW = [
 // build question objects (with integrity guard so options are always 4 unique)
 const FALLBACK = ["at","og","men","som","når","da","hvis","fordi","der","om"];
 const QUESTIONS = RAW.map(([code,text,distr])=>{
-  const [word,rule] = RULES[code];
+  const [word,rule,lvl] = RULES[code];
   const cat = HOVED.includes(code) ? "hoved" : HV.includes(code) ? "hv" : "led";
   // ensure 3 distractors, all unique and different from the answer
   let d = distr.filter((x,i)=> x!==word && distr.indexOf(x)===i);
   for(const f of FALLBACK){ if(d.length>=3) break; if(f!==word && !d.includes(f)) d.push(f); }
   d = d.slice(0,3);
-  return {text, answer:word, rule, distractors:d, cat};
+  return {text, answer:word, rule, lvl, distractors:d, cat};
 });
 
 // ===== GAME =====
@@ -664,12 +669,29 @@ function speakerBtn(text, cls){
 
 let deck=[], idx=0, score=0, streak=0, bestStreak=0, level=1, lives=5, right=0, answered=false, current=null;
 const catName={hoved:"Hovedsætning",led:"Ledsætning",hv:"Hv-ord"};
+let selectedLvl='all';
 
 function getHi(){return parseInt(localStorage.getItem('kkHi')||'0');}
 function setHi(s){if(s>getHi())localStorage.setItem('kkHi',s);}
 
+function pool(){return selectedLvl==='all'?QUESTIONS:QUESTIONS.filter(q=>q.lvl===selectedLvl);}
+
+function initLvlSelect(){
+  const sel=$('lvlSelect');
+  if(!sel||sel.dataset.init) return;
+  sel.dataset.init='1';
+  const levels=['A1','A2','B1','B2','C1'].filter(l=>QUESTIONS.some(q=>q.lvl===l));
+  levels.forEach(l=>{
+    const o=document.createElement('option');
+    o.value=l; o.textContent=l;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change',()=>{ selectedLvl=sel.value; });
+}
+
 function start(){
-  deck = shuffle(QUESTIONS);
+  initLvlSelect();
+  deck = shuffle(pool());
   idx=0;score=0;streak=0;bestStreak=0;level=1;lives=5;right=0;
   $('startScreen').classList.add('hidden');
   $('overScreen').classList.add('hidden');
@@ -687,7 +709,7 @@ function updateHud(){
 
 function nextQuestion(){
   answered=false;
-  if(idx>=deck.length){ deck=shuffle(QUESTIONS); idx=0; }
+  if(idx>=deck.length){ deck=shuffle(pool()); idx=0; }
   current = deck[idx];
   $('rule').classList.remove('show');
   $('next').classList.add('hidden');
@@ -802,6 +824,7 @@ function burstAt(el,good){
 (function(){const e=['🍬','🍭','🍫','🧁','🍩','🍪','🍯'];for(let i=0;i<10;i++){const s=document.createElement('div');s.className='bg-candy';s.textContent=e[i%e.length];s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';s.style.animationDelay=(Math.random()*9)+'s';s.style.fontSize=(22+Math.random()*30)+'px';document.body.appendChild(s);}})();
 
 // events
+initLvlSelect();
 $('startBtn').onclick=start;
 $('againBtn').onclick=start;
 $('next').onclick=nextQuestion;

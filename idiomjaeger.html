@@ -486,6 +486,7 @@ const DATA = [
 ];
 // assign stable id by index
 DATA.forEach((d,i)=>d.id=i);
+const LEVELS=['A1','A2','B1','B2','C1'].filter(l=>DATA.some(d=>d.l===l));
 
 /* ============================================================
    STATE & PERSISTENCE
@@ -633,6 +634,9 @@ function renderMenu(){
     ${topbar()}
     <h2 class="section-title">⚓ Vælg din jagt</h2>
     <div class="progress-line">Mestrede skatte: <b>${masteredCount()}</b> / ${DATA.length} · Nøjagtighed: <b>${accuracy()}%</b> · Stime: <b>${S.streak}</b> 🔥</div>
+    <div class="row mb" style="gap:10px">
+      <label class="flt">Niveau<select id="fPlayLvl" onchange="setPlayLevel(this.value)">${['all',...LEVELS].map(l=>`<option value="${l}" ${PLAY_LVL===l?'selected':''}>${l==='all'?'Alle niveauer':l}</option>`).join('')}</select></label>
+    </div>
     <div class="menu-grid">
       <button class="btn primary" onclick="renderLearn()"><span class="ico">📖</span>Lærings-tilstand<span class="sub">Bladr & studér</span></button>
       <button class="btn" onclick="renderPractice()"><span class="ico">🎯</span>Øve-tilstand<span class="sub">Bland alle modes</span></button>
@@ -649,6 +653,9 @@ function renderMenu(){
    FILTER CONTROL (shared by learn & dictionary)
    ============================================================ */
 let FILT={cat:'all',lvl:'all',mast:'all',q:''};
+let PLAY_LVL='all';
+function levelPool(){return PLAY_LVL==='all'?DATA:DATA.filter(d=>d.l===PLAY_LVL);}
+function setPlayLevel(v){PLAY_LVL=v;renderMenu();}
 function filterControls(onChange){
   return`<div class="row mb" style="gap:10px">
     <label class="flt">Kategori<select id="fCat">${['all',...CATS].map(c=>`<option value="${c}" ${FILT.cat===c?'selected':''}>${c==='all'?'Alle':c}</option>`).join('')}</select></label>
@@ -978,26 +985,26 @@ function startCategory(cat){
 function mixedBuild(d){const fns=[bIdiomMeaning,bMeaningIdiom,bExampleDetective,bContext];return fns[Math.floor(Math.random()*fns.length)](d);}
 function launchGame(id){
   switch(id){
-    case'idiomHunter':return startQuiz({gid:id,ico:'🏹',title:'Idiom Hunter',pool:DATA,build:bIdiomMeaning,total:10});
-    case'meaningHunter':return startQuiz({gid:id,ico:'🎣',title:'Meaning Hunter',pool:DATA,build:bMeaningIdiom,total:10});
-    case'exampleDetective':return startQuiz({gid:id,ico:'🕵️',title:'Example Detective',pool:DATA,build:bExampleDetective,total:10});
-    case'fillMissing':return startText({gid:id,ico:'✏️',title:'Fill the Missing',pool:DATA,total:8,
+    case'idiomHunter':return startQuiz({gid:id,ico:'🏹',title:'Idiom Hunter',pool:levelPool(),build:bIdiomMeaning,total:10});
+    case'meaningHunter':return startQuiz({gid:id,ico:'🎣',title:'Meaning Hunter',pool:levelPool(),build:bMeaningIdiom,total:10});
+    case'exampleDetective':return startQuiz({gid:id,ico:'🕵️',title:'Example Detective',pool:levelPool(),build:bExampleDetective,total:10});
+    case'fillMissing':return startText({gid:id,ico:'✏️',title:'Fill the Missing',pool:levelPool(),total:8,
       canUse:d=>!!blankWord(d.e,d.k),
       make:d=>({id:d.id,answer:d.k,promptHTML:`<div style="font-size:1.05rem">${esc(blankWord(d.e,d.k))}<span class="q-sub">Udfyld det manglende ord (${d.m})</span></div>`})});
-    case'complete':return startText({gid:id,ico:'🧩',title:'Complete the Expression',pool:DATA,total:8,
+    case'complete':return startText({gid:id,ico:'🧩',title:'Complete the Expression',pool:levelPool(),total:8,
       canUse:d=>d.d.trim().split(/\s+/).length>=2,
       make:d=>{const w=lastWord(d.d);const shown=d.d.replace(new RegExp(escRe(w)+'\\s*$'),'_____');return{id:d.id,answer:w,promptHTML:`<div>${esc(shown)}<span class="q-sub">Fuldfør udtrykket — betyder: ${esc(d.m)}</span></div>`};}});
-    case'memory':return startMemory(DATA);
-    case'match':return startMatch(DATA);
+    case'memory':return startMemory(levelPool());
+    case'match':return startMatch(levelPool());
     case'category':return renderCategoryPick();
-    case'timed':return startQuiz({gid:id,ico:'⏱️',title:'Timed Hunt',pool:DATA,build:bIdiomMeaning,timer:60});
-    case'survival':return startQuiz({gid:id,ico:'💀',title:'Idiom Survival',pool:DATA,build:bIdiomMeaning,lives:3});
-    case'context':return startQuiz({gid:id,ico:'🎯',title:'Context Master',pool:DATA,build:bContext,total:10,onEnd:(s,t,p)=>{if(p>=70){S.ctxWin=true;checkAchievements();save();}}});
-    case'native':{const pool=DATA.filter(d=>d.l==='B2'||d.l==='C1');return startQuiz({gid:id,ico:'🎓',title:'Native Speaker',pool,build:bIdiomMeaning,total:10,onEnd:(s,t,p)=>{if(p>=70){S.natWin=true;checkAchievements();save();}}});}
-    case'mixed':return startQuiz({gid:id,ico:'🌀',title:'Mixed Review',pool:DATA,build:mixedBuild,total:12});
+    case'timed':return startQuiz({gid:id,ico:'⏱️',title:'Timed Hunt',pool:levelPool(),build:bIdiomMeaning,timer:60});
+    case'survival':return startQuiz({gid:id,ico:'💀',title:'Idiom Survival',pool:levelPool(),build:bIdiomMeaning,lives:3});
+    case'context':return startQuiz({gid:id,ico:'🎯',title:'Context Master',pool:levelPool(),build:bContext,total:10,onEnd:(s,t,p)=>{if(p>=70){S.ctxWin=true;checkAchievements();save();}}});
+    case'native':{const pool=levelPool().filter(d=>d.l==='B2'||d.l==='C1');return startQuiz({gid:id,ico:'🎓',title:'Native Speaker',pool,build:bIdiomMeaning,total:10,onEnd:(s,t,p)=>{if(p>=70){S.natWin=true;checkAchievements();save();}}});}
+    case'mixed':return startQuiz({gid:id,ico:'🌀',title:'Mixed Review',pool:levelPool(),build:mixedBuild,total:12});
   }
 }
-function startPractice(){startQuiz({gid:'mixed',ico:'⚔️',title:'Øve-tilstand',pool:DATA,build:mixedBuild,total:12});}
+function startPractice(){startQuiz({gid:'mixed',ico:'⚔️',title:'Øve-tilstand',pool:levelPool(),build:mixedBuild,total:12});}
 function startWeak(){
   const pool=weakIdioms();
   if(pool.length<4){toast('Spil lidt mere først — så finder vi dine svage idiomer! 🔁');return;}

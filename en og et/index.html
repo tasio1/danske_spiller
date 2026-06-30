@@ -118,6 +118,18 @@
   .word .art{font-family:'EB Garamond';color:var(--rose);font-weight:500;font-size:1.4rem;font-style:italic}
   .translation{font-style:italic;color:var(--teal);font-size:1.05rem;min-height:1.2rem;margin-bottom:18px}
 
+  /* speaker / pronunciation button */
+  .word-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .speaker{
+    width:38px;height:38px;border-radius:50%;display:inline-grid;place-items:center;
+    font-size:1rem;flex:none;cursor:pointer;
+    background:linear-gradient(180deg,#fff8e8,#efe1bf);border:1.5px solid var(--gold);
+    color:var(--ink);transition:transform .12s,box-shadow .15s;
+  }
+  .speaker:hover{box-shadow:0 4px 10px rgba(40,20,10,.25)}
+  .speaker:active{transform:scale(.92)}
+  .speaker.speaker-sm{width:30px;height:30px;font-size:.85rem;margin-left:6px;vertical-align:middle}
+
   .buttons{display:flex;gap:14px;margin:8px 0 16px}
   .btn-big{
     flex:1;font-family:'Cinzel Decorative',serif;font-size:1.4rem;font-weight:700;padding:16px 0;border-radius:12px;cursor:pointer;color:#f7ecd2;
@@ -173,6 +185,7 @@
   .match-tile{
     padding:13px 8px;border:1.5px solid var(--gold);border-radius:10px;background:#fff8e8;cursor:pointer;
     text-align:center;font-size:1.08rem;transition:background .15s,transform .1s;
+    display:flex;align-items:center;justify-content:center;gap:4px;
   }
   .match-tile:hover:not(.done){background:#fff}
   .match-tile.sel{background:var(--gold-2);transform:scale(1.03)}
@@ -300,7 +313,10 @@
 
       <div class="prompt">
         <div class="hint" id="hint"></div>
-        <div class="word" id="word">&nbsp;</div>
+        <div class="word-row">
+          <div class="word" id="word">&nbsp;</div>
+          <span id="wordSpeaker"></span>
+        </div>
         <div class="translation" id="trans"></div>
       </div>
 
@@ -318,8 +334,8 @@
 
       <div class="flash hidden" id="flashCard">
         <div class="flash-inner">
-          <div class="flash-face"><span class="tag" id="flashTagF"></span><span class="big" id="flashFront"></span><span class="sub" id="flashFrontT"></span></div>
-          <div class="flash-face flash-back"><span class="tag" id="flashTagB"></span><span class="big" id="flashBack"></span><span class="sub" id="flashBackT"></span></div>
+          <div class="flash-face"><span class="tag" id="flashTagF"></span><span class="big" id="flashFront"></span><span id="flashFrontSpeaker"></span><span class="sub" id="flashFrontT"></span></div>
+          <div class="flash-face flash-back"><span class="tag" id="flashTagB"></span><span class="big" id="flashBack"></span><span id="flashBackSpeaker"></span><span class="sub" id="flashBackT"></span></div>
         </div>
       </div>
       <div class="flash-tip hidden" id="flashTip">Tryk på kortet for at vende det</div>
@@ -630,6 +646,41 @@ const SENTENCES=[
   {s:"___ passer ikke til døren.",lemma:"nøgle",form:"bestemt flertal",answer:"nøglerne",en:"The keys don't fit the door."}
 ];
 
+/* ===================== SPEECH SYNTHESIS (Danish) ===================== */
+let voices = [];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "da-DK";
+    const v = danishVoice();
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+  const b = document.createElement("button");
+  b.className = "speaker " + (cls||"");
+  b.type = "button";
+  b.textContent = "🔊";
+  b.setAttribute("aria-label","Pronounce");
+  b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
+
 /* ===================== PROGRESS (localStorage) ===================== */
 const LS_KEY='en_et_traener_v1';
 const defaultProgress=()=>({
@@ -675,6 +726,11 @@ const enetButtons=$("enetButtons"),typeRow=$("typeRow"),optionsBox=$("optionsBox
 const flashCard=$("flashCard"),flashTip=$("flashTip"),matchBox=$("matchBox");
 const btnEn=$("btnEn"),btnEt=$("btnEt"),answerInput=$("answerInput"),submitBtn=$("submitBtn");
 const wordEl=$("word"),hintEl=$("hint"),transEl=$("trans"),messageEl=$("message");
+const wordSpeakerEl=$("wordSpeaker");
+function setWordSpeaker(text){
+  wordSpeakerEl.innerHTML="";
+  if(text) wordSpeakerEl.appendChild(speakerBtn(text));
+}
 const scorePill=$("scorePill"),streakPill=$("streakPill"),timerPill=$("timerPill");
 const progressEl=$("progress"),nextBtn=$("next");
 $("wordCount").textContent=WORDS.length;
@@ -755,6 +811,7 @@ function hideAllInputs(){
   flashTip.classList.add("hidden");matchBox.classList.add("hidden");
   nextBtn.style.display="none";nextBtn.textContent="Næste →";
   messageEl.innerHTML="";transEl.textContent="";
+  setWordSpeaker(null);
 }
 
 function startTimer(){
@@ -787,18 +844,22 @@ function showQuestion(){
   if(mode==="enet"||mode==="speed"){
     hintEl.textContent="Hvilken artikel?";wordEl.textContent=item.w;
     btnEn.disabled=false;btnEt.disabled=false;
+    setWordSpeaker(null); // article not revealed yet — avoid giving away the answer
   }else if(mode==="definite"){
     hintEl.innerHTML="Skriv i <b>bestemt form</b> (ental)";
     wordEl.innerHTML='<span class="art">'+item.a+'</span> '+item.w;
+    setWordSpeaker(item.a+" "+item.w);
     resetInput();
   }else if(mode==="plural"){
     hintEl.innerHTML="Skriv i <b>flertal</b> (ubestemt)";
     wordEl.innerHTML='<span class="art">'+item.a+'</span> '+item.w;
+    setWordSpeaker(item.a+" "+item.w);
     resetInput();
   }else if(mode==="sentence"){
     hintEl.innerHTML="Udfyld: <b>"+item.form+"</b> af <em>"+item.lemma+"</em>";
     wordEl.innerHTML=item.s.replace("___",'<span style="color:#a8132b">_____</span>');
     wordEl.style.fontFamily="'EB Garamond',serif";wordEl.style.fontSize="1.45rem";
+    setWordSpeaker(null); // sentence has a gap — speak the full answer sentence once revealed
     resetInput();
   }
 }
@@ -808,6 +869,7 @@ function answerArticle(sel){
   if(answered)return;answered=true;
   const ok=sel===current.a;
   register(ok,current.a+" "+current.w);
+  setWordSpeaker(current.a+" "+current.w); // reveal pronunciation now that the article is known
   btnEn.disabled=true;btnEt.disabled=true;
   if(mode==="speed"){setTimeout(()=>{if(timer)showQuestion();},520);}
   else{idx++;updateStats();nextBtn.style.display="block";}
@@ -821,6 +883,7 @@ function submitTyped(){
   else{target=current.answer;full=current.answer+(current.en?'  ('+current.en+')':'');}
   const ok=norm(target)===val;
   register(ok,target,full);
+  if(mode==="sentence") setWordSpeaker(current.s.replace("___",current.answer)); // speak the completed sentence
   answerInput.disabled=true;submitBtn.disabled=true;idx++;updateStats();nextBtn.style.display="block";
 }
 function register(ok,answerTxt,full){
@@ -877,6 +940,7 @@ function mcQuestion(){
   hintEl.textContent=category==="opposites"?"Find modsætningen til:":"Find synonymet til:";
   wordEl.textContent=promptWord;
   wordEl.style.fontFamily="'Cinzel Decorative',serif";wordEl.style.fontSize="2.1rem";
+  setWordSpeaker(promptWord);
   transEl.textContent=askA?glossOf(p,"a"):glossOf(p,"b");
   // distractors – unikke og forskellige fra svaret
   const used=new Set([answer]);
@@ -930,6 +994,8 @@ function flashShow(){
   $("flashTagF").textContent=conj;$("flashTagB").textContent=conj;
   $("flashFront").textContent=p.a;$("flashFrontT").textContent=glossOf(p,"a");
   $("flashBack").textContent=p.b;$("flashBackT").textContent=glossOf(p,"b");
+  const fs=$("flashFrontSpeaker");fs.innerHTML="";fs.appendChild(speakerBtn(p.a,"speaker-sm"));
+  const bs=$("flashBackSpeaker");bs.innerHTML="";bs.appendChild(speakerBtn(p.b,"speaker-sm"));
   updateStats();
 }
 
@@ -955,7 +1021,10 @@ function buildMatchBatch(){
 function renderMatchCol(col,items){
   col.innerHTML="";
   items.forEach(it=>{
-    const t=document.createElement("div");t.className="match-tile";t.textContent=it.txt;t.dataset.id=it.id;
+    const t=document.createElement("div");t.className="match-tile";t.dataset.id=it.id;
+    const label=document.createElement("span");label.textContent=it.txt;
+    t.appendChild(label);
+    t.appendChild(speakerBtn(it.txt,"speaker-sm"));
     t.addEventListener("click",()=>matchClick(t));col.appendChild(t);
   });
 }

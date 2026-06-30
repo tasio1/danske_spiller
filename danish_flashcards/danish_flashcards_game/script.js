@@ -213,6 +213,41 @@ function saveProgress() {
     }
 }
 
+/* ---------- SPEECH SYNTHESIS (Danish) ---------- */
+let voices = [];
+function refreshVoices(){
+    if(!('speechSynthesis' in window)) return;
+    voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+    return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+    speechSynthesis.onvoiceschanged = refreshVoices;
+    refreshVoices();
+}
+function speak(text){
+    if(!('speechSynthesis' in window) || !text) return;
+    try{
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "da-DK";
+        const v = danishVoice();
+        if(v) u.voice = v;
+        u.rate = 0.95;
+        speechSynthesis.speak(u);
+    }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+    const b = document.createElement("button");
+    b.className = "speaker " + (cls||"");
+    b.type = "button";
+    b.textContent = "🔊";
+    b.setAttribute("aria-label","Pronounce");
+    b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+    return b;
+}
+
 // DOM references
 const verbListEl = document.getElementById('verb-list');
 const cardWrapper = document.querySelector('.card-wrapper');
@@ -237,7 +272,8 @@ function renderCard() {
     // Front side: shows infinitive and translation
     const front = document.createElement('div');
     front.classList.add('card-face', 'card-front');
-    front.innerHTML = `<div>${verb.infinitive}</div><div style="font-size:0.8rem; margin-top:0.5rem;">${verb.translation}</div>`;
+    front.innerHTML = `<div class="infinitive-row"><span>${verb.infinitive}</span></div><div style="font-size:0.8rem; margin-top:0.5rem;">${verb.translation}</div>`;
+    front.querySelector('.infinitive-row').appendChild(speakerBtn(verb.infinitive, 'speaker-front'));
 
     // Back side: shows conjugated forms plus an example sentence in context
     const back = document.createElement('div');
@@ -246,9 +282,10 @@ function renderCard() {
         <p><strong>Present:</strong> ${verb.present}</p>
         <p><strong>Past:</strong> ${verb.past}</p>
         <p><strong>Past Participle:</strong> ${verb.pastParticiple}</p>
-        <p class="example">"${verb.example}"</p>
+        <p class="example example-row">"${verb.example}"</p>
         <p class="example-en">${verb.exampleEn}</p>
     `;
+    back.querySelector('.example-row').appendChild(speakerBtn(verb.example, 'speaker-back'));
 
     // Append faces and event listener to flip
     card.appendChild(front);

@@ -100,6 +100,13 @@ body{
 .sentence .word:hover{background:#ffe9a8}
 .sentence .word.sel{background:var(--yellow);color:#5a4500}
 
+/* speaker / TTS button */
+.sentwrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sentwrap .sentence{margin:0;flex:1;min-width:0}
+.speaker{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--line);display:inline-grid;place-items:center;font-size:1.1rem;box-shadow:var(--shadow);flex:none;cursor:pointer;font-family:inherit;}
+.speaker.sm{width:30px;height:30px;font-size:.9rem}
+.speaker:active{transform:scale(.92)}
+
 .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
 .opt{
   border:3px solid var(--line);background:#fff;border-radius:14px;padding:14px;
@@ -659,6 +666,43 @@ function distractorsFor(prep, n){
 function goodMsg(){ return pick(FEEDBACK_GOOD); }
 function badMsg(){ return pick(FEEDBACK_BAD); }
 
+/* ============================================================
+   SPEECH SYNTHESIS (Danish)
+   ============================================================ */
+let voices = [];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "da-DK";
+    const v = danishVoice();
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+  const b = document.createElement("button");
+  b.className = "speaker " + (cls||"");
+  b.type = "button";
+  b.textContent = "🔊";
+  b.setAttribute("aria-label","Udtal");
+  b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
+
 function burst(x,y){
   const colors=["#ee1515","#2a75bb","#ffcb05","#3ec46d"];
   for(let i=0;i<10;i++){
@@ -798,10 +842,11 @@ function nextFill(item){
   const html = blankSentence(item).replace("@@@",'<span class="blank">?</span>');
   exShell("✏️ Udfyld hullet", item.theme,
     '<p class="prompt">Skriv den præposition der mangler:</p>'+
-    '<div class="sentence">'+html+'</div>'+
+    '<div class="sentwrap"><div class="sentence">'+html+'</div></div>'+
     '<input class="tinput" id="fillIn" placeholder="fx i, på, til ..." autocomplete="off" autocapitalize="none">'+
     '<div class="btnrow"><button class="btn" id="fillCheck">Tjek svar</button>'+
     '<button class="btn grey" id="fillNext">Spring over</button></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const inp=document.getElementById("fillIn"); inp.focus();
   function check(){
     const val=inp.value.trim().toLowerCase();
@@ -831,8 +876,9 @@ function nextMC(item){
   const html=blankSentence(item).replace("@@@",'<span class="blank" id="mcBlank">?</span>');
   exShell("🎯 Multiple choice", item.theme,
     '<p class="prompt">Vælg den rigtige præposition:</p>'+
-    '<div class="sentence">'+html+'</div>'+
+    '<div class="sentwrap"><div class="sentence">'+html+'</div></div>'+
     '<div class="opts" id="mcOpts"></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const box=document.getElementById("mcOpts");
   opts.forEach((o,i)=>{
     const b=document.createElement("button");b.className="opt";
@@ -863,9 +909,10 @@ function nextDrag(item){
   const html=blankSentence(item).replace("@@@",'<span class="drop" id="dropZone">slip her</span>');
   exShell("🧲 Træk & slip", item.theme,
     '<p class="prompt">Træk den rigtige præposition ind i sætningen:</p>'+
-    '<div class="sentence">'+html+'</div>'+
+    '<div class="sentwrap"><div class="sentence">'+html+'</div></div>'+
     '<div class="dragzone" id="chips"></div>'+
     '<div class="hint">På mobil: tryk på en brik for at placere den.</div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const drop=document.getElementById("dropZone");
   const cbox=document.getElementById("chips");
   let answered=false;
@@ -915,7 +962,8 @@ function nextMistake(item){
   });
   exShell("🔍 Find fejlen", item.theme,
     '<p class="prompt">Én præposition er forkert. Tryk på det forkerte ord:</p>'+
-    '<div class="sentence" id="msSent"></div>');
+    '<div class="sentwrap"><div class="sentence" id="msSent"></div></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const sent=document.getElementById("msSent");
   let answered=false;
   words.forEach((w,wi)=>{
@@ -952,11 +1000,12 @@ function nextCorrect(item){
   const wrongText = item.text.replace(new RegExp("(^|[\\s])"+item.a+"([\\s.,!?])"), "$1"+item.err+"$2");
   exShell("📝 Ret sætningen", item.theme,
     '<p class="prompt">Denne sætning har en forkert præposition. Skriv den korrekt:</p>'+
-    '<div class="sentence" style="color:var(--red-d)">'+wrongText+'</div>'+
+    '<div class="sentwrap"><div class="sentence" style="color:var(--red-d)">'+wrongText+'</div></div>'+
     '<input class="tinput" id="corrIn" placeholder="Skriv hele den rettede sætning ...">'+
     '<div class="hint">Tip: du kan også bare skrive den rigtige præposition.</div>'+
     '<div class="btnrow"><button class="btn" id="corrCheck">Tjek svar</button>'+
     '<button class="btn grey" id="corrShow">Vis svar</button></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const inp=document.getElementById("corrIn");inp.focus();
   function norm(s){ return s.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim(); }
   function finish(ok){
@@ -999,8 +1048,9 @@ function nextTrans(){
     const fb=document.getElementById("fb");
     fb.className="fb show "+(ok?"good":"bad");
     fb.innerHTML='<span class="big">'+(ok?"✅ "+goodMsg():"❌ "+badMsg())+'</span>'+
-      '<div>Korrekt: <span class="corr">'+t[1]+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Korrekt: <span class="corr">'+t[1]+'</span></div>'+
       '<div style="margin-top:6px">💡 '+t[3]+'</div>';
+    fb.querySelector(".corr").after(speakerBtn(t[1],"sm"));
     document.getElementById("trCheck").textContent="Næste →";
     document.getElementById("trCheck").onclick=()=>nextTrans();
     document.getElementById("trShow").classList.add("hide");
@@ -1044,8 +1094,9 @@ function nextPair(){
   const html=blankSentence(item).replace("@@@",'<span class="blank" id="prBlank">?</span>');
   exShell("⚖️ "+p.label, item.theme,
     '<p class="prompt">Hvilken passer her?</p>'+
-    '<div class="sentence">'+html+'</div>'+
+    '<div class="sentwrap"><div class="sentence">'+html+'</div></div>'+
     '<div class="opts" id="prOpts" style="grid-template-columns:repeat(2,1fr)"></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const box=document.getElementById("prOpts");
   opts.forEach(o=>{
     const b=document.createElement("button");b.className="opt";b.textContent=o;
@@ -1090,9 +1141,10 @@ function speedTick(first){
     '<span class="qcount">⚡ Lynrunde</span></div>'+
     '<div class="timer'+(speedLeft<=10?' warn':'')+'" id="spTimer">'+speedLeft+'s</div>'+
     '<div class="scoreline">Point: '+speedScore+' &nbsp;·&nbsp; ✅ '+speedHits+' &nbsp; ❌ '+speedMiss+'</div>'+
-    '<div class="sentence" style="text-align:center">'+html+'</div>'+
+    '<div class="sentwrap" style="justify-content:center"><div class="sentence" style="text-align:center">'+html+'</div></div>'+
     '<div class="opts" id="spOpts"></div>'+
     '</div>';
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text,"sm"));
   const box=document.getElementById("spOpts");
   opts.forEach(o=>{
     const b=document.createElement("button");b.className="opt";b.textContent=o;
@@ -1145,8 +1197,9 @@ function nextReview(){
   const html=blankSentence(item).replace("@@@",'<span class="blank" id="rvBlank">?</span>');
   exShell("🔁 Gentag fejl", item.theme,
     '<p class="prompt">Du svarede forkert tidligere — prøv igen ('+prog.reviewQ.length+' tilbage):</p>'+
-    '<div class="sentence">'+html+'</div>'+
+    '<div class="sentwrap"><div class="sentence">'+html+'</div></div>'+
     '<div class="opts" id="rvOpts"></div>');
+  document.querySelector(".sentwrap").appendChild(speakerBtn(item.text));
   const box=document.getElementById("rvOpts");
   opts.forEach(o=>{
     const b=document.createElement("button");b.className="opt";b.textContent=o;

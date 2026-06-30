@@ -239,6 +239,17 @@ label.flt{display:flex;flex-direction:column;gap:3px;font-size:.78rem;font-weigh
 .kbd{background:#fff8ea;border:1px solid #b08a4a;border-radius:4px;padding:1px 6px;font-size:.8rem;}
 .dsg-home{position:fixed;top:14px;right:14px;z-index:999999;display:inline-flex;align-items:center;gap:6px;background:rgba(20,20,30,.62);color:#fff;text-decoration:none;font:700 .85rem 'Segoe UI',system-ui,sans-serif;padding:9px 16px;border-radius:999px;backdrop-filter:blur(4px);box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .15s ease,background .15s ease}
 .dsg-home:hover{transform:translateY(-2px);background:rgba(20,20,30,.8)}
+
+.speaker{
+  width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;
+  font-size:.9rem;flex:none;cursor:pointer;vertical-align:middle;margin-left:6px;
+  border:2px solid #7a5b2a;background:linear-gradient(180deg,#fff6e0,var(--parchment-dark));
+  color:var(--ink);box-shadow:0 2px 0 #7a5b2a,0 3px 6px var(--shadow);
+  transition:transform .08s,box-shadow .12s;padding:0;line-height:1;
+}
+.speaker:hover{transform:translateY(-1px);}
+.speaker:active{transform:scale(.92);box-shadow:0 1px 0 #7a5b2a;}
+.speaker.small{width:26px;height:26px;font-size:.75rem;margin-left:4px;}
 </style>
 </head>
 <body>
@@ -548,6 +559,46 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 function lvlBadge(l){return`<span class="lvl-badge lvl-${l}">${l}</span>`;}
 function catTag(c){return`<span class="tag cat">${CAT_ICON[c]||''} ${esc(c)}</span>`;}
 
+/* ============================================================
+   SPEECH SYNTHESIS (Danish)
+   ============================================================ */
+let voices=[];
+function refreshVoices(){
+  if(!('speechSynthesis' in window))return;
+  voices=speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang))||voices.find(v=>/^da/i.test(v.lang))||null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged=refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)||!text)return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="da-DK";
+    const v=danishVoice();
+    if(v)u.voice=v;
+    u.rate=0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+/* speaker button registry: since this file builds screens via innerHTML
+   strings (not DOM nodes), buttons are rendered as markup carrying the
+   idiom id + field, and a single delegated listener (bound in topbar
+   re-renders) reads the text back out of DATA to call speak(). This avoids
+   embedding raw Danish text inside onclick="" attributes (quote escaping). */
+function speakerBtn(text,cls){
+  const id='spk'+(_spkSeq++);
+  _spkMap[id]=text;
+  return `<button type="button" class="speaker ${cls||''}" data-spk="${id}" aria-label="Udtal" onclick="event.stopPropagation();speak(_spkMap['${id}'])">🔊</button>`;
+}
+let _spkSeq=0;
+let _spkMap={};
+
 let toastT;
 function toast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
 function burst(x,y,colors){colors=colors||['#f0c14b','#c8941f','#3f8f4a','#fff'];for(let i=0;i<14;i++){const p=document.createElement('div');p.className='particle';const ang=Math.random()*Math.PI*2,dist=40+Math.random()*70;p.style.cssText=`left:${x}px;top:${y}px;background:${colors[i%colors.length]};--dx:${Math.cos(ang)*dist}px;--dy:${Math.sin(ang)*dist}px`;document.body.appendChild(p);p.addEventListener('animationend',()=>p.remove());}}
@@ -632,11 +683,11 @@ function relatedFor(idiom){return DATA.filter(d=>d.c===idiom.c&&d.id!==idiom.id)
 function idiomCardHTML(d,full){
   const rel=full?relatedFor(d):[];
   return`<div class="idiom-card">
-    <h3>${isMastered(d.id)?'<span class="mastered-dot">★</span> ':''}${esc(d.d)}</h3>
+    <h3>${isMastered(d.id)?'<span class="mastered-dot">★</span> ':''}${esc(d.d)}${speakerBtn(d.d)}</h3>
     <div>${catTag(d.c)} ${lvlBadge(d.l)}</div>
     <div class="meaning">${esc(d.m)}</div>
     <div style="font-size:.88rem">${esc(d.x)}</div>
-    <div class="ex">🗣️ "${esc(d.e)}"</div>
+    <div class="ex">🗣️ "${esc(d.e)}"${speakerBtn(d.e)}</div>
     <div class="tr">→ ${esc(d.t)}</div>
     ${full&&rel.length?`<div class="related"><b>Beslægtede:</b> ${rel.map(r=>esc(r.d)).join(' · ')}</div>`:''}
   </div>`;
@@ -688,9 +739,9 @@ function mcq(correctText,distractors){
   const opts=shuffle([{text:correctText,correct:true},...distractors.map(x=>({text:x,correct:false}))]);
   return opts;
 }
-function bIdiomMeaning(d){return{id:d.id,promptHTML:`<div>${esc(d.d)}<span class="q-sub">Hvad betyder idiomet?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
+function bIdiomMeaning(d){return{id:d.id,promptHTML:`<div>${esc(d.d)}${speakerBtn(d.d)}<span class="q-sub">Hvad betyder idiomet?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
 function bMeaningIdiom(d){return{id:d.id,promptHTML:`<div>"${esc(d.m)}"<span class="q-sub">Hvilket idiom passer?</span></div>`,options:mcq(d.d,otherIdioms(d,null,3))};}
-function bExampleDetective(d){return{id:d.id,promptHTML:`<div style="font-size:1.05rem">🗣️ "${esc(d.e)}"<span class="q-sub">Hvad betyder idiomet i sætningen?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
+function bExampleDetective(d){return{id:d.id,promptHTML:`<div style="font-size:1.05rem">🗣️ "${esc(d.e)}"${speakerBtn(d.e)}<span class="q-sub">Hvad betyder idiomet i sætningen?</span></div>`,options:mcq(d.m,otherMeanings(d,null,3))};}
 function bContext(d){return{id:d.id,promptHTML:`<div style="font-size:1.02rem">Situation: <i>${esc(d.x)}</i><span class="q-sub">Hvilket dansk idiom passer bedst?</span></div>`,options:mcq(d.d,otherIdioms(d,null,3))};}
 function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 function blankWord(sentence,word){
@@ -743,7 +794,7 @@ function answer(idx,btn){
   if(correct){fb.textContent=motivate()+' 🪙 +10';fb.className='feedback good';burstAt(btn);}
   else{fb.textContent='Ikke helt — '+esc(d.d);fb.className='feedback bad';}
   if(_justMastered===q.id){toast('🏆 Skat låst op! "'+esc(d.d)+'" mestret!');_justMastered=null;}
-  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b> — ${esc(d.m)}<br>${esc(d.x)}<br><i>"${esc(d.e)}"</i> → ${esc(d.t)}</div>`;
+  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b>${speakerBtn(d.d)} — ${esc(d.m)}<br>${esc(d.x)}<br><i>"${esc(d.e)}"</i>${speakerBtn(d.e)} → ${esc(d.t)}</div>`;
   if(correct)Q.score++;
   if(Q.cfg.lives){if(!correct){Q.lives--;if(Q.lives<=0){document.getElementById('nextWrap').classList.remove('hidden');document.getElementById('nextBtn').textContent='Se resultat ⟶';document.getElementById('nextBtn').onclick=endQuiz;return;}}}
   document.getElementById('nextWrap').classList.remove('hidden');
@@ -808,7 +859,7 @@ function checkText(){
   if(correct){fb.textContent=motivate()+' 🪙 +10';fb.className='feedback good';burstAt(document.getElementById('txtGo'));T.score++;}
   else{fb.textContent='Det rigtige ord var: "'+esc(q.answer)+'"';fb.className='feedback bad';}
   if(_justMastered===q.id){toast('🏆 Skat låst op! "'+esc(d.d)+'" mestret!');_justMastered=null;}
-  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b> — ${esc(d.m)}<br><i>"${esc(d.e)}"</i> → ${esc(d.t)}</div>`;
+  document.getElementById('explainSlot').innerHTML=`<div class="explain"><b>${esc(d.d)}</b>${speakerBtn(d.d)} — ${esc(d.m)}<br><i>"${esc(d.e)}"</i>${speakerBtn(d.e)} → ${esc(d.t)}</div>`;
   document.getElementById('nextWrap').classList.remove('hidden');
   T.answered=false;
 }
@@ -838,7 +889,7 @@ function renderMemory(){
     <h2 class="section-title">🃏 Idiom Memory</h2>
     <div class="progress-line">Par fundet: <b>${MEM.matched}</b>/6 · Træk: ${MEM.moves}</div>
     <div class="mem-grid" id="memGrid">
-      ${MEM.cards.map((c,i)=>`<div class="mem-card${c.matched?' matched':''}${MEM.flipped.includes(i)?' flipped':''}" data-i="${i}"><span class="back">⚜️</span><span class="face">${esc(c.text)}</span></div>`).join('')}
+      ${MEM.cards.map((c,i)=>`<div class="mem-card${c.matched?' matched':''}${MEM.flipped.includes(i)?' flipped':''}" data-i="${i}"><span class="back">⚜️</span><span class="face">${esc(c.text)}${c.kind==='d'?speakerBtn(c.text,'small'):''}</span></div>`).join('')}
     </div>
     <div class="scrollnote">Vend to kort og find idiom + betydning.</div></div>`;
   document.querySelectorAll('#memGrid .mem-card').forEach(el=>el.onclick=()=>memFlip(parseInt(el.dataset.i)));
@@ -881,7 +932,7 @@ function renderMatch(){
     <h2 class="section-title">🔗 Match Pairs</h2>
     <div class="progress-line">Forbundet: <b>${MP.done}</b>/5 — tryk et idiom og dets betydning</div>
     <div class="match-cols">
-      <div class="match-col" id="colL">${MP.left.map(d=>`<div class="match-item" data-id="${d.id}" data-side="L">${esc(d.d)}</div>`).join('')}</div>
+      <div class="match-col" id="colL">${MP.left.map(d=>`<div class="match-item" data-id="${d.id}" data-side="L">${esc(d.d)}${speakerBtn(d.d,'small')}</div>`).join('')}</div>
       <div class="match-col" id="colR">${MP.right.map(d=>`<div class="match-item" data-id="${d.id}" data-side="R">${esc(d.m)}</div>`).join('')}</div>
     </div></div>`;
   document.querySelectorAll('.match-item').forEach(el=>el.onclick=()=>matchClick(el));

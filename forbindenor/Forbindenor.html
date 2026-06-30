@@ -65,6 +65,14 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
 .cat .en{color:var(--muted);letter-spacing:.1em}
 .sentence{font-size:clamp(1.05rem,3.6vw,1.35rem);line-height:1.7;margin:6px 0 4px;
   color:#eafdff}
+.sentence-row{display:flex;align-items:flex-start;gap:10px;margin:6px 0 4px}
+.sentence-row .sentence{margin:0;flex:1}
+.speaker{width:36px;height:36px;border-radius:50%;display:inline-grid;place-items:center;
+  font-size:1rem;flex:none;cursor:pointer;border:1px solid var(--cyan-dim);
+  background:var(--panel);color:var(--cyan);margin-top:.15em;
+  box-shadow:0 0 10px rgba(55,226,255,.15);transition:transform .08s,box-shadow .15s,border-color .15s}
+.speaker:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(55,226,255,.35)}
+.speaker:active{transform:scale(.92)}
 .blank{display:inline-block;min-width:90px;border-bottom:2px solid var(--orange);
   color:var(--orange);text-align:center;padding:0 8px;animation:pulse 1.3s ease-in-out infinite;
   font-weight:bold}
@@ -149,7 +157,10 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
   </div>
   <div class="panel" id="game">
     <div class="cat"><span id="cat">&mdash;</span><span class="en" id="catEn"></span></div>
-    <p class="sentence" id="sentence"></p>
+    <div class="sentence-row">
+      <p class="sentence" id="sentence"></p>
+      <div id="speakerSlot"></div>
+    </div>
     <div class="opts" id="opts"></div>
     <div class="reveal" id="reveal">
       <div class="lbl">Overs&aelig;ttelse / Translation</div>
@@ -574,6 +585,41 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
+/* ---------- SPEECH SYNTHESIS (Danish) ---------- */
+let voices = [];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "da-DK";
+    const v = danishVoice();
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+  const b = document.createElement("button");
+  b.className = "speaker " + (cls||"");
+  b.type = "button";
+  b.textContent = "🔊";
+  b.setAttribute("aria-label","Pronounce");
+  b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
+
 /* ---------- PROGRESS (localStorage) ---------- */
 const LS_KEY = 'forbindenor_v1';
 const defaultProgress = () => ({
@@ -605,6 +651,9 @@ function render(){
   $('cat').textContent=rec.cat;
   $('catEn').textContent='// '+rec.catEn;
   $('sentence').innerHTML=esc(rec.da).replace('{}','<span class="blank" id="bk">_____</span>');
+  const fullSentence=rec.da.replace('{}',rec.initial?cap(rec.ans):rec.ans);
+  const slot=$('speakerSlot'); slot.innerHTML='';
+  slot.appendChild(speakerBtn(fullSentence));
   const opts=shuffle([rec.ans,...distractors(rec)]);
   const box=$('opts'); box.innerHTML='';
   opts.forEach(w=>{

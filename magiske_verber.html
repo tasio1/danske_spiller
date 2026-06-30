@@ -157,6 +157,19 @@ h1{
 .q-chain{font-family:var(--heading);letter-spacing:1px}
 .q-chain .blank{color:var(--gold2)}
 
+/* speaker / pronounce button */
+.q-prompt-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.speaker{
+  width:40px;height:40px;border-radius:50%;flex:none;
+  background:linear-gradient(180deg, rgba(28,35,72,.85), rgba(18,22,44,.9));
+  border:1px solid rgba(212,175,55,.45);color:var(--gold2);
+  display:inline-grid;place-items:center;font-size:1.1rem;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:transform .1s ease, border-color .15s ease;
+}
+.speaker:hover{border-color:var(--amber)}
+.speaker:active{transform:scale(.92)}
+.speaker.sm{width:30px;height:30px;font-size:.85rem}
+
 .options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
 .opt{
   cursor:pointer;text-align:center;font-size:18px;padding:14px;border-radius:12px;
@@ -563,7 +576,7 @@ ENTRIES.forEach(e=>{
       prompt:blankHtml(e.d),
       options:o.options,correct:o.correctIndex,
       explanation:`Datid (past) af "${inf}" er "${v.pa}". Tidsudtrykket peger på fortiden.`,
-      en:e.en});
+      en:e.en, speak:pastText});
   }
   // GAME 1 — Verb Form Arena (present blank) variant
   {
@@ -573,7 +586,7 @@ ENTRIES.forEach(e=>{
       prompt:blankHtml(e.p),
       options:o.options,correct:o.correctIndex,
       explanation:`Nutid (present) af "${inf}" er "${v.pr}".`,
-      en:e.en});
+      en:e.en, speak:presText});
   }
   // GAME 2 — Time Machine (present -> past)
   {
@@ -583,7 +596,7 @@ ENTRIES.forEach(e=>{
       prompt:`<span class="pre">Nutid: ${presText}</span>${blankHtml(e.d)}`,
       options:o.options,correct:o.correctIndex,
       explanation:`Når tiden flyttes til fortiden, bliver "${v.pr}" til datid "${v.pa}".`,
-      en:e.en});
+      en:e.en, speak:pastText});
   }
   // GAME 2b — Time Machine (present -> perfect) for medium/hard
   if(e.lvl>=2){
@@ -593,7 +606,7 @@ ENTRIES.forEach(e=>{
       prompt:`<span class="pre">Nutid: ${presText}</span>${blankHtml(e.pf)}`,
       options:o.options,correct:o.correctIndex,
       explanation:`Førnutid (perfect) = ${v.aux} + tillægsform: "${v.aux} ${v.pp}".`,
-      en:e.en});
+      en:e.en, speak:perfText});
   }
   // GAME 3 — Perfect Tense Builder
   {
@@ -603,7 +616,7 @@ ENTRIES.forEach(e=>{
       prompt:blankHtml(e.pf),
       options:o.options,correct:o.correctIndex,
       explanation:`Førnutid bruger ${v.aux} + kort tillægsform: "${v.aux} ${v.pp}". (${inf} → ${v.pr} → ${v.pa} → ${v.pp})`,
-      en:e.en});
+      en:e.en, speak:perfText});
   }
   // GAME 5 — Sentence Repair (show wrong present form in a past sentence)
   {
@@ -614,7 +627,7 @@ ENTRIES.forEach(e=>{
       prompt:`<span class="pre">Forkert: ${wrongSentence}</span>${blankHtml(e.d)}`,
       options:o.options,correct:o.correctIndex,
       explanation:`Sætningen handler om fortiden, så "${v.pr}" skal være datid "${v.pa}". Rigtigt: ${pastText}`,
-      en:e.en});
+      en:e.en, speak:pastText});
   }
   // GAME 6 — Verb Detective (identify tense) — three variants
   const detectVariants = [
@@ -630,7 +643,7 @@ ENTRIES.forEach(e=>{
       options:order.map(t=>TENSE_NAME[t]),
       correct:order.indexOf(dv.t),
       explanation:`Verbet "${dv.form}" er i ${TENSE_NAME[dv.t].toLowerCase()}.`,
-      en:e.en});
+      en:e.en, speak:dv.text});
   });
 });
 
@@ -649,7 +662,7 @@ Object.keys(V).forEach(inf=>{
       prompt:`<span class="q-chain">${inf} → ${v.pr} → <span class="blank">_____</span> → ${v.pp}</span>`,
       options:o.options,correct:o.correctIndex,
       explanation:`Bøjning: ${inf} → ${v.pr} → ${v.pa} → ${v.pp}. Et uregelmæssigt verbum.`,
-      en:V[inf].en});
+      en:V[inf].en, speak:`${inf}, ${v.pr}, ${v.pa}, ${v.pp}`});
   }
   // fill participle in chain
   {
@@ -659,7 +672,7 @@ Object.keys(V).forEach(inf=>{
       prompt:`<span class="q-chain">${inf} → ${v.pr} → ${v.pa} → <span class="blank">_____</span></span>`,
       options:o.options,correct:o.correctIndex,
       explanation:`Bøjning: ${inf} → ${v.pr} → ${v.pa} → ${v.pp}. Bruges som "${v.aux} ${v.pp}".`,
-      en:V[inf].en});
+      en:V[inf].en, speak:`${inf}, ${v.pr}, ${v.pa}, ${v.pp}`});
   }
 });
 
@@ -707,6 +720,41 @@ function showScreen(name){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600); }
+
+/* ---------- SPEECH SYNTHESIS (Danish) ---------- */
+let voices = [];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "da-DK";
+    const v = danishVoice();
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+  const b = document.createElement('button');
+  b.className = 'speaker ' + (cls||'');
+  b.type = 'button';
+  b.textContent = '🔊';
+  b.setAttribute('aria-label','Pronounce');
+  b.addEventListener('click', e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
 
 /* ---------- BUILD MENU ---------- */
 function buildMenu(){
@@ -816,8 +864,13 @@ function renderQuestion(){
   const area = $('qArea');
   area.innerHTML = `
     <div class="q-instruction">${q.instruction}</div>
-    <div class="q-prompt">${q.prompt}</div>
+    <div class="q-prompt-row">
+      <div class="q-prompt">${q.prompt}</div>
+    </div>
     <div class="options" id="opts"></div>`;
+  if(q.speak){
+    area.querySelector('.q-prompt-row').appendChild(speakerBtn(q.speak));
+  }
   const opts = $('opts');
   q.options.forEach((opt,i)=>{
     const b=document.createElement('div');

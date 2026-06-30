@@ -162,6 +162,12 @@ body{
 .opt.wrong{border-color:var(--red);background:rgba(227,85,106,.16);animation:shake .35s}
 .opt:disabled{cursor:default}
 
+/* speaker / pronounce button */
+.speaker{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:inline-grid;place-items:center;font-size:1.1rem;box-shadow:var(--shadow);flex:none;cursor:pointer;color:var(--text);margin-top:12px}
+.speaker.sm{width:32px;height:32px;font-size:.9rem;margin-top:0}
+.speaker:hover{border-color:var(--accent)}
+.speaker:active{transform:scale(.92)}
+
 /* feedback banner */
 .feedback{margin-top:16px;text-align:center;min-height:30px;font-weight:900;font-size:1.15rem}
 .feedback.good{color:var(--accent)}
@@ -646,6 +652,44 @@ function ringSVG(pct,color){
 function bar(pct){return `<div class="bar"><span style="width:${pct}%"></span></div>`;}
 
 /* =========================================================
+   SPEECH SYNTHESIS (Danish)
+========================================================= */
+let voices=[];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices=speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged=refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="da-DK";
+    const v=danishVoice();
+    if(v) u.voice=v;
+    u.rate=0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+/* small speaker button helper */
+function speakerBtn(text,cls){
+  const b=document.createElement("button");
+  b.className="speaker "+(cls||"");
+  b.type="button";
+  b.textContent="🔊";
+  b.setAttribute("aria-label","Pronounce");
+  b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
+
+/* =========================================================
    NAVIGATION
 ========================================================= */
 let route={name:"home"};
@@ -837,13 +881,18 @@ function nextQuestion(){
   wrap.innerHTML = gameHead(`<span class="muted" style="font-weight:800">${G.idx+1}/${cfg.pool.length}</span>${timerHtml}`)+
     `<div class="prompt">
       <div class="lbl">${cfg.title}</div>
-      <div class="word">${esc(promptText)}</div>
+      <div class="word" id="promptWord">${esc(promptText)}</div>
       <div class="dir-tag">${ask==='da2en'?'🇩🇰 Danish → 🇬🇧 English':'🇬🇧 English → 🇩🇰 Danish'}</div>
     </div>
     <div class="options" id="opts">
       ${opts.map(o=>`<button class="opt" onclick="answerMC(this,'${esc(o).replace(/'/g,"\\'")}')">${esc(o)}</button>`).join("")}
     </div>
     <div class="feedback" id="fb"></div>`;
+
+  if(ask==='da2en'){
+    const promptWordEl=$("#promptWord");
+    if(promptWordEl) promptWordEl.insertAdjacentElement("afterend", speakerBtn(promptText));
+  }
 
   if(cfg.mode==='timed'){
     G._time=10; updateTimer();
@@ -902,6 +951,14 @@ function renderFlash(){
        <button class="btn secondary" onclick="gradeFlash(false)">😕 Still learning</button>
        <button class="btn" onclick="gradeFlash(true)">😎 I knew it</button>
      </div>`;
+  const frontFace=$("#flash .face.front");
+  if(frontFace){
+    const sb=speakerBtn(q.it.da,"sm");
+    sb.style.position="absolute";
+    sb.style.top="14px";
+    sb.style.right="14px";
+    frontFace.appendChild(sb);
+  }
 }
 function flipCard(){G._flipped=!G._flipped;$("#flash").classList.toggle("flipped",G._flipped);}
 function gradeFlash(known){
@@ -926,10 +983,23 @@ function renderMatch(){
     <div class="h1" style="font-size:1.3rem">🧲 Match Pairs</div>
     <p class="sub">${cfg.title} — tap a Danish word, then its English match.</p>
     <div class="match-grid">
-      <div>${left.map(i=>cell(i,'da')).join("")}</div>
+      <div id="matchLeft">${left.map(i=>cell(i,'da')).join("")}</div>
       <div>${right.map(i=>cell(i,'en')).join("")}</div>
     </div>
     <div class="feedback" id="fb"></div>`;
+  // attach speaker buttons to the Danish-side cells (left column) only
+  const leftCells=Array.from(document.querySelectorAll("#matchLeft .match-cell"));
+  leftCells.forEach((btn,i)=>{
+    const holder=document.createElement("div");
+    holder.style.position="relative";
+    btn.parentNode.insertBefore(holder,btn);
+    holder.appendChild(btn);
+    const sb=speakerBtn(left[i].txt,"sm");
+    sb.style.position="absolute";
+    sb.style.top="4px";
+    sb.style.right="4px";
+    holder.appendChild(sb);
+  });
 }
 function pickMatch(btn){
   if(btn.classList.contains("gone"))return;

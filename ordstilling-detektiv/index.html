@@ -187,8 +187,16 @@ body{
 .explain .verdict{font-family:'Special Elite',monospace;font-size:15px;margin-bottom:7px}
 .explain.good .verdict{color:var(--green)}
 .explain.bad .verdict{color:var(--red2)}
-.explain .sol{font-family:'Special Elite',monospace;font-size:17px;color:var(--ink);margin-bottom:4px}
+.explain .sol{font-family:'Special Elite',monospace;font-size:17px;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .explain .tr{font-size:13px;color:#5a4830;font-style:italic;margin-bottom:9px}
+.speaker{
+  width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;
+  font-size:1rem;flex:none;cursor:pointer;border:1.5px solid #7a6030;
+  background:linear-gradient(180deg,#fffaf0,#efe0bf);box-shadow:0 3px 0 #b59a64;
+  transition:transform .07s, box-shadow .07s;
+}
+.speaker:hover{transform:translateY(-1px)}
+.speaker:active{transform:translateY(2px) scale(.96);box-shadow:0 1px 0 #b59a64}
 .explain .why{font-size:13px;line-height:1.55;color:#3a2c18}
 .explain .why b{color:var(--red2)}
 
@@ -709,6 +717,41 @@ const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const flash=t=>{const f=$("flash");f.textContent=t;f.classList.remove("show");void f.offsetWidth;f.classList.add("show")};
 
+/* ---------- speech synthesis (Danish) ---------- */
+let voices = [];
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices();
+}
+function danishVoice(){
+  return voices.find(v=>/da(-|_)?DK/i.test(v.lang)) || voices.find(v=>/^da/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "da-DK";
+    const v = danishVoice();
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+  }catch(e){/* ignore */}
+}
+function speakerBtn(text, cls){
+  const b = document.createElement("button");
+  b.className = "speaker " + (cls||"");
+  b.type = "button";
+  b.textContent = "🔊";
+  b.setAttribute("aria-label","Pronounce");
+  b.addEventListener("click", e=>{ e.stopPropagation(); speak(text); });
+  return b;
+}
+
 function solvedCount(){return CASES.filter(c=>prog.solved[c.n]).length}
 function allSolved(){return solvedCount()===CASES.length}
 function rankFor(){
@@ -918,7 +961,13 @@ function showExplain(ok){
   const ex=$("explain");
   ex.className="explain show "+(ok?"good":"bad");
   $("verdict").textContent=ok?"✓ Case logic confirmed!":"✗ The word order doesn't hold up.";
-  $("sol").textContent=cur.correct.join(" ");
+  const solidText=cur.correct.join(" ");
+  const solEl=$("sol");
+  solEl.innerHTML="";
+  const solTextSpan=document.createElement("span");
+  solTextSpan.textContent=solidText;
+  solEl.appendChild(solTextSpan);
+  solEl.appendChild(speakerBtn(solidText));
   $("trLine").textContent="“"+cur.item.en+"”";
   $("why").innerHTML = (ok?"":"<b>Correct order shown above.</b> ")+ (c?c.grammarTip:"");
   if(G.mode!=="final" && G.lives<=0){

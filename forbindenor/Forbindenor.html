@@ -54,6 +54,7 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
 .chip b{display:block;font-family:'Orbitron';font-size:1.15rem;color:#eafdff;margin-top:2px}
 .chip.score b{color:var(--cyan)} .chip.streak b{color:var(--orange)}
 .chip.lives b{color:var(--bad)}
+.chip.best b{color:#eafdff}
 .panel{background:var(--panel);border:1px solid var(--cyan-dim);border-radius:8px;
   padding:20px 18px;box-shadow:0 0 0 1px rgba(55,226,255,.08),0 8px 40px rgba(0,0,0,.6),
   inset 0 0 30px rgba(55,226,255,.05);backdrop-filter:blur(2px)}
@@ -144,6 +145,7 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
     <div class="chip score">Score<b id="score">0</b></div>
     <div class="chip streak">Streak<b id="streak">0</b></div>
     <div class="chip lives">Energy<b id="lives">6</b></div>
+    <div class="chip best">Best<b id="best">0</b></div>
   </div>
   <div class="panel" id="game">
     <div class="cat"><span id="cat">&mdash;</span><span class="en" id="catEn"></span></div>
@@ -572,6 +574,19 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
+/* ---------- PROGRESS (localStorage) ---------- */
+const LS_KEY = 'forbindenor_v1';
+const defaultProgress = () => ({
+  total:0, correct:0, bestScore:0, bestStreak:0,
+  perWord:{}, perCat:{}
+});
+function loadProgress(){
+  try{ const r = JSON.parse(localStorage.getItem(LS_KEY)); return r && r.perWord ? r : defaultProgress(); }
+  catch(e){ return defaultProgress(); }
+}
+function saveProgress(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(P)); }catch(e){} }
+let P = loadProgress();
+
 const state = {score:0,streak:0,lives:6,i:0,order:shuffle([...Array(records.length).keys()]),answered:false};
 
 function distractors(rec){
@@ -616,7 +631,8 @@ function choose(btn,w,rec){
     if(o.textContent===rec.ans) o.classList.add('correct');
   });
   bk.textContent=disp; bk.classList.add('filled');
-  if(w===rec.ans){
+  const isCorrect = w===rec.ans;
+  if(isCorrect){
     btn.classList.add('correct');
     state.streak++; state.score+=100+Math.min(state.streak,10)*10;
     if(state.streak%5===0){
@@ -627,10 +643,22 @@ function choose(btn,w,rec){
     btn.classList.add('wrong');
     state.streak=0; state.lives--;
   }
+  recordAnswer(rec,isCorrect);
   updateHud();
   $('reveal').classList.add('show');
   if(state.lives<=0){ $('next').textContent='Se resultat »'; }
   $('next').classList.add('show');
+}
+function recordAnswer(rec,isCorrect){
+  P.total++;
+  if(isCorrect) P.correct++;
+  if(state.streak>P.bestStreak) P.bestStreak=state.streak;
+  if(state.score>P.bestScore) P.bestScore=state.score;
+  const pw = P.perWord[rec.ans] || (P.perWord[rec.ans]={t:0,c:0});
+  pw.t++; if(isCorrect) pw.c++;
+  const pc = P.perCat[rec.cat] || (P.perCat[rec.cat]={t:0,c:0});
+  pc.t++; if(isCorrect) pc.c++;
+  saveProgress();
 }
 function energyPopup(msg){
   const t=$('toast');
@@ -643,6 +671,7 @@ function updateHud(){
   $('score').textContent=state.score;
   $('streak').textContent=state.streak;
   $('lives').textContent='◆'.repeat(Math.max(state.lives,0))||'—';
+  $('best').textContent=Math.max(P.bestScore,state.score);
 }
 $('next').onclick=()=>{
   if(state.lives<=0) return end(false);

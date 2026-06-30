@@ -630,6 +630,43 @@ const SENTENCES=[
   {s:"___ passer ikke til døren.",lemma:"nøgle",form:"bestemt flertal",answer:"nøglerne",en:"The keys don't fit the door."}
 ];
 
+/* ===================== PROGRESS (localStorage) ===================== */
+const LS_KEY='en_et_traener_v1';
+const defaultProgress=()=>({
+  total:0, correct:0, bestStreak:0,
+  perItem:{}, // key -> {t:total, c:correct}
+  perMode:{enet:{t:0,c:0},definite:{t:0,c:0},plural:{t:0,c:0},sentence:{t:0,c:0},speed:{t:0,c:0},opposites:{t:0,c:0},synonyms:{t:0,c:0}}
+});
+let P=loadProgress();
+function loadProgress(){
+  try{ const r=JSON.parse(localStorage.getItem(LS_KEY)); return r&&r.perItem&&r.perMode? r: defaultProgress(); }
+  catch(e){ return defaultProgress(); }
+}
+function saveProgress(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(P)); }catch(e){} }
+function progressModeKey(){
+  if(style)return category||"pairs";
+  return mode||"misc";
+}
+function itemKeyFor(m,item){
+  if(!item)return null;
+  if(m==="sentence")return "sentence:"+item.lemma+":"+item.form;
+  if(item.w)return m+":"+item.w; // enet / definite / plural / speed (noun-based)
+  if(item.a&&item.b)return (category||"pair")+":"+item.a+"/"+item.b; // opposites/synonyms pair
+  return null;
+}
+function recordAnswer(itemKey,ok){
+  P.total++; if(ok)P.correct++;
+  if(itemKey){
+    if(!P.perItem[itemKey])P.perItem[itemKey]={t:0,c:0};
+    P.perItem[itemKey].t++; if(ok)P.perItem[itemKey].c++;
+  }
+  const mk=progressModeKey();
+  if(!P.perMode[mk])P.perMode[mk]={t:0,c:0};
+  P.perMode[mk].t++; if(ok)P.perMode[mk].c++;
+  if(bestStreak>P.bestStreak)P.bestStreak=bestStreak;
+  saveProgress();
+}
+
 /* ===================== APP STATE ===================== */
 const $=id=>document.getElementById(id);
 const sections={menu:$("menu"),submenu:$("submenu"),game:$("game"),end:$("end")};
@@ -654,7 +691,7 @@ const quotes=[
 let mode=null, category=null, style=null;
 let queue=[], idx=0, correct=0, streak=0, bestStreak=0, answered=false, current=null;
 let timer=null, timeLeft=0, speedCorrect=0;
-let matchSel=null, matchDone=0, matchTotal=0;
+let matchSel=null, matchDone=0, matchTotal=0, matchBatch=[];
 
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
@@ -797,6 +834,7 @@ function register(ok,answerTxt,full){
     streak=0;messageEl.style.color="var(--bad)";
     messageEl.innerHTML=pick(consol)+" Det rigtige svar: <b>"+(full||answerTxt)+"</b>.";
   }
+  recordAnswer(itemKeyFor(mode,current), ok);
   updateStats();
 }
 
@@ -871,6 +909,7 @@ function mcAnswer(btn,chosen){
   // show full pair + translations
   const gloss=category==="opposites"?(p.ta+" ↔ "+p.tb):p.t;
   messageEl.innerHTML+='<small><b>'+p.a+'</b> '+(category==="opposites"?"↔":"=")+' <b>'+p.b+'</b> · '+gloss+'</small>';
+  recordAnswer(itemKeyFor(null,p), ok);
   idx++;updateStats();nextBtn.style.display="block";
 }
 
@@ -905,6 +944,7 @@ function initMatch(){
 }
 function buildMatchBatch(){
   const batch=shuffle(pairData()).slice(0,MATCH_PAIRS);
+  matchBatch=batch;
   matchTotal=batch.length;matchDone=0;matchSel=null;
   const left=batch.map((p,i)=>({txt:p.a,id:i}));
   const right=batch.map((p,i)=>({txt:p.b,id:i}));
@@ -928,6 +968,7 @@ function matchClick(tile){
     matchSel.classList.remove("sel");matchSel=tile;tile.classList.add("sel");return;
   }
   const ok=matchSel.dataset.id===tile.dataset.id;
+  const pairForKey=matchBatch[Number(tile.dataset.id)];
   if(ok){
     matchSel.classList.add("done");tile.classList.add("done");
     matchSel.classList.remove("sel");matchSel=null;matchDone++;
@@ -942,6 +983,7 @@ function matchClick(tile){
     const x=a,y=b;matchSel=null;
     setTimeout(()=>{x.classList.remove("err");y.classList.remove("err");},650);
   }
+  recordAnswer(itemKeyFor(null,pairForKey), ok);
 }
 
 /* ===================== NEXT BUTTON ===================== */

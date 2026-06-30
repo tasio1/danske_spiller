@@ -164,6 +164,55 @@ let currentIndex = 0;
 let correctCount = 0;
 let wrongCount = 0;
 
+/* ---------- PROGRESS (localStorage) ---------- */
+const LS_KEY = 'verb_glosekort_v1';
+
+// Build a fresh, default progress object matching the current deck size
+function defaultProgress() {
+    return {
+        currentIndex: 0,
+        correctCount: 0,
+        wrongCount: 0,
+        statuses: verbs.map(() => ({ status: 'unreviewed' }))
+    };
+}
+
+// Load saved progress from localStorage, falling back to defaults on any
+// missing/invalid data or if storage is unavailable (e.g. private browsing).
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return defaultProgress();
+        const data = JSON.parse(raw);
+        if (
+            !data ||
+            !Array.isArray(data.statuses) ||
+            data.statuses.length !== verbs.length ||
+            typeof data.currentIndex !== 'number'
+        ) {
+            return defaultProgress();
+        }
+        return data;
+    } catch (e) {
+        return defaultProgress();
+    }
+}
+
+// Persist the current game state to localStorage
+function saveProgress() {
+    try {
+        const data = {
+            currentIndex: currentIndex,
+            correctCount: correctCount,
+            wrongCount: wrongCount,
+            statuses: statuses
+        };
+        localStorage.setItem(LS_KEY, JSON.stringify(data));
+    } catch (e) {
+        // Storage blocked (e.g. private browsing) - silently ignore.
+    }
+}
+
 // DOM references
 const verbListEl = document.getElementById('verb-list');
 const cardWrapper = document.querySelector('.card-wrapper');
@@ -292,6 +341,7 @@ wrongBtn.addEventListener('click', () => {
     if (statuses[currentIndex].status === 'unreviewed') {
         statuses[currentIndex].status = 'wrong';
         wrongCount++;
+        saveProgress();
         goToNext();
     }
 });
@@ -301,6 +351,7 @@ rightBtn.addEventListener('click', () => {
     if (statuses[currentIndex].status === 'unreviewed') {
         statuses[currentIndex].status = 'correct';
         correctCount++;
+        saveProgress();
         goToNext();
     }
 });
@@ -312,10 +363,21 @@ restartBtn.addEventListener('click', () => {
     currentIndex = 0;
     correctCount = 0;
     wrongCount = 0;
+    saveProgress();
     renderAll();
 });
 
 // Initialize on DOMContentLoaded
 window.addEventListener('DOMContentLoaded', () => {
+    // Restore any saved progress before the first render so the sidebar's
+    // now/next/completed classes and the scoreboard reflect where the user
+    // left off. Falls back to a fresh game if nothing was saved or storage
+    // is unavailable.
+    const saved = loadProgress();
+    statuses = saved.statuses;
+    currentIndex = saved.currentIndex;
+    correctCount = saved.correctCount;
+    wrongCount = saved.wrongCount;
+
     renderAll();
 });

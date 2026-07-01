@@ -224,6 +224,8 @@
   .btn-primary{background:var(--rose);color:#f7ecd2}
   .btn-soft{background:#fff8e8;color:var(--ink)}
 
+  .mode-card.weak-disabled{opacity:.55;cursor:default;filter:grayscale(.4)}
+  .mode-card.weak-disabled:hover{transform:none;box-shadow:none}
   .hidden{display:none}
   @media(max-width:600px){
     header h1{font-size:1.3rem}
@@ -290,6 +292,12 @@
             <svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><path d="M24 26V16M24 26l7 4" stroke="#a8132b" stroke-width="2" stroke-linecap="round"/><rect x="20" y="3" width="8" height="5" rx="2" fill="#c79a3a"/><path d="M24 8v3" stroke="#c79a3a" stroke-width="2"/></svg>
           </span>
           <span><h3>Den Hvide Kanins ræs</h3><p>"Jeg kommer for sent!" – en/et på 60 sek.</p></span>
+        </button>
+        <button class="mode-card" id="weakCard" data-mode="weak">
+          <span class="emblem">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff8e8" stroke="#c79a3a" stroke-width="2"/><path d="M16 32 Q24 16 32 32" fill="none" stroke="#a8132b" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="34" r="2" fill="#a8132b"/></svg>
+          </span>
+          <span><h3>Svage ord 🔁</h3><p id="weakSubtitle">Gentræn de ord du har fejlet</p></span>
         </button>
       </div>
       <div class="count-note">♦ <span id="wordCount">0</span> navneord · 100 modsætninger · 100 synonymer ♦</div>
@@ -846,7 +854,7 @@ const LS_KEY='en_et_traener_v1';
 const defaultProgress=()=>({
   total:0, correct:0, bestStreak:0,
   perItem:{}, // key -> {t:total, c:correct}
-  perMode:{enet:{t:0,c:0},definite:{t:0,c:0},plural:{t:0,c:0},sentence:{t:0,c:0},speed:{t:0,c:0},opposites:{t:0,c:0},synonyms:{t:0,c:0}}
+  perMode:{enet:{t:0,c:0},definite:{t:0,c:0},plural:{t:0,c:0},sentence:{t:0,c:0},speed:{t:0,c:0},opposites:{t:0,c:0},synonyms:{t:0,c:0},weak:{t:0,c:0}}
 });
 let P=loadProgress();
 function loadProgress(){
@@ -854,6 +862,36 @@ function loadProgress(){
   catch(e){ return defaultProgress(); }
 }
 function saveProgress(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(P)); }catch(e){} }
+
+/* --- Weak-word helpers --- */
+function weakPool(){
+  // Return WORDS items where ANY perItem key matching *:word.w has c < t
+  return WORDS.filter(noun=>{
+    for(const key in P.perItem){
+      // noun-mode keys are formatted as "mode:word"
+      if(key.endsWith(":"+noun.w)){
+        const rec=P.perItem[key];
+        if(rec.c<rec.t)return true;
+      }
+    }
+    return false;
+  });
+}
+function weakCount(){return weakPool().length;}
+function refreshWeakCard(){
+  const card=document.getElementById("weakCard");
+  if(!card)return;
+  const n=weakCount();
+  const sub=document.getElementById("weakSubtitle");
+  if(n===0){
+    card.classList.add("weak-disabled");
+    if(sub)sub.textContent="Ingen fejl endnu – bliv ved med at øve!";
+  }else{
+    card.classList.remove("weak-disabled");
+    if(sub)sub.textContent=n+" ord at gentræne";
+  }
+}
+
 function progressModeKey(){
   if(style)return category||"pairs";
   return mode||"misc";
@@ -935,8 +973,10 @@ function toMenu(){
   homeBtn.style.display="none";
   $("quote").textContent=pick(quotes);
   show("menu");
+  refreshWeakCard();
 }
 function chooseMode(m){
+  if(m==="weak"&&weakCount()===0)return; // disabled — do nothing
   if(m==="opposites"||m==="synonyms"){
     category=m;
     homeBtn.style.display="block";
@@ -957,9 +997,10 @@ function startMode(m){
   let pool;
   if(m==="sentence") pool=SENTENCES;
   else if(m==="plural") pool=filteredWords().filter(o=>o.p);
+  else if(m==="weak") pool=weakPool();
   else pool=filteredWords();
   queue=shuffle(pool);
-  if(m!=="speed") queue=queue.slice(0, m==="sentence"?Math.min(12,queue.length):ROUND_LEN);
+  if(m!=="speed") queue=queue.slice(0, m==="sentence"?Math.min(12,queue.length):(m==="weak"?Math.min(queue.length,ROUND_LEN):ROUND_LEN));
 
   const typed=(m==="definite"||m==="plural"||m==="sentence");
   enetButtons.classList.toggle("hidden", typed);
@@ -1007,7 +1048,7 @@ function showQuestion(){
   // standard ordstil (kan overskrives nedenfor)
   wordEl.style.fontFamily="'Cinzel Decorative',serif";wordEl.style.fontSize="2.1rem";
 
-  if(mode==="enet"||mode==="speed"){
+  if(mode==="enet"||mode==="speed"||mode==="weak"){
     hintEl.textContent="Hvilken artikel?";wordEl.textContent=item.w;
     btnEn.disabled=false;btnEt.disabled=false;
     setWordSpeaker(null); // article not revealed yet — avoid giving away the answer
@@ -1237,6 +1278,17 @@ function finishRound(){
     showEnd(null,"Du gennemgik alle "+queue.length+" kort","Godt studeret! 🔮",false,true);return;
   }
   const total=queue.length, pct=Math.round(correct/total*100);
+  if(mode==="weak"){
+    // count how many words in the played queue are now fully cleared (c === t for all their keys)
+    const cleared=queue.filter(noun=>{
+      const keys=Object.keys(P.perItem).filter(k=>k.endsWith(":"+noun.w));
+      return keys.length>0&&keys.every(k=>P.perItem[k].c>=P.perItem[k].t);
+    }).length;
+    refreshWeakCard();
+    showEnd(pct,correct+" / "+total+" rigtige",
+      "Ryddet: "+cleared+" / "+total+" svage ord · Strime: "+bestStreak+" 🔥");
+    return;
+  }
   showEnd(pct,correct+" / "+total+" rigtige","Bedste stime: "+bestStreak+" 🔥");
 }
 function finishSpeed(){
@@ -1269,7 +1321,7 @@ submitBtn.addEventListener("click",submitTyped);
 answerInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.stopPropagation();submitTyped();}});
 document.addEventListener("keydown",e=>{
   if(sections.game.classList.contains("hidden"))return;
-  if(!answered&&(mode==="enet"||mode==="speed")){
+  if(!answered&&(mode==="enet"||mode==="speed"||mode==="weak")){
     if(e.key==="1"||e.key==="ArrowLeft")answerArticle("en");
     if(e.key==="2"||e.key==="ArrowRight")answerArticle("et");
   }

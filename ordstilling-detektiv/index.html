@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -122,6 +122,11 @@ body{
 .bar{height:10px;background:#cdb888;border-radius:8px;overflow:hidden;border:1px solid #8a7448;margin:6px auto 0;max-width:380px}
 .bar > div{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--gold2),var(--green2));transition:width .6s}
 .reset{display:block;margin:16px auto 0;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit}
+.weak-btn{display:block;margin:8px auto 0;background:none;border:1.5px solid var(--amber);color:var(--amber);border-radius:20px;padding:5px 16px;font-size:12px;font-family:'Special Elite',monospace;letter-spacing:.5px;cursor:pointer;transition:background .15s,color .15s}
+.weak-btn:hover{background:var(--amber);color:var(--ink)}
+.weak-btn.hidden{display:none}
+.weak-banner{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);background:rgba(217,131,36,.12);border:1px solid rgba(217,131,36,.35);border-radius:4px;padding:4px 10px;text-align:center;margin-bottom:8px}
+.weak-banner.hidden{display:none}
 
 /* ---------- CASE / PLAY screen ---------- */
 .topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -254,6 +259,7 @@ body{
     <p class="progress-note" id="progNote">Cases solved: 0 / 12</p>
     <div class="bar"><div id="progBar"></div></div>
     <button class="reset" id="resetBtn">Reset all progress</button>
+    <button class="weak-btn hidden" id="weakBtn">Svage sætninger 🔁</button>
   </div>
 
   <!-- ================= PLAY ================= -->
@@ -268,6 +274,7 @@ body{
       </div>
     </div>
 
+    <div class="weak-banner hidden" id="weakBanner">⚠ Svage sætninger tilstand — øvetilstand</div>
     <div class="casehead" id="caseHead"></div>
     <div class="qbar"><div id="qFill"></div></div>
 
@@ -820,15 +827,39 @@ function renderMap(){
   const s=solvedCount();
   $("progNote").textContent=`Cases solved: ${s} / 12`+(allSolved()?" · FINAL UNLOCKED":"");
   $("progBar").style.width=(s/12*100)+"%";
+  const hasWeak=Object.values(prog.weak).some(v=>v>0);
+  $("weakBtn").classList.toggle("hidden",!hasWeak);
 }
 $("resetBtn").onclick=()=>{
   if(confirm("Reset all progress and stamps?")){prog={solved:{},best:{},weak:{},finalBest:0};saveP(prog);renderMap();}
 };
+$("weakBtn").onclick=()=>startWeak();
 $("backBtn").onclick=()=>{ stopTimer(); show("map"); renderMap(); };
+
+function startWeak(){
+  const pool=[];
+  CASES.forEach(c=>{
+    if((prog.weak[c.n]||0)>0){
+      c.sents.forEach(s=>pool.push({...s, caseN:c.n, cefr:c.cefr, grammarTip:c.grammarTip, caseTitle:c.title}));
+    }
+  });
+  if(!pool.length){ renderMap(); return; }
+  const q=shuffle(pool);
+  G={mode:"weak", caseN:0, c:null, queue:q, i:0, score:0, streak:0, lives:99, correct:0, total:0};
+  $("weakBanner").classList.remove("hidden");
+  $("timer").classList.add("hidden");
+  $("caseHead").innerHTML=
+    `<div class="file">ØVETILSTAND · ALLE NIVEAUER</div>`+
+    `<h2>Svage sætninger 🔁</h2>`+
+    `<div class="story">Gennemgå de sætninger, du har haft svært ved. Hver korrekt svar reducerer puljen — den skrumper, efterhånden som du øver dig.</div>`+
+    `<div class="focus">🎯 ${q.length} sætning${q.length===1?"":"er"} i puljen</div>`;
+  show("play"); renderHUD(); loadQuestion();
+}
 
 function show(which){
   $("mapScreen").classList.toggle("hidden",which!=="map");
   $("playScreen").classList.toggle("hidden",which!=="play");
+  if(which!=="play") $("weakBanner").classList.add("hidden");
 }
 
 /* ===================================================== GAME STATE ====== */
@@ -877,7 +908,7 @@ function startFinal(){
 function renderHUD(){
   $("scoreV").textContent=G.score;
   $("streakV").textContent=G.streak;
-  $("livesV").textContent=G.mode==="final"?"∞":"❤".repeat(G.lives)+"♡".repeat(3-G.lives);
+  $("livesV").textContent=(G.mode==="final"||G.mode==="weak")?"∞":"❤".repeat(G.lives)+"♡".repeat(3-G.lives);
 }
 
 /* ---------- timer (final) ---------- */
@@ -905,10 +936,10 @@ function loadQuestion(){
   const tokens=item.da.split(" ");
   cur={item, correct:tokens, placed:[], caseN:item.caseN||G.caseN};
 
-  $("promptLbl").textContent=G.mode==="final"
+  $("promptLbl").textContent=(G.mode==="final"||G.mode==="weak")
     ? `▸ STATEMENT ${G.i+1} / ${total}  ·  ${item.cefr}`
     : `▸ STATEMENT ${G.i+1} / ${total}`;
-  $("enLine").innerHTML=`Reconstruct in Danish: <b>“${item.en}”</b>`;
+  $("enLine").innerHTML=`Reconstruct in Danish: <b>"${item.en}"</b>`;
 
   // answer slot
   const ans=$("answer"); ans.className="answer empty"; ans.innerHTML="";
@@ -969,11 +1000,17 @@ $("checkBtn").onclick=()=>{
     const pts=10+Math.min(G.streak,5)*2+(G.mode==="final"?5:0);
     G.score+=pts;
     if(G.streak>1&&G.streak%3===0) flash("🔥 x"+G.streak+" streak!");
+    if(G.mode==="weak"){
+      const cn=cur.caseN;
+      prog.weak[cn]=(prog.weak[cn]||1)-1;
+      if(prog.weak[cn]<=0) delete prog.weak[cn];
+      saveP(prog);
+    }
   }else{
     G.streak=0;
     const cn=cur.caseN;
-    prog.weak[cn]=(prog.weak[cn]||0)+1; saveP(prog);
-    if(G.mode!=="final"){ G.lives--; }
+    if(G.mode!=="weak"){ prog.weak[cn]=(prog.weak[cn]||0)+1; saveP(prog); }
+    if(G.mode!=="final"&&G.mode!=="weak"){ G.lives--; }
   }
   renderHUD();
   showExplain(ok);
@@ -981,6 +1018,7 @@ $("checkBtn").onclick=()=>{
 
 function showExplain(ok){
   const c=CASES.find(x=>x.n===cur.caseN);
+  const tipText=G.mode==="weak"?(cur.item.grammarTip||""):(c?c.grammarTip:"");
   const ex=$("explain");
   ex.className="explain show "+(ok?"good":"bad");
   $("verdict").textContent=ok?"✓ Case logic confirmed!":"✗ The word order doesn't hold up.";
@@ -992,8 +1030,8 @@ function showExplain(ok){
   solEl.appendChild(solTextSpan);
   solEl.appendChild(speakerBtn(solidText));
   $("trLine").textContent="“"+cur.item.en+"”";
-  $("why").innerHTML = (ok?"":"<b>Correct order shown above.</b> ")+ (c?c.grammarTip:"");
-  if(G.mode!=="final" && G.lives<=0){
+  $("why").innerHTML = (ok?"":"<b>Correct order shown above.</b> ")+ tipText;
+  if(G.mode!=="final" && G.mode!=="weak" && G.lives<=0){
     $("nextBtn").textContent="See results ▸";
   }else{
     $("nextBtn").textContent = (G.i>=G.queue.length-1)?"Finish ▸":"Next ▸";
@@ -1001,7 +1039,7 @@ function showExplain(ok){
 }
 
 $("nextBtn").onclick=()=>{
-  if(G.mode!=="final" && G.lives<=0){ finishSession(); return; }
+  if(G.mode!=="final"&&G.mode!=="weak" && G.lives<=0){ finishSession(); return; }
   G.i++;
   if(G.i>=G.queue.length){ finishSession(); }
   else loadQuestion();
@@ -1015,7 +1053,22 @@ function finishSession(){
   const pct=Math.round(G.correct/Math.max(1,G.total)*100);
   const area=$("completeArea"); area.classList.remove("hidden");
 
-  if(G.mode==="case"){
+  if(G.mode==="weak"){
+    const remaining=Object.values(prog.weak).filter(v=>v>0).length;
+    area.innerHTML=
+      `<div class="bigstamp" style="color:#d98324;border-color:#d98324;transform:rotate(-3deg)">ØVET</div>`+
+      `<h2>Svage sætninger 🔁</h2>`+
+      `<div class="score">${G.correct} sætninger klaret ud af ${G.total}</div>`+
+      `<p>${remaining>0
+        ? `Godt arbejde! Der er stadig <b>${remaining} sag${remaining===1?"":"er"}</b> med svage sætninger. Fortsæt med at øve dig!`
+        : `Fremragende! Du har ryddet alle svage sætninger fra puljen. 🎉`}</p>`+
+      `<div class="controls" style="margin-top:16px">
+         <button class="btn clear" id="againBtn">🔁 Øv igen</button>
+         <button class="btn check" id="mapBtn2">Tilbage til kortvalg ▸</button>
+       </div>`;
+    $("againBtn").onclick=()=>startWeak();
+    $("mapBtn2").onclick=()=>{show("map");renderMap();};
+  }else if(G.mode==="case"){
     const passed=G.lives>0 && pct>=60;
     if(passed){
       prog.solved[G.caseN]=true;

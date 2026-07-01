@@ -167,6 +167,15 @@ let wrongCount = 0;
 // Active CEFR filter: 'All' or one of 'A1','A2','B1','B2','C1'
 let cefrFilter = 'All';
 
+/* ---------- REVIEW MISTAKES MODE ---------- */
+// When in review mode these are non-null:
+//   reviewDeck     — array of { verbIndex } for the mistake verbs being reviewed
+//   reviewPos      — current position within reviewDeck
+//   savedIndex     — currentIndex value to restore on exit
+let reviewDeck   = null;
+let reviewPos    = 0;
+let savedIndex   = 0;
+
 // Returns the subset of verbs that match the current CEFR filter
 function filteredVerbs() {
     if (cefrFilter === 'All') return verbs;
@@ -267,6 +276,60 @@ const wrongCountEl = document.getElementById('wrong-count');
 const wrongBtn = document.getElementById('wrong-btn');
 const rightBtn = document.getElementById('right-btn');
 const restartBtn = document.getElementById('restart-btn');
+const reviewMistakesBtn = document.getElementById('review-mistakes-btn');
+const reviewModeBanner  = document.getElementById('review-mode-banner');
+const exitReviewBtn     = document.getElementById('exit-review-btn');
+
+/* ---------- REVIEW MISTAKES HELPERS ---------- */
+
+// Returns true when we are currently in Review Mode
+function inReviewMode() { return reviewDeck !== null; }
+
+// Update the Review Mistakes button: enabled only when there are 'wrong' verbs
+// and we are NOT already in review mode
+function updateReviewBtn() {
+    const hasWrong = statuses.some(s => s.status === 'wrong');
+    reviewMistakesBtn.disabled = !hasWrong || inReviewMode();
+    reviewMistakesBtn.title = hasWrong
+        ? 'Review your incorrect verbs in a focused session'
+        : 'No mistakes yet — keep practicing!';
+}
+
+// Enter Review Mode: snapshot current position, build the sub-deck, render
+function enterReviewMode() {
+    savedIndex = currentIndex;
+    reviewDeck = statuses
+        .map((s, i) => (s.status === 'wrong' ? i : -1))
+        .filter(i => i !== -1)
+        .map(verbIndex => ({ verbIndex }));
+    reviewPos = 0;
+    currentIndex = reviewDeck[0].verbIndex;
+    reviewModeBanner.style.display = 'flex';
+    reviewMistakesBtn.disabled = true;
+    renderAll();
+}
+
+// Exit Review Mode: restore the saved position, hide the banner, re-render
+function exitReviewMode() {
+    reviewDeck  = null;
+    reviewPos   = 0;
+    currentIndex = savedIndex;
+    reviewModeBanner.style.display = 'none';
+    updateReviewBtn();
+    renderAll();
+}
+
+// Advance within the review sub-deck; exit when the deck is exhausted
+function reviewGoToNext() {
+    reviewPos++;
+    if (reviewPos >= reviewDeck.length) {
+        // Finished all mistake cards — exit automatically
+        exitReviewMode();
+    } else {
+        currentIndex = reviewDeck[reviewPos].verbIndex;
+        renderAll();
+    }
+}
 
 /* ---------- CEFR LEVEL FILTER UI ---------- */
 function buildCefrFilter() {
@@ -414,36 +477,60 @@ function renderVerbList() {
 
 // Update the scoreboard numbers
 function updateScoreboard() {
-    const fv = filteredVerbs();
-    const filteredStatuses = fv.map(v => statuses[verbs.indexOf(v)]);
-    const completedCount = filteredStatuses.filter(item => item.status !== 'unreviewed').length;
-    const filteredPosition = fv.indexOf(verbs[currentIndex]);
-    const displayIndex = filteredPosition >= 0 ? filteredPosition : 0;
+    if (inReviewMode()) {
+        // Show review-specific counters
+        const total = reviewDeck.length;
+        cardNumberEl.textContent = `Review ${reviewPos + 1} of ${total}`;
+        const remaining = total - reviewPos;
+        remainingEl.textContent = `Remaining: ${remaining}`;
+        correctCountEl.textContent = `Correct: ${correctCount}`;
+        wrongCountEl.textContent = `Wrong: ${wrongCount}`;
 
-    cardNumberEl.textContent = `Card ${displayIndex + 1} of ${fv.length}`;
-    const remaining = fv.length - completedCount;
-    remainingEl.textContent = `Remaining: ${remaining}`;
-    correctCountEl.textContent = `Correct: ${correctCount}`;
-    wrongCountEl.textContent = `Wrong: ${wrongCount}`;
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.background = 'linear-gradient(90deg, var(--wl-red-dark), var(--wl-red))';
+        progressBar.style.width = `${(reviewPos / total) * 100}%`;
 
-    // Update progress bar width based on completed count within filter
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercent = fv.length > 0 ? (completedCount / fv.length) * 100 : 0;
-    progressBar.style.width = `${progressPercent}%`;
-
-    // Disable buttons if current card already marked
-    const status = statuses[currentIndex].status;
-    if (status === 'correct' || status === 'wrong') {
-        wrongBtn.disabled = true;
-        rightBtn.disabled = true;
-        wrongBtn.classList.add('disabled');
-        rightBtn.classList.add('disabled');
-    } else {
+        // In review mode cards always start as 'wrong' — always allow re-rating
         wrongBtn.disabled = false;
         rightBtn.disabled = false;
         wrongBtn.classList.remove('disabled');
         rightBtn.classList.remove('disabled');
+    } else {
+        // Normal mode scoreboard
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.background = '';   // restore CSS default
+
+        const fv = filteredVerbs();
+        const filteredStatuses = fv.map(v => statuses[verbs.indexOf(v)]);
+        const completedCount = filteredStatuses.filter(item => item.status !== 'unreviewed').length;
+        const filteredPosition = fv.indexOf(verbs[currentIndex]);
+        const displayIndex = filteredPosition >= 0 ? filteredPosition : 0;
+
+        cardNumberEl.textContent = `Card ${displayIndex + 1} of ${fv.length}`;
+        const remaining = fv.length - completedCount;
+        remainingEl.textContent = `Remaining: ${remaining}`;
+        correctCountEl.textContent = `Correct: ${correctCount}`;
+        wrongCountEl.textContent = `Wrong: ${wrongCount}`;
+
+        const progressPercent = fv.length > 0 ? (completedCount / fv.length) * 100 : 0;
+        progressBar.style.width = `${progressPercent}%`;
+
+        // Disable buttons if current card already marked
+        const status = statuses[currentIndex].status;
+        if (status === 'correct' || status === 'wrong') {
+            wrongBtn.disabled = true;
+            rightBtn.disabled = true;
+            wrongBtn.classList.add('disabled');
+            rightBtn.classList.add('disabled');
+        } else {
+            wrongBtn.disabled = false;
+            rightBtn.disabled = false;
+            wrongBtn.classList.remove('disabled');
+            rightBtn.classList.remove('disabled');
+        }
     }
+
+    updateReviewBtn();
 }
 
 // Render everything
@@ -465,6 +552,15 @@ function goToNext() {
 
 // Handle marking as wrong — also auto-flips the card to reveal note
 wrongBtn.addEventListener('click', () => {
+    if (inReviewMode()) {
+        // In review mode: verb stays 'wrong', flip to show answer, then advance
+        const card = cardWrapper.querySelector('.flashcard');
+        if (card && !card.classList.contains('is-flipped')) {
+            card.classList.add('is-flipped');
+        }
+        setTimeout(() => reviewGoToNext(), 1200);
+        return;
+    }
     if (statuses[currentIndex].status === 'unreviewed') {
         statuses[currentIndex].status = 'wrong';
         wrongCount++;
@@ -481,6 +577,17 @@ wrongBtn.addEventListener('click', () => {
 
 // Handle marking as correct
 rightBtn.addEventListener('click', () => {
+    if (inReviewMode()) {
+        // Promote this verb from 'wrong' to 'correct' and advance
+        if (statuses[currentIndex].status === 'wrong') {
+            statuses[currentIndex].status = 'correct';
+            correctCount++;
+            wrongCount = Math.max(0, wrongCount - 1);
+            saveProgress();
+        }
+        reviewGoToNext();
+        return;
+    }
     if (statuses[currentIndex].status === 'unreviewed') {
         statuses[currentIndex].status = 'correct';
         correctCount++;
@@ -491,6 +598,12 @@ rightBtn.addEventListener('click', () => {
 
 // Restart the game
 restartBtn.addEventListener('click', () => {
+    // Exit review mode if active before resetting
+    if (inReviewMode()) {
+        reviewDeck = null;
+        reviewPos  = 0;
+        reviewModeBanner.style.display = 'none';
+    }
     // Reset statuses
     statuses = verbs.map(() => ({ status: 'unreviewed' }));
     currentIndex = 0;
@@ -498,6 +611,16 @@ restartBtn.addEventListener('click', () => {
     wrongCount = 0;
     saveProgress();
     renderAll();
+});
+
+// Enter review mode when "Review Mistakes" is clicked
+reviewMistakesBtn.addEventListener('click', () => {
+    if (!inReviewMode()) enterReviewMode();
+});
+
+// Exit review mode when "Back to full deck" is clicked
+exitReviewBtn.addEventListener('click', () => {
+    if (inReviewMode()) exitReviewMode();
 });
 
 // Initialize on DOMContentLoaded
@@ -516,4 +639,6 @@ window.addEventListener('DOMContentLoaded', () => {
     wrongCount = saved.wrongCount;
 
     renderAll();
+    // Reflect persisted mistake state on the Review button
+    updateReviewBtn();
 });

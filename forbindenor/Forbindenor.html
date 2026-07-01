@@ -139,6 +139,20 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
   100%{opacity:0;transform:translate(-50%,-16px)}}
 .dsg-home{position:fixed;top:14px;right:14px;z-index:999999;display:inline-flex;align-items:center;gap:6px;background:rgba(20,20,30,.62);color:#fff;text-decoration:none;font:700 .85rem 'Segoe UI',system-ui,sans-serif;padding:9px 16px;border-radius:999px;backdrop-filter:blur(4px);box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .15s ease,background .15s ease}
 .dsg-home:hover{transform:translateY(-2px);background:rgba(20,20,30,.8)}
+.weak-btn{cursor:pointer;border:1px solid var(--orange);background:rgba(46,18,4,.7);color:var(--orange);
+  font-family:'Share Tech Mono';font-size:.74rem;letter-spacing:.1em;padding:7px 12px;
+  border-radius:4px;display:none;transition:transform .1s,box-shadow .15s,border-color .15s;
+  box-shadow:inset 0 0 14px rgba(255,138,30,.1)}
+.weak-btn:hover{border-color:var(--orange-hot);box-shadow:0 0 14px rgba(255,138,30,.35);transform:translateY(-1px)}
+.weak-banner{display:none;background:rgba(46,18,4,.8);border:1px solid var(--orange);border-radius:6px;
+  padding:10px 14px;margin-bottom:12px;text-align:center;color:var(--orange);font-size:.78rem;
+  letter-spacing:.12em;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.weak-banner.show{display:flex}
+.weak-banner b{color:var(--orange-hot);font-family:'Orbitron';font-size:.85rem;letter-spacing:.15em}
+.back-btn{cursor:pointer;border:1px solid var(--cyan-dim);background:var(--panel);color:var(--cyan);
+  font-family:'Share Tech Mono';font-size:.72rem;letter-spacing:.1em;padding:5px 10px;border-radius:4px;
+  transition:border-color .15s,box-shadow .15s}
+.back-btn:hover{border-color:var(--cyan);box-shadow:0 0 10px rgba(55,226,255,.3)}
 </style>
 </head>
 <body>
@@ -154,6 +168,12 @@ h1 .o{color:var(--orange);text-shadow:0 0 10px var(--orange-hot)}
     <div class="chip streak">Streak<b id="streak">0</b></div>
     <div class="chip lives">Energy<b id="lives">6</b></div>
     <div class="chip best">Best<b id="best">0</b></div>
+    <button class="weak-btn" id="weakBtn" type="button">Svage forbindeord 🔁</button>
+  </div>
+  <div class="weak-banner" id="weakBanner">
+    <b>⚠ SVAGE ORD TILSTAND</b>
+    <span id="weakCount"></span>
+    <button class="back-btn" id="backBtn" type="button">Tilbage til normalt spil ✕</button>
   </div>
   <div class="panel" id="game">
     <div class="cat"><span id="cat">&mdash;</span><span class="en" id="catEn"></span></div>
@@ -633,7 +653,8 @@ function loadProgress(){
 function saveProgress(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(P)); }catch(e){} }
 let P = loadProgress();
 
-const state = {score:0,streak:0,lives:6,i:0,order:shuffle([...Array(records.length).keys()]),answered:false};
+const state = {score:0,streak:0,lives:6,i:0,order:shuffle([...Array(records.length).keys()]),answered:false,
+  weakMode:false,weakPool:[],weakOrder:[]};
 
 function distractors(rec){
   const pool=(byCat[rec.cat]||[]).filter(w=>w!==rec.ans);
@@ -647,7 +668,9 @@ function distractors(rec){
 }
 function render(){
   state.answered=false;
-  const rec=records[state.order[state.i]];
+  const pool = state.weakMode ? state.weakPool : records;
+  const order = state.weakMode ? state.weakOrder : state.order;
+  const rec=pool[order[state.i]];
   $('cat').textContent=rec.cat;
   $('catEn').textContent='// '+rec.catEn;
   $('sentence').innerHTML=esc(rec.da).replace('{}','<span class="blank" id="bk">_____</span>');
@@ -667,8 +690,9 @@ function render(){
   $('tr').textContent=rec.en;
   $('note').innerHTML=esc(rec.note).replace(/'([^']+)'/g,"<b>$1</b>");
   updateHud();
-  $('bar').style.width=(state.i/records.length*100)+'%';
-  $('count').textContent='Sekvens '+(state.i+1)+' / '+records.length;
+  const total = order.length;
+  $('bar').style.width=(state.i/total*100)+'%';
+  $('count').textContent='Sekvens '+(state.i+1)+' / '+total+(state.weakMode?' // Svage ord':'');
 }
 function choose(btn,w,rec){
   if(state.answered) return;
@@ -708,6 +732,7 @@ function recordAnswer(rec,isCorrect){
   const pc = P.perCat[rec.cat] || (P.perCat[rec.cat]={t:0,c:0});
   pc.t++; if(isCorrect) pc.c++;
   saveProgress();
+  refreshWeakBtn();
 }
 function energyPopup(msg){
   const t=$('toast');
@@ -725,12 +750,24 @@ function updateHud(){
 $('next').onclick=()=>{
   if(state.lives<=0) return end(false);
   state.i++;
-  if(state.i>=records.length) return end(true);
+  const limit = state.weakMode ? state.weakOrder.length : records.length;
+  if(state.i>=limit){
+    if(state.weakMode){
+      // Rebuild weak pool in case words were "cured", then loop
+      rebuildWeakPool();
+      if(state.weakPool.length===0){ exitWeakMode(); return; }
+      state.i=0;
+      render();
+      return;
+    }
+    return end(true);
+  }
   render();
 };
 function end(win){
   $('game').style.display='none';
   $('end').classList.add('show');
+  $('weakBanner').classList.remove('show');
   $('finalScore').textContent=state.score;
   $('endMsg').textContent=win
     ? 'Du gennemførte alle '+records.length+' sekvenser. // You cleared the whole grid!'
@@ -739,10 +776,50 @@ function end(win){
 $('again').onclick=()=>{
   state.score=0;state.streak=0;state.lives=6;state.i=0;
   state.order=shuffle([...Array(records.length).keys()]);
+  state.weakMode=false; state.weakPool=[]; state.weakOrder=[];
   $('end').classList.remove('show');
+  $('weakBanner').classList.remove('show');
   $('game').style.display='block';
+  refreshWeakBtn();
   render();
 };
+
+/* ---------- WEAK MODE ---------- */
+function buildWeakPool(){
+  return records.filter(r=>{
+    const pw=P.perWord[r.ans];
+    return pw && pw.c < pw.t;
+  });
+}
+function rebuildWeakPool(){
+  state.weakPool=buildWeakPool();
+  state.weakOrder=shuffle([...Array(state.weakPool.length).keys()]);
+}
+function refreshWeakBtn(){
+  const hasWeak = buildWeakPool().length > 0;
+  const btn=$('weakBtn');
+  btn.style.display = hasWeak ? 'block' : 'none';
+}
+function enterWeakMode(){
+  rebuildWeakPool();
+  if(state.weakPool.length===0) return;
+  state.weakMode=true;
+  state.i=0;
+  const cnt=new Set(state.weakPool.map(r=>r.ans)).size;
+  $('weakCount').textContent=cnt+' svage ord ('+state.weakPool.length+' sekvenser)';
+  $('weakBanner').classList.add('show');
+  render();
+}
+function exitWeakMode(){
+  state.weakMode=false; state.weakPool=[]; state.weakOrder=[];
+  $('weakBanner').classList.remove('show');
+  energyPopup('✓ Ingen svage ord tilbage!');
+  render();
+}
+$('weakBtn').onclick=()=>{ if(!state.weakMode) enterWeakMode(); };
+$('backBtn').onclick=()=>exitWeakMode();
+
+refreshWeakBtn();
 render();
 </script>
 </body>

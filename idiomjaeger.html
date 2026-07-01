@@ -204,6 +204,8 @@ label.flt{display:flex;flex-direction:column;gap:3px;font-size:.78rem;font-weigh
 .bar-val{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));}
 .bar-row .pct{width:38px;text-align:right;font-weight:bold;}
 
+@media(max-width:480px){.match-cols{grid-template-columns:1fr;}}
+
 /* Achievements */
 .badge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
 @media(max-width:420px){.badge-grid{grid-template-columns:1fr;}}
@@ -484,14 +486,15 @@ const DATA = [
 {d:"Gå i hundene",m:"To go to the dogs",x:"To deteriorate or fall into ruin.",e:"Uden vedligehold går huset i hundene.",t:"Without upkeep the house will go to the dogs.",l:"C1",c:"Problems & Challenges",k:"hundene"},
 {d:"Brænde sine broer",m:"To burn one's bridges",x:"To destroy relationships so there's no going back.",e:"Sig ikke op i vrede – du skal ikke brænde dine broer.",t:"Don't quit in anger – you shouldn't burn your bridges.",l:"B2",c:"Work & Meetings",k:"broer"},
 ];
-// assign stable id by index
-DATA.forEach((d,i)=>d.id=i);
+// assign stable string id derived from idiom content
+DATA.forEach(d=>d.id=d.d.toLowerCase().replace(/\s+/g,'_').replace(/[æ]/g,'ae').replace(/[ø]/g,'oe').replace(/[å]/g,'aa').replace(/[^a-z_]/g,'').slice(0,40));
+const DATA_BY_ID=Object.fromEntries(DATA.map(d=>[d.id,d]));
 const LEVELS=['A1','A2','B1','B2','C1'].filter(l=>DATA.some(d=>d.l===l));
 
 /* ============================================================
    STATE & PERSISTENCE
    ============================================================ */
-const SAVE_KEY='idiomjaeger_v1';
+const SAVE_KEY='idiomjaeger_v2';
 const DEFAULT_STATE=()=>({idiom:{},totalAns:0,totalCorrect:0,streak:0,longest:0,coins:0,daily:{},ach:[],ctxWin:false,natWin:false});
 let S=load();
 function load(){
@@ -626,7 +629,7 @@ function checkAchievements(){let unlocked=[];ACHS.forEach(a=>{if(!S.ach.includes
 /* ============================================================
    ROUTER
    ============================================================ */
-function goMenu(){renderMenu();}
+function goMenu(){if(Q&&Q.timerH){clearInterval(Q.timerH);Q.timerH=null;}renderMenu();}
 
 function renderMenu(){
   app.innerHTML=`
@@ -793,7 +796,7 @@ function renderQuestion(){
 }
 function answer(idx,btn){
   if(Q.answered)return;Q.answered=true;
-  const q=Q.current,opt=q.options[idx],d=DATA[q.id];
+  const q=Q.current,opt=q.options[idx],d=DATA_BY_ID[q.id];
   const correct=opt.correct;
   document.querySelectorAll('#choices .choice').forEach((b,i)=>{b.disabled=true;if(q.options[i].correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');});
   recordAnswer(q.id,correct);
@@ -856,7 +859,7 @@ function renderText(){
 }
 function checkText(){
   if(T.answered)return;
-  const q=T.current,d=DATA[q.id];const val=normTxt(document.getElementById('txtIn').value);
+  const q=T.current,d=DATA_BY_ID[q.id];const val=normTxt(document.getElementById('txtIn').value);
   if(!val)return;
   T.answered=true;
   const correct=val===normTxt(q.answer);
@@ -912,7 +915,7 @@ function memFlip(i){
       ca.matched=cb.matched=true;MEM.matched++;MEM.flipped=[];
       recordAnswer(ca.pid,true);
       const burstCard=document.querySelector(`.mem-card[data-i="${a}"]`);burstAt(burstCard);
-      if(_justMastered===ca.pid){toast('🏆 "'+esc(DATA[ca.pid].d)+'" mestret!');_justMastered=null;}
+      if(_justMastered===ca.pid){toast('🏆 "'+esc(DATA_BY_ID[ca.pid].d)+'" mestret!');_justMastered=null;}
       setTimeout(()=>{if(MEM.matched>=6)endMemory();else renderMemory();},450);
     }else{
       setTimeout(()=>{MEM.flipped=[];renderMemory();},850);
@@ -946,13 +949,13 @@ function renderMatch(){
 }
 function matchClick(el){
   if(el.classList.contains('done'))return;
-  const side=el.dataset.side,id=parseInt(el.dataset.id);
+  const side=el.dataset.side,id=el.dataset.id;
   if(side==='L'){document.querySelectorAll('#colL .match-item').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');MP.selL=id;return;}
   if(MP.selL===null)return;
   if(id===MP.selL){
     document.querySelectorAll(`.match-item[data-id="${id}"]`).forEach(x=>{x.classList.add('done');x.classList.remove('sel');});
     recordAnswer(id,true);MP.done++;burstAt(el);
-    if(_justMastered===id){toast('🏆 "'+esc(DATA[id].d)+'" mestret!');_justMastered=null;}
+    if(_justMastered===id){toast('🏆 "'+esc(DATA_BY_ID[id].d)+'" mestret!');_justMastered=null;}
     MP.selL=null;
     if(MP.done>=5)setTimeout(endMatch,400);
   }else{

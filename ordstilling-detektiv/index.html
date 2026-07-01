@@ -867,7 +867,7 @@ let G=null; // current session
 
 function makeQueue(caseN){
   const c=CASES.find(x=>x.n===caseN);
-  // pick 12 of the case's sentences, easier (earlier-indexed) first then a shuffle within
+  // pick 12 sentences at random from the case
   const picks=shuffle(c.sents).slice(0,12);
   return picks;
 }

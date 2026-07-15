@@ -10,12 +10,22 @@
 set -euo pipefail
 
 # ============================================================
-# EDIT NTFY_TOPIC BEFORE FIRST USE
+# Config. NTFY_TOPIC lives in .build-env (gitignored) because the topic name
+# is a shared secret — anyone who knows it can read your notifications and
+# send you push messages. Never put it in a tracked file.
 # ============================================================
 REPO_DIR="/c/Users/taras/Downloads/danske_spiller"
-NTFY_TOPIC="taras-dansk-build-9k4m"             # <-- subscribe to this in the ntfy app
-#                                                       then subscribe to the same string
-#                                                       in the ntfy app on your phone
+
+if [ -f "$REPO_DIR/.build-env" ]; then
+  # shellcheck disable=SC1091
+  . "$REPO_DIR/.build-env"
+fi
+
+if [ -z "${NTFY_TOPIC:-}" ]; then
+  echo "ERROR: NTFY_TOPIC unset. Create $REPO_DIR/.build-env with:" >&2
+  echo '  NTFY_TOPIC="your-topic-here"' >&2
+  exit 1
+fi
 # ============================================================
 
 LOG_DIR="$REPO_DIR/.build-logs"
@@ -57,14 +67,23 @@ CLAUDE_EXIT=$?
 set -e
 
 # ---- commit + push whatever changed ------------------------
+# The agent commits its own work, so usually nothing is left staged here.
+# This only sweeps up anything it left behind.
 git add -A
-if git diff --cached --quiet; then
-  PUSHED="no changes committed"
+if ! git diff --cached --quiet; then
+  git commit -m "Auto-build: uncommitted leftovers $TIMESTAMP" > /dev/null
+fi
+
+# Push whatever is ahead of the remote, regardless of who committed it.
+AHEAD=$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)
+if [ "$AHEAD" -gt 0 ]; then
+  if git push > /dev/null 2>&1; then
+    PUSHED="pushed $AHEAD commit(s), now at $(git rev-parse --short HEAD)"
+  else
+    PUSHED="PUSH FAILED — $AHEAD commit(s) still local"
+  fi
 else
-  COMMIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-  git commit -m "Auto-build: increment $TIMESTAMP" > /dev/null
-  git push
-  PUSHED="pushed ($(git rev-parse --short HEAD))"
+  PUSHED="nothing to push"
 fi
 
 # ---- parse run summary from JSON log -----------------------
@@ -86,7 +105,24 @@ else
 fi
 
 # ============================================================
-# CRONTAB SETUP
-# Run `crontab -e` and add the line below (edit the path first):
-# 0 */4 * * * /bin/bash /c/Users/taras/Downloads/danske_spiller/build-loop.sh >> /c/Users/taras/Downloads/danske_spiller/.build-logs/cron.log 2>&1
+# SCHEDULING (Windows — there is no cron here)
+#
+# Registered as scheduled task "danske-spiller-build", every 4 hours.
+# To re-register from PowerShell:
+#
+#   $action = New-ScheduledTaskAction -Execute 'C:\Program Files\Git\bin\bash.exe' `
+#     -Argument '-lc "/c/Users/taras/Downloads/danske_spiller/build-loop.sh >> /c/Users/taras/Downloads/danske_spiller/.build-logs/cron.log 2>&1"'
+#   $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date.AddHours(2) `
+#     -RepetitionInterval (New-TimeSpan -Hours 4)
+#   $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries `
+#     -AllowStartIfOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+#   Register-ScheduledTask -TaskName 'danske-spiller-build' -Action $action `
+#     -Trigger $trigger -Settings $settings -Force
+#
+# Inspect / run now / remove:
+#   Get-ScheduledTaskInfo -TaskName 'danske-spiller-build'
+#   Start-ScheduledTask   -TaskName 'danske-spiller-build'
+#   Unregister-ScheduledTask -TaskName 'danske-spiller-build' -Confirm:$false
+#
+# Note: runs only while this user is logged in.
 # ============================================================

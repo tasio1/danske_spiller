@@ -71,11 +71,6 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 
 ## Next Up
 
-- id: shared-core-1
-  spec: shared-danscore
-  status: todo
-  title: "DanskCore module 1 — store, tts, srs, diff (shared/dansk-core.js)"
-
 - id: shared-core-2
   spec: shared-danscore
   status: todo
@@ -183,3 +178,5 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 ---
 
 ## Completed
+
+- shared-core-1 / DanskCore module 1 — store, tts, srs, diff (shared/dansk-core.js) / 2026-07-15 / 5534b28

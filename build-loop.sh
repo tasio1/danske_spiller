@@ -47,7 +47,10 @@ notify() {
 }
 
 # ---- bail out quietly if nothing is queued -----------------
-if ! grep -q "status: todo" PROGRESS.md; then
+# Match only indented task fields ("  status: todo"), not the prose in the
+# rules header, which also contains the words "status: todo" and would
+# otherwise make this check always true.
+if ! grep -qE '^[[:space:]]+status: todo' PROGRESS.md; then
   notify \
     "danske_spiller: nothing to do" \
     "No todo tasks in PROGRESS.md — skipped this run." \

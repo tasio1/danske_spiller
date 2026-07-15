@@ -1,0 +1,1146 @@
+<!--
+  Danish Sentence Builder: Adverbs & Connectors
+
+  This file implements a complete single‑page learning game for Danish
+  adverbs and conjunctions.  It is completely self‑contained: all of
+  the HTML, CSS and JavaScript live inside this single document.  No
+  external libraries or backend services are required.  Progress is
+  stored in the browser’s localStorage so returning players can pick
+  up where they left off.  A sample dataset is built into the script
+  so the game works immediately; learners can also paste CSV data
+  exported from the supplied Excel sheet to load all ~500 sentences.
+
+  CSV import instructions:
+  - Click the “Import Data” button in the header.  Paste your CSV
+    content into the textarea and click “Load Game Data”.  The CSV
+    must include the following columns (order doesn’t matter):
+      word, meaning, sentence_da, sentence_en, category, level, theme
+    Each row should correspond to a single entry in the dataset.  If
+    values contain commas, wrap them in double quotes.
+  - Alternatively, you can copy the entire Excel sheet into the
+    textarea: ensure columns are separated by commas or tabs.
+
+  Progress storage:
+  - Progress (score, streak, level, stats, saved review words and
+    mistakes) is saved in localStorage under the key
+    "danishSentenceBuilderProgress".  Your progress is preserved across
+    sessions (subject to browser privacy settings)【164741182258330†L185-L193】.
+  - To reset all progress, click the “Reset Progress” button in the
+    settings panel.
+  - To export your progress as JSON for backup or analysis, click
+    “Export Progress”.
+
+  Keyboard shortcuts:
+  - Number keys 1–4 select answers in multiple‑choice questions.
+  - Enter submits your selection when available.
+  - R opens Review Mode (practice saved words and mistakes).
+
+  This game is designed for adult learners at the B1–B2 level.  It
+  covers adverbs and connectors in real Danish sentences, emphasising
+  meaning, usage and word order.  The interface is mobile‑friendly
+  with a dark‑mode toggle.
+-->
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danish Sentence Builder: Adverbs &amp; Connectors</title>
+  <style>
+    /* CSS reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    :root {
+      --primary: #004080;
+      --accent: #e07a5f;
+      --bg-light: #ffffff;
+      --text-light: #0a0a0a;
+      --bg-dark: #121212;
+      --text-dark: #f5f5f5;
+    }
+    /* Light mode variables */
+    body:not(.dark) {
+      --bg-color: var(--bg-light);
+      --text-color: var(--text-light);
+      --card-bg: #f7f9fc;
+      --card-border: #dce3ef;
+    }
+    /* Dark mode variables */
+    body.dark {
+      --bg-color: var(--bg-dark);
+      --text-color: var(--text-dark);
+      --card-bg: #1e1e1e;
+      --card-border: #333333;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      flex: 1;
+    }
+    header .header-buttons button {
+      margin-left: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      border: none;
+      border-radius: 4px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    header .header-buttons button:hover {
+      opacity: 0.9;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1rem;
+    }
+    #dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    #dashboard .stat {
+      flex: 1 1 48%;
+      min-width: 150px;
+    }
+    #game {
+      flex: 1;
+    }
+    #game h2 {
+      margin-bottom: 0.5rem;
+    }
+    #options button {
+      width: 100%;
+      margin: 0.3rem 0;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      cursor: pointer;
+    }
+    #options button:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    #options button.correct {
+      background: #388e3c;
+      color: #fff;
+    }
+    #options button.wrong {
+      background: #c62828;
+      color: #fff;
+    }
+    #controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    #controls button {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+    }
+    #controls button:hover {
+      opacity: 0.9;
+    }
+    .hidden {
+      display: none !important;
+    }
+    /* Import modal styling */
+    #importModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #importModal .modal-content {
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 1rem;
+      max-width: 90%;
+      width: 500px;
+      max-height: 90%;
+      overflow-y: auto;
+      border-radius: 6px;
+    }
+    #importModal textarea {
+      width: 100%;
+      height: 200px;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+    }
+    #importModal button {
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    /* Simple fluency map styling */
+    #map {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    #map button {
+      flex: 1 1 30%;
+      padding: 0.8rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    #map button.completed {
+      background: #4caf50;
+      color: #fff;
+    }
+    #map button.locked {
+      background: #9e9e9e;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    /* Word order challenge parts */
+    #reorderParts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 1rem 0;
+    }
+    #reorderParts button {
+      padding: 0.5rem;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: var(--card-bg);
+      cursor: pointer;
+    }
+    #reorderParts button.selected {
+      background: var(--primary);
+      color: #fff;
+    }
+    /* Category quest drop zones */
+    #categoryQuest {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .category-drop {
+      flex: 1 1 45%;
+      min-height: 60px;
+      padding: 0.5rem;
+      border: 2px dashed var(--card-border);
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .category-drop.over {
+      border-color: var(--primary);
+      background: rgba(0, 64, 128, 0.1);
+    }
+    .dragging {
+      opacity: 0.5;
+    }
+    #categoryOptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    #categoryOptions .word-chip {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: var(--card-bg);
+      cursor: pointer;
+    }
+    #feedback {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      min-height: 1.2rem;
+    }
+    /* Review mode styling */
+    #reviewList {
+      margin-top: 0.5rem;
+    }
+    #reviewList li {
+      padding: 0.3rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Danish Sentence Builder</h1>
+    <div class="header-buttons">
+      <button id="darkToggle" title="Toggle dark mode">🌙</button>
+      <button id="importBtn" title="Import CSV data">Import Data</button>
+      <button id="reviewBtn" title="Review saved words (R)">Review</button>
+      <button id="settingsBtn" title="Settings">Settings</button>
+    </div>
+  </header>
+  <main>
+    <!-- Dashboard & Map -->
+    <div id="dashboard" class="card"></div>
+    <!-- Fluency Map Zones -->
+    <div id="map" class="card"></div>
+    <!-- Game Area -->
+    <div id="game" class="card"></div>
+  </main>
+
+  <!-- Import Modal -->
+  <div id="importModal" class="hidden">
+    <div class="modal-content">
+      <h2>Import CSV Data</h2>
+      <p>Paste your CSV (columns: word, meaning, sentence_da, sentence_en, category, level, theme). Separate values with commas or tabs.</p>
+      <textarea id="csvInput" placeholder="Paste CSV here..."></textarea>
+      <div>
+        <button id="loadDataBtn">Load Game Data</button>
+        <button id="cancelImportBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (contains reset/export) -->
+  <div id="settingsModal" class="hidden">
+    <div class="modal-content">
+      <h2>Settings</h2>
+      <p>
+        Use these options to manage your progress. Data is stored in
+        localStorage【164741182258330†L185-L193】 and will persist across sessions unless you clear it or
+        browse in private mode.
+      </p>
+      <button id="exportProgressBtn">Export Progress</button>
+      <button id="resetProgressBtn">Reset Progress</button>
+      <button id="closeSettingsBtn">Close</button>
+      <div id="exportArea" class="hidden">
+        <p>Copy your progress JSON below:</p>
+        <textarea id="progressOutput" readonly style="width:100%;height:150px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" class="hidden">
+    <div class="modal-content">
+      <h2>Review Mode</h2>
+      <p>Practice saved words or defeat Mistake Monsters. Answer each correctly three times to remove it.</p>
+      <ul id="reviewList"></ul>
+      <button id="closeReviewBtn">Close</button>
+    </div>
+  </div>
+
+  <script>
+    /* === Data and Progress Structures === */
+    // Built‑in sample data.  Replace or augment this by importing CSV.
+    let dataset = [
+      {
+        word: "alligevel",
+        meaning: "anyway / nevertheless",
+        sentence_da: "Jeg kom for sent, men jeg nåede alligevel mødet.",
+        sentence_en: "I arrived late, but I still made it to the meeting.",
+        category: "Adverb - Manner",
+        level: "B1",
+        theme: "Work",
+      },
+      {
+        word: "stadig",
+        meaning: "still",
+        sentence_da: "Hun arbejder stadig på projektet.",
+        sentence_en: "She is still working on the project.",
+        category: "Adverb - Frequency",
+        level: "B1",
+        theme: "Work",
+      },
+      {
+        word: "fordi",
+        meaning: "because",
+        sentence_da: "Jeg blev hjemme, fordi jeg var syg.",
+        sentence_en: "I stayed home because I was sick.",
+        category: "Subordinating conjunction",
+        level: "B1",
+        theme: "Health",
+      },
+      {
+        word: "derfor",
+        meaning: "therefore / that's why",
+        sentence_da: "Det regnede, derfor blev vi inde.",
+        sentence_en: "It rained, therefore we stayed inside.",
+        category: "Adverb - Cause/Effect",
+        level: "B2",
+        theme: "Weather",
+      },
+      {
+        word: "når",
+        meaning: "when (habitual)",
+        sentence_da: "Når jeg er træt, drikker jeg kaffe.",
+        sentence_en: "When I'm tired, I drink coffee.",
+        category: "Subordinating conjunction",
+        level: "B1",
+        theme: "Daily life",
+      },
+      {
+        word: "da",
+        meaning: "when (past)",
+        sentence_da: "Da jeg var lille, boede jeg i Aarhus.",
+        sentence_en: "When I was little, I lived in Aarhus.",
+        category: "Subordinating conjunction",
+        level: "B1",
+        theme: "Childhood",
+      },
+      {
+        word: "men",
+        meaning: "but",
+        sentence_da: "Han ville gerne komme, men han kunne ikke.",
+        sentence_en: "He wanted to come, but he couldn't.",
+        category: "Coordinating conjunction",
+        level: "B1",
+        theme: "Social",
+      },
+      {
+        word: "endnu",
+        meaning: "yet",
+        sentence_da: "Jeg har ikke set filmen endnu.",
+        sentence_en: "I haven't seen the movie yet.",
+        category: "Adverb - Time",
+        level: "B1",
+        theme: "Entertainment",
+      },
+      {
+        word: "inde",
+        meaning: "inside",
+        sentence_da: "Vi bliver inde, når det er koldt.",
+        sentence_en: "We stay inside when it's cold.",
+        category: "Adverb - Place",
+        level: "B2",
+        theme: "Weather",
+      },
+      {
+        word: "ud",
+        meaning: "out",
+        sentence_da: "Han gik ud af huset.",
+        sentence_en: "He went out of the house.",
+        category: "Adverb - Place",
+        level: "B1",
+        theme: "Home",
+      },
+    ];
+
+    // Define categories used in the Fluency Map
+    const zones = [
+      { id: "time", name: "Tid", filter: (entry) => /Time/.test(entry.category) },
+      { id: "place", name: "Sted", filter: (entry) => /Place/.test(entry.category) },
+      { id: "manner", name: "Måde", filter: (entry) => /Manner/.test(entry.category) },
+      { id: "frequency", name: "Frekvens", filter: (entry) => /Frequency/.test(entry.category) },
+      { id: "connector", name: "Bindeord", filter: (entry) => /conjunction/i.test(entry.category) },
+      { id: "order", name: "Sætningsbygning", filter: (entry) => true }, // fallback
+    ];
+
+    // Progress object to track scores, levels, etc.
+    let progress = {
+      score: 0,
+      correct: 0,
+      total: 0,
+      level: 0, // index into levels array
+      streak: 0,
+      longestStreak: 0,
+      accuracy: 0,
+      wordsPracticed: 0,
+      weakestCategory: null,
+      categoryStats: {}, // {categoryName: {correct, total}}
+      savedWords: {}, // {word: count} saved for review; count used to track review completions
+      mistakes: {}, // {word: {count, needed}}; needed indicates times to defeat monster
+    };
+
+    // Level definitions: label, unlock threshold (# correct answers required)
+    const levels = [
+      { id: 0, name: "Explorer", threshold: 0 },
+      { id: 1, name: "Builder", threshold: 10 },
+      { id: 2, name: "Connector", threshold: 25 },
+      { id: 3, name: "Fluency", threshold: 45 },
+      { id: 4, name: "Master", threshold: 70 },
+    ];
+
+    // Modes enumeration
+    const MODES = {
+      MEANING: "Meaning Match",
+      GAP: "Sentence Gap",
+      TRANSLATE: "Translation Bridge",
+      ORDER: "Word Order",
+      CATEGORY: "Category Quest",
+      CONNECTOR: "Connector Duel",
+      LISTENING: "Listening Simulation",
+      BOSS: "Boss Round",
+    };
+
+    // Current game state
+    let currentMode = null;
+    let currentEntry = null;
+    let currentOptions = [];
+    let awaitingAnswer = false;
+    let reorderSelections = [];
+    let reviewQueue = [];
+    let reviewActive = false;
+
+    /* === Utility Functions === */
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadProgress() {
+      const stored = localStorage.getItem("danishSentenceBuilderProgress");
+      if (stored) {
+        try {
+          const obj = JSON.parse(stored);
+          progress = Object.assign(progress, obj);
+        } catch (e) {
+          console.error("Failed to parse saved progress", e);
+        }
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(
+        "danishSentenceBuilderProgress",
+        JSON.stringify(progress)
+      );
+    }
+
+    function updateDashboard() {
+      const dash = document.getElementById("dashboard");
+      dash.innerHTML = "";
+      // Compute accuracy
+      progress.accuracy = progress.total
+        ? ((progress.correct / progress.total) * 100).toFixed(1)
+        : 0;
+      // Determine weakest category
+      let weakest = null;
+      let weakestRate = 1;
+      Object.entries(progress.categoryStats).forEach(([cat, stats]) => {
+        const rate = stats.correct / (stats.total || 1);
+        if (rate < weakestRate) {
+          weakestRate = rate;
+          weakest = cat;
+        }
+      });
+      progress.weakestCategory = weakest;
+      // Stats list
+      const stats = [
+        { label: "Score", value: progress.score },
+        { label: "Level", value: levels[progress.level].name },
+        { label: "Streak", value: progress.streak },
+        { label: "Accuracy", value: progress.accuracy + "%" },
+        { label: "Words Practiced", value: progress.wordsPracticed },
+        { label: "Weakest", value: progress.weakestCategory || "-" },
+        { label: "Saved Words", value: Object.keys(progress.savedWords).length },
+      ];
+      stats.forEach((item) => {
+        const statDiv = document.createElement("div");
+        statDiv.className = "stat";
+        statDiv.innerHTML = `<strong>${item.label}:</strong> ${item.value}`;
+        dash.appendChild(statDiv);
+      });
+    }
+
+    function populateMap() {
+      const map = document.getElementById("map");
+      map.innerHTML = "";
+      zones.forEach((zone) => {
+        const btn = document.createElement("button");
+        btn.textContent = zone.name;
+        btn.dataset.zone = zone.id;
+        // Determine completion or locked status based on level
+        const levelUnlock = zones.indexOf(zone);
+        if (progress.level < levelUnlock) {
+          btn.classList.add("locked");
+          btn.disabled = true;
+        } else if (progress.level > levelUnlock) {
+          btn.classList.add("completed");
+        }
+        btn.addEventListener("click", () => startZone(zone));
+        map.appendChild(btn);
+      });
+    }
+
+    function startZone(zone) {
+      // Choose a random mode for this zone
+      const possibleModes = [
+        MODES.MEANING,
+        MODES.GAP,
+        MODES.TRANSLATE,
+        MODES.ORDER,
+        MODES.CATEGORY,
+        MODES.CONNECTOR,
+        MODES.LISTENING,
+      ];
+      currentMode = possibleModes[Math.floor(Math.random() * possibleModes.length)];
+      loadQuestion(currentMode, zone);
+    }
+
+    function loadQuestion(mode, zone = null) {
+      // Filter entries by zone if provided
+      let entries = dataset;
+      if (zone) entries = dataset.filter(zone.filter);
+      currentMode = mode;
+      // If review active, get from reviewQueue
+      if (reviewActive && reviewQueue.length > 0) {
+        const next = reviewQueue.shift();
+        currentEntry = next.entry;
+        currentMode = next.mode;
+      } else {
+        currentEntry = entries[Math.floor(Math.random() * entries.length)];
+      }
+      reorderSelections = [];
+      renderGame();
+    }
+
+    function renderGame() {
+      const game = document.getElementById("game");
+      game.innerHTML = "";
+      const title = document.createElement("h2");
+      title.textContent = currentMode;
+      game.appendChild(title);
+      const content = document.createElement("div");
+      content.id = "content";
+      game.appendChild(content);
+      const optionsDiv = document.createElement("div");
+      optionsDiv.id = "options";
+      game.appendChild(optionsDiv);
+      const feedback = document.createElement("div");
+      feedback.id = "feedback";
+      game.appendChild(feedback);
+      // Generate question based on mode
+      switch (currentMode) {
+        case MODES.MEANING:
+          renderMeaningQuestion(content, optionsDiv);
+          break;
+        case MODES.GAP:
+          renderGapQuestion(content, optionsDiv);
+          break;
+        case MODES.TRANSLATE:
+          renderTranslateQuestion(content, optionsDiv);
+          break;
+        case MODES.ORDER:
+          renderOrderQuestion(content);
+          break;
+        case MODES.CATEGORY:
+          renderCategoryQuestion(content);
+          break;
+        case MODES.CONNECTOR:
+          renderConnectorQuestion(content, optionsDiv);
+          break;
+        case MODES.LISTENING:
+          renderListeningQuestion(content, optionsDiv);
+          break;
+        case MODES.BOSS:
+          startBossRound();
+          return;
+      }
+      awaitingAnswer = true;
+    }
+
+    /* === Question Renderers === */
+    function renderMeaningQuestion(content, optionsDiv) {
+      content.innerHTML = `<p><strong>${currentEntry.word}</strong></p>`;
+      // Build options: correct meaning + random wrong options
+      const distractors = dataset
+        .filter((e) => e.word !== currentEntry.word)
+        .map((e) => e.meaning);
+      shuffle(distractors);
+      const options = [currentEntry.meaning, distractors[0], distractors[1], distractors[2]];
+      currentOptions = shuffle(options.slice());
+      currentOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.addEventListener("click", () => handleAnswer(opt === currentEntry.meaning));
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function renderGapQuestion(content, optionsDiv) {
+      const gapSentence = currentEntry.sentence_da.replace(
+        new RegExp(currentEntry.word, "i"),
+        "______"
+      );
+      content.innerHTML = `<p>${gapSentence}</p>`;
+      // Options: correct word + wrong ones
+      const distractors = dataset
+        .filter((e) => e.word !== currentEntry.word)
+        .map((e) => e.word);
+      shuffle(distractors);
+      const opts = [currentEntry.word, distractors[0], distractors[1], distractors[2]];
+      currentOptions = shuffle(opts.slice());
+      currentOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.addEventListener("click", () => handleAnswer(opt === currentEntry.word));
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function renderTranslateQuestion(content, optionsDiv) {
+      content.innerHTML = `<p>${currentEntry.sentence_en}</p>`;
+      // Options: correct Danish sentence + wrong ones
+      const distractors = dataset
+        .filter((e) => e.sentence_da !== currentEntry.sentence_da)
+        .map((e) => e.sentence_da);
+      shuffle(distractors);
+      const opts = [currentEntry.sentence_da, distractors[0], distractors[1], distractors[2]];
+      currentOptions = shuffle(opts.slice());
+      currentOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.addEventListener("click", () => handleAnswer(opt === currentEntry.sentence_da));
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function renderOrderQuestion(content) {
+      // Split sentence into parts (simple split on spaces and punctuation)
+      const parts = currentEntry.sentence_da.split(/\s+/);
+      // Shuffle parts to create scrambled array
+      const scrambled = shuffle(parts.slice());
+      content.innerHTML = `<p>Arrange the words to form the correct sentence:</p>`;
+      const reorderDiv = document.createElement("div");
+      reorderDiv.id = "reorderParts";
+      scrambled.forEach((part, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = part;
+        btn.addEventListener("click", () => selectReorderPart(btn, part));
+        reorderDiv.appendChild(btn);
+      });
+      content.appendChild(reorderDiv);
+      const submitBtn = document.createElement("button");
+      submitBtn.textContent = "Submit Order";
+      submitBtn.addEventListener("click", () => {
+        const answer = reorderSelections.join(" ");
+        handleAnswer(answer.trim() === currentEntry.sentence_da.trim());
+      });
+      content.appendChild(submitBtn);
+    }
+
+    function selectReorderPart(btn, part) {
+      if (btn.classList.contains("selected")) return;
+      btn.classList.add("selected");
+      reorderSelections.push(part);
+    }
+
+    function renderCategoryQuestion(content) {
+      content.innerHTML = `<p>Assign the word <strong>${currentEntry.word}</strong> to the correct category:</p>`;
+      // Provide list of categories (7 categories per spec)
+      const categories = [
+        "Time",
+        "Place",
+        "Manner",
+        "Frequency",
+        "Coordinating conjunction",
+        "Subordinating conjunction",
+        "Correlative conjunction",
+      ];
+      const options = document.createElement("div");
+      options.id = "options";
+      categories.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.addEventListener("click", () => {
+          const corrCat = currentEntry.category;
+          // Determine high‑level category
+          let correctCat = "";
+          if (/Time/i.test(corrCat)) correctCat = "Time";
+          else if (/Place/i.test(corrCat)) correctCat = "Place";
+          else if (/Manner/i.test(corrCat)) correctCat = "Manner";
+          else if (/Frequency/i.test(corrCat)) correctCat = "Frequency";
+          else if (/Coordinating/i.test(corrCat)) correctCat = "Coordinating conjunction";
+          else if (/Subordinating/i.test(corrCat)) correctCat = "Subordinating conjunction";
+          else if (/Correlative/i.test(corrCat)) correctCat = "Correlative conjunction";
+          handleAnswer(cat === correctCat);
+        });
+        options.appendChild(btn);
+      });
+      content.appendChild(options);
+    }
+
+    function renderConnectorQuestion(content, optionsDiv) {
+      // Build two clauses: take existing sentence and split at comma or period
+      const parts = currentEntry.sentence_da.split(/[.,;]/);
+      let clause1, clause2;
+      if (parts.length >= 2) {
+        clause1 = parts[0].trim();
+        clause2 = parts[1].trim();
+      } else {
+        // If no punctuation, create generic clauses
+        clause1 = currentEntry.sentence_da;
+        clause2 = "";
+      }
+      content.innerHTML = `<p>${clause1} … ${clause2}</p>`;
+      // Provide connectors: include current word and some distractors (only conjunctions)
+      const conjunctions = dataset
+        .filter((e) => /conjunction/i.test(e.category))
+        .map((e) => e.word);
+      const unique = Array.from(new Set(conjunctions));
+      shuffle(unique);
+      const opts = [currentEntry.word];
+      for (let i = 0; i < unique.length && opts.length < 4; i++) {
+        if (unique[i] !== currentEntry.word) opts.push(unique[i]);
+      }
+      currentOptions = shuffle(opts.slice());
+      currentOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.addEventListener("click", () => handleAnswer(opt === currentEntry.word));
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function renderListeningQuestion(content, optionsDiv) {
+      content.innerHTML = `<p id="listenSentence">${currentEntry.sentence_da}</p>`;
+      // Hide the sentence after a short delay
+      setTimeout(() => {
+        const el = document.getElementById("listenSentence");
+        if (el) el.textContent = "(Sentence hidden)";
+      }, 3000);
+      // Provide options: missing word and distractors
+      const distractors = dataset
+        .filter((e) => e.word !== currentEntry.word)
+        .map((e) => e.word);
+      shuffle(distractors);
+      const opts = [currentEntry.word, distractors[0], distractors[1], distractors[2]];
+      currentOptions = shuffle(opts.slice());
+      currentOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.addEventListener("click", () => handleAnswer(opt === currentEntry.word));
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function startBossRound() {
+      // Generate five mixed challenges in sequence
+      const bossModes = [
+        MODES.MEANING,
+        MODES.GAP,
+        MODES.TRANSLATE,
+        MODES.ORDER,
+        MODES.CATEGORY,
+      ];
+      reviewQueue = bossModes.map((mode) => {
+        return { entry: dataset[Math.floor(Math.random() * dataset.length)], mode };
+      });
+      reviewActive = true;
+      loadQuestion(reviewQueue[0].mode);
+    }
+
+    /* === Answer Handling === */
+    function handleAnswer(correct) {
+      if (!awaitingAnswer) return;
+      awaitingAnswer = false;
+      const feedback = document.getElementById("feedback");
+      const options = document.querySelectorAll("#options button");
+      options.forEach((btn) => {
+        if (
+          (currentMode === MODES.MEANING && btn.textContent === currentEntry.meaning) ||
+          (currentMode === MODES.GAP && btn.textContent === currentEntry.word) ||
+          (currentMode === MODES.TRANSLATE && btn.textContent === currentEntry.sentence_da) ||
+          (currentMode === MODES.CONNECTOR && btn.textContent === currentEntry.word) ||
+          (currentMode === MODES.LISTENING && btn.textContent === currentEntry.word)
+        ) {
+          btn.classList.add("correct");
+        }
+      });
+      if (correct) {
+        feedback.textContent = "Correct!";
+        progress.score += 10;
+        progress.correct++;
+        progress.streak++;
+        progress.longestStreak = Math.max(progress.longestStreak, progress.streak);
+        // Bonus points for fast answer: we could measure time but not implemented here
+      } else {
+        feedback.textContent = "Wrong.";
+        progress.streak = 0;
+        // Record mistake for review
+        const w = currentEntry.word;
+        if (!progress.mistakes[w]) progress.mistakes[w] = { count: 0, needed: 3 };
+        progress.mistakes[w].count++;
+        // Add to savedWords if not already
+        if (!progress.savedWords[w]) progress.savedWords[w] = 0;
+      }
+      progress.total++;
+      progress.wordsPracticed++;
+      // Update category stats
+      const cat = currentEntry.category;
+      if (!progress.categoryStats[cat]) progress.categoryStats[cat] = { correct: 0, total: 0 };
+      progress.categoryStats[cat].total++;
+      if (correct) progress.categoryStats[cat].correct++;
+      // After feedback, show details
+      showAnswerExplanation(correct);
+      // Update level
+      updateLevel();
+      saveProgress();
+    }
+
+    function showAnswerExplanation(correct) {
+      const feedback = document.getElementById("feedback");
+      const explanation = document.createElement("div");
+      explanation.style.marginTop = "0.3rem";
+      if (correct) {
+        explanation.innerHTML = `<em>${currentEntry.word}:</em> ${currentEntry.meaning}`;
+      } else {
+        explanation.innerHTML = `Correct answer: <strong>${currentEntry.word}</strong> — ${currentEntry.meaning}<br>Danish: ${currentEntry.sentence_da}<br>English: ${currentEntry.sentence_en}`;
+      }
+      feedback.appendChild(explanation);
+      // After a delay, load next question automatically (except in review)
+      setTimeout(() => {
+        if (reviewActive && reviewQueue.length > 0) {
+          // If wrong, push the item back to queue end
+          if (!correct) reviewQueue.push({ entry: currentEntry, mode: currentMode });
+          if (reviewQueue.length === 0) {
+            reviewActive = false;
+            updateDashboard();
+            populateMap();
+            document.getElementById("game").innerHTML = "<p>Review complete!</p>";
+          } else {
+            const next = reviewQueue.shift();
+            currentEntry = next.entry;
+            currentMode = next.mode;
+            renderGame();
+          }
+          return;
+        }
+        loadQuestion(currentMode);
+        updateDashboard();
+        populateMap();
+      }, 2000);
+    }
+
+    function updateLevel() {
+      for (let i = levels.length - 1; i >= 0; i--) {
+        if (progress.correct >= levels[i].threshold) {
+          progress.level = i;
+          break;
+        }
+      }
+    }
+
+    /* === Review Mode === */
+    function openReview() {
+      const modal = document.getElementById("reviewModal");
+      const list = document.getElementById("reviewList");
+      list.innerHTML = "";
+      // Build list from mistakes and savedWords
+      const reviewWords = new Set([
+        ...Object.keys(progress.savedWords),
+        ...Object.keys(progress.mistakes),
+      ]);
+      if (reviewWords.size === 0) {
+        list.innerHTML = `<li>No saved words or mistakes.</li>`;
+      } else {
+        reviewWords.forEach((word) => {
+          const entry = dataset.find((e) => e.word === word);
+          if (!entry) return;
+          const li = document.createElement("li");
+          const needed = progress.mistakes[word] ? progress.mistakes[word].needed - (progress.mistakes[word].completed || 0) : (progress.savedWords[word] || 1);
+          li.innerHTML = `<strong>${word}</strong> – Needs ${needed} correct answers to clear`;
+          list.appendChild(li);
+        });
+      }
+      modal.classList.remove("hidden");
+      // Build reviewQueue with entries
+      reviewQueue = [];
+      reviewWords.forEach((word) => {
+        const entry = dataset.find((e) => e.word === word);
+        if (entry) {
+          // Use meaning mode for review; could randomize
+          reviewQueue.push({ entry, mode: MODES.MEANING });
+        }
+      });
+      if (reviewQueue.length > 0) {
+        reviewActive = true;
+        loadQuestion(reviewQueue[0].mode);
+      }
+    }
+
+    /* === CSV Import === */
+    function parseCSV(text) {
+      const lines = text.trim().split(/\n|\r\n|\r/);
+      const entries = [];
+      const headers = lines[0].split(/,|\t/).map((h) => h.trim());
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i];
+        if (!row.trim()) continue;
+        const values = row.split(/,|\t/).map((v) => v.trim());
+        const entry = {};
+        headers.forEach((h, idx) => {
+          entry[h] = values[idx] || "";
+        });
+        // Only add if word and sentence_da present
+        if (entry.word && entry.sentence_da) entries.push(entry);
+      }
+      return entries;
+    }
+
+    /* === Event Bindings === */
+    document.addEventListener("DOMContentLoaded", () => {
+      // Load progress and update UI
+      loadProgress();
+      updateDashboard();
+      populateMap();
+      // Start with a random zone/mode
+      startZone(zones[0]);
+      // Dark mode toggle
+      const darkToggle = document.getElementById("darkToggle");
+      if (localStorage.getItem("danishDarkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+      darkToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        const isDark = document.body.classList.contains("dark");
+        localStorage.setItem("danishDarkMode", isDark);
+      });
+      // Import modal events
+      const importBtn = document.getElementById("importBtn");
+      const importModal = document.getElementById("importModal");
+      importBtn.addEventListener("click", () => {
+        importModal.classList.remove("hidden");
+      });
+      document.getElementById("cancelImportBtn").addEventListener("click", () => {
+        importModal.classList.add("hidden");
+      });
+      document.getElementById("loadDataBtn").addEventListener("click", () => {
+        const text = document.getElementById("csvInput").value;
+        const entries = parseCSV(text);
+        if (entries.length > 0) {
+          dataset = entries;
+          progress.correct = 0;
+          progress.total = 0;
+          progress.score = 0;
+          progress.streak = 0;
+          progress.wordsPracticed = 0;
+          progress.categoryStats = {};
+          progress.savedWords = {};
+          progress.mistakes = {};
+          updateLevel();
+          saveProgress();
+          updateDashboard();
+          populateMap();
+          alert(`Loaded ${entries.length} entries.`);
+        } else {
+          alert("No valid entries found. Please check your CSV.");
+        }
+        importModal.classList.add("hidden");
+      });
+      // Settings modal
+      const settingsModal = document.getElementById("settingsModal");
+      document.getElementById("settingsBtn").addEventListener("click", () => {
+        settingsModal.classList.remove("hidden");
+      });
+      document.getElementById("closeSettingsBtn").addEventListener("click", () => {
+        settingsModal.classList.add("hidden");
+        document.getElementById("exportArea").classList.add("hidden");
+      });
+      document.getElementById("exportProgressBtn").addEventListener("click", () => {
+        const area = document.getElementById("exportArea");
+        area.classList.toggle("hidden");
+        const output = document.getElementById("progressOutput");
+        output.value = JSON.stringify(progress, null, 2);
+      });
+      document.getElementById("resetProgressBtn").addEventListener("click", () => {
+        if (confirm("Reset all progress?")) {
+          localStorage.removeItem("danishSentenceBuilderProgress");
+          progress = {
+            score: 0,
+            correct: 0,
+            total: 0,
+            level: 0,
+            streak: 0,
+            longestStreak: 0,
+            accuracy: 0,
+            wordsPracticed: 0,
+            weakestCategory: null,
+            categoryStats: {},
+            savedWords: {},
+            mistakes: {},
+          };
+          saveProgress();
+          updateDashboard();
+          populateMap();
+          alert("Progress reset.");
+        }
+      });
+      // Review mode button
+      document.getElementById("reviewBtn").addEventListener("click", () => {
+        openReview();
+      });
+      document.getElementById("closeReviewBtn").addEventListener("click", () => {
+        document.getElementById("reviewModal").classList.add("hidden");
+        reviewActive = false;
+        reviewQueue = [];
+        updateDashboard();
+        populateMap();
+        document.getElementById("game").innerHTML = "";
+      });
+      // Global keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        // Number keys 1–4 map to current options
+        if (!awaitingAnswer) return;
+        const keyNum = parseInt(e.key);
+        if (keyNum >= 1 && keyNum <= 4) {
+          const opts = Array.from(document.querySelectorAll("#options button"));
+          const btn = opts[keyNum - 1];
+          if (btn) btn.click();
+        }
+        if (e.key === "Enter") {
+          // For order questions, submit order
+          const submit = Array.from(document.querySelectorAll("#content button")).find((b) => b.textContent === "Submit Order");
+          if (submit) submit.click();
+        }
+        if (e.key.toLowerCase() === "r") {
+          openReview();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

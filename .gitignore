@@ -1,2 +1,5 @@
 .claude/
 .build-logs/
+
+# Local working artifacts, not repo content
+danish_b1_b2_500_adverb_sentences.xlsx

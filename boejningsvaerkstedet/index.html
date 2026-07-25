@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bøjningsværkstedet</title>
+<style>
+  :root {
+    --parchment: #E8DDC4;
+    --wood: #7A5134;
+    --brass: #B88A44;
+    --ink: #282622;
+    --correct: #50744B;
+    --wrong: #8C413A;
+    --adj-amber: #C58A37;
+    --noun-blue: #49758A;
+    --article-violet: #735C83;
+
+    --bg: var(--parchment);
+    --fg: var(--ink);
+    --card-bg: #F4ECD8;
+    --border: var(--brass);
+    --muted: #6b5c46;
+
+    --dc-fg: var(--fg);
+    --dc-btn-bg: #FFF9EC;
+    --dc-border: var(--border);
+    --dc-accent: var(--wood);
+    --dc-accent-fg: #FBF3DE;
+    --dc-input-bg: #FFFDF6;
+    --dc-correct: var(--correct);
+    --dc-correct-bg: rgba(80, 116, 75, .16);
+    --dc-wrong: var(--wrong);
+    --dc-wrong-bg: rgba(140, 65, 58, .16);
+  }
+
+  [data-theme="dark"] {
+    --bg: #2B2925;
+    --fg: #EDE3C8;
+    --card-bg: #35322A;
+    --border: #8A6A3F;
+    --muted: #b8a97e;
+
+    --dc-btn-bg: #3A362C;
+    --dc-input-bg: #3A362C;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-width: 360px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Georgia, 'Iowan Old Style', 'EB Garamond', serif;
+    transition: background .2s ease, color .2s ease;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { color: inherit; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5em;
+    padding: .6em .8em;
+    background: var(--wood);
+    color: #F5EAD0;
+    border-bottom: 3px solid var(--brass);
+    flex-wrap: wrap;
+  }
+
+  .topbar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+  }
+
+  .topbar-controls {
+    display: flex;
+    gap: .4em;
+  }
+
+  .icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, .08);
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .icon-btn:hover { background: rgba(255, 255, 255, .18); }
+  .icon-btn:focus-visible { outline: 2px solid #FBF3DE; outline-offset: 2px; }
+
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 1.2em .9em 2.5em;
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+  }
+
+  .title {
+    text-align: center;
+    font-size: 1.7rem;
+    color: var(--wood);
+    margin: .2em 0 0;
+  }
+
+  [data-theme="dark"] .title { color: var(--brass); }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin: 0;
+    font-size: .95rem;
+  }
+
+  .panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1em;
+  }
+
+  .field-label {
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+    margin: 0 0 .5em;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
+  }
+
+  .chip {
+    min-height: 44px;
+    padding: .5em .9em;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--dc-btn-bg);
+    color: var(--fg);
+    cursor: pointer;
+    font: inherit;
+    font-size: .92rem;
+  }
+
+  .chip[aria-pressed="true"] {
+    background: var(--wood);
+    color: #FBF3DE;
+    border-color: var(--wood);
+  }
+
+  .chip[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+
+  .chip:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
+
+  .play-btn {
+    min-height: 54px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    background: var(--brass);
+    color: #2B2412;
+    border: 2px solid var(--wood);
+    border-radius: 14px;
+    cursor: pointer;
+  }
+
+  .play-btn:hover { filter: brightness(1.06); }
+  .play-btn:focus-visible { outline: 2px solid var(--wood); outline-offset: 3px; }
+
+  .footer-row {
+    display: flex;
+    justify-content: center;
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    font-size: .85rem;
+    min-height: 44px;
+    padding: 0 .3em;
+  }
+
+  .play-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5em;
+  }
+
+  .back-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: .4em .8em;
+    background: var(--dc-btn-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--fg);
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .back-btn:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
+
+  .progress-label {
+    font-size: .9rem;
+    color: var(--muted);
+  }
+
+  .progress-track {
+    height: 8px;
+    background: rgba(122, 81, 52, .18);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--wood), var(--brass));
+    transition: width .25s ease;
+  }
+
+  .quiz-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1em;
+  }
+
+  .quiz-card.flash-correct { animation: flashCorrect .35s ease; }
+  .quiz-card.flash-wrong { animation: flashWrong .35s ease; }
+
+  @keyframes flashCorrect {
+    0% { box-shadow: 0 0 0 0 rgba(80, 116, 75, 0); }
+    40% { box-shadow: 0 0 0 6px rgba(80, 116, 75, .35); }
+    100% { box-shadow: 0 0 0 0 rgba(80, 116, 75, 0); }
+  }
+
+  @keyframes flashWrong {
+    0% { box-shadow: 0 0 0 0 rgba(140, 65, 58, 0); }
+    40% { box-shadow: 0 0 0 6px rgba(140, 65, 58, .35); }
+    100% { box-shadow: 0 0 0 0 rgba(140, 65, 58, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .quiz-card.flash-correct, .quiz-card.flash-wrong { animation: none; }
+    .progress-fill { transition: none; }
+  }
+
+  .next-btn {
+    margin-top: .8em;
+    min-height: 44px;
+    padding: .6em 1.2em;
+    background: var(--wood);
+    color: #FBF3DE;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .next-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  .empty-state {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+    padding: 2em 1em;
+  }
+
+  .dc-quiz-prompt-text { font-size: 1.15rem; }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">🛠️ Bøjningsværkstedet</div>
+    <div class="topbar-controls">
+      <button type="button" id="darkToggle" class="icon-btn" aria-label="Skift mørk/lys tilstand"></button>
+      <button type="button" id="soundToggle" class="icon-btn" aria-label="Slå lyd til/fra"></button>
+    </div>
+  </header>
+  <main>
+    <div id="view-root" class="screen"></div>
+  </main>
+
+  <script src="../shared/dansk-core.js"></script>
+  <script src="../shared/data/nouns.js"></script>
+  <script src="../shared/data/adjectives.js"></script>
+  <script src="./data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var GAME_ID = 'boejningsvaerkstedet';
+    var GAME_LEVELS = ['A1', 'A2', 'B1', 'B2'];
+    var ROUND_SIZE = 10;
+
+    var MODES = [
+      { id: 'fire_former', label: 'Fire former' },
+      { id: 'byg_navneordet', label: 'Byg navneordet' },
+      { id: 'adjektivvaerkstedet', label: 'Adjektivværkstedet' },
+      { id: 'sammenligningspressen', label: 'Sammenligningspressen' },
+      { id: 'bestemt_ubestemt', label: 'Bestemt eller ubestemt?' },
+      { id: 'maengdevaerkstedet', label: 'Mængdeværkstedet' }
+    ];
+
+    var FORM_LABELS = {
+      indefinite_singular: 'ubestemt ental',
+      definite_singular: 'bestemt ental',
+      indefinite_plural: 'ubestemt flertal',
+      definite_plural: 'bestemt flertal'
+    };
+
+    var SOUND_THEME = {
+      select: function () {
+        DanskCore.ui.sound.sequence([
+          { type: 'triangle', frequency: 500, duration: 0.09, gain: 0.03 }
+        ]);
+      },
+      correct: function () {
+        DanskCore.ui.sound.sequence([
+          { type: 'square', frequency: 220, duration: 0.06, gain: 0.05 },
+          { type: 'triangle', frequency: 330, duration: 0.07, gain: 0.06, delay: 0.07 },
+          { type: 'sine', frequency: 494, duration: 0.10, gain: 0.05, delay: 0.14 }
+        ]);
+      },
+      wrong: function () {
+        DanskCore.ui.sound.sequence([
+          { type: 'triangle', frequency: 140, duration: 0.15, gain: 0.04 }
+        ]);
+      },
+      roundComplete: function () {
+        DanskCore.ui.sound.sequence([
+          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06 },
+          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06, delay: 0.15 },
+          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06, delay: 0.30 },
+          { type: 'sine', frequency: 330, duration: 0.40, gain: 0.07, delay: 0.45 }
+        ]);
+      }
+    };
+
+    var DATA = window.BOEJNINGS_DATA || {};
+    var NOUN_BY_ID = {};
+    (window.DANSK_NOUNS || []).forEach(function (n) { NOUN_BY_ID[n.id] = n; });
+
+    function modeHasItems(modeId) {
+      return Array.isArray(DATA[modeId]) && DATA[modeId].length > 0;
+    }
+
+    var viewRoot = document.getElementById('view-root');
+    var darkToggle = document.getElementById('darkToggle');
+    var soundToggle = document.getElementById('soundToggle');
+
+    var state = {
+      selectedMode: MODES.filter(function (m) { return modeHasItems(m.id); })[0] || MODES[0],
+      selectedLevels: GAME_LEVELS.slice()
+    };
+
+    var session = null;
+    var advanceTimer = null;
+
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    function clearAdvanceTimer() {
+      if (advanceTimer) {
+        clearTimeout(advanceTimer);
+        advanceTimer = null;
+      }
+    }
+
+    // -- top bar ------------------------------------------------------
+
+    function refreshTopbarIcons() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      darkToggle.textContent = dark ? '☀️' : '🌙';
+      soundToggle.textContent = DanskCore.ui.sound.isEnabled() ? '🔊' : '🔇';
+    }
+
+    darkToggle.addEventListener('click', function () {
+      DanskCore.ui.darkMode.toggle();
+      refreshTopbarIcons();
+    });
+
+    soundToggle.addEventListener('click', function () {
+      DanskCore.ui.sound.toggle();
+      refreshTopbarIcons();
+    });
+
+    // -- start screen ---------------------------------------------------
+
+    function renderStart() {
+      clearAdvanceTimer();
+      session = null;
+      viewRoot.innerHTML = '';
+
+      var title = document.createElement('h1');
+      title.className = 'title';
+      title.textContent = 'Bøjningsværkstedet';
+      viewRoot.appendChild(title);
+
+      var panel = document.createElement('div');
+      panel.className = 'panel';
+
+      var modeLabel = document.createElement('p');
+      modeLabel.className = 'field-label';
+      modeLabel.textContent = 'Værksted';
+      panel.appendChild(modeLabel);
+
+      var modeRow = document.createElement('div');
+      modeRow.className = 'chip-row';
+      modeRow.setAttribute('role', 'group');
+      modeRow.setAttribute('aria-label', 'Vælg værksted');
+      MODES.forEach(function (mode) {
+        var enabled = modeHasItems(mode.id);
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.textContent = enabled ? mode.label : mode.label + ' (kommer snart)';
+        chip.setAttribute('aria-pressed', state.selectedMode.id === mode.id ? 'true' : 'false');
+        if (!enabled) {
+          chip.disabled = true;
+        } else {
+          chip.addEventListener('click', function () {
+            state.selectedMode = mode;
+            renderStart();
+          });
+        }
+        modeRow.appendChild(chip);
+      });
+      panel.appendChild(modeRow);
+
+      var levelLabel = document.createElement('p');
+      levelLabel.className = 'field-label';
+      levelLabel.style.marginTop = '.9em';
+      levelLabel.textContent = 'Niveau';
+      panel.appendChild(levelLabel);
+
+      var levelRow = document.createElement('div');
+      levelRow.className = 'chip-row';
+      levelRow.setAttribute('role', 'group');
+      levelRow.setAttribute('aria-label', 'Vælg niveau');
+      GAME_LEVELS.forEach(function (level) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.textContent = level;
+        var active = state.selectedLevels.indexOf(level) !== -1;
+        chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+        chip.addEventListener('click', function () {
+          var idx = state.selectedLevels.indexOf(level);
+          if (idx === -1) {
+            state.selectedLevels.push(level);
+          } else if (state.selectedLevels.length > 1) {
+            state.selectedLevels.splice(idx, 1);
+          }
+          renderStart();
+        });
+        levelRow.appendChild(chip);
+      });
+      panel.appendChild(levelRow);
+
+      viewRoot.appendChild(panel);
+
+      var playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.className = 'play-btn';
+      playBtn.textContent = 'Spil';
+      playBtn.addEventListener('click', function () { startRound(state.selectedMode.id); });
+      viewRoot.appendChild(playBtn);
+
+      var footerRow = document.createElement('div');
+      footerRow.className = 'footer-row';
+      var resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'link-btn';
+      resetBtn.textContent = 'Nulstil fremskridt';
+      resetBtn.addEventListener('click', function () {
+        var confirmed = window.confirm('Er du sikker på, at du vil nulstille alt fremskridt i Bøjningsværkstedet?');
+        if (!confirmed) return;
+        MODES.forEach(function (mode) {
+          DanskCore.store.remove('srs:' + GAME_ID + ':' + mode.id);
+        });
+        DanskCore.ui.announce('Fremskridt nulstillet.');
+      });
+      footerRow.appendChild(resetBtn);
+      viewRoot.appendChild(footerRow);
+    }
+
+    // -- play screen ------------------------------------------------------
+
+    function startRound(modeId) {
+      var pool = DanskCore.level.filter(DATA[modeId] || [], state.selectedLevels);
+      if (!pool.length) {
+        renderEmptyState();
+        return;
+      }
+      var srsState = DanskCore.srs.load(GAME_ID + ':' + modeId);
+      var shuffledPool = shuffle(pool);
+      var due = DanskCore.srs.nextItems(srsState, shuffledPool, ROUND_SIZE);
+      if (due.length < ROUND_SIZE) {
+        var dueIds = {};
+        due.forEach(function (it) { dueIds[it.id] = true; });
+        shuffledPool.forEach(function (it) {
+          if (due.length >= ROUND_SIZE) return;
+          if (!dueIds[it.id]) { due.push(it); dueIds[it.id] = true; }
+        });
+      }
+      session = {
+        modeId: modeId,
+        items: shuffle(due).slice(0, ROUND_SIZE),
+        index: 0,
+        score: 0,
+        total: 0,
+        wrong: [],
+        srsState: srsState
+      };
+      renderPlayScreen();
+    }
+
+    function renderEmptyState() {
+      viewRoot.innerHTML = '';
+      var wrap = document.createElement('div');
+      wrap.className = 'empty-state panel';
+      var msg = document.createElement('p');
+      msg.textContent = 'Ingen opgaver matcher dine filtre endnu.';
+      wrap.appendChild(msg);
+      var back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'back-btn';
+      back.textContent = 'Tilbage';
+      back.addEventListener('click', renderStart);
+      wrap.appendChild(back);
+      viewRoot.appendChild(wrap);
+    }
+
+    function buildFireFormerPrompt(item) {
+      var noun = NOUN_BY_ID[item.noun_id] || {};
+      var label = FORM_LABELS[item.requested_form] || item.requested_form;
+      return {
+        prompt: 'Skriv ' + label + ' af ordet "' + (noun.base || '') + '".',
+        accepted_answers: item.accepted_answers,
+        note: item.note
+      };
+    }
+
+    function labelForItem(item) {
+      var noun = NOUN_BY_ID[item.noun_id] || {};
+      var label = FORM_LABELS[item.requested_form] || item.requested_form;
+      return (noun.base || item.id) + ' (' + label + ')';
+    }
+
+    function patternKeyForItem(item) {
+      var noun = NOUN_BY_ID[item.noun_id] || {};
+      var formSlug = String(item.requested_form).replace(/_/g, '-');
+      return 'pattern:' + GAME_ID + ':noun:' + formSlug + ':' + (noun.plural_pattern || 'unknown');
+    }
+
+    function renderPlayScreen() {
+      clearAdvanceTimer();
+      viewRoot.innerHTML = '';
+
+      if (!session || session.index >= session.items.length) {
+        finishRound();
+        return;
+      }
+
+      var header = document.createElement('div');
+      header.className = 'play-header';
+      var back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'back-btn';
+      back.textContent = '← Tilbage';
+      back.addEventListener('click', renderStart);
+      header.appendChild(back);
+      var progressLabel = document.createElement('span');
+      progressLabel.className = 'progress-label';
+      progressLabel.textContent = 'Opgave ' + (session.index + 1) + ' af ' + session.items.length;
+      header.appendChild(progressLabel);
+      viewRoot.appendChild(header);
+
+      var track = document.createElement('div');
+      track.className = 'progress-track';
+      var fill = document.createElement('div');
+      fill.className = 'progress-fill';
+      fill.style.width = Math.round((session.index / session.items.length) * 100) + '%';
+      track.appendChild(fill);
+      viewRoot.appendChild(track);
+
+      var card = document.createElement('div');
+      card.className = 'quiz-card';
+      viewRoot.appendChild(card);
+
+      var item = session.items[session.index];
+      var adapted = session.modeId === 'fire_former'
+        ? buildFireFormerPrompt(item)
+        : { prompt: item.note || '', accepted_answers: [], note: 'Denne tilstand er endnu ikke klar.' };
+
+      DanskCore.quiz.freeText.render(adapted, card, function (correct, value) {
+        onAnswer(item, card, correct, value);
+      });
+    }
+
+    function onAnswer(item, card, correct) {
+      session.total++;
+      if (correct) {
+        session.score++;
+      } else {
+        session.wrong.push(item);
+      }
+      DanskCore.srs.record(session.srsState, item.id, correct);
+      if (session.modeId === 'fire_former') {
+        DanskCore.srs.pattern(session.srsState, patternKeyForItem(item), correct);
+      }
+      DanskCore.ui.announce(correct ? 'Rigtigt' : 'Forkert');
+
+      var reduced = DanskCore.ui.motion.isReduced();
+      if (!reduced) card.classList.add(correct ? 'flash-correct' : 'flash-wrong');
+
+      if (correct) {
+        SOUND_THEME.correct();
+        advanceTimer = setTimeout(function () {
+          session.index++;
+          renderPlayScreen();
+        }, 800);
+      } else {
+        SOUND_THEME.wrong();
+        var nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'next-btn';
+        nextBtn.textContent = 'Næste';
+        nextBtn.addEventListener('click', function () {
+          session.index++;
+          renderPlayScreen();
+        });
+        card.appendChild(nextBtn);
+        nextBtn.focus();
+      }
+    }
+
+    function dedupeById(items) {
+      var seen = {};
+      var out = [];
+      items.forEach(function (it) {
+        if (!seen[it.id]) { seen[it.id] = true; out.push(it); }
+      });
+      return out;
+    }
+
+    function finishRound() {
+      SOUND_THEME.roundComplete();
+      var accuracy = session.total ? (session.score / session.total * 100) : 0;
+      var weakItems = dedupeById(session.wrong).slice(0, 3).map(labelForItem);
+      var wrongForReview = dedupeById(session.wrong);
+      var modeId = session.modeId;
+
+      viewRoot.innerHTML = '';
+      var heading = document.createElement('h2');
+      heading.className = 'title';
+      heading.textContent = 'Runde afsluttet';
+      viewRoot.appendChild(heading);
+
+      var card = document.createElement('div');
+      card.className = 'panel';
+      viewRoot.appendChild(card);
+
+      DanskCore.quiz.summary.render(
+        { score: session.score, accuracy: accuracy, weakItems: weakItems },
+        card,
+        function () { startRound(modeId); },
+        wrongForReview.length ? function () { startErrorReview(modeId, wrongForReview); } : undefined
+      );
+    }
+
+    function startErrorReview(modeId, items) {
+      var srsState = DanskCore.srs.load(GAME_ID + ':' + modeId);
+      session = {
+        modeId: modeId,
+        items: shuffle(items),
+        index: 0,
+        score: 0,
+        total: 0,
+        wrong: [],
+        srsState: srsState
+      };
+      renderPlayScreen();
+    }
+
+    // -- global keyboard ------------------------------------------------
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && session) {
+        renderStart();
+      }
+    });
+
+    // -- init -------------------------------------------------------------
+
+    DanskCore.ui.darkMode.init();
+    DanskCore.ui.sound.init(true);
+    refreshTopbarIcons();
+    renderStart();
+  })();
+  </script>
+</body>
+</html>

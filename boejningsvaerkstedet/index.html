@@ -2,746 +2,845 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bøjningsværkstedet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bøjningsværkstedet 🛠️</title>
 <style>
-  :root {
-    --parchment: #E8DDC4;
-    --wood: #7A5134;
-    --brass: #B88A44;
-    --ink: #282622;
-    --correct: #50744B;
-    --wrong: #8C413A;
-    --adj-amber: #C58A37;
-    --noun-blue: #49758A;
-    --article-violet: #735C83;
+  /* ---- Bøjningsværkstedet — parchment/brass bookbinding workshop ----
+     Palette (prd.md § 2.2): Parchment #E8DDC4, Dark parchment #2B2925,
+     Wood #7A5134, Brass #B88A44, Ink #282622, Correct #50744B,
+     Wrong #8C413A, Adjektiv amber #C58A37, Navneord blue #49758A,
+     Artikel violet #735C83. */
+  :root{
+    --parchment:#E8DDC4;
+    --wood:#7A5134;
+    --brass:#B88A44;
+    --ink:#282622;
+    --correct:#50744B;
+    --wrong:#8C413A;
+    --adj:#C58A37;
+    --noun:#49758A;
+    --article:#735C83;
 
-    --bg: var(--parchment);
-    --fg: var(--ink);
-    --card-bg: #F4ECD8;
-    --border: var(--brass);
-    --muted: #6b5c46;
+    --bg:#E8DDC4;
+    --panel:#F1E9D6;
+    --panel-2:#e2d6ba;
+    --text:#282622;
+    --muted:#6b5f4c;
+    --line:rgba(122,81,52,.35);
+    --shadow:0 14px 40px rgba(40,30,20,.22);
 
-    --dc-fg: var(--fg);
-    --dc-btn-bg: #FFF9EC;
-    --dc-border: var(--border);
-    --dc-accent: var(--wood);
-    --dc-accent-fg: #FBF3DE;
-    --dc-input-bg: #FFFDF6;
-    --dc-correct: var(--correct);
-    --dc-correct-bg: rgba(80, 116, 75, .16);
-    --dc-wrong: var(--wrong);
-    --dc-wrong-bg: rgba(140, 65, 58, .16);
+    /* DanskCore quiz renderer theming hooks (used by future modes) */
+    --dc-fg:var(--text);
+    --dc-btn-bg:var(--panel);
+    --dc-border:var(--line);
+    --dc-accent:var(--brass);
+    --dc-accent-fg:#2b2118;
+    --dc-input-bg:#fbf6ea;
+    --dc-correct:var(--correct);
+    --dc-correct-bg:rgba(80,116,75,.16);
+    --dc-wrong:var(--wrong);
+    --dc-wrong-bg:rgba(140,65,58,.16);
+  }
+  html[data-theme="dark"]{
+    --bg:#2B2925;
+    --panel:#35322c;
+    --panel-2:#3f3b33;
+    --text:#E8DDC4;
+    --muted:#b8ac93;
+    --line:rgba(184,138,68,.35);
+    --shadow:0 14px 40px rgba(0,0,0,.5);
+    --dc-input-bg:#2f2c26;
+    --dc-accent-fg:#221a10;
   }
 
-  [data-theme="dark"] {
-    --bg: #2B2925;
-    --fg: #EDE3C8;
-    --card-bg: #35322A;
-    --border: #8A6A3F;
-    --muted: #b8a97e;
-
-    --dc-btn-bg: #3A362C;
-    --dc-input-bg: #3A362C;
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 15% 8%, rgba(184,138,68,.16), transparent 42%),
+      radial-gradient(circle at 85% 90%, rgba(122,81,52,.18), transparent 46%),
+      var(--bg);
+    background-attachment:fixed;
+    min-height:100vh;
+    padding:18px 12px 48px;
+    display:flex;justify-content:center;align-items:flex-start;
+    line-height:1.45;
   }
 
-  * { box-sizing: border-box; }
+  .shell{width:100%;max-width:640px}
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    min-width: 360px;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: Georgia, 'Iowan Old Style', 'EB Garamond', serif;
-    transition: background .2s ease, color .2s ease;
+  header.topbar{
+    display:flex;align-items:center;gap:.6em;margin-bottom:16px;
+  }
+  .brand{
+    font-weight:700;font-size:1.35rem;letter-spacing:.01em;
+    color:var(--wood);flex:1 1 auto;display:flex;align-items:center;gap:.4em;
+  }
+  html[data-theme="dark"] .brand{color:var(--brass)}
+  .icon-btn{
+    min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;
+    font-size:1.15rem;background:var(--panel);color:var(--text);
+    border:1px solid var(--line);border-radius:10px;cursor:pointer;
+  }
+  .icon-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+  .card{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.28), transparent 26%),
+      repeating-linear-gradient(0deg, rgba(122,81,52,.05) 0 1px, transparent 1px 24px),
+      var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:20px 18px;
   }
 
-  body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  h1.title{
+    margin:.1em 0 .1em;font-size:1.9rem;color:var(--wood);
   }
+  html[data-theme="dark"] h1.title{color:var(--brass)}
+  .lede{margin:.2em 0 1.2em;color:var(--muted)}
 
-  a { color: inherit; }
+  .group-label{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:1em 0 .5em}
 
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .5em;
-    padding: .6em .8em;
-    background: var(--wood);
-    color: #F5EAD0;
-    border-bottom: 3px solid var(--brass);
-    flex-wrap: wrap;
+  .chips{display:flex;flex-wrap:wrap;gap:.5em}
+  .chip{
+    min-height:44px;padding:.5em .95em;border-radius:999px;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);
+    cursor:pointer;font:inherit;font-size:.95rem;
   }
-
-  .topbar-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    letter-spacing: .01em;
+  .chip[aria-pressed="true"]{
+    background:var(--brass);color:#2b2118;border-color:var(--brass);font-weight:600;
   }
+  .chip:focus-visible{outline:2px solid var(--wood);outline-offset:2px}
 
-  .topbar-controls {
-    display: flex;
-    gap: .4em;
+  .modes{display:flex;flex-direction:column;gap:.5em}
+  .mode-btn{
+    display:flex;align-items:center;gap:.7em;text-align:left;
+    min-height:52px;padding:.6em .9em;border-radius:12px;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);
+    cursor:pointer;font:inherit;
   }
-
-  .icon-btn {
-    min-width: 44px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    background: rgba(255, 255, 255, .08);
-    color: inherit;
-    border: 1px solid rgba(255, 255, 255, .35);
-    border-radius: 10px;
-    cursor: pointer;
+  .mode-btn .num{
+    width:30px;height:30px;flex:0 0 auto;border-radius:8px;background:var(--wood);color:#f3e8d2;
+    display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;
   }
+  .mode-btn .mtxt{flex:1 1 auto}
+  .mode-btn .mname{font-weight:600}
+  .mode-btn .mmeta{font-size:.82rem;color:var(--muted)}
+  .mode-btn[aria-pressed="true"]{border-color:var(--brass);box-shadow:0 0 0 2px rgba(184,138,68,.35) inset}
+  .mode-btn[disabled]{opacity:.5;cursor:not-allowed}
+  .mode-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 
-  .icon-btn:hover { background: rgba(255, 255, 255, .18); }
-  .icon-btn:focus-visible { outline: 2px solid #FBF3DE; outline-offset: 2px; }
-
-  main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    padding: 1.2em .9em 2.5em;
+  .primary{
+    margin-top:1.3em;width:100%;min-height:54px;font-size:1.15rem;font-weight:700;
+    border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(180deg,var(--brass),#a2792f);color:#2b2118;
+    box-shadow:0 6px 0 rgba(122,81,52,.5),var(--shadow);
   }
+  .primary:active{transform:translateY(2px);box-shadow:0 4px 0 rgba(122,81,52,.5)}
+  .primary:focus-visible{outline:2px solid var(--wood);outline-offset:3px}
 
-  .screen {
-    width: 100%;
-    max-width: 640px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.1em;
+  .btn{
+    min-height:44px;padding:.55em 1.1em;border-radius:10px;cursor:pointer;font:inherit;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);
   }
+  .btn.accent{background:var(--brass);color:#2b2118;border-color:var(--brass);font-weight:600}
+  .btn:focus-visible{outline:2px solid var(--wood);outline-offset:2px}
 
-  .title {
-    text-align: center;
-    font-size: 1.7rem;
-    color: var(--wood);
-    margin: .2em 0 0;
+  /* ---- play screen ---- */
+  .playbar{display:flex;align-items:center;gap:.6em;margin-bottom:12px}
+  .playbar .back{min-width:44px}
+  .progress{flex:1 1 auto;height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line)}
+  .progress > i{display:block;height:100%;background:var(--wood);width:0;transition:width .3s ease}
+  html[data-theme="dark"] .progress > i{background:var(--brass)}
+  .count{font-size:.85rem;color:var(--muted);min-width:3.2em;text-align:right}
+
+  .material{display:flex;align-items:center;gap:.6em;flex-wrap:wrap;margin-bottom:.4em}
+  .lemma{font-size:1.7rem;font-weight:700;color:var(--noun)}
+  html[data-theme="dark"] .lemma{color:#8fbdd2}
+  .gender-tag{
+    font-size:.8rem;padding:.25em .7em;border-radius:999px;font-weight:600;
+    background:rgba(115,92,131,.16);color:var(--article);border:1px solid rgba(115,92,131,.4);
   }
+  html[data-theme="dark"] .gender-tag{color:#c4a9d6}
+  .ask{color:var(--muted);margin:.1em 0 1em}
 
-  [data-theme="dark"] .title { color: var(--brass); }
-
-  .subtitle {
-    text-align: center;
-    color: var(--muted);
-    margin: 0;
-    font-size: .95rem;
+  table.grid{width:100%;border-collapse:separate;border-spacing:8px;margin:0 0 1em}
+  table.grid th{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:center;padding:.2em}
+  table.grid th.rowh{text-align:right;white-space:nowrap}
+  table.grid td{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:.7em .5em;text-align:center;min-height:44px;font-size:1.05rem;
   }
-
-  .panel {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1em;
+  table.grid td.filled{color:var(--muted);font-style:italic}
+  table.grid td.target{
+    background:#fbf6ea;border:2px dashed var(--brass);padding:.3em;
   }
+  html[data-theme="dark"] table.grid td.target{background:#2f2c26}
+  table.grid td.target.done-correct{border-style:solid;border-color:var(--correct);background:var(--dc-correct-bg)}
+  table.grid td.target.done-wrong{border-style:solid;border-color:var(--wrong);background:var(--dc-wrong-bg)}
 
-  .field-label {
-    font-size: .85rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--muted);
-    margin: 0 0 .5em;
+  .answer-row{display:flex;gap:.5em;flex-wrap:wrap;align-items:center}
+  input.answer{
+    flex:1 1 9em;min-height:48px;padding:.5em .8em;font:inherit;font-size:1.15rem;
+    border:1px solid var(--line);border-radius:10px;background:var(--dc-input-bg);color:var(--text);
+    text-align:center;
   }
+  input.answer:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
 
-  .chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5em;
+  .slip{
+    margin-top:1em;border-left:4px solid var(--brass);background:var(--panel-2);
+    border-radius:0 8px 8px 0;padding:.7em .9em;font-size:.98rem;
   }
+  .slip.correct{border-left-color:var(--correct)}
+  .slip.wrong{border-left-color:var(--wrong)}
+  .slip .sol{font-weight:700}
+  .slip .sol.ok{color:var(--correct)}
+  .slip .sol.bad{color:var(--wrong)}
+  html[data-theme="dark"] .slip .sol.ok{color:#8fc088}
+  html[data-theme="dark"] .slip .sol.bad{color:#d98f88}
+  .slip .note{margin-top:.35em;color:var(--text)}
+  .slip .actions{margin-top:.7em;display:flex;gap:.5em;flex-wrap:wrap;align-items:center}
 
-  .chip {
-    min-height: 44px;
-    padding: .5em .9em;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--dc-btn-bg);
-    color: var(--fg);
-    cursor: pointer;
-    font: inherit;
-    font-size: .92rem;
+  .empty-state{text-align:center;color:var(--muted);padding:1.5em .5em}
+  .empty-state .big{font-size:2.2rem;display:block;margin-bottom:.3em}
+
+  /* round summary */
+  .sum-head{font-size:1.4rem;color:var(--wood);margin:.1em 0 .6em}
+  html[data-theme="dark"] .sum-head{color:var(--brass)}
+  .sum-stats{display:flex;gap:1.4em;flex-wrap:wrap;margin-bottom:1em}
+  .sum-stats .stat b{display:block;font-size:1.8rem;color:var(--text)}
+  .sum-stats .stat span{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .weak-list{list-style:none;padding:0;margin:.2em 0 1em;display:flex;flex-direction:column;gap:.4em}
+  .weak-list li{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:.5em .7em;font-size:.95rem}
+  .xgame{
+    display:inline-flex;align-items:center;gap:.4em;margin-top:.4em;text-decoration:none;
+    background:rgba(73,117,138,.14);border:1px solid rgba(73,117,138,.45);color:var(--noun);
+    padding:.55em .9em;border-radius:999px;font-size:.92rem;
   }
+  html[data-theme="dark"] .xgame{color:#8fbdd2}
+  .sum-actions{display:flex;gap:.6em;flex-wrap:wrap;margin-top:1em}
 
-  .chip[aria-pressed="true"] {
-    background: var(--wood);
-    color: #FBF3DE;
-    border-color: var(--wood);
+  .hidden{display:none !important}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* animations (disabled under reduced motion) */
+  @keyframes press-in{0%{transform:scale(1)}45%{transform:scale(.97)}100%{transform:scale(1)}}
+  .press{animation:press-in .28s ease}
+  @media (prefers-reduced-motion: reduce){
+    .press{animation:none}
+    .progress > i{transition:none}
+    .primary:active{transform:none}
   }
-
-  .chip[disabled] {
-    opacity: .5;
-    cursor: not-allowed;
-  }
-
-  .chip:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
-
-  .play-btn {
-    min-height: 54px;
-    font-size: 1.15rem;
-    font-weight: 700;
-    background: var(--brass);
-    color: #2B2412;
-    border: 2px solid var(--wood);
-    border-radius: 14px;
-    cursor: pointer;
-  }
-
-  .play-btn:hover { filter: brightness(1.06); }
-  .play-btn:focus-visible { outline: 2px solid var(--wood); outline-offset: 3px; }
-
-  .footer-row {
-    display: flex;
-    justify-content: center;
-  }
-
-  .link-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    text-decoration: underline;
-    cursor: pointer;
-    font: inherit;
-    font-size: .85rem;
-    min-height: 44px;
-    padding: 0 .3em;
-  }
-
-  .play-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .5em;
-  }
-
-  .back-btn {
-    min-height: 44px;
-    min-width: 44px;
-    padding: .4em .8em;
-    background: var(--dc-btn-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--fg);
-    cursor: pointer;
-    font: inherit;
-  }
-
-  .back-btn:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
-
-  .progress-label {
-    font-size: .9rem;
-    color: var(--muted);
-  }
-
-  .progress-track {
-    height: 8px;
-    background: rgba(122, 81, 52, .18);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--wood), var(--brass));
-    transition: width .25s ease;
-  }
-
-  .quiz-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.1em;
-  }
-
-  .quiz-card.flash-correct { animation: flashCorrect .35s ease; }
-  .quiz-card.flash-wrong { animation: flashWrong .35s ease; }
-
-  @keyframes flashCorrect {
-    0% { box-shadow: 0 0 0 0 rgba(80, 116, 75, 0); }
-    40% { box-shadow: 0 0 0 6px rgba(80, 116, 75, .35); }
-    100% { box-shadow: 0 0 0 0 rgba(80, 116, 75, 0); }
-  }
-
-  @keyframes flashWrong {
-    0% { box-shadow: 0 0 0 0 rgba(140, 65, 58, 0); }
-    40% { box-shadow: 0 0 0 6px rgba(140, 65, 58, .35); }
-    100% { box-shadow: 0 0 0 0 rgba(140, 65, 58, 0); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .quiz-card.flash-correct, .quiz-card.flash-wrong { animation: none; }
-    .progress-fill { transition: none; }
-  }
-
-  .next-btn {
-    margin-top: .8em;
-    min-height: 44px;
-    padding: .6em 1.2em;
-    background: var(--wood);
-    color: #FBF3DE;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font: inherit;
-  }
-
-  .next-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-
-  .empty-state {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    align-items: center;
-    padding: 2em 1em;
-  }
-
-  .dc-quiz-prompt-text { font-size: 1.15rem; }
 </style>
 </head>
 <body>
+<div class="shell">
   <header class="topbar">
-    <div class="topbar-title">🛠️ Bøjningsværkstedet</div>
-    <div class="topbar-controls">
-      <button type="button" id="darkToggle" class="icon-btn" aria-label="Skift mørk/lys tilstand"></button>
-      <button type="button" id="soundToggle" class="icon-btn" aria-label="Slå lyd til/fra"></button>
-    </div>
+    <div class="brand">🛠️ Bøjningsværkstedet</div>
+    <button class="icon-btn" id="btn-dark" type="button" aria-label="Skift mørk tilstand" title="Mørk tilstand">🌙</button>
+    <button class="icon-btn" id="btn-sound" type="button" aria-label="Slå lyd til eller fra" title="Lyd">🔊</button>
   </header>
-  <main>
-    <div id="view-root" class="screen"></div>
+
+  <!-- ================= START SCREEN ================= -->
+  <main id="start-screen" class="card">
+    <h1 class="title">Bøjningsværkstedet</h1>
+    <p class="lede">Bøj hele navneordsgruppen — former, artikler, tillægsord og mængder.</p>
+
+    <div class="group-label">Vælg værksted</div>
+    <div class="modes" id="mode-list" role="group" aria-label="Vælg tilstand"></div>
+
+    <div class="group-label">Niveau</div>
+    <div class="chips" id="level-list" role="group" aria-label="Vælg niveau"></div>
+
+    <button class="primary" id="btn-play" type="button">Spil</button>
   </main>
 
-  <script src="../shared/dansk-core.js"></script>
-  <script src="../shared/data/nouns.js"></script>
-  <script src="../shared/data/adjectives.js"></script>
-  <script src="./data.js"></script>
-  <script>
-  (function () {
-    'use strict';
+  <!-- ================= PLAY SCREEN ================= -->
+  <main id="play-screen" class="card hidden">
+    <div class="playbar">
+      <button class="icon-btn back" id="btn-back" type="button" aria-label="Tilbage til start" title="Tilbage">✕</button>
+      <div class="progress" aria-hidden="true"><i id="progress-fill"></i></div>
+      <div class="count" id="progress-count">0/0</div>
+    </div>
+    <div id="item-host" aria-live="polite"></div>
+  </main>
 
-    var GAME_ID = 'boejningsvaerkstedet';
-    var GAME_LEVELS = ['A1', 'A2', 'B1', 'B2'];
-    var ROUND_SIZE = 10;
+  <!-- ================= SUMMARY SCREEN ================= -->
+  <main id="summary-screen" class="card hidden">
+    <div id="summary-host"></div>
+  </main>
+</div>
 
-    var MODES = [
-      { id: 'fire_former', label: 'Fire former' },
-      { id: 'byg_navneordet', label: 'Byg navneordet' },
-      { id: 'adjektivvaerkstedet', label: 'Adjektivværkstedet' },
-      { id: 'sammenligningspressen', label: 'Sammenligningspressen' },
-      { id: 'bestemt_ubestemt', label: 'Bestemt eller ubestemt?' },
-      { id: 'maengdevaerkstedet', label: 'Mængdeværkstedet' }
-    ];
+<!-- shared library + data -->
+<script src="../shared/dansk-core.js"></script>
+<script src="../shared/data/nouns.js"></script>
+<script src="../shared/data/adjectives.js"></script>
+<script src="./data.js"></script>
+<script>
+(function(){
+  'use strict';
 
-    var FORM_LABELS = {
-      indefinite_singular: 'ubestemt ental',
-      definite_singular: 'bestemt ental',
-      indefinite_plural: 'ubestemt flertal',
-      definite_plural: 'bestemt flertal'
-    };
+  var DC = window.DanskCore;
+  var DATA = window.BOEJNINGS_DATA || {};
+  var NOUNS = window.DANSK_NOUNS || [];
 
-    var SOUND_THEME = {
-      select: function () {
-        DanskCore.ui.sound.sequence([
-          { type: 'triangle', frequency: 500, duration: 0.09, gain: 0.03 }
-        ]);
-      },
-      correct: function () {
-        DanskCore.ui.sound.sequence([
-          { type: 'square', frequency: 220, duration: 0.06, gain: 0.05 },
-          { type: 'triangle', frequency: 330, duration: 0.07, gain: 0.06, delay: 0.07 },
-          { type: 'sine', frequency: 494, duration: 0.10, gain: 0.05, delay: 0.14 }
-        ]);
-      },
-      wrong: function () {
-        DanskCore.ui.sound.sequence([
-          { type: 'triangle', frequency: 140, duration: 0.15, gain: 0.04 }
-        ]);
-      },
-      roundComplete: function () {
-        DanskCore.ui.sound.sequence([
-          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06 },
-          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06, delay: 0.15 },
-          { type: 'square', frequency: 220, duration: 0.08, gain: 0.06, delay: 0.30 },
-          { type: 'sine', frequency: 330, duration: 0.40, gain: 0.07, delay: 0.45 }
-        ]);
-      }
-    };
+  var GAME_ID = 'boejningsvaerkstedet';
+  var ROUND_SIZE = 10;
 
-    var DATA = window.BOEJNINGS_DATA || {};
-    var NOUN_BY_ID = {};
-    (window.DANSK_NOUNS || []).forEach(function (n) { NOUN_BY_ID[n.id] = n; });
+  // ---- noun lookup for Mode 1 display context ----
+  var NOUN_BY_ID = {};
+  NOUNS.forEach(function(n){ NOUN_BY_ID[n.id] = n; });
 
-    function modeHasItems(modeId) {
-      return Array.isArray(DATA[modeId]) && DATA[modeId].length > 0;
+  // ---- mode registry ----
+  var MODES = [
+    { key:'fire_former',          num:1, name:'Fire former',            meta:'De fire navneordsformer' },
+    { key:'byg_navneordet',       num:2, name:'Byg navneordet',         meta:'Byg hele navneordsgruppen' },
+    { key:'adjektivvaerkstedet',  num:3, name:'Adjektivværkstedet',     meta:'Tillægsordets bøjning' },
+    { key:'sammenligningspressen',num:4, name:'Sammenligningspressen',  meta:'Gradbøjning' },
+    { key:'bestemt_ubestemt',     num:5, name:'Bestemt eller ubestemt?',meta:'Bestemthed i kontekst' },
+    { key:'maengdevaerkstedet',   num:6, name:'Mængdeværkstedet',       meta:'Mængdeord' }
+  ];
+
+  var FORM_META = {
+    indefinite_singular:{ row:0, col:0, da:'ubestemt ental',   slug:'indefinite-singular' },
+    definite_singular:  { row:1, col:0, da:'bestemt ental',    slug:'definite-singular' },
+    indefinite_plural:  { row:0, col:1, da:'ubestemt flertal', slug:'indefinite-plural' },
+    definite_plural:    { row:1, col:1, da:'bestemt flertal',  slug:'definite-plural' }
+  };
+  var FORM_ORDER = ['indefinite_singular','definite_singular','indefinite_plural','definite_plural'];
+
+  var LEVELS = ['A1','A2','B1','B2'];
+
+  // ---- sound theme (prd.md § 2.5) ----
+  var SOUND = {
+    select:function(){ DC.ui.sound.sequence([{type:'triangle',frequency:500,duration:0.09,gain:0.03}]); },
+    correct:function(){ DC.ui.sound.sequence([
+      {type:'square',frequency:220,duration:0.06,gain:0.05},
+      {type:'triangle',frequency:330,duration:0.07,gain:0.06,delay:0.07},
+      {type:'sine',frequency:494,duration:0.10,gain:0.05,delay:0.14}
+    ]); },
+    wrong:function(){ DC.ui.sound.sequence([{type:'triangle',frequency:140,duration:0.15,gain:0.04}]); },
+    roundComplete:function(){ DC.ui.sound.sequence([
+      {type:'square',frequency:220,duration:0.08,gain:0.06},
+      {type:'square',frequency:220,duration:0.08,gain:0.06,delay:0.15},
+      {type:'square',frequency:220,duration:0.08,gain:0.06,delay:0.30},
+      {type:'sine',frequency:330,duration:0.40,gain:0.07,delay:0.45}
+    ]); }
+  };
+
+  // ---- persisted preferences ----
+  var prefs = DC.store.namespace(GAME_ID);
+  var srsState = DC.srs.load(GAME_ID);
+
+  // ---- app state ----
+  var state = {
+    mode: 'fire_former',
+    levels: LEVELS.slice(),
+    round: [],      // array of item objects
+    idx: 0,
+    correct: 0,
+    missed: []      // item objects answered wrong (for Gentag fejl + weak list)
+  };
+
+  // ---- element refs ----
+  var el = {
+    start:   document.getElementById('start-screen'),
+    play:    document.getElementById('play-screen'),
+    summary: document.getElementById('summary-screen'),
+    modeList:document.getElementById('mode-list'),
+    levelList:document.getElementById('level-list'),
+    itemHost:document.getElementById('item-host'),
+    sumHost: document.getElementById('summary-host'),
+    fill:    document.getElementById('progress-fill'),
+    pcount:  document.getElementById('progress-count')
+  };
+
+  // ---- init settings ----
+  DC.ui.darkMode.init();
+  DC.ui.sound.init(prefs.get('sound') !== false);
+  syncSoundIcon();
+
+  // restore last mode/levels if present
+  var savedMode = prefs.get('mode');
+  if (savedMode && MODES.some(function(m){ return m.key === savedMode; })) state.mode = savedMode;
+  var savedLevels = prefs.get('levels');
+  if (Array.isArray(savedLevels) && savedLevels.length) {
+    state.levels = savedLevels.filter(function(l){ return LEVELS.indexOf(l) !== -1; });
+    if (!state.levels.length) state.levels = LEVELS.slice();
+  }
+
+  document.getElementById('btn-dark').addEventListener('click', function(){ DC.ui.darkMode.toggle(); });
+  document.getElementById('btn-sound').addEventListener('click', function(){
+    var on = DC.ui.sound.toggle();
+    prefs.set('sound', on);
+    syncSoundIcon();
+    if (on) SOUND.select();
+  });
+  function syncSoundIcon(){
+    document.getElementById('btn-sound').textContent = DC.ui.sound.isEnabled() ? '🔊' : '🔇';
+  }
+
+  document.getElementById('btn-play').addEventListener('click', startRound);
+  document.getElementById('btn-back').addEventListener('click', showStart);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !el.play.classList.contains('hidden')) {
+      showStart();
     }
+  });
 
-    var viewRoot = document.getElementById('view-root');
-    var darkToggle = document.getElementById('darkToggle');
-    var soundToggle = document.getElementById('soundToggle');
-
-    var state = {
-      selectedMode: MODES.filter(function (m) { return modeHasItems(m.id); })[0] || MODES[0],
-      selectedLevels: GAME_LEVELS.slice()
-    };
-
-    var session = null;
-    var advanceTimer = null;
-
-    function shuffle(arr) {
-      var a = arr.slice();
-      for (var i = a.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-      }
-      return a;
-    }
-
-    function clearAdvanceTimer() {
-      if (advanceTimer) {
-        clearTimeout(advanceTimer);
-        advanceTimer = null;
-      }
-    }
-
-    // -- top bar ------------------------------------------------------
-
-    function refreshTopbarIcons() {
-      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-      darkToggle.textContent = dark ? '☀️' : '🌙';
-      soundToggle.textContent = DanskCore.ui.sound.isEnabled() ? '🔊' : '🔇';
-    }
-
-    darkToggle.addEventListener('click', function () {
-      DanskCore.ui.darkMode.toggle();
-      refreshTopbarIcons();
+  // ---- build start-screen controls ----
+  function buildStartControls(){
+    // modes
+    el.modeList.innerHTML = '';
+    MODES.forEach(function(m){
+      var pool = poolFor(m.key, LEVELS); // total available regardless of level filter
+      var ready = pool.length > 0;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mode-btn';
+      btn.setAttribute('aria-pressed', String(m.key === state.mode));
+      if (!ready) { btn.disabled = true; btn.title = 'Kommer snart'; }
+      btn.innerHTML = '<span class="num">' + m.num + '</span>' +
+        '<span class="mtxt"><span class="mname">' + m.name + '</span>' +
+        '<span class="mmeta"> · ' + m.meta + (ready ? '' : ' · kommer snart') + '</span></span>';
+      btn.addEventListener('click', function(){
+        if (btn.disabled) return;
+        state.mode = m.key;
+        prefs.set('mode', m.key);
+        updateModePressed();
+      });
+      el.modeList.appendChild(btn);
     });
+    updateModePressed();
 
-    soundToggle.addEventListener('click', function () {
-      DanskCore.ui.sound.toggle();
-      refreshTopbarIcons();
+    // levels
+    el.levelList.innerHTML = '';
+    LEVELS.forEach(function(lvl){
+      var c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'chip';
+      c.textContent = lvl;
+      c.setAttribute('aria-pressed', String(state.levels.indexOf(lvl) !== -1));
+      c.addEventListener('click', function(){
+        var i = state.levels.indexOf(lvl);
+        if (i === -1) state.levels.push(lvl);
+        else if (state.levels.length > 1) state.levels.splice(i, 1); // keep at least one
+        c.setAttribute('aria-pressed', String(state.levels.indexOf(lvl) !== -1));
+        prefs.set('levels', state.levels.slice());
+      });
+      el.levelList.appendChild(c);
     });
+  }
 
-    // -- start screen ---------------------------------------------------
-
-    function renderStart() {
-      clearAdvanceTimer();
-      session = null;
-      viewRoot.innerHTML = '';
-
-      var title = document.createElement('h1');
-      title.className = 'title';
-      title.textContent = 'Bøjningsværkstedet';
-      viewRoot.appendChild(title);
-
-      var panel = document.createElement('div');
-      panel.className = 'panel';
-
-      var modeLabel = document.createElement('p');
-      modeLabel.className = 'field-label';
-      modeLabel.textContent = 'Værksted';
-      panel.appendChild(modeLabel);
-
-      var modeRow = document.createElement('div');
-      modeRow.className = 'chip-row';
-      modeRow.setAttribute('role', 'group');
-      modeRow.setAttribute('aria-label', 'Vælg værksted');
-      MODES.forEach(function (mode) {
-        var enabled = modeHasItems(mode.id);
-        var chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'chip';
-        chip.textContent = enabled ? mode.label : mode.label + ' (kommer snart)';
-        chip.setAttribute('aria-pressed', state.selectedMode.id === mode.id ? 'true' : 'false');
-        if (!enabled) {
-          chip.disabled = true;
-        } else {
-          chip.addEventListener('click', function () {
-            state.selectedMode = mode;
-            renderStart();
-          });
-        }
-        modeRow.appendChild(chip);
-      });
-      panel.appendChild(modeRow);
-
-      var levelLabel = document.createElement('p');
-      levelLabel.className = 'field-label';
-      levelLabel.style.marginTop = '.9em';
-      levelLabel.textContent = 'Niveau';
-      panel.appendChild(levelLabel);
-
-      var levelRow = document.createElement('div');
-      levelRow.className = 'chip-row';
-      levelRow.setAttribute('role', 'group');
-      levelRow.setAttribute('aria-label', 'Vælg niveau');
-      GAME_LEVELS.forEach(function (level) {
-        var chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'chip';
-        chip.textContent = level;
-        var active = state.selectedLevels.indexOf(level) !== -1;
-        chip.setAttribute('aria-pressed', active ? 'true' : 'false');
-        chip.addEventListener('click', function () {
-          var idx = state.selectedLevels.indexOf(level);
-          if (idx === -1) {
-            state.selectedLevels.push(level);
-          } else if (state.selectedLevels.length > 1) {
-            state.selectedLevels.splice(idx, 1);
-          }
-          renderStart();
-        });
-        levelRow.appendChild(chip);
-      });
-      panel.appendChild(levelRow);
-
-      viewRoot.appendChild(panel);
-
-      var playBtn = document.createElement('button');
-      playBtn.type = 'button';
-      playBtn.className = 'play-btn';
-      playBtn.textContent = 'Spil';
-      playBtn.addEventListener('click', function () { startRound(state.selectedMode.id); });
-      viewRoot.appendChild(playBtn);
-
-      var footerRow = document.createElement('div');
-      footerRow.className = 'footer-row';
-      var resetBtn = document.createElement('button');
-      resetBtn.type = 'button';
-      resetBtn.className = 'link-btn';
-      resetBtn.textContent = 'Nulstil fremskridt';
-      resetBtn.addEventListener('click', function () {
-        var confirmed = window.confirm('Er du sikker på, at du vil nulstille alt fremskridt i Bøjningsværkstedet?');
-        if (!confirmed) return;
-        MODES.forEach(function (mode) {
-          DanskCore.store.remove('srs:' + GAME_ID + ':' + mode.id);
-        });
-        DanskCore.ui.announce('Fremskridt nulstillet.');
-      });
-      footerRow.appendChild(resetBtn);
-      viewRoot.appendChild(footerRow);
+  function updateModePressed(){
+    var btns = el.modeList.querySelectorAll('.mode-btn');
+    for (var i=0;i<btns.length;i++){
+      btns[i].setAttribute('aria-pressed', String(MODES[i].key === state.mode));
     }
+  }
 
-    // -- play screen ------------------------------------------------------
+  function poolFor(modeKey, levels){
+    var all = Array.isArray(DATA[modeKey]) ? DATA[modeKey] : [];
+    return DC.level.filter(all, levels);
+  }
 
-    function startRound(modeId) {
-      var pool = DanskCore.level.filter(DATA[modeId] || [], state.selectedLevels);
-      if (!pool.length) {
-        renderEmptyState();
-        return;
-      }
-      var srsState = DanskCore.srs.load(GAME_ID + ':' + modeId);
-      var shuffledPool = shuffle(pool);
-      var due = DanskCore.srs.nextItems(srsState, shuffledPool, ROUND_SIZE);
-      if (due.length < ROUND_SIZE) {
-        var dueIds = {};
-        due.forEach(function (it) { dueIds[it.id] = true; });
-        shuffledPool.forEach(function (it) {
-          if (due.length >= ROUND_SIZE) return;
-          if (!dueIds[it.id]) { due.push(it); dueIds[it.id] = true; }
-        });
-      }
-      session = {
-        modeId: modeId,
-        items: shuffle(due).slice(0, ROUND_SIZE),
-        index: 0,
-        score: 0,
-        total: 0,
-        wrong: [],
-        srsState: srsState
-      };
-      renderPlayScreen();
-    }
+  // ---- screen switching ----
+  function show(which){
+    el.start.classList.toggle('hidden', which !== 'start');
+    el.play.classList.toggle('hidden', which !== 'play');
+    el.summary.classList.toggle('hidden', which !== 'summary');
+  }
+  function showStart(){
+    buildStartControls();
+    show('start');
+    document.getElementById('btn-play').focus();
+  }
 
-    function renderEmptyState() {
-      viewRoot.innerHTML = '';
-      var wrap = document.createElement('div');
-      wrap.className = 'empty-state panel';
-      var msg = document.createElement('p');
-      msg.textContent = 'Ingen opgaver matcher dine filtre endnu.';
-      wrap.appendChild(msg);
-      var back = document.createElement('button');
-      back.type = 'button';
-      back.className = 'back-btn';
-      back.textContent = 'Tilbage';
-      back.addEventListener('click', renderStart);
-      wrap.appendChild(back);
-      viewRoot.appendChild(wrap);
-    }
-
-    function buildFireFormerPrompt(item) {
-      var noun = NOUN_BY_ID[item.noun_id] || {};
-      var label = FORM_LABELS[item.requested_form] || item.requested_form;
-      return {
-        prompt: 'Skriv ' + label + ' af ordet "' + (noun.base || '') + '".',
-        accepted_answers: item.accepted_answers,
-        note: item.note
-      };
-    }
-
-    function labelForItem(item) {
-      var noun = NOUN_BY_ID[item.noun_id] || {};
-      var label = FORM_LABELS[item.requested_form] || item.requested_form;
-      return (noun.base || item.id) + ' (' + label + ')';
-    }
-
-    function patternKeyForItem(item) {
-      var noun = NOUN_BY_ID[item.noun_id] || {};
-      var formSlug = String(item.requested_form).replace(/_/g, '-');
-      return 'pattern:' + GAME_ID + ':noun:' + formSlug + ':' + (noun.plural_pattern || 'unknown');
-    }
-
-    function renderPlayScreen() {
-      clearAdvanceTimer();
-      viewRoot.innerHTML = '';
-
-      if (!session || session.index >= session.items.length) {
-        finishRound();
-        return;
-      }
-
-      var header = document.createElement('div');
-      header.className = 'play-header';
-      var back = document.createElement('button');
-      back.type = 'button';
-      back.className = 'back-btn';
-      back.textContent = '← Tilbage';
-      back.addEventListener('click', renderStart);
-      header.appendChild(back);
-      var progressLabel = document.createElement('span');
-      progressLabel.className = 'progress-label';
-      progressLabel.textContent = 'Opgave ' + (session.index + 1) + ' af ' + session.items.length;
-      header.appendChild(progressLabel);
-      viewRoot.appendChild(header);
-
-      var track = document.createElement('div');
-      track.className = 'progress-track';
-      var fill = document.createElement('div');
-      fill.className = 'progress-fill';
-      fill.style.width = Math.round((session.index / session.items.length) * 100) + '%';
-      track.appendChild(fill);
-      viewRoot.appendChild(track);
-
-      var card = document.createElement('div');
-      card.className = 'quiz-card';
-      viewRoot.appendChild(card);
-
-      var item = session.items[session.index];
-      var adapted = session.modeId === 'fire_former'
-        ? buildFireFormerPrompt(item)
-        : { prompt: item.note || '', accepted_answers: [], note: 'Denne tilstand er endnu ikke klar.' };
-
-      DanskCore.quiz.freeText.render(adapted, card, function (correct, value) {
-        onAnswer(item, card, correct, value);
-      });
-    }
-
-    function onAnswer(item, card, correct) {
-      session.total++;
-      if (correct) {
-        session.score++;
-      } else {
-        session.wrong.push(item);
-      }
-      DanskCore.srs.record(session.srsState, item.id, correct);
-      if (session.modeId === 'fire_former') {
-        DanskCore.srs.pattern(session.srsState, patternKeyForItem(item), correct);
-      }
-      DanskCore.ui.announce(correct ? 'Rigtigt' : 'Forkert');
-
-      var reduced = DanskCore.ui.motion.isReduced();
-      if (!reduced) card.classList.add(correct ? 'flash-correct' : 'flash-wrong');
-
-      if (correct) {
-        SOUND_THEME.correct();
-        advanceTimer = setTimeout(function () {
-          session.index++;
-          renderPlayScreen();
-        }, 800);
-      } else {
-        SOUND_THEME.wrong();
-        var nextBtn = document.createElement('button');
-        nextBtn.type = 'button';
-        nextBtn.className = 'next-btn';
-        nextBtn.textContent = 'Næste';
-        nextBtn.addEventListener('click', function () {
-          session.index++;
-          renderPlayScreen();
-        });
-        card.appendChild(nextBtn);
-        nextBtn.focus();
-      }
-    }
-
-    function dedupeById(items) {
+  // ---- round lifecycle ----
+  function buildRound(pool){
+    // Prefer SRS-due items, then pad with the rest (shuffled) up to ROUND_SIZE.
+    var due = DC.srs.nextItems(srsState, shuffle(pool.slice()), ROUND_SIZE);
+    var chosen = due.slice();
+    if (chosen.length < ROUND_SIZE) {
       var seen = {};
-      var out = [];
-      items.forEach(function (it) {
-        if (!seen[it.id]) { seen[it.id] = true; out.push(it); }
-      });
-      return out;
+      chosen.forEach(function(it){ seen[it.id] = true; });
+      var rest = shuffle(pool.filter(function(it){ return !seen[it.id]; }));
+      for (var i=0; i<rest.length && chosen.length<ROUND_SIZE; i++) chosen.push(rest[i]);
     }
+    return chosen;
+  }
 
-    function finishRound() {
-      SOUND_THEME.roundComplete();
-      var accuracy = session.total ? (session.score / session.total * 100) : 0;
-      var weakItems = dedupeById(session.wrong).slice(0, 3).map(labelForItem);
-      var wrongForReview = dedupeById(session.wrong);
-      var modeId = session.modeId;
-
-      viewRoot.innerHTML = '';
-      var heading = document.createElement('h2');
-      heading.className = 'title';
-      heading.textContent = 'Runde afsluttet';
-      viewRoot.appendChild(heading);
-
-      var card = document.createElement('div');
-      card.className = 'panel';
-      viewRoot.appendChild(card);
-
-      DanskCore.quiz.summary.render(
-        { score: session.score, accuracy: accuracy, weakItems: weakItems },
-        card,
-        function () { startRound(modeId); },
-        wrongForReview.length ? function () { startErrorReview(modeId, wrongForReview); } : undefined
-      );
+  function startRound(){
+    var pool = poolFor(state.mode, state.levels);
+    if (!pool.length) {
+      // No data for this mode/level yet — show a graceful empty state.
+      show('play');
+      renderEmpty();
+      return;
     }
+    state.round = buildRound(pool);
+    state.idx = 0;
+    state.correct = 0;
+    state.missed = [];
+    show('play');
+    renderItem();
+  }
 
-    function startErrorReview(modeId, items) {
-      var srsState = DanskCore.srs.load(GAME_ID + ':' + modeId);
-      session = {
-        modeId: modeId,
-        items: shuffle(items),
-        index: 0,
-        score: 0,
-        total: 0,
-        wrong: [],
-        srsState: srsState
-      };
-      renderPlayScreen();
-    }
+  function renderEmpty(){
+    el.fill.style.width = '0%';
+    el.pcount.textContent = '';
+    el.itemHost.innerHTML = '';
+    var box = document.createElement('div');
+    box.className = 'empty-state';
+    box.innerHTML = '<span class="big">🛠️</span>' +
+      '<p>Denne tilstand er endnu ikke klar. Prøv <strong>Fire former</strong>.</p>';
+    var back = document.createElement('button');
+    back.className = 'btn accent';
+    back.type = 'button';
+    back.textContent = 'Tilbage';
+    back.addEventListener('click', showStart);
+    box.appendChild(back);
+    el.itemHost.appendChild(box);
+    back.focus();
+  }
 
-    // -- global keyboard ------------------------------------------------
+  function updateProgress(){
+    var pct = state.round.length ? Math.round((state.idx / state.round.length) * 100) : 0;
+    el.fill.style.width = pct + '%';
+    el.pcount.textContent = (state.idx + 1) + '/' + state.round.length;
+  }
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && session) {
-        renderStart();
+  function renderItem(){
+    if (state.idx >= state.round.length) { finishRound(); return; }
+    updateProgress();
+    var item = state.round[state.idx];
+    var renderer = RENDERERS[item.mode] || RENDERERS._fallback;
+    renderer(item);
+  }
+
+  function advance(){
+    state.idx++;
+    renderItem();
+  }
+
+  function finishRound(){
+    el.fill.style.width = '100%';
+    SOUND.roundComplete();
+    renderSummary();
+    show('summary');
+  }
+
+  // ---- answer bookkeeping (shared by all modes) ----
+  function recordAnswer(item, correct, patternKey){
+    DC.srs.record(srsState, item.id, correct);
+    if (patternKey) DC.srs.pattern(srsState, patternKey, correct);
+    if (correct) state.correct++;
+    else state.missed.push(item);
+  }
+
+  // =====================================================================
+  //  Mode renderers
+  // =====================================================================
+  var RENDERERS = {};
+
+  // ---- Mode 1 — Fire former (2×2 grid, free-text) --------------------
+  RENDERERS.fire_former = function(item){
+    var noun = NOUN_BY_ID[item.noun_id] || {};
+    var fm = FORM_META[item.requested_form] || FORM_META.indefinite_singular;
+    var patternKey = 'pattern:' + GAME_ID + ':noun:' + fm.slug + ':' + (noun.plural_pattern || 'unknown');
+
+    el.itemHost.innerHTML = '';
+    var wrap = document.createElement('div');
+
+    // material header
+    var material = document.createElement('div');
+    material.className = 'material';
+    var lemma = document.createElement('span');
+    lemma.className = 'lemma';
+    lemma.textContent = noun.base || item.noun_id;
+    material.appendChild(lemma);
+    var gtag = document.createElement('span');
+    gtag.className = 'gender-tag';
+    gtag.textContent = (noun.gender || '') + '-ord';
+    material.appendChild(gtag);
+    DC.ui.ttsButton(noun.base || item.noun_id, material);
+    wrap.appendChild(material);
+
+    var ask = document.createElement('p');
+    ask.className = 'ask';
+    ask.textContent = 'Skriv formen: ' + fm.da + '.';
+    wrap.appendChild(ask);
+
+    // 2×2 grid
+    var table = document.createElement('table');
+    table.className = 'grid';
+    table.innerHTML =
+      '<thead><tr><th></th><th>Ental</th><th>Flertal</th></tr></thead>';
+    var tbody = document.createElement('tbody');
+    var rowLabels = ['Ubestemt','Bestemt'];
+    var targetCell = null;
+    for (var r=0; r<2; r++){
+      var tr = document.createElement('tr');
+      var th = document.createElement('th');
+      th.className = 'rowh';
+      th.textContent = rowLabels[r];
+      tr.appendChild(th);
+      for (var c=0; c<2; c++){
+        var td = document.createElement('td');
+        if (r === fm.row && c === fm.col){
+          td.className = 'target';
+          var input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'answer';
+          input.setAttribute('aria-label', 'Skriv ' + fm.da);
+          input.setAttribute('autocomplete','off');
+          input.setAttribute('autocapitalize','off');
+          input.spellcheck = false;
+          td.appendChild(input);
+          targetCell = td;
+          wrap._input = input;
+        } else {
+          td.className = 'filled';
+          td.textContent = '·';
+        }
+        tr.appendChild(td);
       }
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+
+    // answer button row
+    var row = document.createElement('div');
+    row.className = 'answer-row';
+    var submit = document.createElement('button');
+    submit.className = 'btn accent';
+    submit.type = 'button';
+    submit.textContent = 'Sæt i pressen';
+    row.appendChild(submit);
+    wrap.appendChild(row);
+
+    var slip = document.createElement('div');
+    wrap.appendChild(slip);
+    el.itemHost.appendChild(wrap);
+
+    var input = wrap._input;
+    var answered = false;
+
+    function submitAnswer(){
+      if (answered) return;
+      var val = input.value;
+      if (!val || !val.trim()) { input.focus(); return; }
+      answered = true;
+      var res = DC.diff.check(val, item.accepted_answers);
+      input.disabled = true;
+      submit.disabled = true;
+      targetCell.textContent = '';
+      var shown = document.createElement('span');
+      shown.textContent = res.correct ? val.trim() : (item.accepted_answers[0] || '');
+      targetCell.appendChild(shown);
+      targetCell.classList.add(res.correct ? 'done-correct' : 'done-wrong');
+      recordAnswer(item, res.correct, patternKey);
+
+      if (res.correct){
+        SOUND.correct();
+        if (!DC.ui.motion.isReduced()) table.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        buildSlip(slip, true, item, null);
+        window.setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        DC.ui.announce('Forkert. Rigtigt svar: ' + (item.accepted_answers[0] || ''));
+        buildSlip(slip, false, item, advance);
+      }
+    }
+
+    submit.addEventListener('click', submitAnswer);
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); submitAnswer(); }
     });
+    input.focus();
+  };
 
-    // -- init -------------------------------------------------------------
+  RENDERERS._fallback = function(){ renderEmpty(); };
 
-    DanskCore.ui.darkMode.init();
-    DanskCore.ui.sound.init(true);
-    refreshTopbarIcons();
-    renderStart();
-  })();
-  </script>
+  // ---- proofing slip (feedback) ----
+  function buildSlip(host, correct, item, onNext){
+    host.innerHTML = '';
+    var slip = document.createElement('div');
+    slip.className = 'slip ' + (correct ? 'correct' : 'wrong');
+
+    if (!correct){
+      var sol = document.createElement('div');
+      sol.innerHTML = 'Rigtigt svar: <span class="sol bad">' +
+        escapeHtml(item.accepted_answers[0] || '') + '</span>';
+      slip.appendChild(sol);
+    }
+    if (item.note){
+      var note = document.createElement('div');
+      note.className = 'note';
+      note.textContent = item.note;
+      slip.appendChild(note);
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'actions';
+    // TTS replay for the correct target form
+    var target = (item.accepted_answers && item.accepted_answers[0]) || '';
+    if (target) DC.ui.ttsButton(target, actions);
+
+    if (typeof onNext === 'function'){
+      var next = document.createElement('button');
+      next.className = 'btn accent';
+      next.type = 'button';
+      next.textContent = 'Videre';
+      next.addEventListener('click', onNext);
+      actions.appendChild(next);
+      slip.appendChild(actions);
+      host.appendChild(slip);
+      next.focus();
+      // Enter advances too
+      slip.addEventListener('keydown', function(e){
+        if (e.key === 'Enter'){ e.preventDefault(); onNext(); }
+      });
+    } else {
+      slip.appendChild(actions);
+      host.appendChild(slip);
+    }
+  }
+
+  // =====================================================================
+  //  Round summary
+  // =====================================================================
+  function renderSummary(){
+    var total = state.round.length;
+    var acc = total ? Math.round((state.correct / total) * 100) : 0;
+    el.sumHost.innerHTML = '';
+
+    var h = document.createElement('div');
+    h.className = 'sum-head';
+    h.textContent = 'Runden er færdig';
+    el.sumHost.appendChild(h);
+
+    var stats = document.createElement('div');
+    stats.className = 'sum-stats';
+    stats.innerHTML =
+      '<div class="stat"><b>' + state.correct + '/' + total + '</b><span>Rigtige</span></div>' +
+      '<div class="stat"><b>' + acc + '%</b><span>Præcision</span></div>';
+    el.sumHost.appendChild(stats);
+
+    // up to 3 weakest items
+    var weak = uniqueMissed().slice(0, 3);
+    if (weak.length){
+      var wl = document.createElement('div');
+      wl.className = 'group-label';
+      wl.textContent = 'Øv disse igen';
+      el.sumHost.appendChild(wl);
+      var ul = document.createElement('ul');
+      ul.className = 'weak-list';
+      weak.forEach(function(item){
+        var li = document.createElement('li');
+        li.textContent = weakLabel(item);
+        ul.appendChild(li);
+      });
+      el.sumHost.appendChild(ul);
+    }
+
+    // one cross-game recommendation chip (prd § Cross-Game Curriculum Links)
+    var chip = crossGameChip(acc);
+    if (chip) el.sumHost.appendChild(chip);
+
+    // actions
+    var actions = document.createElement('div');
+    actions.className = 'sum-actions';
+
+    var again = document.createElement('button');
+    again.className = 'primary';
+    again.style.marginTop = '0';
+    again.style.width = 'auto';
+    again.type = 'button';
+    again.textContent = 'Spil igen';
+    again.addEventListener('click', startRound);
+    actions.appendChild(again);
+
+    if (state.missed.length){
+      var retry = document.createElement('button');
+      retry.className = 'btn';
+      retry.type = 'button';
+      retry.textContent = 'Gentag fejl';
+      retry.addEventListener('click', function(){
+        state.round = uniqueMissed();
+        state.idx = 0;
+        state.correct = 0;
+        state.missed = [];
+        show('play');
+        renderItem();
+      });
+      actions.appendChild(retry);
+    }
+
+    var home = document.createElement('button');
+    home.className = 'btn';
+    home.type = 'button';
+    home.textContent = 'Til start';
+    home.addEventListener('click', showStart);
+    actions.appendChild(home);
+
+    el.sumHost.appendChild(actions);
+    again.focus();
+  }
+
+  function uniqueMissed(){
+    var seen = {}, out = [];
+    state.missed.forEach(function(it){
+      if (!seen[it.id]){ seen[it.id] = true; out.push(it); }
+    });
+    return out;
+  }
+
+  function weakLabel(item){
+    if (item.mode === 'fire_former'){
+      var noun = NOUN_BY_ID[item.noun_id] || {};
+      var fm = FORM_META[item.requested_form];
+      return (noun.base || item.noun_id) + ' → ' + (item.accepted_answers[0] || '') +
+        (fm ? ' (' + fm.da + ')' : '');
+    }
+    return item.accepted_answers ? (item.accepted_answers[0] || item.id) : item.id;
+  }
+
+  function crossGameChip(acc){
+    // Recommend the gender trainer when accuracy is low on noun forms.
+    if (acc >= 70) return null;
+    if (state.mode !== 'fire_former') return null;
+    var a = document.createElement('a');
+    a.className = 'xgame';
+    a.href = '../en og et/index.html';
+    a.textContent = '🔎 Problemer med navneordsformer? → En/Et-træner';
+    return a;
+  }
+
+  // ---- helpers ----
+  function shuffle(arr){
+    for (var i=arr.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(ch){
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch];
+    });
+  }
+
+  // ---- boot ----
+  buildStartControls();
+})();
+</script>
 </body>
 </html>

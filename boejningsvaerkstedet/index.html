@@ -191,6 +191,38 @@
   }
   input.answer:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
 
+  /* ---- Mode 3 (Adjektivværkstedet) frame ---- */
+  .adj-lemma{font-size:1.7rem;font-weight:700;color:var(--adj)}
+  html[data-theme="dark"] .adj-lemma{color:#e0b26a}
+  .feat-tags{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .feat-tag{font-size:.8rem;padding:.25em .7em;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  .frame{font-size:1.15rem;color:var(--text);margin:.2em 0 1em}
+  .frame .blank{display:inline-block;min-width:3.4em;border-bottom:2px dashed var(--brass);text-align:center}
+
+  /* ---- Mode 2 (Byg navneordet) workbench ---- */
+  .workbench{display:flex;gap:.55em;justify-content:center;flex-wrap:wrap;margin:.5em 0 1em}
+  .slot-col{display:flex;flex-direction:column;align-items:center;gap:.3em}
+  .slot-cap{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .slot{
+    min-width:5em;min-height:52px;padding:.4em .6em;border-radius:10px;
+    border:2px dashed var(--brass);background:#fbf6ea;color:var(--text);
+    display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:default;
+  }
+  html[data-theme="dark"] .slot{background:#2f2c26}
+  .slot.filled{border-style:solid;cursor:pointer}
+  .slot.done-correct{border-color:var(--correct);background:var(--dc-correct-bg)}
+  .slot.done-wrong{border-color:var(--wrong);background:var(--dc-wrong-bg)}
+  .slot:focus-visible{outline:2px solid var(--wood);outline-offset:2px}
+  .tray{display:flex;gap:.5em;flex-wrap:wrap;justify-content:center;margin-bottom:.4em}
+  .tile{
+    min-height:44px;min-width:44px;padding:.5em .95em;border-radius:10px;font:inherit;font-size:1.05rem;
+    border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;
+  }
+  .tile:disabled{opacity:.32;cursor:default}
+  .tile:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .label-print{text-align:center;font-size:1.35rem;font-weight:700;color:var(--noun);margin:.3em 0}
+  html[data-theme="dark"] .label-print{color:#8fbdd2}
+
   .slip{
     margin-top:1em;border-left:4px solid var(--brass);background:var(--panel-2);
     border-radius:0 8px 8px 0;padding:.7em .9em;font-size:.98rem;
@@ -291,9 +323,12 @@
   var GAME_ID = 'boejningsvaerkstedet';
   var ROUND_SIZE = 10;
 
-  // ---- noun lookup for Mode 1 display context ----
+  // ---- lookups for display context ----
+  var ADJ = window.DANSK_ADJECTIVES || [];
   var NOUN_BY_ID = {};
   NOUNS.forEach(function(n){ NOUN_BY_ID[n.id] = n; });
+  var ADJ_BY_ID = {};
+  ADJ.forEach(function(a){ ADJ_BY_ID[a.id] = a; });
 
   // ---- mode registry ----
   var MODES = [
@@ -647,16 +682,17 @@
       targetCell.classList.add(res.correct ? 'done-correct' : 'done-wrong');
       recordAnswer(item, res.correct, patternKey);
 
+      var solution = item.accepted_answers[0] || '';
       if (res.correct){
         SOUND.correct();
         if (!DC.ui.motion.isReduced()) table.classList.add('press');
         DC.ui.announce('Rigtigt.');
-        buildSlip(slip, true, item, null);
+        buildSlip(slip, true, solution, item.note, null);
         window.setTimeout(advance, 800);
       } else {
         SOUND.wrong();
-        DC.ui.announce('Forkert. Rigtigt svar: ' + (item.accepted_answers[0] || ''));
-        buildSlip(slip, false, item, advance);
+        DC.ui.announce('Forkert. Rigtigt svar: ' + solution);
+        buildSlip(slip, false, solution, item.note, advance);
       }
     }
 
@@ -667,10 +703,212 @@
     input.focus();
   };
 
+  // ---- Mode 3 — Adjektivværkstedet (adjective agreement, free-text) ----
+  function adjContext(item){
+    var g = item.gender, d = item.definiteness, n = item.number;
+    var tags = [];
+    if (g === 'common') tags.push('en-ord');
+    else if (g === 'neuter') tags.push('et-ord');
+    tags.push(d === 'definite' ? 'bestemt' : 'ubestemt');
+    tags.push(n === 'plural' ? 'flertal' : 'ental');
+    var frame;
+    if (n === 'plural') frame = 'flere';
+    else if (d === 'definite') frame = (g === 'neuter') ? 'det' : 'den';
+    else frame = (g === 'neuter') ? 'et' : 'en';
+    return { tags: tags, frame: frame, slug: (g || 'plural') + '-' + d + '-' + n };
+  }
+
+  RENDERERS.adjektivvaerkstedet = function(item){
+    var adj = ADJ_BY_ID[item.adjective_id] || {};
+    var ctx = adjContext(item);
+    var patternKey = 'pattern:' + GAME_ID + ':adj:' + ctx.slug;
+    var solution = item.accepted_answers[0] || '';
+
+    el.itemHost.innerHTML = '';
+    var wrap = document.createElement('div');
+
+    var material = document.createElement('div');
+    material.className = 'material';
+    var lemma = document.createElement('span');
+    lemma.className = 'adj-lemma';
+    lemma.textContent = adj.base || item.adjective_id;
+    material.appendChild(lemma);
+    DC.ui.ttsButton(adj.base || item.adjective_id, material);
+    wrap.appendChild(material);
+
+    var tagRow = document.createElement('div');
+    tagRow.className = 'feat-tags';
+    ctx.tags.forEach(function(t){
+      var s = document.createElement('span'); s.className = 'feat-tag'; s.textContent = t; tagRow.appendChild(s);
+    });
+    wrap.appendChild(tagRow);
+
+    var frame = document.createElement('div');
+    frame.className = 'frame';
+    frame.appendChild(document.createTextNode(ctx.frame + ' '));
+    var blank = document.createElement('span');
+    blank.className = 'blank'; blank.textContent = '?';
+    frame.appendChild(blank);
+    frame.appendChild(document.createTextNode(' …'));
+    wrap.appendChild(frame);
+
+    var ask = document.createElement('p');
+    ask.className = 'ask';
+    ask.textContent = 'Skriv tillægsordet i den rigtige form.';
+    wrap.appendChild(ask);
+
+    var row = document.createElement('div');
+    row.className = 'answer-row';
+    var input = document.createElement('input');
+    input.type = 'text'; input.className = 'answer';
+    input.setAttribute('aria-label', 'Skriv tillægsordets form');
+    input.setAttribute('autocomplete', 'off'); input.setAttribute('autocapitalize', 'off'); input.spellcheck = false;
+    row.appendChild(input);
+    var submit = document.createElement('button');
+    submit.className = 'btn accent'; submit.type = 'button'; submit.textContent = 'Bøj';
+    row.appendChild(submit);
+    wrap.appendChild(row);
+
+    var slip = document.createElement('div');
+    wrap.appendChild(slip);
+    el.itemHost.appendChild(wrap);
+
+    var answered = false;
+    function submitAnswer(){
+      if (answered) return;
+      var val = input.value;
+      if (!val || !val.trim()){ input.focus(); return; }
+      answered = true;
+      var res = DC.diff.check(val, item.accepted_answers);
+      input.disabled = true; submit.disabled = true;
+      blank.textContent = res.correct ? val.trim() : solution;
+      blank.style.borderBottomColor = res.correct ? 'var(--correct)' : 'var(--wrong)';
+      recordAnswer(item, res.correct, patternKey);
+      if (res.correct){
+        SOUND.correct();
+        if (!DC.ui.motion.isReduced()) frame.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        buildSlip(slip, true, solution, item.note, null);
+        window.setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        DC.ui.announce('Forkert. Rigtigt svar: ' + solution);
+        buildSlip(slip, false, solution, item.note, advance);
+      }
+    }
+    submit.addEventListener('click', submitAnswer);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); submitAnswer(); } });
+    input.focus();
+  };
+
+  // ---- Mode 2 — Byg navneordet (tap-to-place tile workbench) ----
+  var SLOT_CAPS = ['artikel', 'tillægsord', 'navneord'];
+  function phraseFeatureTags(f){
+    return [
+      f.definiteness === 'definite' ? 'bestemt' : 'ubestemt',
+      f.number === 'plural' ? 'flertal' : 'ental',
+      f.gender === 'neuter' ? 'et-ord' : 'en-ord'
+    ];
+  }
+  RENDERERS.byg_navneordet = function(item){
+    var order = (item.accepted_orders && item.accepted_orders[0]) || [];
+    var slotCount = order.length || 3;
+    var featSlug = item.features.definiteness + '-' + item.features.number + '-' + item.features.gender;
+    var patternKey = 'pattern:' + GAME_ID + ':phrase:' + featSlug;
+    var solution = order.join(' ');
+
+    el.itemHost.innerHTML = '';
+    var wrap = document.createElement('div');
+
+    var tagRow = document.createElement('div');
+    tagRow.className = 'feat-tags';
+    phraseFeatureTags(item.features).forEach(function(t){
+      var s = document.createElement('span'); s.className = 'feat-tag'; s.textContent = t; tagRow.appendChild(s);
+    });
+    wrap.appendChild(tagRow);
+    var ask = document.createElement('p');
+    ask.className = 'ask';
+    ask.textContent = 'Byg navneordsgruppen — tryk på brikkerne i rigtig rækkefølge.';
+    wrap.appendChild(ask);
+
+    var bench = document.createElement('div');
+    bench.className = 'workbench';
+    var slotEls = [];
+    for (var i = 0; i < slotCount; i++){
+      var col = document.createElement('div'); col.className = 'slot-col';
+      var cap = document.createElement('span'); cap.className = 'slot-cap';
+      cap.textContent = SLOT_CAPS[i] || ('#' + (i + 1));
+      col.appendChild(cap);
+      var slot = document.createElement('button'); slot.type = 'button'; slot.className = 'slot';
+      slot.setAttribute('aria-label', (SLOT_CAPS[i] || 'plads') + ' (tom)');
+      col.appendChild(slot); bench.appendChild(col); slotEls.push(slot);
+    }
+    wrap.appendChild(bench);
+
+    var tray = document.createElement('div'); tray.className = 'tray';
+    wrap.appendChild(tray);
+    var slip = document.createElement('div'); wrap.appendChild(slip);
+    el.itemHost.appendChild(wrap);
+
+    var placed = new Array(slotCount);
+    var placedFrom = new Array(slotCount);
+    var tileBtns = [];
+    var answered = false;
+
+    shuffle(item.pieces.slice()).forEach(function(tok){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.textContent = tok;
+      b.addEventListener('click', function(){ if (!answered) placeTile(b, tok); });
+      tileBtns.push(b); tray.appendChild(b);
+    });
+
+    function nextEmpty(){ for (var i = 0; i < slotCount; i++){ if (!placed[i]) return i; } return -1; }
+    function placeTile(btn, tok){
+      var i = nextEmpty(); if (i === -1) return;
+      placed[i] = tok; placedFrom[i] = btn; btn.disabled = true;
+      var slot = slotEls[i];
+      slot.textContent = tok; slot.classList.add('filled');
+      slot.setAttribute('aria-label', (SLOT_CAPS[i] || 'plads') + ': ' + tok + ' — tryk for at fjerne');
+      SOUND.select();
+      if (nextEmpty() === -1) check();
+    }
+    slotEls.forEach(function(slot, i){
+      slot.addEventListener('click', function(){
+        if (answered || !placed[i]) return;
+        if (placedFrom[i]) placedFrom[i].disabled = false;
+        placed[i] = null; placedFrom[i] = null;
+        slot.textContent = ''; slot.classList.remove('filled');
+        slot.setAttribute('aria-label', (SLOT_CAPS[i] || 'plads') + ' (tom)');
+      });
+    });
+
+    function check(){
+      answered = true;
+      var correct = placed.join(' ') === solution;
+      slotEls.forEach(function(s){ s.classList.add(correct ? 'done-correct' : 'done-wrong'); });
+      tileBtns.forEach(function(b){ b.disabled = true; });
+      recordAnswer(item, correct, patternKey);
+      if (correct){
+        SOUND.correct();
+        if (!DC.ui.motion.isReduced()) bench.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        buildSlip(slip, true, solution, item.note, null);
+        window.setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        DC.ui.announce('Forkert. Rigtigt svar: ' + solution);
+        buildSlip(slip, false, solution, item.note, advance);
+      }
+    }
+
+    if (tileBtns[0]) tileBtns[0].focus();
+  };
+
   RENDERERS._fallback = function(){ renderEmpty(); };
 
   // ---- proofing slip (feedback) ----
-  function buildSlip(host, correct, item, onNext){
+  // solutionText: the correct target form/phrase (used for the wrong-answer
+  // line and the TTS replay button). noteText: one grammar note.
+  function buildSlip(host, correct, solutionText, noteText, onNext){
     host.innerHTML = '';
     var slip = document.createElement('div');
     slip.className = 'slip ' + (correct ? 'correct' : 'wrong');
@@ -678,21 +916,20 @@
     if (!correct){
       var sol = document.createElement('div');
       sol.innerHTML = 'Rigtigt svar: <span class="sol bad">' +
-        escapeHtml(item.accepted_answers[0] || '') + '</span>';
+        escapeHtml(solutionText || '') + '</span>';
       slip.appendChild(sol);
     }
-    if (item.note){
+    if (noteText){
       var note = document.createElement('div');
       note.className = 'note';
-      note.textContent = item.note;
+      note.textContent = noteText;
       slip.appendChild(note);
     }
 
     var actions = document.createElement('div');
     actions.className = 'actions';
-    // TTS replay for the correct target form
-    var target = (item.accepted_answers && item.accepted_answers[0]) || '';
-    if (target) DC.ui.ttsButton(target, actions);
+    // TTS replay for the correct target form/phrase
+    if (solutionText) DC.ui.ttsButton(solutionText, actions);
 
     if (typeof onNext === 'function'){
       var next = document.createElement('button');
@@ -809,6 +1046,13 @@
       var fm = FORM_META[item.requested_form];
       return (noun.base || item.noun_id) + ' → ' + (item.accepted_answers[0] || '') +
         (fm ? ' (' + fm.da + ')' : '');
+    }
+    if (item.mode === 'adjektivvaerkstedet'){
+      var adj = ADJ_BY_ID[item.adjective_id] || {};
+      return (adj.base || item.adjective_id) + ' → ' + (item.accepted_answers[0] || '');
+    }
+    if (item.mode === 'byg_navneordet'){
+      return (item.accepted_orders && item.accepted_orders[0]) ? item.accepted_orders[0].join(' ') : item.id;
     }
     return item.accepted_answers ? (item.accepted_answers[0] || item.id) : item.id;
   }

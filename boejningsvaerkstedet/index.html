@@ -223,6 +223,48 @@
   .label-print{text-align:center;font-size:1.35rem;font-weight:700;color:var(--noun);margin:.3em 0}
   html[data-theme="dark"] .label-print{color:#8fbdd2}
 
+  /* ---- Mode 4 (Sammenligningspressen) three-slot press ---- */
+  .press-row{display:flex;gap:.5em;justify-content:center;flex-wrap:wrap;margin:.4em 0 1em}
+  .press-col{display:flex;flex-direction:column;align-items:center;gap:.3em;flex:1 1 6.5em;min-width:6.5em}
+  .press-col .slot-cap{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .press-col .arrow{color:var(--brass);font-size:1.2rem;align-self:center;padding-top:1.1em}
+  input.slot-input{
+    width:100%;min-height:48px;padding:.5em .5em;font:inherit;font-size:1.1rem;
+    border:1px solid var(--line);border-radius:10px;background:var(--dc-input-bg);color:var(--text);text-align:center;
+  }
+  input.slot-input:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  input.slot-input.done-correct{border:2px solid var(--correct);background:var(--dc-correct-bg)}
+  input.slot-input.done-wrong{border:2px solid var(--wrong);background:var(--dc-wrong-bg)}
+
+  /* ---- Modes 5 & 6 (multiple choice in context) ---- */
+  .context{
+    font-size:1.2rem;line-height:1.6;color:var(--text);margin:.3em 0 1em;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:.8em .9em;
+  }
+  .context .blank{
+    display:inline-block;min-width:3.2em;border-bottom:2px dashed var(--brass);
+    text-align:center;font-weight:600;
+  }
+  .context .blank.done-correct{border-bottom-color:var(--correct);color:var(--correct)}
+  .context .blank.done-wrong{border-bottom-color:var(--wrong);color:var(--wrong)}
+  html[data-theme="dark"] .context .blank.done-correct{color:#8fc088}
+  html[data-theme="dark"] .context .blank.done-wrong{color:#d98f88}
+  .options{display:flex;flex-direction:column;gap:.5em}
+  .opt{
+    display:flex;align-items:center;gap:.7em;text-align:left;
+    min-height:48px;padding:.55em .9em;border-radius:11px;font:inherit;font-size:1.05rem;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;
+  }
+  .opt .onum{
+    width:26px;height:26px;flex:0 0 auto;border-radius:7px;background:var(--wood);color:#f3e8d2;
+    display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;
+  }
+  .opt:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .opt:disabled{cursor:default}
+  .opt.chosen-correct{border-color:var(--correct);background:var(--dc-correct-bg)}
+  .opt.chosen-wrong{border-color:var(--wrong);background:var(--dc-wrong-bg)}
+  .opt.reveal-correct{border-color:var(--correct);box-shadow:0 0 0 2px rgba(80,116,75,.35) inset}
+
   .slip{
     margin-top:1em;border-left:4px solid var(--brass);background:var(--panel-2);
     border-radius:0 8px 8px 0;padding:.7em .9em;font-size:.98rem;
@@ -491,6 +533,7 @@
     el.summary.classList.toggle('hidden', which !== 'summary');
   }
   function showStart(){
+    clearKeyHandler();
     buildStartControls();
     show('start');
     document.getElementById('btn-play').focus();
@@ -550,7 +593,15 @@
     el.pcount.textContent = (state.idx + 1) + '/' + state.round.length;
   }
 
+  // Per-item keyboard handler (number keys for MC options). Cleared before
+  // each new item so it never leaks across items or after Escape.
+  var activeKeyHandler = null;
+  function clearKeyHandler(){
+    if (activeKeyHandler){ document.removeEventListener('keydown', activeKeyHandler); activeKeyHandler = null; }
+  }
+
   function renderItem(){
+    clearKeyHandler();
     if (state.idx >= state.round.length) { finishRound(); return; }
     updateProgress();
     var item = state.round[state.idx];
@@ -903,6 +954,200 @@
     if (tileBtns[0]) tileBtns[0].focus();
   };
 
+  // ---- Mode 4 — Sammenligningspressen (three-slot comparison, free-text) ----
+  var CMP_SLOTS = ['grundform','komparativ','superlativ'];
+  RENDERERS.sammenligningspressen = function(item){
+    var adj = ADJ_BY_ID[item.adjective_id] || {};
+    var patternKey = 'pattern:' + GAME_ID + ':comparison:' + (item.comparison_type || 'regular');
+    var solution = item.slots.map(function(s){ return s.accepted_answers[0]; }).join(' → ');
+
+    el.itemHost.innerHTML = '';
+    var wrap = document.createElement('div');
+
+    var material = document.createElement('div');
+    material.className = 'material';
+    var lemma = document.createElement('span');
+    lemma.className = 'adj-lemma';
+    lemma.textContent = adj.base || item.adjective_id;
+    material.appendChild(lemma);
+    DC.ui.ttsButton(adj.base || item.adjective_id, material);
+    wrap.appendChild(material);
+
+    var ask = document.createElement('p');
+    ask.className = 'ask';
+    ask.textContent = 'Gradbøj tillægsordet: grundform → komparativ → superlativ.';
+    wrap.appendChild(ask);
+
+    var row = document.createElement('div');
+    row.className = 'press-row';
+    var inputs = [];
+    item.slots.forEach(function(slot, i){
+      if (i > 0){
+        var arr = document.createElement('span');
+        arr.className = 'arrow'; arr.setAttribute('aria-hidden','true'); arr.textContent = '→';
+        row.appendChild(arr);
+      }
+      var col = document.createElement('div'); col.className = 'press-col';
+      var cap = document.createElement('span'); cap.className = 'slot-cap';
+      cap.textContent = slot.label || CMP_SLOTS[i] || ('#' + (i + 1));
+      col.appendChild(cap);
+      var input = document.createElement('input');
+      input.type = 'text'; input.className = 'slot-input';
+      input.setAttribute('aria-label', slot.label);
+      input.setAttribute('autocomplete','off'); input.setAttribute('autocapitalize','off');
+      input.spellcheck = false;
+      if (i === 0){ input.value = (adj.base || ''); }  // grundform pre-filled as the shown lemma
+      col.appendChild(input);
+      row.appendChild(col);
+      inputs.push(input);
+    });
+    wrap.appendChild(row);
+
+    var actions = document.createElement('div');
+    actions.className = 'answer-row';
+    var submit = document.createElement('button');
+    submit.className = 'btn accent'; submit.type = 'button'; submit.textContent = 'Sæt i pressen';
+    actions.appendChild(submit);
+    wrap.appendChild(actions);
+
+    var slip = document.createElement('div'); wrap.appendChild(slip);
+    el.itemHost.appendChild(wrap);
+
+    var answered = false;
+    function submitAnswer(){
+      if (answered) return;
+      // require every slot filled
+      for (var k=0;k<inputs.length;k++){ if (!inputs[k].value.trim()){ inputs[k].focus(); return; } }
+      answered = true;
+      var allCorrect = true;
+      item.slots.forEach(function(slot, i){
+        var res = DC.diff.check(inputs[i].value, slot.accepted_answers);
+        inputs[i].disabled = true;
+        inputs[i].classList.add(res.correct ? 'done-correct' : 'done-wrong');
+        if (!res.correct){ inputs[i].value = slot.accepted_answers[0]; allCorrect = false; }
+      });
+      submit.disabled = true;
+      recordAnswer(item, allCorrect, patternKey);
+      if (allCorrect){
+        SOUND.correct();
+        if (!DC.ui.motion.isReduced()) row.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        buildSlip(slip, true, solution, item.note, null);
+        window.setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        DC.ui.announce('Forkert. Rigtigt svar: ' + solution);
+        buildSlip(slip, false, solution, item.note, advance);
+      }
+    }
+    submit.addEventListener('click', submitAnswer);
+    inputs.forEach(function(inp, i){
+      inp.addEventListener('keydown', function(e){
+        if (e.key === 'Enter'){
+          e.preventDefault();
+          if (i < inputs.length - 1 && !inputs[i+1].value.trim()){ inputs[i+1].focus(); }
+          else submitAnswer();
+        }
+      });
+    });
+    inputs[1] ? inputs[1].focus() : inputs[0].focus();  // grundform pre-filled; start at komparativ
+  };
+
+  // ---- Modes 5 & 6 — multiple choice in context -----------------------
+  // Mode 5 (bestemt_ubestemt) and Mode 6 (maengdevaerkstedet) share the same
+  // interaction: a short context with a blank + option buttons.
+  function makeMcRenderer(patternType){
+    return function(item){
+      var patternKey = 'pattern:' + GAME_ID + ':' + patternType + ':' + (item.pattern || 'general');
+      var ttsText = String(item.context || '').replace(/_{2,}/g, ' … ');
+
+      el.itemHost.innerHTML = '';
+      var wrap = document.createElement('div');
+
+      // context with a visible blank
+      var ctx = document.createElement('div');
+      ctx.className = 'context';
+      var blank = null;
+      var parts = String(item.context || '').split(/_{2,}/);
+      parts.forEach(function(seg, i){
+        ctx.appendChild(document.createTextNode(seg));
+        if (i < parts.length - 1){
+          blank = document.createElement('span');
+          blank.className = 'blank'; blank.textContent = '?';
+          ctx.appendChild(blank);
+        }
+      });
+      wrap.appendChild(ctx);
+
+      // TTS replay for the context prompt
+      var ttsRow = document.createElement('div');
+      ttsRow.className = 'answer-row';
+      DC.ui.ttsButton(ttsText, ttsRow);
+      wrap.appendChild(ttsRow);
+
+      var opts = document.createElement('div');
+      opts.className = 'options';
+      opts.setAttribute('role','group');
+      opts.setAttribute('aria-label','Svarmuligheder');
+      wrap.appendChild(opts);
+
+      var slip = document.createElement('div'); wrap.appendChild(slip);
+      el.itemHost.appendChild(wrap);
+
+      var buttons = [];
+      var answered = false;
+      item.options.forEach(function(optText, i){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'opt';
+        b.innerHTML = '<span class="onum">' + (i + 1) + '</span>' +
+          '<span class="otxt">' + escapeHtml(optText) + '</span>';
+        b.addEventListener('click', function(){ choose(i); });
+        buttons.push(b); opts.appendChild(b);
+      });
+
+      function choose(i){
+        if (answered) return;
+        answered = true;
+        clearKeyHandler();
+        var chosen = item.options[i];
+        var correct = DC.diff.normalize(chosen) === DC.diff.normalize(item.correct);
+        buttons.forEach(function(b, j){
+          b.disabled = true;
+          if (j === i) b.classList.add(correct ? 'chosen-correct' : 'chosen-wrong');
+          if (!correct && DC.diff.normalize(item.options[j]) === DC.diff.normalize(item.correct)){
+            b.classList.add('reveal-correct');
+          }
+        });
+        if (blank){
+          blank.textContent = item.correct;
+          blank.classList.add(correct ? 'done-correct' : 'done-wrong');
+        }
+        recordAnswer(item, correct, patternKey);
+        if (correct){
+          SOUND.correct();
+          if (!DC.ui.motion.isReduced()) ctx.classList.add('press');
+          DC.ui.announce('Rigtigt.');
+          buildSlip(slip, true, item.correct, item.note, null);
+          window.setTimeout(advance, 800);
+        } else {
+          SOUND.wrong();
+          DC.ui.announce('Forkert. Rigtigt svar: ' + item.correct);
+          buildSlip(slip, false, item.correct, item.note, advance);
+        }
+      }
+
+      activeKeyHandler = function(e){
+        if (answered) return;
+        var n = parseInt(e.key, 10);
+        if (n >= 1 && n <= buttons.length){ e.preventDefault(); choose(n - 1); }
+      };
+      document.addEventListener('keydown', activeKeyHandler);
+      if (buttons[0]) buttons[0].focus();
+    };
+  }
+  RENDERERS.bestemt_ubestemt = makeMcRenderer('definiteness');
+  RENDERERS.maengdevaerkstedet = makeMcRenderer('quantifier');
+
   RENDERERS._fallback = function(){ renderEmpty(); };
 
   // ---- proofing slip (feedback) ----
@@ -1053,6 +1298,15 @@
     }
     if (item.mode === 'byg_navneordet'){
       return (item.accepted_orders && item.accepted_orders[0]) ? item.accepted_orders[0].join(' ') : item.id;
+    }
+    if (item.mode === 'sammenligningspressen'){
+      var adj4 = ADJ_BY_ID[item.adjective_id] || {};
+      var cmp = (item.slots && item.slots[1] && item.slots[1].accepted_answers[0]) || '';
+      var sup = (item.slots && item.slots[2] && item.slots[2].accepted_answers[0]) || '';
+      return (adj4.base || item.adjective_id) + ' → ' + cmp + ' → ' + sup;
+    }
+    if (item.mode === 'bestemt_ubestemt' || item.mode === 'maengdevaerkstedet'){
+      return item.correct || item.id;
     }
     return item.accepted_answers ? (item.accepted_answers[0] || item.id) : item.id;
   }

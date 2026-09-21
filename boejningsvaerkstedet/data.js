@@ -223,12 +223,165 @@
     return items;
   }
 
+  // =====================================================================
+  //  Mode 4 — Sammenligningspressen (comparison, three-slot free-text)
+  //  Schema: prd.md § 2.4 (comparison item). Generated from adjectives.js so
+  //  the set tracks the canonical adjective list. Skips indeclinable adjectives
+  //  (no comparison) and verify:true forms (not yet native-verified).
+  // =====================================================================
+  function buildSammenligning() {
+    var items = [];
+    ADJECTIVES.forEach(function (a) {
+      if (a.verify) { return; }
+      if (a.indeclinable) { return; }
+      var grund = a.common_form, komp = a.comparative,
+          sup = a.superlative_indefinite, supDef = a.superlative_definite;
+      if (!grund || !komp || !sup) { return; }
+
+      var ctype = a.irregular ? 'irregular' : (a.periphrastic ? 'periphrastic' : 'regular');
+      // Superlative: accept the bare form, the definite form, and the natural
+      // "den/det + definite" phrasing used predicatively/attributively.
+      var supAns = uniq([sup, supDef, 'den ' + supDef, 'det ' + supDef]);
+
+      var note;
+      if (a.irregular) {
+        note = capitalize(a.base) + ' gradbøjes uregelmæssigt: ' + grund + ' → ' + komp + ' → ' + sup + '.';
+      } else if (a.periphrastic) {
+        note = capitalize(a.base) + ' gradbøjes med mere/mest: ' + komp + ' → ' + sup + '.';
+      } else {
+        note = capitalize(a.base) + ' gradbøjes med -ere/-est: ' + komp + ' → ' + sup + '.';
+      }
+
+      items.push({
+        id: a.id + '-sammenligning',
+        level: maxLevel(a.level, 'A2'),
+        mode: 'sammenligningspressen',
+        adjective_id: a.id,
+        comparison_type: ctype,
+        slots: [
+          { label: 'grundform', accepted_answers: [grund] },
+          { label: 'komparativ', accepted_answers: [komp] },
+          { label: 'superlativ', accepted_answers: supAns }
+        ],
+        note: note
+      });
+    });
+    return items;
+  }
+
+  // =====================================================================
+  //  Mode 5 — Bestemt eller ubestemt? (definiteness in context, MC)
+  //  Schema: prd.md § 2.4 (contextual definiteness item). Hand-authored short
+  //  contexts (2–3 sentences); each item has exactly one defensible answer.
+  //  `pattern` groups items for SRS pattern keys.
+  // =====================================================================
+  var BESTEMT_UBESTEMT = [
+    // --- first mention (ubestemt) ---
+    { id:'b5-koebte-bog', level:'A2', pattern:'foerste-omtale', context:'Jeg købte ___ i går. Bogen var alt for dyr.', options:['en bog','bogen','den bog'], correct:'en bog', note:'Første gang noget nævnes, bruges ubestemt form: en bog.' },
+    { id:'b5-saa-kat', level:'A1', pattern:'foerste-omtale', context:'Jeg så ___ i haven i morges. Katten jagede en fugl.', options:['en kat','katten'], correct:'en kat', note:'Ved første omtale bruges ubestemt form: en kat.' },
+    { id:'b5-fik-brev', level:'A2', pattern:'foerste-omtale', context:'Hun fik ___ i dag. Brevet var fra banken.', options:['et brev','brevet'], correct:'et brev', note:'Første omtale af et nyt et-ord: et brev.' },
+    { id:'b5-moedte-mand', level:'A2', pattern:'foerste-omtale', context:'Jeg mødte ___ på toget. Han var meget venlig.', options:['en mand','manden'], correct:'en mand', note:'En ny, ukendt person nævnes med ubestemt form: en mand.' },
+    // --- subsequent mention (bestemt) ---
+    { id:'b5-ny-laerer', level:'A2', pattern:'anden-omtale', context:'Vi har fået en ny lærer. ___ hedder Mette.', options:['Læreren','En lærer','Lærer'], correct:'Læreren', note:'Ved anden omtale er personen kendt: bestemt form læreren.' },
+    { id:'b5-et-hus', level:'A2', pattern:'anden-omtale', context:'Han fortalte om et hus ved stranden. ___ var meget gammelt.', options:['Huset','Et hus','Hus'], correct:'Huset', note:'Anden omtale bruger bestemt form: huset.' },
+    { id:'b5-en-hund', level:'A1', pattern:'anden-omtale', context:'Der kom en hund løbende. ___ var helt våd.', options:['Hunden','En hund'], correct:'Hunden', note:'Hunden er nu kendt fra første sætning: bestemt form.' },
+    { id:'b5-en-cykel', level:'A2', pattern:'anden-omtale', context:'Jeg har købt en cykel. ___ er blå.', options:['Cyklen','En cykel'], correct:'Cyklen', note:'Anden omtale: bestemt form cyklen.' },
+    { id:'b5-en-film', level:'A2', pattern:'anden-omtale', context:'Vi så en film i går. ___ var meget kedelig.', options:['Filmen','En film'], correct:'Filmen', note:'Filmen er kendt fra første sætning: bestemt form.' },
+    // --- professions without article ---
+    { id:'b5-bror-laege', level:'A2', pattern:'erhverv', context:'Min bror er ___.', options:['læge','en læge','lægen'], correct:'læge', note:'Erhverv efter er/blive står uden artikel: han er læge.' },
+    { id:'b5-som-sygeplejerske', level:'A2', pattern:'erhverv', context:'Hun arbejder som ___ på et hospital.', options:['sygeplejerske','en sygeplejerske'], correct:'sygeplejerske', note:'Efter som står erhverv uden artikel.' },
+    { id:'b5-blive-laerer', level:'A2', pattern:'erhverv', context:'Jeg vil gerne være ___, når jeg er færdig med at læse.', options:['lærer','en lærer'], correct:'lærer', note:'Erhverv efter være står uden artikel: være lærer.' },
+    { id:'b5-far-tjener', level:'A2', pattern:'erhverv', context:'Hendes far er ___ på en restaurant i byen.', options:['tjener','en tjener','tjeneren'], correct:'tjener', note:'Erhverv uden nærmere beskrivelse står uden artikel: er tjener.' },
+    // --- possessive: no definite suffix ---
+    { id:'b5-min-taske', level:'A2', pattern:'ejestedord', context:'Jeg kan ikke finde ___. Har du set den?', options:['min taske','min tasken','tasken min'], correct:'min taske', note:'Ejestedord + navneord i grundform: min taske, ikke min tasken.' },
+    { id:'b5-mine-noegler', level:'A2', pattern:'ejestedord', context:'Åh nej, jeg har glemt ___ derhjemme.', options:['mine nøgler','mine nøglerne'], correct:'mine nøgler', note:'Efter ejestedord bruges grundform uden bestemt endelse: mine nøgler.' },
+    { id:'b5-hans-bil', level:'A2', pattern:'ejestedord', context:'Den røde bil der — det er ___.', options:['hans bil','hans bilen'], correct:'hans bil', note:'Ejestedord + navneord uden bestemt endelse: hans bil.' },
+    { id:'b5-dit-hus', level:'A2', pattern:'ejestedord', context:'Er det store, gule hus ___?', options:['dit hus','dit huset'], correct:'dit hus', note:'Ejestedord styrer grundform: dit hus, ikke dit huset.' },
+    // --- demonstratives ---
+    { id:'b5-dette-hus', level:'B1', pattern:'paapegende', context:'Jeg vil helst have ___ her, ikke det derovre.', options:['dette hus','denne hus','det hus'], correct:'dette hus', note:'Dette bruges påpegende om et-ord: dette hus.' },
+    { id:'b5-denne-bog', level:'B1', pattern:'paapegende', context:'Har du læst ___ her? Den er rigtig god.', options:['denne bog','dette bog','denne bogen'], correct:'denne bog', note:'Denne bruges påpegende om en-ord: denne bog.' },
+    { id:'b5-disse-sko', level:'B1', pattern:'paapegende', context:'___ her er alt for små til mig.', options:['Disse sko','Denne sko','Disse skoene'], correct:'Disse sko', note:'Disse bruges påpegende om flertal: disse sko.' },
+    { id:'b5-den-mand', level:'B1', pattern:'paapegende', context:'___ mand derovre har ventet længe.', options:['Den','Det','De'], correct:'Den', note:'Den bruges påpegende om et en-ord: den mand.' },
+    // --- definite adjective construction (no double definiteness) ---
+    { id:'b5-store-hus', level:'B1', pattern:'foranstillet-tillaegsord', context:'Jeg kan rigtig godt lide ___ nede ved søen.', options:['det store hus','det store huset','store huset'], correct:'det store hus', note:'Med foranstillet tillægsord: det + -e-form + grundform: det store hus.' },
+    { id:'b5-roede-bil', level:'B1', pattern:'foranstillet-tillaegsord', context:'Hvor er ___ parkeret henne?', options:['den røde bil','den røde bilen'], correct:'den røde bil', note:'Bestemt form med tillægsord: den røde bil, ikke bilen.' },
+    { id:'b5-gamle-mand', level:'B1', pattern:'foranstillet-tillaegsord', context:'Kender du ___, der bor på hjørnet?', options:['den gamle mand','den gamle manden'], correct:'den gamle mand', note:'Foranstillet tillægsord giver grundform: den gamle mand.' },
+    { id:'b5-nye-computer', level:'B1', pattern:'foranstillet-tillaegsord', context:'Må jeg lige låne ___?', options:['den nye computer','den nye computeren'], correct:'den nye computer', note:'Bestemt form med tillægsord: den nye computer.' },
+    // --- generic plural ---
+    { id:'b5-aebler-sunde', level:'A2', pattern:'generisk-flertal', context:'___ er sunde og fulde af vitaminer.', options:['Æbler','Æblerne','Et æble'], correct:'Æbler', note:'Generelle udsagn om en hel gruppe bruger ubestemt flertal: æbler.' },
+    { id:'b5-hunde-generic', level:'A2', pattern:'generisk-flertal', context:'Kan du lide ___? Jeg elsker dem.', options:['hunde','hundene'], correct:'hunde', note:'Om hunde i almindelighed: ubestemt flertal hunde.' },
+    { id:'b5-boern-leger', level:'A2', pattern:'generisk-flertal', context:'___ elsker at lege udenfor.', options:['Børn','Børnene'], correct:'Børn', note:'Generelt om alle børn: ubestemt flertal børn.' },
+    { id:'b5-blomster-dufter', level:'A2', pattern:'generisk-flertal', context:'___ dufter dejligt om foråret.', options:['Blomster','Blomsterne'], correct:'Blomster', note:'Almen sandhed om blomster: ubestemt flertal blomster.' },
+    // --- fixed expressions ---
+    { id:'b5-i-skole', level:'A2', pattern:'fast-udtryk', context:'Mit barn går i ___ hver dag klokken otte.', options:['skole','skolen','en skole'], correct:'skole', note:'Fast udtryk: gå i skole — uden artikel.' },
+    { id:'b5-i-seng', level:'A2', pattern:'fast-udtryk', context:'Jeg går altid i ___ klokken elleve.', options:['seng','sengen','en seng'], correct:'seng', note:'Fast udtryk: gå i seng — uden artikel.' },
+    { id:'b5-paa-arbejde', level:'A2', pattern:'fast-udtryk', context:'Han tager på ___ klokken syv hver morgen.', options:['arbejde','arbejdet'], correct:'arbejde', note:'Fast udtryk: på arbejde — uden bestemt endelse.' },
+    { id:'b5-spise-aftensmad', level:'A2', pattern:'fast-udtryk', context:'Vi spiser ___ klokken seks om aftenen.', options:['aftensmad','aftensmaden'], correct:'aftensmad', note:'Fast udtryk: spise aftensmad — uden artikel.' },
+    { id:'b5-i-byen', level:'A2', pattern:'fast-udtryk', context:'Skal vi tage i ___ og handle på lørdag?', options:['byen','by','en by'], correct:'byen', note:'Fast udtryk: i byen — med bestemt form.' },
+    // --- specific vs nonspecific reference ---
+    { id:'b5-tolk-nonspecific', level:'B1', pattern:'specifik-reference', context:'Vi leder efter ___, der kan tale arabisk.', options:['en tolk','tolken'], correct:'en tolk', note:'Om en hvilken som helst (ikke-bestemt) person: ubestemt form en tolk.' },
+    { id:'b5-manden-specific', level:'B1', pattern:'specifik-reference', context:'___, jeg talte med i går, ringer tilbage i morgen.', options:['Manden','En mand'], correct:'Manden', note:'En bestemt, kendt person: bestemt form manden.' },
+    { id:'b5-loesning-nonspecific', level:'B1', pattern:'specifik-reference', context:'Vi har brug for ___ på det her problem.', options:['en løsning','løsningen'], correct:'en løsning', note:'En endnu ukendt løsning: ubestemt form en løsning.' }
+  ];
+
+  // =====================================================================
+  //  Mode 6 — Mængdeværkstedet (quantifiers & countability, MC)
+  //  Schema: prd.md § 2.4 (quantifier item). Hand-authored; `pattern` groups
+  //  items for SRS pattern keys. Countable vs. uncountable is the core split.
+  // =====================================================================
+  var MAENGDE = [
+    // --- mange / meget ---
+    { id:'b6-mange-mennesker', level:'A1', pattern:'mange-meget', context:'Der er ___ mennesker i parken i dag.', options:['mange','meget','lidt'], correct:'mange', note:'Mange bruges om tælleligt flertal: mange mennesker.' },
+    { id:'b6-meget-arbejde', level:'A1', pattern:'mange-meget', context:'Han har ___ arbejde for tiden.', options:['meget','mange','få'], correct:'meget', note:'Meget bruges om utælleligt: meget arbejde.' },
+    { id:'b6-meget-tid', level:'A1', pattern:'mange-meget', context:'Jeg har ikke ___ tid i dag.', options:['meget','mange'], correct:'meget', note:'Tid er utælleligt: meget tid.' },
+    { id:'b6-mange-boeger', level:'A1', pattern:'mange-meget', context:'Hun har læst ___ bøger i år.', options:['mange','meget'], correct:'mange', note:'Bøger er tælleligt: mange bøger.' },
+    { id:'b6-mange-penge', level:'A2', pattern:'mange-meget', context:'Hvor ___ penge har du med?', options:['mange','meget'], correct:'mange', note:'Penge er flertal og tælles: mange penge.' },
+    // --- få / lidt ---
+    { id:'b6-faa-gaester', level:'A2', pattern:'faa-lidt', context:'Der kom kun ___ gæster til festen.', options:['få','lidt','meget'], correct:'få', note:'Få bruges om tælleligt: få gæster.' },
+    { id:'b6-lidt-maelk', level:'A2', pattern:'faa-lidt', context:'Vi har kun ___ mælk tilbage.', options:['lidt','få'], correct:'lidt', note:'Mælk er utælleligt: lidt mælk.' },
+    { id:'b6-faa-ord', level:'A2', pattern:'faa-lidt', context:'Han sagde kun ___ ord til mødet.', options:['få','lidt'], correct:'få', note:'Ord er tælleligt: få ord.' },
+    { id:'b6-lidt-sukker', level:'A2', pattern:'faa-lidt', context:'Kom ___ sukker i kaffen, tak.', options:['lidt','få'], correct:'lidt', note:'Sukker er utælleligt: lidt sukker.' },
+    { id:'b6-faa-fejl', level:'A2', pattern:'faa-lidt', context:'Der var kun ___ fejl i opgaven.', options:['få','lidt'], correct:'få', note:'Fejl er tælleligt: få fejl.' },
+    // --- flere / mere ---
+    { id:'b6-mere-kaffe', level:'A2', pattern:'flere-mere', context:'Kan jeg få ___ kaffe, tak?', options:['mere','flere'], correct:'mere', note:'Mere bruges om utælleligt: mere kaffe.' },
+    { id:'b6-flere-stole', level:'A2', pattern:'flere-mere', context:'Vi skal bruge ___ stole til gæsterne.', options:['flere','mere'], correct:'flere', note:'Flere bruges om tælleligt: flere stole.' },
+    { id:'b6-mere-vand', level:'A2', pattern:'flere-mere', context:'Planten har brug for ___ vand.', options:['mere','flere'], correct:'mere', note:'Vand er utælleligt: mere vand.' },
+    // --- færre / mindre ---
+    { id:'b6-faerre-studerende', level:'B1', pattern:'faerre-mindre', context:'I år er der ___ studerende end sidste år.', options:['færre','mindre'], correct:'færre', note:'Færre bruges om tælleligt: færre studerende.' },
+    { id:'b6-mindre-kaffe', level:'B1', pattern:'faerre-mindre', context:'Jeg prøver at drikke ___ kaffe end før.', options:['mindre','færre'], correct:'mindre', note:'Kaffe er utælleligt: mindre kaffe.' },
+    { id:'b6-faerre-biler', level:'B1', pattern:'faerre-mindre', context:'Der er ___ biler på vejen om søndagen.', options:['færre','mindre'], correct:'færre', note:'Biler er tælleligt: færre biler.' },
+    // --- al / alt / alle ---
+    { id:'b6-alle-boern', level:'A2', pattern:'al-alt-alle', context:'___ børnene legede ude i haven.', options:['Alle','Al','Alt'], correct:'Alle', note:'Alle bruges om tælleligt flertal: alle børn.' },
+    { id:'b6-al-mad', level:'A2', pattern:'al-alt-alle', context:'Han spiste ___ maden op med det samme.', options:['al','alle','alt'], correct:'al', note:'Al bruges om utælleligt fælleskøn: al maden.' },
+    { id:'b6-alt-i-orden', level:'A2', pattern:'al-alt-alle', context:'Er ___ i orden med dig?', options:['alt','al','alle'], correct:'alt', note:'Alt står alene om noget abstrakt/utælleligt: er alt i orden?' },
+    { id:'b6-alt-vand', level:'A2', pattern:'al-alt-alle', context:'___ vandet løb ud på gulvet.', options:['Alt','Al','Alle'], correct:'Alt', note:'Alt bruges om utælleligt intetkøn: alt vandet.' },
+    // --- hver / hvert ---
+    { id:'b6-hver-dag', level:'A1', pattern:'hver-hvert', context:'___ dag går jeg en lang tur.', options:['Hver','Hvert'], correct:'Hver', note:'Hver bruges om en-ord: hver dag.' },
+    { id:'b6-hvert-barn', level:'A2', pattern:'hver-hvert', context:'___ barn fik en ballon med hjem.', options:['Hvert','Hver'], correct:'Hvert', note:'Hvert bruges om et-ord: hvert barn.' },
+    { id:'b6-hver-uge', level:'A2', pattern:'hver-hvert', context:'Vi mødes ___ uge til træning.', options:['hver','hvert'], correct:'hver', note:'Uge er en-ord: hver uge.' },
+    { id:'b6-hvert-aar', level:'A2', pattern:'hver-hvert', context:'De rejser til Norge ___ år.', options:['hvert','hver'], correct:'hvert', note:'År er et-ord: hvert år.' },
+    // --- begge ---
+    { id:'b6-begge-foraeldre', level:'A2', pattern:'begge', context:'___ mine forældre arbejder som lærere.', options:['Begge','Hver','Al'], correct:'Begge', note:'Begge bruges om præcis to: begge mine forældre.' },
+    { id:'b6-begge-haender', level:'A2', pattern:'begge', context:'Hun holdt fast om koppen med ___ hænder.', options:['begge','hver','alle'], correct:'begge', note:'Begge bruges om et par (to): begge hænder.' },
+    // --- ingen / intet ---
+    { id:'b6-ingen-maelk', level:'A2', pattern:'ingen-intet', context:'Der er ___ mælk tilbage i køleskabet.', options:['ingen','intet'], correct:'ingen', note:'Ingen bruges om fælleskøn og flertal: ingen mælk.' },
+    { id:'b6-intet-problem', level:'B1', pattern:'ingen-intet', context:'Han har ___ problem med at vente.', options:['intet','ingen'], correct:'intet', note:'Intet bruges om et-ord: intet problem.' },
+    { id:'b6-ingen-kom', level:'A2', pattern:'ingen-intet', context:'___ kom til mødet i morges.', options:['Ingen','Intet'], correct:'Ingen', note:'Ingen bruges om personer: ingen kom.' },
+    { id:'b6-intet-svar', level:'B1', pattern:'ingen-intet', context:'Vi fik ___ svar på vores brev.', options:['intet','ingen'], correct:'intet', note:'Svar er et-ord: intet svar.' },
+    // --- nogen / nogle / noget ---
+    { id:'b6-nogen-hjemme', level:'A2', pattern:'nogen-nogle-noget', context:'Er der ___ hjemme?', options:['nogen','nogle','noget'], correct:'nogen', note:'Nogen bruges i spørgsmål om en enkelt person: er der nogen?' },
+    { id:'b6-nogle-aebler', level:'A2', pattern:'nogen-nogle-noget', context:'Jeg har købt ___ æbler til madpakken.', options:['nogle','nogen','noget'], correct:'nogle', note:'Nogle bruges om et ubestemt tælleligt flertal: nogle æbler.' },
+    { id:'b6-noget-kaffe', level:'A2', pattern:'nogen-nogle-noget', context:'Vil du have ___ kaffe?', options:['noget','nogen','nogle'], correct:'noget', note:'Noget bruges om utælleligt: noget kaffe.' },
+    { id:'b6-nogle-venner', level:'A2', pattern:'nogen-nogle-noget', context:'Jeg mødtes med ___ venner i weekenden.', options:['nogle','nogen','noget'], correct:'nogle', note:'Nogle bruges om et tælleligt flertal: nogle venner.' },
+    { id:'b6-noget-vand', level:'A2', pattern:'nogen-nogle-noget', context:'Der er ___ vand på gulvet i badeværelset.', options:['noget','nogle','nogen'], correct:'noget', note:'Vand er utælleligt: noget vand.' }
+  ];
+
   window.BOEJNINGS_DATA = {
     fire_former: buildFireFormer(),
     byg_navneordet: buildByg(),
     adjektivvaerkstedet: buildAdjektiv(),
-    sammenligningspressen: [],
-    bestemt_ubestemt: [],
-    maengdevaerkstedet: []
+    sammenligningspressen: buildSammenligning(),
+    bestemt_ubestemt: BESTEMT_UBESTEMT,
+    maengdevaerkstedet: MAENGDE
   };
 })();

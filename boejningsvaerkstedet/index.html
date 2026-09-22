@@ -605,7 +605,9 @@
     if (state.idx >= state.round.length) { finishRound(); return; }
     updateProgress();
     var item = state.round[state.idx];
-    var renderer = RENDERERS[item.mode] || RENDERERS._fallback;
+    // Modes 5 & 6 items (bestemt_ubestemt, maengdevaerkstedet) legitimately
+    // omit a `mode` field per prd § 2.4, so fall back to the round's mode.
+    var renderer = RENDERERS[item.mode || state.mode] || RENDERERS._fallback;
     renderer(item);
   }
 
@@ -1286,26 +1288,28 @@
   }
 
   function weakLabel(item){
-    if (item.mode === 'fire_former'){
+    // Effective mode — Modes 5 & 6 items carry no `mode` field (prd § 2.4).
+    var mode = item.mode || state.mode;
+    if (mode === 'fire_former'){
       var noun = NOUN_BY_ID[item.noun_id] || {};
       var fm = FORM_META[item.requested_form];
       return (noun.base || item.noun_id) + ' → ' + (item.accepted_answers[0] || '') +
         (fm ? ' (' + fm.da + ')' : '');
     }
-    if (item.mode === 'adjektivvaerkstedet'){
+    if (mode === 'adjektivvaerkstedet'){
       var adj = ADJ_BY_ID[item.adjective_id] || {};
       return (adj.base || item.adjective_id) + ' → ' + (item.accepted_answers[0] || '');
     }
-    if (item.mode === 'byg_navneordet'){
+    if (mode === 'byg_navneordet'){
       return (item.accepted_orders && item.accepted_orders[0]) ? item.accepted_orders[0].join(' ') : item.id;
     }
-    if (item.mode === 'sammenligningspressen'){
+    if (mode === 'sammenligningspressen'){
       var adj4 = ADJ_BY_ID[item.adjective_id] || {};
       var cmp = (item.slots && item.slots[1] && item.slots[1].accepted_answers[0]) || '';
       var sup = (item.slots && item.slots[2] && item.slots[2].accepted_answers[0]) || '';
       return (adj4.base || item.adjective_id) + ' → ' + cmp + ' → ' + sup;
     }
-    if (item.mode === 'bestemt_ubestemt' || item.mode === 'maengdevaerkstedet'){
+    if (mode === 'bestemt_ubestemt' || mode === 'maengdevaerkstedet'){
       return item.correct || item.id;
     }
     return item.accepted_answers ? (item.accepted_answers[0] || item.id) : item.id;

@@ -87,6 +87,12 @@ Element.prototype.querySelectorAll = function (sel) {
   return out;
 };
 Element.prototype.querySelector = function (sel) { const r = this.querySelectorAll(sel); return r[0] || null; };
+Element.prototype.contains = function (node) {
+  if (node === this) return true;
+  let found = false;
+  (function walk(n){ (n.children || []).forEach(c => { if (c === node) found = true; else walk(c); }); })(this);
+  return found;
+};
 
 const registry = {};
 const IDS = ['start-screen', 'play-screen', 'summary-screen', 'mode-list', 'level-list',

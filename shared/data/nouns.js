@@ -94,7 +94,49 @@
     { id: 'minut', level: 'A1', base: 'minut', gender: 'et', indefinite_singular: 'et minut', definite_singular: 'minuttet', indefinite_plural: 'minutter', definite_plural: 'minutterne', plural_pattern: 'er', note: 'Minut fordobler konsonanten foran endelsen: minut → minuttet, minutter.', example: 'Minutterne føltes som timer.', tags: ['time'], verify: false },
     { id: 'butik', level: 'A1', base: 'butik', gender: 'en', indefinite_singular: 'en butik', definite_singular: 'butikken', indefinite_plural: 'butikker', definite_plural: 'butikkerne', plural_pattern: 'er', note: 'Butik fordobler konsonanten foran endelsen: butik → butikken, butikker.', example: 'Butikkerne åbner klokken ti.', tags: ['town'], verify: false },
     { id: 'robot', level: 'B1', base: 'robot', gender: 'en', indefinite_singular: 'en robot', definite_singular: 'robotten', indefinite_plural: 'robotter', definite_plural: 'robotterne', plural_pattern: 'er', note: 'Robot fordobler konsonanten foran endelsen: robot → robotten, robotter.', example: 'Robotterne arbejdede på fabrikken.', tags: ['technology'], verify: false },
-    { id: 'edderkop', level: 'B1', base: 'edderkop', gender: 'en', indefinite_singular: 'en edderkop', definite_singular: 'edderkoppen', indefinite_plural: 'edderkopper', definite_plural: 'edderkopperne', plural_pattern: 'er', note: 'Edderkop fordobler konsonanten foran endelsen: edderkop → edderkoppen, edderkopper.', example: 'Edderkopperne spandt net i vinduet.', tags: ['animals'], verify: false }
+    { id: 'edderkop', level: 'B1', base: 'edderkop', gender: 'en', indefinite_singular: 'en edderkop', definite_singular: 'edderkoppen', indefinite_plural: 'edderkopper', definite_plural: 'edderkopperne', plural_pattern: 'er', note: 'Edderkop fordobler konsonanten foran endelsen: edderkop → edderkoppen, edderkopper.', example: 'Edderkopperne spandt net i vinduet.', tags: ['animals'], verify: false },
+
+    // --- Professions & agent nouns (plural -e, definite plural without extra e) ---
+    { id: 'kok', level: 'B1', base: 'kok', gender: 'en', indefinite_singular: 'en kok', definite_singular: 'kokken', indefinite_plural: 'kokke', definite_plural: 'kokkene', plural_pattern: 'e', note: 'Kok fordobler konsonanten foran endelsen: kok → kokken, kokke.', example: 'Kokkene tilberedte maden i køkkenet.', tags: ['work'], verify: false },
+    { id: 'tjener', level: 'B1', base: 'tjener', gender: 'en', indefinite_singular: 'en tjener', definite_singular: 'tjeneren', indefinite_plural: 'tjenere', definite_plural: 'tjenerne', plural_pattern: 'e', note: 'Tjener får -e i flertal, men bestemt flertal er tjenerne: tjener → tjenere → tjenerne.', example: 'Tjenerne serverede maden hurtigt.', tags: ['work'], verify: false },
+    { id: 'kunstner', level: 'B1', base: 'kunstner', gender: 'en', indefinite_singular: 'en kunstner', definite_singular: 'kunstneren', indefinite_plural: 'kunstnere', definite_plural: 'kunstnerne', plural_pattern: 'e', note: 'Kunstner får -e i flertal og bestemt flertal kunstnerne: kunstner → kunstnere → kunstnerne.', example: 'Kunstnerne udstillede deres værker.', tags: ['work'], verify: false },
+    { id: 'musiker', level: 'B1', base: 'musiker', gender: 'en', indefinite_singular: 'en musiker', definite_singular: 'musikeren', indefinite_plural: 'musikere', definite_plural: 'musikerne', plural_pattern: 'e', note: 'Musiker får -e i flertal: musiker → musikere → musikerne.', example: 'Musikerne stemte deres instrumenter.', tags: ['work'], verify: false },
+    { id: 'skuespiller', level: 'B1', base: 'skuespiller', gender: 'en', indefinite_singular: 'en skuespiller', definite_singular: 'skuespilleren', indefinite_plural: 'skuespillere', definite_plural: 'skuespillerne', plural_pattern: 'e', note: 'Skuespiller får -e i flertal: skuespiller → skuespillere → skuespillerne.', example: 'Skuespillerne øvede replikkerne.', tags: ['work'], verify: false },
+    { id: 'forfatter', level: 'B1', base: 'forfatter', gender: 'en', indefinite_singular: 'en forfatter', definite_singular: 'forfatteren', indefinite_plural: 'forfattere', definite_plural: 'forfatterne', plural_pattern: 'e', note: 'Forfatter får -e i flertal, og bestemt flertal er forfatterne: forfatter → forfattere → forfatterne.', example: 'Forfatterne signerede deres bøger.', tags: ['work'], verify: false },
+    { id: 'politiker', level: 'B1', base: 'politiker', gender: 'en', indefinite_singular: 'en politiker', definite_singular: 'politikeren', indefinite_plural: 'politikere', definite_plural: 'politikerne', plural_pattern: 'e', note: 'Politiker får -e i flertal: politiker → politikere → politikerne.', example: 'Politikerne diskuterede det nye forslag.', tags: ['work'], verify: false },
+    { id: 'forsker', level: 'B1', base: 'forsker', gender: 'en', indefinite_singular: 'en forsker', definite_singular: 'forskeren', indefinite_plural: 'forskere', definite_plural: 'forskerne', plural_pattern: 'e', note: 'Forsker får -e i flertal: forsker → forskere → forskerne.', example: 'Forskerne offentliggjorde deres resultater.', tags: ['work'], verify: false },
+    { id: 'landmand', level: 'A2', base: 'landmand', gender: 'en', indefinite_singular: 'en landmand', definite_singular: 'landmanden', indefinite_plural: 'landmænd', definite_plural: 'landmændene', plural_pattern: 'irregular', note: 'Landmand har uregelmæssigt flertal som mand: landmand → landmænd.', example: 'Landmændene høstede kornet i august.', tags: ['work'], verify: false },
+
+    // --- Consonant doubling before the ending ---
+    { id: 'metal', level: 'B1', base: 'metal', gender: 'et', indefinite_singular: 'et metal', definite_singular: 'metallet', indefinite_plural: 'metaller', definite_plural: 'metallerne', plural_pattern: 'er', note: 'Metal fordobler konsonanten foran endelsen: metal → metallet, metaller.', example: 'Metallerne blev smeltet om.', tags: ['material'], verify: false },
+    { id: 'stof', level: 'B1', base: 'stof', gender: 'et', indefinite_singular: 'et stof', definite_singular: 'stoffet', indefinite_plural: 'stoffer', definite_plural: 'stofferne', plural_pattern: 'er', note: 'Stof fordobler konsonanten foran endelsen: stof → stoffet, stoffer.', example: 'Stofferne blev vævet på fabrikken.', tags: ['material'], verify: false },
+    { id: 'kop', level: 'A1', base: 'kop', gender: 'en', indefinite_singular: 'en kop', definite_singular: 'koppen', indefinite_plural: 'kopper', definite_plural: 'kopperne', plural_pattern: 'er', note: 'Kop fordobler konsonanten foran endelsen: kop → koppen, kopper.', example: 'Kopperne stod på hylden.', tags: ['objects'], verify: false },
+    { id: 'saek', level: 'A2', base: 'sæk', gender: 'en', indefinite_singular: 'en sæk', definite_singular: 'sækken', indefinite_plural: 'sække', definite_plural: 'sækkene', plural_pattern: 'e', note: 'Sæk fordobler konsonanten foran endelsen: sæk → sækken, sække.', example: 'Sækkene var fyldt med kartofler.', tags: ['objects'], verify: false },
+    { id: 'klub', level: 'A2', base: 'klub', gender: 'en', indefinite_singular: 'en klub', definite_singular: 'klubben', indefinite_plural: 'klubber', definite_plural: 'klubberne', plural_pattern: 'er', note: 'Klub fordobler konsonanten foran endelsen: klub → klubben, klubber.', example: 'Klubberne mødtes til turnering.', tags: ['leisure'], verify: false },
+    { id: 'medlem', level: 'B1', base: 'medlem', gender: 'et', indefinite_singular: 'et medlem', definite_singular: 'medlemmet', indefinite_plural: 'medlemmer', definite_plural: 'medlemmerne', plural_pattern: 'er', note: 'Medlem fordobler konsonanten foran endelsen: medlem → medlemmet, medlemmer.', example: 'Medlemmerne stemte om forslaget.', tags: ['society'], verify: false },
+    { id: 'billet', level: 'A2', base: 'billet', gender: 'en', indefinite_singular: 'en billet', definite_singular: 'billetten', indefinite_plural: 'billetter', definite_plural: 'billetterne', plural_pattern: 'er', note: 'Billet fordobler konsonanten foran endelsen: billet → billetten, billetter.', example: 'Billetterne var udsolgt på få minutter.', tags: ['leisure'], verify: false },
+    { id: 'fabrik', level: 'A2', base: 'fabrik', gender: 'en', indefinite_singular: 'en fabrik', definite_singular: 'fabrikken', indefinite_plural: 'fabrikker', definite_plural: 'fabrikkerne', plural_pattern: 'er', note: 'Fabrik fordobler konsonanten foran endelsen: fabrik → fabrikken, fabrikker.', example: 'Fabrikkerne lå uden for byen.', tags: ['town'], verify: false },
+    { id: 'knap', level: 'A2', base: 'knap', gender: 'en', indefinite_singular: 'en knap', definite_singular: 'knappen', indefinite_plural: 'knapper', definite_plural: 'knapperne', plural_pattern: 'er', note: 'Knap fordobler konsonanten foran endelsen: knap → knappen, knapper.', example: 'Knapperne på skjorten manglede.', tags: ['objects'], verify: false },
+    { id: 'tablet', level: 'A2', base: 'tablet', gender: 'en', indefinite_singular: 'en tablet', definite_singular: 'tabletten', indefinite_plural: 'tabletter', definite_plural: 'tabletterne', plural_pattern: 'er', note: 'Tablet fordobler konsonanten foran endelsen: tablet → tabletten, tabletter.', example: 'Tabletterne blev opladet om natten.', tags: ['technology'], verify: false },
+    { id: 'rabat', level: 'B1', base: 'rabat', gender: 'en', indefinite_singular: 'en rabat', definite_singular: 'rabatten', indefinite_plural: 'rabatter', definite_plural: 'rabatterne', plural_pattern: 'er', note: 'Rabat fordobler konsonanten foran endelsen: rabat → rabatten, rabatter.', example: 'Rabatterne gjaldt kun i weekenden.', tags: ['money'], verify: false },
+    { id: 'skat', level: 'B1', base: 'skat', gender: 'en', indefinite_singular: 'en skat', definite_singular: 'skatten', indefinite_plural: 'skatter', definite_plural: 'skatterne', plural_pattern: 'er', note: 'Skat fordobler konsonanten foran endelsen: skat → skatten, skatter.', example: 'Skatterne blev opkrævet hvert år.', tags: ['money'], verify: false },
+    { id: 'ret', level: 'A2', base: 'ret', gender: 'en', indefinite_singular: 'en ret', definite_singular: 'retten', indefinite_plural: 'retter', definite_plural: 'retterne', plural_pattern: 'er', note: 'Ret (mad) fordobler konsonanten foran endelsen: ret → retten, retter.', example: 'Retterne blev serveret én ad gangen.', tags: ['food'], verify: false },
+    { id: 'forskel', level: 'B1', base: 'forskel', gender: 'en', indefinite_singular: 'en forskel', definite_singular: 'forskellen', indefinite_plural: 'forskelle', definite_plural: 'forskellene', plural_pattern: 'e', note: 'Forskel fordobler konsonanten foran endelsen: forskel → forskellen, forskelle.', example: 'Forskellene mellem sprogene var små.', tags: ['abstract'], verify: false },
+
+    // --- Schwa elision in -el/-er stems ---
+    { id: 'gaffel', level: 'A2', base: 'gaffel', gender: 'en', indefinite_singular: 'en gaffel', definite_singular: 'gaflen', indefinite_plural: 'gafler', definite_plural: 'gaflerne', plural_pattern: 'irregular', note: 'Gaffel mister sit e foran endelsen: gaffel → gaflen, gafler.', example: 'Gaflerne lå til venstre for tallerkenen.', tags: ['objects'], verify: false },
+    { id: 'muskel', level: 'B1', base: 'muskel', gender: 'en', indefinite_singular: 'en muskel', definite_singular: 'musklen', indefinite_plural: 'muskler', definite_plural: 'musklerne', plural_pattern: 'irregular', note: 'Muskel mister sit e foran flertalsendelsen: muskel → musklen, muskler.', example: 'Musklerne var ømme efter træningen.', tags: ['body'], verify: false },
+    { id: 'seddel', level: 'A2', base: 'seddel', gender: 'en', indefinite_singular: 'en seddel', definite_singular: 'sedlen', indefinite_plural: 'sedler', definite_plural: 'sedlerne', plural_pattern: 'irregular', note: 'Seddel mister sit e foran endelsen: seddel → sedlen, sedler.', example: 'Sedlerne lå i tegnebogen.', tags: ['money'], verify: false },
+    { id: 'skulder', level: 'A2', base: 'skulder', gender: 'en', indefinite_singular: 'en skulder', definite_singular: 'skulderen', indefinite_plural: 'skuldre', definite_plural: 'skuldrene', plural_pattern: 'irregular', note: 'Skulder mister sit e i flertal: skulder → skuldre.', example: 'Skuldrene var spændte efter en lang dag.', tags: ['body'], verify: false },
+    { id: 'regel', level: 'B1', base: 'regel', gender: 'en', indefinite_singular: 'en regel', definite_singular: 'reglen', indefinite_plural: 'regler', definite_plural: 'reglerne', plural_pattern: 'irregular', note: 'Regel mister sit e foran endelsen: regel → reglen, regler.', example: 'Reglerne blev forklaret grundigt.', tags: ['abstract'], verify: false },
+    { id: 'tallerken', level: 'A2', base: 'tallerken', gender: 'en', indefinite_singular: 'en tallerken', definite_singular: 'tallerkenen', indefinite_plural: 'tallerkener', definite_plural: 'tallerkenerne', plural_pattern: 'er', note: 'Tallerken får -er i flertal: tallerken → tallerkenen, tallerkener.', example: 'Tallerkenerne blev stablet i skabet.', tags: ['objects'], verify: true },
+
+    // --- Irregular / foreign / zero-plural with doubling ---
+    { id: 'loen', level: 'B1', base: 'løn', gender: 'en', indefinite_singular: 'en løn', definite_singular: 'lønnen', indefinite_plural: 'lønninger', definite_plural: 'lønningerne', plural_pattern: 'irregular', note: 'Løn har uregelmæssigt flertal: løn → lønnen, lønninger.', example: 'Lønningerne blev udbetalt sidst på måneden.', tags: ['money'], verify: false },
+    { id: 'museum', level: 'A2', base: 'museum', gender: 'et', indefinite_singular: 'et museum', definite_singular: 'museet', indefinite_plural: 'museer', definite_plural: 'museerne', plural_pattern: 'foreign', note: 'Museum er et fremmedord: endelsen -um falder bort i bestemt form og flertal: museum → museet, museer.', example: 'Museerne havde gratis adgang om søndagen.', tags: ['town'], verify: false },
+    { id: 'myg', level: 'B1', base: 'myg', gender: 'en', indefinite_singular: 'en myg', definite_singular: 'myggen', indefinite_plural: 'myg', definite_plural: 'myggene', plural_pattern: 'zero', note: 'Myg fordobler konsonanten i bestemt form og har samme form i flertal: myg → myggen, myg.', example: 'Myggene summede i sommernatten.', tags: ['animals'], verify: false },
+    { id: 'lam', level: 'B1', base: 'lam', gender: 'et', indefinite_singular: 'et lam', definite_singular: 'lammet', indefinite_plural: 'lam', definite_plural: 'lammene', plural_pattern: 'zero', note: 'Lam fordobler konsonanten i bestemt form og har nulflertal: lam → lammet, lam.', example: 'Lammene sprang rundt på marken.', tags: ['animals'], verify: false },
+    { id: 'spil', level: 'A1', base: 'spil', gender: 'et', indefinite_singular: 'et spil', definite_singular: 'spillet', indefinite_plural: 'spil', definite_plural: 'spillene', plural_pattern: 'zero', note: 'Spil fordobler konsonanten i bestemt form og har nulflertal: spil → spillet, spil.', example: 'Spillene lå samlet i skabet.', tags: ['leisure'], verify: false }
   ];
 
   var REGULAR = [
@@ -257,7 +299,134 @@
     noun('A2', 'plan', 'en', 'planer', 'er', 'Plan får -er i flertal: plan → planer.', 'Planerne blev ændret i sidste øjeblik.', ['abstract']),
     noun('B2', 'mulighed', 'en', 'muligheder', 'er', 'Mulighed får -er i flertal: mulighed → muligheder.', 'Mulighederne var mange for de studerende.', ['abstract']),
     noun('A2', 'problem', 'et', 'problemer', 'er', 'Problem får -er i flertal: problem → problemer.', 'Problemerne blev løst hurtigt.', ['abstract']),
-    noun('B1', 'grund', 'en', 'grunde', 'e', 'Grund følger -e-mønsteret i flertal: grund → grunde.', 'Grundene til beslutningen var flere.', ['abstract'])
+    noun('B1', 'grund', 'en', 'grunde', 'e', 'Grund følger -e-mønsteret i flertal: grund → grunde.', 'Grundene til beslutningen var flere.', ['abstract']),
+
+    // Professions & roles
+    noun('A1', 'læge', 'en', 'læger', 'er', 'Læge får -r i flertal, da ordet ender på -e: læge → læger.', 'Lægerne tog imod patienterne.', ['work']),
+    noun('A2', 'sygeplejerske', 'en', 'sygeplejersker', 'er', 'Sygeplejerske får -r i flertal, da ordet ender på -e: sygeplejerske → sygeplejersker.', 'Sygeplejerskerne arbejdede på nattevagt.', ['work']),
+    noun('B1', 'ingeniør', 'en', 'ingeniører', 'er', 'Ingeniør får -er i flertal: ingeniør → ingeniører.', 'Ingeniørerne tegnede den nye bro.', ['work']),
+    noun('B1', 'advokat', 'en', 'advokater', 'er', 'Advokat får -er i flertal: advokat → advokater.', 'Advokaterne mødtes i retten.', ['work']),
+    noun('B1', 'journalist', 'en', 'journalister', 'er', 'Journalist får -er i flertal: journalist → journalister.', 'Journalisterne stillede mange spørgsmål.', ['work']),
+    noun('B1', 'politibetjent', 'en', 'politibetjente', 'e', 'Politibetjent følger -e-mønsteret i flertal: politibetjent → politibetjente.', 'Politibetjentene regulerede trafikken.', ['work']),
+    noun('B1', 'direktør', 'en', 'direktører', 'er', 'Direktør får -er i flertal: direktør → direktører.', 'Direktørerne holdt et langt møde.', ['work']),
+
+    // Kitchen & objects
+    noun('A1', 'kniv', 'en', 'knive', 'e', 'Kniv følger -e-mønsteret i flertal: kniv → knive.', 'Knivene blev slebet skarpe.', ['objects']),
+    noun('A1', 'ske', 'en', 'skeer', 'er', 'Ske får -er i flertal: ske → skeer.', 'Skeerne lå i skuffen.', ['objects']),
+    noun('A2', 'kande', 'en', 'kander', 'er', 'Kande får -r i flertal, da ordet ender på -e: kande → kander.', 'Kanderne var fyldt med saft.', ['objects']),
+    noun('A2', 'gryde', 'en', 'gryder', 'er', 'Gryde får -r i flertal, da ordet ender på -e: gryde → gryder.', 'Gryderne kogte på komfuret.', ['objects']),
+    noun('A2', 'pande', 'en', 'pander', 'er', 'Pande får -r i flertal, da ordet ender på -e: pande → pander.', 'Panderne hang over komfuret.', ['objects']),
+    noun('A2', 'fad', 'et', 'fade', 'e', 'Fad følger -e-mønsteret i flertal: fad → fade.', 'Fadene blev båret ind til bordet.', ['objects']),
+    noun('A2', 'krus', 'et', 'krus', 'zero', 'Krus har samme form i ubestemt ental og flertal: et krus, krus.', 'Krusene stod på hylden.', ['objects']),
+    noun('A1', 'flaske', 'en', 'flasker', 'er', 'Flaske får -r i flertal, da ordet ender på -e: flaske → flasker.', 'Flaskerne blev sorteret til genbrug.', ['objects']),
+
+    // Containers
+    noun('A1', 'kasse', 'en', 'kasser', 'er', 'Kasse får -r i flertal, da ordet ender på -e: kasse → kasser.', 'Kasserne blev stablet i garagen.', ['objects']),
+    noun('A2', 'æske', 'en', 'æsker', 'er', 'Æske får -r i flertal, da ordet ender på -e: æske → æsker.', 'Æskerne var fyldt med chokolade.', ['objects']),
+    noun('A1', 'pose', 'en', 'poser', 'er', 'Pose får -r i flertal, da ordet ender på -e: pose → poser.', 'Poserne blev fyldt med varer.', ['objects']),
+    noun('A1', 'taske', 'en', 'tasker', 'er', 'Taske får -r i flertal, da ordet ender på -e: taske → tasker.', 'Taskerne stod klar ved døren.', ['objects']),
+    noun('A2', 'kuffert', 'en', 'kufferter', 'er', 'Kuffert får -er i flertal: kuffert → kufferter.', 'Kufferterne blev pakket dagen før.', ['objects']),
+    noun('A2', 'kurv', 'en', 'kurve', 'e', 'Kurv følger -e-mønsteret i flertal: kurv → kurve.', 'Kurvene var fulde af æbler.', ['objects']),
+    noun('A2', 'spand', 'en', 'spande', 'e', 'Spand følger -e-mønsteret i flertal: spand → spande.', 'Spandene stod fyldt med vand.', ['objects']),
+
+    // Body
+    noun('A2', 'hjerte', 'et', 'hjerter', 'er', 'Hjerte får -r i flertal, da ordet ender på -e: hjerte → hjerter.', 'Hjerterne bankede hurtigt af spænding.', ['body']),
+    noun('B1', 'lunge', 'en', 'lunger', 'er', 'Lunge får -r i flertal, da ordet ender på -e: lunge → lunger.', 'Lungerne fyldtes med frisk luft.', ['body']),
+    noun('B1', 'knogle', 'en', 'knogler', 'er', 'Knogle får -r i flertal, da ordet ender på -e: knogle → knogler.', 'Knoglerne var stærke og sunde.', ['body']),
+    noun('A2', 'læbe', 'en', 'læber', 'er', 'Læbe får -r i flertal, da ordet ender på -e: læbe → læber.', 'Læberne var tørre af kulden.', ['body']),
+    noun('A2', 'kind', 'en', 'kinder', 'er', 'Kind får -er i flertal: kind → kinder.', 'Kinderne blev røde af forlegenhed.', ['body']),
+    noun('A1', 'hår', 'et', 'hår', 'zero', 'Hår har samme form i ubestemt ental og flertal: et hår, hår.', 'Hårene lå på badeværelsesgulvet.', ['body']),
+    noun('A2', 'hud', 'en', 'huder', 'er', 'Hud får -er i flertal: hud → huder.', 'Huderne blev garvet til læder.', ['body']),
+
+    // Nature & weather
+    noun('A2', 'vind', 'en', 'vinde', 'e', 'Vind følger -e-mønsteret i flertal: vind → vinde.', 'Vindene kom fra vest.', ['nature']),
+    noun('A2', 'lyn', 'et', 'lyn', 'zero', 'Lyn har samme form i ubestemt ental og flertal: et lyn, lyn.', 'Lynene oplyste hele himlen.', ['nature']),
+
+    // Money & economy
+    noun('A1', 'krone', 'en', 'kroner', 'er', 'Krone får -r i flertal, da ordet ender på -e: krone → kroner.', 'Kronerne lå i sparegrisen.', ['money']),
+    noun('A2', 'regning', 'en', 'regninger', 'er', 'Regning får -er i flertal: regning → regninger.', 'Regningerne skulle betales inden månedens udgang.', ['money']),
+    noun('B1', 'kvittering', 'en', 'kvitteringer', 'er', 'Kvittering får -er i flertal: kvittering → kvitteringer.', 'Kvitteringerne lå i posen.', ['money']),
+    noun('A1', 'pris', 'en', 'priser', 'er', 'Pris får -er i flertal: pris → priser.', 'Priserne steg hen over året.', ['money']),
+
+    // Town & society
+    noun('A1', 'bank', 'en', 'banker', 'er', 'Bank får -er i flertal: bank → banker.', 'Bankerne lukkede klokken fire.', ['town']),
+    noun('A2', 'apotek', 'et', 'apoteker', 'er', 'Apotek får -er i flertal: apotek → apoteker.', 'Apotekerne havde åbent i weekenden.', ['town']),
+    noun('A2', 'sygehus', 'et', 'sygehuse', 'e', 'Sygehus følger -e-mønsteret i flertal: sygehus → sygehuse.', 'Sygehusene fik nyt udstyr.', ['town']),
+    noun('B1', 'rådhus', 'et', 'rådhuse', 'e', 'Rådhus følger -e-mønsteret i flertal: rådhus → rådhuse.', 'Rådhusene lå centralt i byerne.', ['town']),
+    noun('A1', 'bro', 'en', 'broer', 'er', 'Bro får -er i flertal: bro → broer.', 'Broerne forbandt de to øer.', ['town']),
+    noun('A2', 'havn', 'en', 'havne', 'e', 'Havn følger -e-mønsteret i flertal: havn → havne.', 'Havnene var fulde af både.', ['town']),
+    noun('A2', 'hospital', 'et', 'hospitaler', 'er', 'Hospital får -er i flertal: hospital → hospitaler.', 'Hospitalerne manglede senge.', ['town']),
+    noun('A2', 'kiosk', 'en', 'kiosker', 'er', 'Kiosk får -er i flertal: kiosk → kiosker.', 'Kioskerne solgte aviser og slik.', ['town']),
+    noun('A2', 'supermarked', 'et', 'supermarkeder', 'er', 'Supermarked får -er i flertal: supermarked → supermarkeder.', 'Supermarkederne havde tilbud om fredagen.', ['town']),
+
+    // Food & drink
+    noun('A1', 'brød', 'et', 'brød', 'zero', 'Brød har samme form i ubestemt ental og flertal: et brød, brød.', 'Brødene blev bagt tidligt om morgenen.', ['food']),
+    noun('A1', 'ost', 'en', 'oste', 'e', 'Ost følger -e-mønsteret i flertal: ost → oste.', 'Ostene lå på et fad.', ['food']),
+    noun('A1', 'pølse', 'en', 'pølser', 'er', 'Pølse får -r i flertal, da ordet ender på -e: pølse → pølser.', 'Pølserne blev grillet på pladen.', ['food']),
+    noun('A1', 'kage', 'en', 'kager', 'er', 'Kage får -r i flertal, da ordet ender på -e: kage → kager.', 'Kagerne blev serveret til kaffen.', ['food']),
+    noun('A2', 'suppe', 'en', 'supper', 'er', 'Suppe får -r i flertal, da ordet ender på -e: suppe → supper.', 'Supperne blev serveret varme.', ['food']),
+    noun('A1', 'frugt', 'en', 'frugter', 'er', 'Frugt får -er i flertal: frugt → frugter.', 'Frugterne lå i skålen.', ['food']),
+    noun('A2', 'grøntsag', 'en', 'grøntsager', 'er', 'Grøntsag får -er i flertal: grøntsag → grøntsager.', 'Grøntsagerne blev dampet let.', ['food']),
+    noun('A1', 'fisk', 'en', 'fisk', 'zero', 'Fisk har samme form i ubestemt ental og flertal: en fisk, fisk.', 'Fiskene svømmede i akvariet.', ['food']),
+    noun('A2', 'vin', 'en', 'vine', 'e', 'Vin følger -e-mønsteret i flertal: vin → vine.', 'Vinene blev smagt til middagen.', ['food']),
+    noun('A1', 'appelsin', 'en', 'appelsiner', 'er', 'Appelsin får -er i flertal: appelsin → appelsiner.', 'Appelsinerne var søde og saftige.', ['food']),
+    noun('A1', 'banan', 'en', 'bananer', 'er', 'Banan får -er i flertal: banan → bananer.', 'Bananerne blev gule i vindueskarmen.', ['food']),
+    noun('A1', 'tomat', 'en', 'tomater', 'er', 'Tomat får -er i flertal: tomat → tomater.', 'Tomaterne modnede i drivhuset.', ['food']),
+    noun('A2', 'løg', 'et', 'løg', 'zero', 'Løg har samme form i ubestemt ental og flertal: et løg, løg.', 'Løgene blev hakket fint.', ['food']),
+    noun('A2', 'salat', 'en', 'salater', 'er', 'Salat får -er i flertal: salat → salater.', 'Salaterne blev anrettet på fade.', ['food']),
+
+    // Sports & leisure
+    noun('A1', 'bold', 'en', 'bolde', 'e', 'Bold følger -e-mønsteret i flertal: bold → bolde.', 'Boldene lå spredt på banen.', ['leisure']),
+    noun('A2', 'mål', 'et', 'mål', 'zero', 'Mål har samme form i ubestemt ental og flertal: et mål, mål.', 'Målene blev scoret i anden halvleg.', ['leisure']),
+    noun('A1', 'kamp', 'en', 'kampe', 'e', 'Kamp følger -e-mønsteret i flertal: kamp → kampe.', 'Kampene blev spillet om søndagen.', ['leisure']),
+    noun('A2', 'hold', 'et', 'hold', 'zero', 'Hold har samme form i ubestemt ental og flertal: et hold, hold.', 'Holdene mødtes i finalen.', ['leisure']),
+    noun('A2', 'bane', 'en', 'baner', 'er', 'Bane får -r i flertal, da ordet ender på -e: bane → baner.', 'Banerne blev kridtet op før kampen.', ['leisure']),
+    noun('A2', 'leg', 'en', 'lege', 'e', 'Leg følger -e-mønsteret i flertal: leg → lege.', 'Legene i skolegården var vilde.', ['leisure']),
+    noun('A1', 'gave', 'en', 'gaver', 'er', 'Gave får -r i flertal, da ordet ender på -e: gave → gaver.', 'Gaverne lå under juletræet.', ['leisure']),
+    noun('A1', 'fest', 'en', 'fester', 'er', 'Fest får -er i flertal: fest → fester.', 'Festerne varede til langt ud på natten.', ['leisure']),
+    noun('A1', 'film', 'en', 'film', 'zero', 'Film har samme form i ubestemt ental og flertal: en film, film.', 'Filmene blev vist på festivalen.', ['leisure']),
+    noun('A1', 'sang', 'en', 'sange', 'e', 'Sang følger -e-mønsteret i flertal: sang → sange.', 'Sangene blev sunget i kor.', ['leisure']),
+    noun('A1', 'billede', 'et', 'billeder', 'er', 'Billede får -r i flertal, da ordet ender på -e: billede → billeder.', 'Billederne hang på væggen.', ['leisure']),
+
+    // Abstract & society
+    noun('B2', 'rettighed', 'en', 'rettigheder', 'er', 'Rettighed får -er i flertal: rettighed → rettigheder.', 'Rettighederne er beskyttet af loven.', ['abstract']),
+    noun('B1', 'lov', 'en', 'love', 'e', 'Lov følger -e-mønsteret i flertal: lov → love.', 'Lovene blev vedtaget i Folketinget.', ['abstract']),
+    noun('A2', 'fejl', 'en', 'fejl', 'zero', 'Fejl har samme form i ubestemt ental og flertal: en fejl, fejl.', 'Fejlene blev rettet inden aflevering.', ['abstract']),
+    noun('A1', 'svar', 'et', 'svar', 'zero', 'Svar har samme form i ubestemt ental og flertal: et svar, svar.', 'Svarene stod bag i bogen.', ['abstract']),
+    noun('A1', 'spørgsmål', 'et', 'spørgsmål', 'zero', 'Spørgsmål har samme form i ubestemt ental og flertal: et spørgsmål, spørgsmål.', 'Spørgsmålene var svære at besvare.', ['abstract']),
+    noun('A1', 'historie', 'en', 'historier', 'er', 'Historie får -r i flertal, da ordet ender på -e: historie → historier.', 'Historierne blev fortalt igen og igen.', ['abstract']),
+    noun('A2', 'sætning', 'en', 'sætninger', 'er', 'Sætning får -er i flertal: sætning → sætninger.', 'Sætningerne blev rettet af læreren.', ['abstract']),
+    noun('A1', 'sprog', 'et', 'sprog', 'zero', 'Sprog har samme form i ubestemt ental og flertal: et sprog, sprog.', 'Sprogene i Europa er mange.', ['abstract']),
+    noun('A1', 'navn', 'et', 'navne', 'e', 'Navn følger -e-mønsteret i flertal: navn → navne.', 'Navnene blev råbt op ét for ét.', ['abstract']),
+    noun('A2', 'liv', 'et', 'liv', 'zero', 'Liv har samme form i ubestemt ental og flertal: et liv, liv.', 'Livene blev reddet af redningsmandskabet.', ['abstract']),
+    noun('B1', 'sandhed', 'en', 'sandheder', 'er', 'Sandhed får -er i flertal: sandhed → sandheder.', 'Sandhederne kom langsomt frem.', ['abstract']),
+    noun('B1', 'løgn', 'en', 'løgne', 'e', 'Løgn følger -e-mønsteret i flertal: løgn → løgne.', 'Løgnene blev hurtigt afsløret.', ['abstract']),
+    noun('A2', 'mening', 'en', 'meninger', 'er', 'Mening får -er i flertal: mening → meninger.', 'Meningerne var delte i gruppen.', ['abstract']),
+    noun('B1', 'beslutning', 'en', 'beslutninger', 'er', 'Beslutning får -er i flertal: beslutning → beslutninger.', 'Beslutningerne blev truffet i fællesskab.', ['abstract']),
+    noun('B1', 'oplevelse', 'en', 'oplevelser', 'er', 'Oplevelse får -r i flertal, da ordet ender på -e: oplevelse → oplevelser.', 'Oplevelserne fra rejsen sad længe i dem.', ['abstract']),
+    noun('B1', 'forhold', 'et', 'forhold', 'zero', 'Forhold har samme form i ubestemt ental og flertal: et forhold, forhold.', 'Forholdene på arbejdspladsen blev bedre.', ['abstract']),
+    noun('B1', 'samfund', 'et', 'samfund', 'zero', 'Samfund har samme form i ubestemt ental og flertal: et samfund, samfund.', 'Samfundene udviklede sig hver for sig.', ['abstract']),
+    noun('A2', 'krig', 'en', 'krige', 'e', 'Krig følger -e-mønsteret i flertal: krig → krige.', 'Krigene prægede hele århundredet.', ['abstract']),
+
+    // Animals
+    noun('B1', 'orm', 'en', 'orme', 'e', 'Orm følger -e-mønsteret i flertal: orm → orme.', 'Ormene gravede sig ned i jorden.', ['animals']),
+    noun('A2', 'får', 'et', 'får', 'zero', 'Får har samme form i ubestemt ental og flertal: et får, får.', 'Fårene græssede på engen.', ['animals']),
+    noun('A2', 'kanin', 'en', 'kaniner', 'er', 'Kanin får -er i flertal: kanin → kaniner.', 'Kaninerne hoppede rundt i buret.', ['animals']),
+    noun('A2', 'måge', 'en', 'måger', 'er', 'Måge får -r i flertal, da ordet ender på -e: måge → måger.', 'Mågerne kredsede over havnen.', ['animals']),
+    noun('B1', 'ørn', 'en', 'ørne', 'e', 'Ørn følger -e-mønsteret i flertal: ørn → ørne.', 'Ørnene svævede højt over bjergene.', ['animals']),
+    noun('A2', 'sommerfugl', 'en', 'sommerfugle', 'e', 'Sommerfugl følger -e-mønsteret i flertal: sommerfugl → sommerfugle.', 'Sommerfuglene flagrede mellem blomsterne.', ['animals']),
+    noun('A2', 'myre', 'en', 'myrer', 'er', 'Myre får -r i flertal, da ordet ender på -e: myre → myrer.', 'Myrerne byggede en stor tue.', ['animals']),
+    noun('A2', 'ged', 'en', 'geder', 'er', 'Ged får -er i flertal: ged → geder.', 'Gederne klatrede op ad skrænten.', ['animals']),
+    noun('A2', 'kylling', 'en', 'kyllinger', 'er', 'Kylling får -er i flertal: kylling → kyllinger.', 'Kyllingerne pippede i kurven.', ['animals']),
+    noun('B1', 'rotte', 'en', 'rotter', 'er', 'Rotte får -r i flertal, da ordet ender på -e: rotte → rotter.', 'Rotterne gemte sig i kælderen.', ['animals']),
+    noun('B1', 'delfin', 'en', 'delfiner', 'er', 'Delfin får -er i flertal: delfin → delfiner.', 'Delfinerne fulgte skibet.', ['animals']),
+
+    // Technology
+    noun('A2', 'fjernsyn', 'et', 'fjernsyn', 'zero', 'Fjernsyn har samme form i ubestemt ental og flertal: et fjernsyn, fjernsyn.', 'Fjernsynene stod tændt i hver stue.', ['technology']),
+    noun('A2', 'radio', 'en', 'radioer', 'er', 'Radio får -er i flertal: radio → radioer.', 'Radioerne spillede den samme sang.', ['technology']),
+    noun('A2', 'fil', 'en', 'filer', 'er', 'Fil får -er i flertal: fil → filer.', 'Filerne blev gemt på computeren.', ['technology']),
+    noun('A2', 'mappe', 'en', 'mapper', 'er', 'Mappe får -r i flertal, da ordet ender på -e: mappe → mapper.', 'Mapperne blev sorteret efter dato.', ['technology']),
+    noun('B1', 'ledning', 'en', 'ledninger', 'er', 'Ledning får -er i flertal: ledning → ledninger.', 'Ledningerne lå viklet sammen bag skrivebordet.', ['technology'])
   ];
 
   window.DANSK_NOUNS = MANUAL.concat(REGULAR);

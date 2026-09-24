@@ -202,7 +202,10 @@
     ['A2', 'langsom', 'ikke hurtig'],
     ['B1', 'arbejdsom', 'flittig'],
     ['B1', 'virksom', 'effektiv, virkende'],
-    ['B1', 'voldsom', 'meget kraftig']
+    ['B1', 'voldsom', 'meget kraftig'],
+    ['B1', 'opmærksom', 'som lægger mærke til noget'],
+    ['B2', 'betænksom', 'hensynsfuld, omtænksom'],
+    ['B2', 'sparsom', 'som der kun er lidt af']
   ].map(function (row) { return adjSom(row[0], row[1], row[2], row[1] === 'virksom'); });
 
   // -isk class: periphrastic, neuter unchanged
@@ -211,7 +214,8 @@
     ['B2', 'psykisk'], ['B1', 'fantastisk'], ['B2', 'realistisk'], ['B2', 'elektronisk'],
     ['B2', 'automatisk'], ['B2', 'teknisk'], ['B2', 'kritisk'], ['B2', 'logisk'],
     ['B2', 'dramatisk'], ['B2', 'historisk'], ['B2', 'klassisk'], ['B2', 'politisk'],
-    ['B2', 'akademisk'], ['B2', 'systematisk']
+    ['B2', 'akademisk'], ['B2', 'systematisk'], ['B1', 'magisk'], ['B2', 'tragisk'],
+    ['B2', 'komisk'], ['B2', 'demokratisk']
   ].map(function (row) { return adjPeriphrastic(row[0], row[1], row[1].replace(/isk$/, '') + '-adjektiv', true, false); });
 
   // -et class (participle-derived): periphrastic, neuter unchanged
@@ -225,7 +229,8 @@
   // -løs class: periphrastic, neuter takes +t
   var LOES_WORDS = [
     ['B1', 'arbejdsløs'], ['B1', 'meningsløs'], ['B1', 'hjælpeløs'], ['B1', 'håbløs'],
-    ['B1', 'ansvarsløs'], ['B2', 'formålsløs'], ['B2', 'sanseløs']
+    ['B1', 'ansvarsløs'], ['B2', 'formålsløs'], ['B2', 'sanseløs'],
+    ['B1', 'trådløs'], ['B2', 'smagløs']
   ].map(function (row) { return adjPeriphrastic(row[0], row[1], 'uden noget', false, true); });
 
   // -ig / -lig regular class
@@ -245,7 +250,10 @@
     ['B2', 'dødelig'], ['B1', 'folkelig'], ['A2', 'kærlig'], ['B1', 'kongelig'],
     ['B1', 'rummelig'], ['A2', 'hyggelig'], ['B1', 'pinlig'], ['B1', 'retfærdig'],
     ['B1', 'uretfærdig'], ['A2', 'tidlig'], ['B1', 'nyttig'], ['B1', 'unyttig'],
-    ['B1', 'skadelig']
+    ['B1', 'skadelig'], ['A2', 'flittig'], ['B1', 'fornuftig'], ['B1', 'villig'],
+    ['B1', 'rigelig'], ['B1', 'ivrig'], ['B1', 'grundig'], ['B1', 'hyppig'],
+    ['A2', 'dygtig'], ['A2', 'kraftig'], ['A2', 'ordentlig'], ['B1', 'saftig'],
+    ['B1', 'luftig']
   ].map(function (row) { return adjIg(row[0], row[1], false); });
 
   // Regular monosyllabic / vowel-final adjectives (no doubling, -est superlative)
@@ -267,7 +275,15 @@
     ['A2', 'flad', 'uden højdeforskel', false], ['A2', 'rund', 'formet som en cirkel eller kugle', false],
     ['B1', 'spids', 'som slutter i en spids', true], ['A2', 'skarp', 'som kan skære godt, eller tydelig', false],
     ['A2', 'blank', 'skinnende', false], ['A2', 'mørk', 'modsat af lys', false],
-    ['A2', 'lys', 'modsat af mørk', false], ['A2', 'sen', 'modsat af tidlig', false]
+    ['A2', 'lys', 'modsat af mørk', false], ['A2', 'sen', 'modsat af tidlig', false],
+    ['A1', 'klar', 'tydelig, gennemsigtig', false], ['B1', 'fjern', 'langt væk', false],
+    ['B1', 'stejl', 'med stor hældning', false], ['A2', 'vild', 'ikke tam, uden kontrol', false],
+    ['A2', 'mild', 'ikke streng eller kraftig', false], ['B1', 'stiv', 'ikke bøjelig', false],
+    ['A2', 'våd', 'dækket af væske', false], ['A2', 'rar', 'venlig og behagelig', false],
+    ['A2', 'dyb', 'som når langt ned', false], ['A2', 'fed', 'med meget fedt, eller sej', false],
+    ['A2', 'flink', 'venlig og hjælpsom', false], ['A2', 'frisk', 'ny og sund, ikke gammel', false],
+    ['A2', 'rask', 'ved godt helbred igen', false], ['B1', 'vred', 'meget sur, gal', false],
+    ['B1', 'tavs', 'som ikke siger noget', false], ['B1', 'barsk', 'hård og ubarmhjertig', false]
   ].map(function (row) { return adjReg(row[0], row[1], row[2], row[3]); });
 
   window.DANSK_ADJECTIVES = MANUAL.concat(EN_WORDS, SOM_WORDS, ISK_WORDS, ET_WORDS, LOES_WORDS, IG_WORDS, REG_WORDS);

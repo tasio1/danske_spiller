@@ -38,6 +38,18 @@ Files live next to this skill:
    - It starts recording after page load and misses roughly the first 100-300 ms, so the page should hold its first frame briefly.
    - Frame capture may run below 15 fps (about 8-9 fps measured), so the fallback video is choppy.
 
+## Adding an explainer to a game
+
+The shipping copy lives in `shared/explainer/` (`explainer.js`, `explainer.css`, `monitor.svg`, `modal.js`, `modal.css`, `scenes/<id>.scene.js`). Wiring a game takes three additive lines and touches no game logic, content or storage:
+
+1. `<html lang="da" data-explainer="scene-id[,scene-id]">` (several ids show a chooser).
+2. After the game's theme css: `<link rel="stylesheet" href="../shared/explainer/modal.css">` and `<script src="../shared/explainer/modal.js"></script>` (drop `../` for root-level games).
+3. Put the scene in `shared/explainer/scenes/<id>.scene.js` (copy it into `examples/` too).
+
+`modal.js` adds a FORKLARING button to the shared `.sd-bar` (floating corner button if there is no bar), opens an accessible dialog (Esc closes, focus trap, focus returns, 44 px targets) and loads the player and scene on demand, so nothing runs at page load. While it is open it stops keys from reaching the game. It does not pause game timers.
+
+The skill's `templates/` copy of the player is for previewing; if you change the player, copy `explainer.js`, `explainer.css` (fix the `../fonts/` path) and `monitor.svg` to `shared/explainer/` too. Verify by opening the game, clicking the button, and checking mobile, desktop and dark mode, Esc, and no console errors.
+
 ## Design rules
 
 - The rule must be visible without reading: movement and colour carry it, the rule card only confirms it.

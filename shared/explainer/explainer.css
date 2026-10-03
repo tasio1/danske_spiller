@@ -1,0 +1,96 @@
+/* Explainer player styles - Sjovt Dansk palette. Fonts: ../../../../shared/fonts (falls back to system mono). */
+@font-face { font-family: "XP Mono"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "XP Mono"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); }
+
+.xp, .xp-controls {
+  --xp-font: "XP Mono", "SD Mono", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  --xp-ink: #101010; --xp-paper: #FFF4D6; --xp-orange: #F94F37; --xp-ok: #148A3C; --xp-bad: #D4145A; --xp-focus: #2B3FD6;
+  --xp-screen: #FFF4D6; --xp-text: #101010; --xp-tile: #FFFFFF; --xp-gap: rgba(16,16,16,.08); --xp-gapline: #101010;
+  --xp-card: #FFFFFF; --xp-arrow: #101010; --xp-btn: #FFF4D6; --xp-btn-text: #101010; --xp-line: #101010;
+  --xp-bw: 3px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .xp, :root:not([data-theme="light"]) .xp-controls {
+    --xp-screen: #12151F; --xp-text: #FFF4D6; --xp-gap: rgba(255,244,214,.12); --xp-gapline: #FFF4D6;
+    --xp-card: #232842; --xp-arrow: #FFC25A; --xp-btn: #232842; --xp-btn-text: #FFF4D6; --xp-line: #FFF4D6;
+  }
+}
+:root[data-theme="dark"] .xp, :root[data-theme="dark"] .xp-controls {
+  --xp-screen: #12151F; --xp-text: #FFF4D6; --xp-gap: rgba(255,244,214,.12); --xp-gapline: #FFF4D6;
+  --xp-card: #232842; --xp-arrow: #FFC25A; --xp-btn: #232842; --xp-btn-text: #FFF4D6; --xp-line: #FFF4D6;
+}
+
+/* ---------- root = the screen content */
+.xp { container-type: inline-size; box-sizing: border-box; display: flex; flex-direction: column; width: 100%; height: 100%;
+  min-width: 0; min-height: 260px; overflow: hidden; background: var(--xp-screen); color: var(--xp-text);
+  font-family: var(--xp-font); }
+.xp > .xp-bar, .xp > .xp-stage { font-size: clamp(10px, 4.8cqw, 24px); }
+.xp *, .xp *::before, .xp *::after { box-sizing: border-box; }
+.xp [hidden] { display: none !important; }
+
+.xp-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: .6em; padding: .3em .6em;
+  background: var(--xp-orange); color: #101010; font-weight: 700; font-size: .72em; min-height: 2.2em; }
+.xp-bar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.xp-bar-right { display: flex; align-items: center; gap: .5em; flex: none; }
+.xp-badge { background: #101010; color: #FFC25A; padding: .1em .45em; }
+.xp-badge-verify { background: #FFF4D6; color: #101010; }
+.xp-count { font-variant-numeric: tabular-nums; }
+
+.xp-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.xp-sent { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .7em .5em; padding: 2.4em .6em 1.2em; max-width: 100%; }
+.xp-idle { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1em;
+  opacity: .8; font-size: .8em; }
+.xp-layer, .xp-arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+
+/* ---------- pixel tiles */
+.xp-tile { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 2.4em; padding: 0 .6em;
+  background: var(--xp-tile); color: #101010; font-weight: 700; line-height: 1; white-space: nowrap;
+  box-shadow: 0 calc(-1*var(--xp-bw)) 0 0 #101010, 0 var(--xp-bw) 0 0 #101010, calc(-1*var(--xp-bw)) 0 0 0 #101010, var(--xp-bw) 0 0 0 #101010,
+              0 calc(var(--xp-bw) + .18em) 0 0 rgba(16,16,16,.45); margin: var(--xp-bw); }
+.xp-tile.is-gap { background: var(--xp-gap); box-shadow: none; border: var(--xp-bw) dashed var(--xp-gapline); margin: 0; }
+.xp-tile.is-ok { background: var(--xp-ok); color: #fff; box-shadow: 0 calc(-1*var(--xp-bw)) 0 0 #101010, 0 var(--xp-bw) 0 0 #101010, calc(-1*var(--xp-bw)) 0 0 0 #101010, var(--xp-bw) 0 0 0 #101010; margin: var(--xp-bw); }
+.xp-tile.is-ok.is-gap { border: 0; }
+.xp-tile.is-hl { background: var(--hl, #E1AD12); color: var(--hl-fg, #101010); }
+.xp-tile.is-hl-k { outline: var(--xp-bw) solid #101010; outline-offset: 3px; }
+.xp-tile.is-moving { z-index: 3; background: #FFC25A; }
+.xp-flier { position: absolute; margin: 0; z-index: 4; background: #FFC25A; }
+.xp-flier.is-bad { background: #FFD0DE; box-shadow: 0 calc(-1*var(--xp-bw)) 0 0 var(--xp-bad), 0 var(--xp-bw) 0 0 var(--xp-bad), calc(-1*var(--xp-bw)) 0 0 0 var(--xp-bad), var(--xp-bw) 0 0 0 var(--xp-bad); }
+.xp-mark { position: absolute; top: -.7em; right: -.7em; width: 1.3em; height: 1.3em; display: flex; align-items: center; justify-content: center; color: #fff; }
+.xp-mark-ok { background: var(--xp-ok); box-shadow: 0 0 0 2px #101010; }
+.xp-mark-bad { background: var(--xp-bad); box-shadow: 0 0 0 2px #101010; }
+.xp .xp-ico, .xp-controls .xp-ico { width: .8em; height: .8em; display: block; }
+.xp-mark .xp-ico { width: .75em; height: .75em; }
+
+/* ---------- arrows (SVG, drawn in stage px) */
+.xp-arrow-line { fill: none; stroke: var(--xp-arrow); stroke-width: 3; stroke-linejoin: miter; shape-rendering: crispEdges; stroke-dasharray: 1; }
+.xp-arrow-head { fill: var(--xp-arrow); shape-rendering: crispEdges; }
+.xp-arrow-label { fill: var(--xp-text); font-family: var(--xp-font); font-weight: 700; font-size: .72em; paint-order: stroke; stroke: var(--xp-screen); stroke-width: 5px; }
+
+/* ---------- rule card */
+.xp-rule { width: calc(100% - 1.6em); max-height: 100%; background: var(--xp-card); color: var(--xp-text); padding: .9em 1em; display: flex; flex-direction: column; gap: .7em;
+  box-shadow: 0 calc(-1*var(--xp-bw)) 0 0 var(--xp-line), 0 var(--xp-bw) 0 0 var(--xp-line), calc(-1*var(--xp-bw)) 0 0 0 var(--xp-line), var(--xp-bw) 0 0 0 var(--xp-line); }
+.xp-rule-head { align-self: flex-start; background: var(--xp-orange); color: #101010; font-weight: 700; padding: .15em .6em; font-size: .7em; text-transform: uppercase; letter-spacing: .1em; }
+.xp-rule-line { font-weight: 700; font-size: 1.05em; line-height: 1.35; overflow-wrap: anywhere; }
+
+.xp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- controls */
+.xp-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; padding: 12px 4px; font-family: var(--xp-font); color: var(--xp-text); }
+.xp-btn { min-width: 44px; min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  font: 700 14px/1 var(--xp-font); background: var(--xp-btn); color: var(--xp-btn-text); border: 0; border-radius: 0; margin: 4px;
+  box-shadow: 0 -4px 0 0 var(--xp-line), 0 4px 0 0 var(--xp-line), -4px 0 0 0 var(--xp-line), 4px 0 0 0 var(--xp-line); }
+.xp-btn:hover { background: #FFC25A; color: #101010; }
+.xp-btn:active { transform: translateY(2px); }
+.xp-btn.xp-play { background: var(--xp-orange); color: #101010; }
+.xp-btn:focus-visible { outline: 3px solid var(--xp-focus); outline-offset: 5px; }
+.xp-btn .xp-ico { width: 16px; height: 16px; }
+.xp-prog { flex: 1 1 100%; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.xp-prog i { width: 10px; height: 6px; background: var(--xp-gap); outline: 1px solid var(--xp-gapline); outline-offset: -1px; }
+.xp-prog i.on { background: var(--xp-orange); outline-color: var(--xp-orange); }
+@media (max-width: 400px) { .xp-btn { padding: 0 10px; font-size: 13px; gap: 6px; } .xp-controls { gap: 6px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .xp *, .xp-controls * { animation: none !important; transition: none !important; }
+}

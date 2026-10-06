@@ -607,6 +607,53 @@ if (want('content')) {
   await page.close();
 }
 
+// ============ retest extras: margin numbers, advance timing over fresh loads, font fallback measure, no-audio boot
+if (want('retest')) {
+  const cplFn = () => { const lines = p => { const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); const map = new Map(); let n; while ((n = w.nextNode())) for (let i = 0; i < n.length; i++) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1); const b = r.getClientRects()[0]; if (!b || !b.width) continue; const k = Math.round(b.top); map.set(k, (map.get(k) || 0) + 1); } return [...map.values()]; };
+    const all = [...document.querySelectorAll('#lf-text p[data-par]')].map(lines); const full = all.flatMap(a => a.slice(0, -1)).sort((x, y) => x - y); return { median: full[Math.floor(full.length / 2)], max: Math.max(...all.flat()) }; };
+  for (const vp of Object.keys(VPS)) {
+    const { page } = await open(vp); await play(page);
+    const m = await page.evaluate(cplFn);
+    const g = await page.evaluate(() => {
+      const rd = document.getElementById('lf-reader'), tx = document.getElementById('lf-text'), p = tx.querySelector('p[data-par]');
+      const cs = getComputedStyle(p, '::before'); const sp = document.createElement('span'); sp.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${cs.font}`; sp.textContent = '¶8'; document.body.appendChild(sp);
+      const w = sp.getBoundingClientRect().width; sp.remove();
+      const stacked = cs.position !== 'absolute';
+      const gap = tx.getBoundingClientRect().left - rd.getBoundingClientRect().left;
+      return { stacked, numW: Math.round(w), gap: Math.round(gap), need: Math.round(w + 8), display: cs.display, content: cs.content };
+    });
+    note(`retest cpl ${vp}`, { ...m, ...g });
+    rec(`retest ${vp}: chars/line median ${m.median} max ${m.max} (<=75; 60-75 median at wide widths)`, m.max <= 75 || vp === '360x640', JSON.stringify(m));
+    rec(`retest ${vp}: margin number ¶N has room (${g.stacked ? 'stacked, inline block' : 'gap ' + g.gap + 'px >= ' + g.need + 'px'}) and is not clipped by reader`, g.stacked || g.gap >= g.need, JSON.stringify(g));
+    if (VPS[vp].width >= 1024 && VPS[vp].width < 1300 || vp === '1440x900') {
+      await page.addStyleTag({ content: '.lf-text{font-family:"Times New Roman",serif !important}' }); await sleep(200);
+      const t = await page.evaluate(cplFn); note(`retest Times New Roman ${vp}`, t);
+      rec(`retest ${vp}: Times New Roman fallback chars/line <= 80 (info)`, t.max <= 80, JSON.stringify(t));
+    }
+    if (SHOTS) { await page.evaluate(() => { document.getElementById('lf-reader').scrollTop = 120; }); await sleep(200); await shot(page, vp, 'retest-margin'); }
+    await page.close();
+  }
+  for (const muted of [false, true]) {
+    const times = [];
+    for (let i = 0; i < 6; i++) {
+      const { page } = await open('1440x900');
+      if (muted) await page.click('#btn-sound');
+      await play(page);
+      const t1 = await advTime(page); await sleep(200); const t2 = await advTime(page); await sleep(200);
+      times.push([t1, t2]); await page.close();
+    }
+    const flat = times.flat();
+    rec(`retest advance ${muted ? 'muted' : 'unmuted'}: first and second correct answers 700-900 ms over 6 fresh loads`, flat.every(x => x >= 700 && x <= 900), JSON.stringify(times));
+  }
+  { // muted: still 0 audio nodes with AudioContext now built on Spil
+    const { page } = await open('1440x900'); await page.click('#btn-sound'); await play(page); await answerRound(page, [true, false, true]);
+    const n = await page.evaluate(() => window.__osc); rec('retest sound: muted round makes 0 audio nodes (AudioContext built on Spil)', n === 0, 'osc=' + n); await page.close(); }
+  { const { page, issues } = await open('1440x900', { init: () => { delete window.AudioContext; delete window.webkitAudioContext; } });
+    await play(page); await answerRound(page, [true, false, true]);
+    const ok = await page.$eval('#lf-q', n => /Point: 2/.test(n.innerText));
+    rec('retest sound: AudioContext unavailable -> full round works, no console error', ok && issues.length === 0, issues.join(' | ')); await page.close(); }
+}
+
 await browser.close();
 const fails = results.filter(r => r.ok === false), nv = results.filter(r => r.ok === null);
 console.log(`\nSUMMARY ${results.length - fails.length - nv.length} pass, ${fails.length} fail, ${nv.length} not verified`);

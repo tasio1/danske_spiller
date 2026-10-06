@@ -78,16 +78,16 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 - id: laese-validator
   spec: laeseforstaaelse
   type: test
-  status: todo
+  status: review
   priority: P1
   title: "tester: tests/laeseforstaaelse-data.mjs — corpus validator (test-first, before any text exists)"
   acceptance: "fails on a bad fixture for each rule (banned phrase, quotation mark, wrong gap/question counts, bad solution map, bad {{n}} markers); passes on a good fixture; --expect=a,b,c,d asserts per-mode text counts; runs in under 1 s. Pattern: tests/pronomen-data-guard.mjs; code in reference plan Task 2."
-  notes: "Allowed files: tests/laeseforstaaelse-data.mjs, tests/fixtures/laese/*. Rules come from .claude/skills/laese-text-authoring."
+  notes: "Done: task/laese-validator@e3ac2c7 (selftest 2 good + 41 bad fixtures, 0.6 s; PM mutation-tested). Known gaps accepted: speaker after the verb (mener X), other verbs (spoerger), pronoun-only attribution; a sentence-initial single name only warns. Needs an independent tester pass before release. Allowed files: tests/laeseforstaaelse-data.mjs, tests/fixtures/laese/*. Rules come from .claude/skills/laese-text-authoring."
 
 - id: laese-facts-a
   spec: laeseforstaaelse
   type: chore
-  status: todo
+  status: review
   priority: P1
   title: "fact sheets (web): art-ulven, art-dialekter, art-efterskole"
   acceptance: "docs/laeseforstaaelse/facts/<text-id>.md per text; 6-12 facts each with verbatim source sentence, URL, fetch date; figures that cannot be confirmed are marked UNCONFIRMED; no game prose written"
@@ -96,7 +96,7 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 - id: laese-facts-b
   spec: laeseforstaaelse
   type: chore
-  status: todo
+  status: review
   priority: P1
   title: "fact sheets (web): haefte-kolonihave, haefte-rebildfest"
   acceptance: "same as laese-facts-a; plus a list of practical details (times, prices) that will be exercise values and must not be presented as real"
@@ -104,7 +104,7 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 - id: laese-facts-c
   spec: laeseforstaaelse
   type: chore
-  status: todo
+  status: review
   priority: P1
   title: "fact sheets (web): art-samsoe, art-madspild"
   acceptance: "same as laese-facts-a"
@@ -112,19 +112,30 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 - id: laese-facts-d
   spec: laeseforstaaelse
   type: chore
-  status: todo
+  status: review
   priority: P1
   title: "fact sheets (web): art-bakken, art-cykelsti, art-gaekkebrev"
   acceptance: "same as laese-facts-a"
 
-- id: laese-facts-verify
+- id: laese-facts-verify-1
   spec: laeseforstaaelse
   type: chore
-  status: todo
+  status: review
   priority: P1
-  depends_on: [laese-facts-a, laese-facts-b, laese-facts-c, laese-facts-d]
-  title: "independent verification of every fact sheet (a different agent dispatch than the author)"
-  acceptance: "every URL re-fetched; every figure marked CONFIRMED / CHANGED / UNCONFIRMED in the sheet; the author of a sheet never verifies it; user spot-checks 2-3 sheets"
+  depends_on: [laese-facts-a, laese-facts-b]
+  title: "independent verification of fact sheets: ulven, dialekter, efterskole, kolonihave, rebildfest"
+  acceptance: "every fact line has a final status + verified line; VERIFY-1.md written; author never verifies own sheet"
+  notes: "Done: task/laese-facts-verify-1@fa69077 (60 facts: 58 CONFIRMED, 2 CHANGED; curl on raw pages, no WebFetch). PM spot-check: ulveatlas 11 kobler/61 hvalpe reproduces. Next: tester format gate, then release together with the facts-a/-b branches it contains."
+
+- id: laese-facts-verify-2
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  depends_on: [laese-facts-c, laese-facts-d]
+  title: "independent verification of fact sheets: bakken, cykelsti, gaekkebrev, madspild, samsoe"
+  acceptance: "same as laese-facts-verify-1; VERIFY-2.md written"
+  notes: "Done: task/laese-facts-verify-2@af6e5a4 (51 facts: 49 CONFIRMED, 1 CHANGED, 1 UNCONFIRMED). PM spot-check: bakken.dk 'altid gratis entré' and supercykelstier.dk 244 km/16 ruter reproduce on raw pages. Next: tester format gate, then release."
 
 - id: laese-shell
   spec: laeseforstaaelse
@@ -190,40 +201,40 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
   type: data
   status: todo
   priority: P1
-  depends_on: [laese-shell, laese-facts-verify]
+  depends_on: [laese-shell, laese-facts-verify-1, laese-facts-verify-2]
   title: "Læseforståelse data-mc.js — art-dialekter, art-efterskole (art-ulven comes with the shell)"
   acceptance: "3 mc texts in total (--expect mc=3); written only from CONFIRMED facts of the fact sheets; validator exits 0; verify:true where unsure; no filler or clone-generators"
-  notes: "Allowed files: laeseforstaaelse/data-mc.js. Load .claude/skills/laese-text-authoring first."
+  notes: "ANGLE CORRECTIONS from verification (VERIFY-1/2.md win over the plan): art-ulven use only the VERIFY-1 Safe-to-use list, EU status is now only beskyttet, no biologist/L&F positions, state the year of every wolf figure; art-dialekter no causal why (DR 2015 gives only a researcher formodning), no i dag, sources 2015/2019/2024; art-efterskole use 238 schools (Aug 2025) not 234, 36,2 % is 10th grade only. Allowed files: laeseforstaaelse/data-mc.js. Load .claude/skills/laese-text-authoring first."
 
 - id: laese-data-skim
   spec: laeseforstaaelse
   type: data
   status: todo
   priority: P1
-  depends_on: [laese-mode-skim, laese-facts-verify]
+  depends_on: [laese-mode-skim, laese-facts-verify-1, laese-facts-verify-2]
   title: "Læseforståelse data-skim.js — haefte-kolonihave, haefte-rebildfest"
   acceptance: "2 hæfter, 8-10 notices of 1200-1800 chars each, 15 questions each, >= 3 near-miss pairs each; validator exits 0 with --expect skim=2; practical times and prices are exercise values and the footer says so"
-  notes: "Allowed files: laeseforstaaelse/data-skim.js."
+  notes: "ANGLE CORRECTIONS: haefte-rebildfest say only 1912 (not a date), no 56 ha (sources: ca. 80 ha / 200 acres / 140 tonder), Nixon only if a second source is added; haefte-kolonihave counts differ by scope (19.773 Danmarks Statistik 2024; ca. 62.000 lex.dk; knap 40.000 = Kolonihaveforbundet members), building/season rules are municipal not national, Risskov waiting list 8-10 years is from 2018. Allowed files: laeseforstaaelse/data-skim.js."
 
 - id: laese-data-insert
   spec: laeseforstaaelse
   type: data
   status: todo
   priority: P1
-  depends_on: [laese-mode-insert, laese-facts-verify]
+  depends_on: [laese-mode-insert, laese-facts-verify-1, laese-facts-verify-2]
   title: "Læseforståelse data-insert.js — art-samsoe, art-madspild"
   acceptance: "2 insert texts, 5 gaps and 7 blocks each, each gap note names the cohesion signal; validator exits 0 with --expect insert=2"
-  notes: "Allowed files: laeseforstaaelse/data-insert.js."
+  notes: "ANGLE CORRECTIONS: art-madspild drop the export angle (unsupported); use Stop Spild Af Mad 2008, Too Good To Go created in Denmark 2015, Wefood 2016; the 881.062 t figure is UNCONFIRMED. art-samsoe never say the island owns its turbines (2018 sale of 9 of 10 offshore turbines was announced and conditional); self-sufficiency year unresolved (2007 vs 2003); 70 % of 440 mio. kr. is a share of investment, 3700 is the island population. Allowed files: laeseforstaaelse/data-insert.js."
 
 - id: laese-data-cloze
   spec: laeseforstaaelse
   type: data
   status: todo
   priority: P1
-  depends_on: [laese-mode-cloze, laese-facts-verify]
+  depends_on: [laese-mode-cloze, laese-facts-verify-1, laese-facts-verify-2]
   title: "Læseforståelse data-cloze.js — art-bakken, art-cykelsti, art-gaekkebrev"
   acceptance: "3 cloze texts, 8 gaps each, >= 3 connector types each, markers {{1}}..{{8}} in order; validator exits 0 with --expect cloze=3"
-  notes: "Allowed files: laeseforstaaelse/data-cloze.js."
+  notes: "ANGLE CORRECTIONS: art-bakken 1583 is only the Kirsten Piil legend date (ifolge traditionen), free entry is a present-day fact with no start year, use 1,8 mio. visitors (2025, anslaet); art-cykelsti omit route lengths and the Cykelslangen length, 43 % (2025) vs 46 % (2024) are Copenhagen work/education trips; art-gaekkebrev 1770 is the oldest known letter, say ifolge en udbredt regel for the egg rule, palmesondag is a tradition. Allowed files: laeseforstaaelse/data-cloze.js."
 
 - id: laese-seo
   spec: laeseforstaaelse

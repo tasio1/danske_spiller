@@ -68,20 +68,24 @@ See `danish-grammar-qa`.
 - **insert:** each paragraph is placeable from a cohesion signal across the gap (a referring word, a time marker, a contrast); the two distractors fit the topic but break cohesion.
 - **cloze:** target connectors and adverbs; each gap has a `type` (`kontrast`, `konsekvens`, `praecisering`, `tilfoejelse`, `tid`); all four options are grammatically possible in the slot, so the choice is about meaning. Gap markers `{{1}}`…`{{8}}` appear in order, once each, inside `paragraphs`.
 
-## 8. Calibration text (the bar)
+## 8. Calibration text (style only, never facts)
+
+This text shows the bar for rhythm, concreteness and structure. **Do not copy its figures into a game text.** Every figure in a real text comes from the verified fact sheet, with the year it belongs to. (An earlier version of this calibration used a wolf count, an "agriculture demands a plan" claim and "strictly protected" status that the independent verification found stale or unsupported. It was rebuilt from CONFIRMED lines only.)
 
 > **Hvem skal betale for ulven?** · *Overblik · Natur*
 >
 > Ulven er tilbage. Det koster penge.
 >
-> I 2023 registrerede myndighederne 57 ulveangreb på husdyr, i 2024 var tallet 91, og i 2025 steg det til 239. Der blev udbetalt erstatning for 1.285 dræbte dyr, langt de fleste af dem får, og staten brugte mindst 36 millioner kroner på erstatninger og på tilskud til ulvesikre hegn.
+> I 2023 blev der registreret 57 ulveangreb på husdyr i Jylland. I 2024 var tallet 91, og i 2025 steg det til 239. Der blev givet erstatning for mindst 1.285 dræbte dyr, og langt de fleste var får.
 >
-> Tallene skal ses ved siden af bestanden. Den seneste overvågning fandt syv flokke, tre par og en enlig han. Regner man med syv ulve i hver flok, svarer det til omkring 49 dyr. Det er ikke en optælling, men et skøn.
+> Staten brugte mindst 36 millioner kroner på erstatninger og tilskud til ulvesikre hegn, og det var især hegnene, der kostede penge, fordi omkring 35 millioner af beløbet gik til dem.
 >
-> Fåreavlere oplever angrebene som en belastning, der ikke kan måles i kroner alene, fordi erstatningen hverken dækker vedligeholdelse af hegn eller den frygt, et angreb kan sætte i gang.
+> Hegnene hjælper ikke altid. I ti angreb i 2025 blev omkring 80 dyr dræbt bag hegn, som var i orden.
 >
-> Biologer peger på, at ulven er fredet i hele EU. Det betyder, at Danmark ikke bare kan beslutte at skyde den.
+> I foråret 2026 var der syv flokke med hvalpe, tre par uden hvalpe og en enlig han. Det er en foreløbig opgørelse.
 >
-> Landbrugets organisationer vil have en plan. De spørger, hvor mange ulve Danmark skal have, og hvem der skal bestemme det.
+> Ulvens status i EU er ændret. Siden 2025 er den ikke længere strengt beskyttet, men blot beskyttet.
+>
+> I august 2026 bad en landboforening om en plan for, hvor mange ulve Danmark skal have.
 
-Why it works: eight concrete figures, one trade-off as group positions, no people and no quotes, a 3-word sentence beside a 29-word one, no banned phrase, paragraphs of very different length. Its figures come from planning-stage searches and must be re-confirmed on the fact sheet before this text is shipped; the EU-protection sentence in particular is not yet backed by a fetched source.
+Why it works: each sentence carries a figure with its year, one trade-off, no people and no quotes, a 3-word sentence beside a 30-word one, no banned phrase, paragraphs of very different length. It is deliberately short; a real article runs 1.2-2.8 normalsider. Its figures are the CONFIRMED set of `docs/laeseforstaaelse/facts/art-ulven.md`; a newer ulveatlas status (August 2026: 11 kobler, at least 61 hvalpe) exists, so a real text must either use that or keep to spring 2026 consistently and say so.

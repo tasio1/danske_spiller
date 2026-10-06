@@ -166,6 +166,15 @@ function write(dir, files) {
 const good = { 'data.js': REGISTRY };
 for (const [m, a] of [['skim', SKIM], ['mc', MC], ['insert', INSERT], ['cloze', CLOZE]]) good[FILE[m][0]] = dataFile(m, a);
 write(path.join(HERE, 'good'), good);
+// A second good fixture: broad groups may speak, connectors may open a sentence next to a speech verb.
+{
+  const mc = clone(MC);
+  mc[0].id = 'fixture-grupper-mc';
+  mc[0].questions.forEach((q, i) => { q.id = `fixture-grupper-mc-q${i + 1}`; });
+  mc[0].paragraphs.splice(5, 0, 'Biologer peger på, at ulven er fredet i hele EU. Fåreavlere oplever angrebene som en belastning, og landbrugsorganisationerne mener, at erstatningen er for lav.');
+  mc[0].questions.forEach(q => { if (q.evidence >= 5) q.evidence += 1; });
+  write(path.join(HERE, 'good', 'broad-groups'), { 'data.js': REGISTRY, 'data-mc.js': dataFile('mc', mc) });
+}
 
 // ---------------------------------------------------------------- bad: one fault each, named after the rule
 const BASE = { skim: SKIM, mc: MC, insert: INSERT, cloze: CLOZE };
@@ -175,6 +184,9 @@ const t0 = a => a[0];
 const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
 
 def('banned-phrase', 'mc', a => { t0(a).paragraphs[9] += ' Alt i alt kan man sige, at valget er svært.'; });
+def('invented-speaker-midsentence', 'mc', a => { t0(a).paragraphs[4] += ' Udvalget talte længe, så Mette siger ja til forslaget.'; });
+def('invented-speaker-fullname', 'mc', a => { t0(a).paragraphs[4] += ' Jens Hansen forklarer, at prisen er rimelig.'; });
+def('invented-speaker-notice', 'skim', a => { t0(a).notices[0].body += ' Landbrug & Fødevarer mener, at vandforbud er for strenge.'; });
 def('capped-connector', 'mc', a => { t0(a).paragraphs[4] += ' Derudover er prisen lav.'; t0(a).paragraphs[8] += ' Derudover er forslaget omstridt.'; });
 def('quotation-mark', 'mc', a => { t0(a).paragraphs[7] += ' Politikerne kalder det »en mellemvej«.'; });
 def('byline', 'mc', a => { t0(a).byline = 'Af Mette Hansen'; });

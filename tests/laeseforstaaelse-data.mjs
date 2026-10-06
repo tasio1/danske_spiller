@@ -49,6 +49,28 @@ const wordCount = s => s.split(/\s+/).filter(Boolean).length;
 const firstWord = s => (nfc(s).match(/^[^\p{L}]*([\p{L}]+)/u) || [, ''])[1].toLowerCase();
 const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const phraseRe = p => new RegExp('(?<![\\p{L}])' + escRe(p).replace(/ /g, '\\s+') + '(?![\\p{L}])', 'giu');
+// Invented speakers (SKILL.md section 2). A capitalised run before a speech verb is a proper noun
+// (person or organisation): both are banned as speakers. Broad groups and connectors are allowed.
+const SPEECH = '(?:siger|sagde|fortæller|fortalte|mener|mente|slår fast|forklarer|oplyser|udtaler|påpeger|vurderer)';
+const SPEAKER_RE = new RegExp(String.raw`(?<![\p{L}])(\p{Lu}[\p{L}.-]*(?:(?: & | og | )\p{Lu}[\p{L}.-]*)*)\s+` + SPEECH + String.raw`(?![\p{L}])`, 'gu');
+const SPEAKER_OK = new Set(['man', 'det', 'der', 'de', 'den', 'vi', 'han', 'hun', 'jeg', 'du', 'ingen', 'nogen', 'alle', 'mange', 'flere',
+  'nogle', 'fåreavlere', 'biologer', 'forskere', 'eksperter', 'landbrugsorganisationerne',
+  // connectors and adverbs that open a sentence in running prose
+  ...OPENERS, 'faktisk', 'konkret', 'først', 'så', 'men', 'dog', 'nu', 'her', 'altså', 'måske', 'ofte', 'tidligere', 'senere', 'indtil', 'selvfølgelig', 'naturligvis']);
+function speakerHits(text) {
+  const out = { errors: [], warns: [] };
+  for (const sent of sentences(text)) {
+    const lead = sent.search(/\p{L}/u);
+    for (const m of sent.matchAll(SPEAKER_RE)) {
+      const run = m[1];
+      const words = run.split(/ & | og | /);
+      const initial = m.index <= lead;
+      if (!initial || words.length > 1) out.errors.push(run);
+      else if (!SPEAKER_OK.has(run.toLowerCase())) out.warns.push(run);
+    }
+  }
+  return out;
+}
 const isStr = v => typeof v === 'string' && v.trim().length > 0;
 const isInt = v => Number.isInteger(v);
 
@@ -122,6 +144,11 @@ function validate(dir, expect) {
     if (!Array.isArray(t.sources) || !t.sources.length) fail('missing-sources', id, 'sources[] is empty or missing');
     else for (const u of t.sources) if (typeof u !== 'string' || !/^https?:\/\/\S+$/.test(u)) fail('bad-source-url', id, `source is not an http(s) URL: ${u}`);
     if (t.verify !== undefined && typeof t.verify !== 'boolean') fail('verify-type', id, 'verify must be a boolean when present');
+    for (const txt of [...prose(t), ...(t.notices || []).map(n => n && n.body)].filter(x => typeof x === 'string')) {
+      const h = speakerHits(nfc(txt));
+      for (const r of h.errors) fail('invented-speaker', id, `"${r}" is a proper noun followed by a speech verb: no invented or named speakers`);
+      for (const r of h.warns) warn(id, `invented-speaker: "${r}" + speech verb at sentence start — check it is a broad group, not a person`);
+    }
 
     // banned phrases and capped connectors on everything the learner reads
     const paras = prose(t);
@@ -169,8 +196,6 @@ function validate(dir, expect) {
       const n = paras.filter(p => triple.test(p)).length;
       if (n * 2 >= paras.length) fail('triple-list', id, `${n} of ${paras.length} paragraphs hold an "A, B og C" list (max under half)`);
     }
-    if (/[A-ZÆØÅ][a-zæøå]+ (siger|fortæller|mener|slår fast)\b/.test(all.replace(/(^|[.!?]\s+)\S+/g, '$1')))
-      warn(id, 'looks like "<Navn> siger" — check there is no invented speaker');
     if (all.length < NORMALSIDE * 1.2) warn(id, `${all.length} chars — under 1.2 normalsider (${NORMALSIDE * 1.2})`);
     if (all.length > NORMALSIDE * 2.8) warn(id, `${all.length} chars — over 2.8 normalsider (${NORMALSIDE * 2.8})`);
   };
@@ -321,16 +346,17 @@ function selftest() {
   if (!goods.length) note(false, 'no good fixture found under tests/fixtures/laese/good');
   for (const g of goods) {
     const r = validate(g);
-    note(r.errors.length === 0, `good/${path.relative(goodRoot, g) || '.'} passes${r.errors.length ? ' but: ' + r.errors.map(fmt).join(' | ') : ''}`);
+    const sw = r.warns.filter(w => /invented-speaker/.test(w.msg));
+    note(r.errors.length === 0 && !sw.length, `good/${path.relative(goodRoot, g) || '.'} passes${r.errors.length ? ' but: ' + r.errors.map(fmt).join(' | ') : ''}${sw.length ? ' but speaker warning: ' + sw.map(w => w.msg).join(' | ') : ''}`);
   }
   const badRoot = path.join(FIXTURES, 'bad');
   const bads = subdirs(badRoot);
   for (const rule of REQUIRED_BAD) note(bads.includes(rule), `bad/${rule} fixture exists`);
   for (const rule of bads) {
     const r = validate(path.join(badRoot, rule));
-    const hit = r.errors.some(e => fmt(e).includes(`[${rule}]`));
-    const others = [...new Set(r.errors.map(e => e.rule).filter(x => x !== rule))];
-    note(r.errors.length > 0 && hit, `bad/${rule} fails with [${rule}]` +
+    const hit = r.errors.some(e => e.rule === rule || rule.startsWith(e.rule + '-'));   // dir may carry a suffix: invented-speaker-fullname
+    const others = [...new Set(r.errors.map(e => e.rule).filter(x => x !== rule && !rule.startsWith(x + '-')))];
+    note(r.errors.length > 0 && hit, `bad/${rule} fails with [${r.errors.map(e => e.rule).filter((x, i, a) => a.indexOf(x) === i).join(', ')}]` +
       (hit ? (others.length ? ` (also: ${others.join(', ')})` : '') : r.errors.length ? ` — but got: ${r.errors.map(fmt).join(' | ')}` : ' — but it PASSED'));
   }
   console.log(bad ? `\nselftest: ${bad} problem(s)` : `\nselftest: PASS (${goods.length} good, ${bads.length} bad fixtures)`);

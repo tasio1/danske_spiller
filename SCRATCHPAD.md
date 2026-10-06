@@ -175,3 +175,10 @@ This file is run *history + hand-off*. Never edit `prd.md` / `specs.md` because 
 - Next: Mark boejning-data as completed in PROGRESS.md; move to next task (saetning-game-1)
 
 <!-- APPEND NEW EVENTS BELOW THIS LINE -->
+
+### 2026-10-06 · decision · laeseforstaaelse
+- What: new game Læseforståelse specced (specs.md § laeseforstaaelse), text-authoring skill installed, 20 tasks (laese-*) appended to PROGRESS.md; user approved dispatching Wave 1
+- Result: ok
+- State left behind: master only; no task branch merged yet. Main checkout still on skill/danish-learning-articles (releaser needs master there before any merge)
+- Next: Wave 1 = laese-validator + laese-facts-a..d in parallel; laese-shell after the validator lands; then laese-facts-verify
+- Gotchas: shell depends on the validator (acceptance runs it); fact sheets are docs-only, tester checks format only, accuracy via laese-facts-verify + user spot-check

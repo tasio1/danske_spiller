@@ -14,22 +14,22 @@
       // Traceability: paragraph (1-based, = data-par) -> fact in docs/laeseforstaaelse/facts/art-ulven.md
       //   1 spring-2026 stock 7 flokke / 3 par / 1 enlig han, foreløbig: F6
       //   2 forårsbestand, start af overvågningsår: F6; syv ulve pr. flok: F7; years 2023-25 / 2025 / spring 2026: F1, F2, F5, F6
-      //   3 57 (2023), 91 (2024): F2; 239 (2025, Jylland): F1
+      //   3 57 (2023), 91 (2024): F2 (no scope stated, so none given); 239 (2025, scope i Jylland): F1
       //   4 1.239 får, 32 kreaturer, 5 heste, 8 geder, 1 vædder, i alt 1.285 (sum printed on the sheet): F3; mindst 1.285 dræbt: F4
       //   5 mindst 36 mio. kr. (erstatning + hegnstilskud): F5; omkring 35 mio. til hegn: F5 caveat; staten betaler hegn: F10
       //   6 omkring 80 dyr, ti angreb, bag hegn i orden (2025): F12; staten betaler: F10
-      //   7 strengt beskyttet -> beskyttet (2025): F8; bilag IV -> V: F9
+      //   7 strengt beskyttet -> beskyttet (2025): F8; bilag IV -> V (the change, no current-status claim): F9
       //   8 landboforening (unnamed) beder om en plan, august 2026: F11
       // Derived figures: none. Definitions (erstatning, tilskud, mindst) are plain vocabulary, not facts.
       paragraphs: [
         'Ulven lever igen i Danmark, og den sætter spor i regnskabet. I foråret 2026 var der syv flokke med hvalpe fra 2025, tre par uden hvalpe og en enlig han. Det er en foreløbig opgørelse, som kun er vejledende. Det betyder, at tallene kan ændre sig, når der kommer nye målinger.',
-        'Tallene skal læses med forsigtighed. Opgørelsen af bestanden viser foråret, ved starten af et nyt overvågningsår, så den er et øjebliksbillede og ikke et endeligt facit. Når bestanden gøres op, regner man med syv ulve for hver flok, men det er en regneregel, og den fortæller ikke sikkert, hvor mange ulve der reelt findes. Tallene hører også til forskellige år: angrebene er talt for 2023 til 2025, regningen gælder 2025, og bestanden er fra foråret 2026. Man kan derfor ikke lægge dem sammen til ét samlet tal.',
-        'Angrebene på husdyr er blevet flere. I 2023 blev der registreret 57 ulveangreb på husdyr i Jylland. Året efter var tallet 91, og i 2025 nåede det op på 239. Tallene stiger hurtigt.',
+        'Tallene skal læses med forsigtighed. Opgørelsen viser bestanden i foråret, ved starten af et nyt overvågningsår, så den er et øjebliksbillede og ikke et endeligt facit. Når bestanden gøres op, regner man med syv ulve for hver flok, men det er en regneregel, og den fortæller ikke sikkert, hvor mange ulve der reelt findes. Tallene hører også til forskellige år: angrebene er talt for 2023 til 2025, regningen gælder 2025, og bestanden er fra foråret 2026. Man kan derfor ikke lægge dem sammen til ét samlet tal.',
+        'Angrebene på husdyr er blevet flere. I 2023 blev der registreret 57 ulveangreb på husdyr. Året efter var tallet 91, og i 2025 blev der registreret 239 i Jylland. Tallene stiger hurtigt.',
         'Erstatningen følger dyrene. For 2025 blev der udbetalt kompensation for 1.239 får, 32 kreaturer, fem heste, otte geder og en vædder, i alt 1.285 dyr. Kompensation og erstatning betyder her det samme, nemlig penge for dyr, som ulve har dræbt. Tallet gælder dyr og ikke angreb, så de 1.285 dyr og de 239 angreb er to forskellige tal. Ulve dræbte altså mindst 1.285 husdyr i Danmark det år, og får udgør langt det meste af tallet, så det er især fåreholdere, der er ramt.',
         'Regningen har to dele. Erstatning er penge til dem, der har mistet dyr, og den kommer, når angrebet er sket. Tilskud til hegn er penge, der gives, for at nye angreb ikke sker. Sammen kostede de staten mindst 36 millioner kroner i 2025, og mindst betyder, at beløbet kan være højere. Det var hegnene, der tog det meste, for omkring 35 millioner kroner gik til dem. Staten betaler for at gøre et hegn ulvesikkert, så dyreholderen ikke selv skal bære den udgift.',
         'Et ulvesikkert hegn skal holde ulve ude af folden, men det er ingen garanti. I 2025 blev omkring 80 dyr, mest får og lam, dræbt bag hegn, der var i orden og virkede helt, som de skulle. Det skete i ti angreb, og der blev udbetalt erstatning for dyrene. Staten betaler dermed både for hegnene og for de dyr, som hegnene ikke redder.',
-        'Ulvens beskyttelse er også ændret. I 2025 sænkede EU ulvens status fra strengt beskyttet til beskyttet. Før stod ulven i bilag IV, og nu står den i bilag V i habitatdirektivet. Ulven er altså stadig beskyttet, men reglerne er ikke så stramme som før.',
-        'To ting står over for hinanden. Ulven har en beskyttet status, og samtidig betaler staten erstatninger og hegn. I august 2026 bad en landboforening om en plan for, hvor mange ulve Danmark skal have. Debatten handler altså om, hvor meget ulven må koste, og hvor mange ulve landet vil have. Både beskyttelsen og regningen kan ændre sig, så tallene i teksten viser kun, hvordan det så ud i 2025 og i foråret 2026.'
+        'Ulvens beskyttelse er også ændret. I 2025 sænkede EU ulvens status fra strengt beskyttet til beskyttet. Ændringen flytter ulven fra bilag IV til bilag V i habitatdirektivet. Ulven er altså stadig beskyttet, men reglerne er ikke så stramme som før.',
+        'To ting står over for hinanden. Ulven har en beskyttet status, og samtidig betaler staten erstatninger og hegn. I august 2026 bad en landboforening om en plan for, hvor mange ulve Danmark skal have. Debatten handler altså om, hvor meget ulven må koste, og hvor mange ulve landet vil have. Både beskyttelsen og regningen kan ændre sig, så tallene i teksten viser kun, hvordan det så ud fra 2023 til 2025 og i foråret 2026.'
       ],
       questions: [
         {

@@ -74,7 +74,7 @@ try {
               border-left: 2px solid var(--lf-rule); padding: 16px 20px 24px; background: var(--lf-paper); }
 
   /* Reading column: one measure, centred, system serif. */
-  .lf-text { max-width: 68ch; margin-inline: auto; font: var(--lf-fs)/1.65 Georgia, "Iowan Old Style", "Times New Roman", serif; }
+  .lf-text { max-width: 29em; margin-inline: auto; font: var(--lf-fs)/1.65 Georgia, "Iowan Old Style", "Times New Roman", serif; }
   .lf-kicker { margin: 0 0 4px; font: 700 .72em/1.4 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--lf-muted); }
   .lf-text h2 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
   .lf-text p { margin: 0 0 1em; position: relative; }
@@ -404,11 +404,11 @@ try {
     }
     DC.quiz.mc.render({ prompt: q.q, options: q.options, correct: q.options[q.correct] }, host, function (correct, option) {
       if (tok !== state.token) return;           // stale handler from a question we left
+      if (correct) a.next(800, tok);            // schedule the advance first: sound set-up must not delay it
       a.onAnswer(q.id, correct, null, q.options.indexOf(option));
       if (correct) {
         host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
         DC.ui.announce('Rigtigt.');
-        a.next(800, tok);
       } else {
         DC.ui.announce('Forkert. Rigtigt svar: ' + q.options[q.correct]);
         a.highlight(q.evidence);
@@ -476,6 +476,7 @@ try {
     syncStart(); $('btn-play').focus({ preventScroll: true });
   }
   function startPlay() {
+    try { DC.ui.sound.playCtx(); } catch (err) { /* sound is optional */ }   // build the AudioContext on the Spil gesture
     var texts = D.textsFor(state.mode, state.levels);
     if (!texts.length) { syncStart(); return; }
     var next = texts[0];

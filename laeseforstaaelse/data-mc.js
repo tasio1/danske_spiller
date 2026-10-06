@@ -16,7 +16,7 @@
         'Tallene skal læses med forsigtighed. De er foreløbige og vejledende, og de viser bestanden i foråret, ved starten af et nyt overvågningsår, så de er et øjebliksbillede og ikke et endeligt facit. Når bestanden gøres op, regner man med syv ulve for hver flok, men det er en regneregel, og den fortæller ikke, hvor mange ulve der reelt går rundt i de ti territorier.',
         'Angrebene på husdyr er blevet flere. I 2023 blev der registreret 57 ulveangreb på husdyr i Jylland. Året efter var tallet 91, og i 2025 nåede det op på 239. Tallene stiger hurtigt. Der var 148 flere angreb i 2025 end året før, og samlet er tallet mere end fire gange så højt som i 2023. Alle tre tal gælder registrerede angreb, ikke gæt på, hvor mange der er sket uden at blive meldt.',
         'Erstatningen følger dyrene. For 2025 blev der udbetalt kompensation for 1.239 får, 32 kreaturer, fem heste, otte geder og en vædder, i alt 1.285 dyr. Ulve dræbte altså mindst 1.285 husdyr i Danmark det år, og får udgør langt det meste af tallet. Mere end 96 procent af de dræbte dyr var får, så det er især fåreholdere, der mærker angrebene. Kreaturer, heste og geder fylder til sammen kun 46 af dyrene.',
-        'Regningen har to dele. Erstatning er penge til dem, der har mistet dyr, og den kommer, når angrebet er sket. Tilskud til hegn er penge, der gives, for at nye angreb ikke sker. Sammen kostede de staten mindst 36 millioner kroner i 2025. Det var hegnene, der tog det meste, for omkring 35 millioner kroner gik til dem. Staten betaler for at gøre et hegn ulvesikkert, så dyreholderen skal ikke selv bære den udgift.',
+        'Regningen har to dele. Erstatning er penge til dem, der har mistet dyr, og den kommer, når angrebet er sket. Tilskud til hegn er penge, der gives, for at nye angreb ikke sker. Sammen kostede de staten mindst 36 millioner kroner i 2025. Det var hegnene, der tog det meste, for omkring 35 millioner kroner gik til dem. Staten betaler for at gøre et hegn ulvesikkert, så dyreholderen ikke selv skal bære den udgift.',
         'Hegn er ingen garanti. I 2025 blev omkring 80 dyr, mest får og lam, dræbt bag hegn, der var i orden og virkede helt, som de skulle. Det skete i ti angreb, og der blev udbetalt erstatning for dyrene, selv om hegnet var i orden. Det giver i gennemsnit omkring otte dyr pr. angreb. Staten betaler dermed både for hegnene og for de dyr, som hegnene ikke redder.',
         'Ulvens beskyttelse er også ændret. I 2025 sænkede EU ulvens status fra strengt beskyttet til beskyttet. Før stod ulven i bilag IV, og nu står den i bilag V. Ændringen gælder habitatdirektivet, som er EU-reglerne for beskyttede arter og naturtyper. Ulven er altså stadig beskyttet, men reglerne er ikke så stramme som før.',
         'To ting står over for hinanden. Ulven har en beskyttet status, og samtidig betaler staten erstatninger og hegn. I august 2026 efterlyste landboforeningen Agillix en plan for, hvor stor en ulvebestand Danmark skal have. Både beskyttelsen og regningen kan ændre sig, så tallene i teksten viser kun, hvordan det så ud i 2025 og i foråret 2026.'
@@ -36,15 +36,15 @@
         },
         {
           id: 'art-ulven-q2',
-          q: 'Hvad kostede mest af statens udgifter til ulven i 2025?',
+          q: 'Hvad gik de fleste af de mindst 36 millioner kroner til, som staten brugte i 2025?',
           options: [
             'Tilskud til ulvesikre hegn',
             'Erstatning til ejerne af dræbte dyr',
-            'Overvågning af ulvene'
+            'Udgifter til at tælle ulvene'
           ],
           correct: 0,
           evidence: 4,
-          note: 'Omkring 35 af de mindst 36 millioner kroner gik til hegn; overvågning nævnes ikke som udgift.'
+          note: 'Omkring 35 af de mindst 36 millioner kroner gik til hegn; beløbet dækker kun erstatning og hegn.'
         },
         {
           id: 'art-ulven-q3',

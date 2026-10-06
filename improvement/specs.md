@@ -40,6 +40,7 @@ Examples:
 - **Sætningsmaskinen** may use word tiles, but must focus on subordinate clauses, questions, relative clauses and transformations rather than basic V2.
 - **Bøjningsværkstedet** may use noun gender, but must focus on full noun phrases, plurals, definiteness and adjective agreement rather than choosing only en or et.
 - **Skrivekontrollen** may contain connectors, but must test punctuation, clause boundaries and text correction rather than connector selection.
+- **Læseforståelse** may gap connectors and adverbs, but only inside a continuous 1.5-page text, scored per connector type; it must not drill connectors on isolated sentences (Konjunktion Crush, Forbindeord, Adverbier og bindeord). Full scope: `specs.md` § laeseforstaaelse.
 
 ---
 

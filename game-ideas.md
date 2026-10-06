@@ -1,207 +1,69 @@
-# Game ideas for Sjovt Dansk
+# Game ideas for Sjovt Dansk (grouped)
 
-Date: 2026-10-02. Researcher: game-researcher agent. Web tools worked (WebSearch + one WebFetch); source notes are marked per idea. Sources are search-result summaries unless marked "fetched".
+Date: 2026-10-06. Six bigger games with several modes each, plus one cross-game learning layer. Game F (Læseforståelse) already has a full implementation plan. Pronunciation ideas (stød, reduced speech, minimal pairs, soft d, shadowing, pronunciation pitfalls) were removed. Ideas that duplicate existing or planned games (Tidsmaskinen, Skrivekontrollen, Bøjningsværkstedet, Antonymer) were dropped: Vil/skal/kan, Find fejlen, Bestemt form-bygger, Du eller De, near-synonyms.
 
-**Existing games reviewed** (index.html, PROGRESS.md, improvement/specs.md): Danske Antonymer, Verb-glosekort, Magiske Verber, Præpositionsmester, Dansk Mester (hverdagsvendinger), En/Et-træner, Konjunktion Crush, Ordstillingsdetektiven (V2), Forbindeord, Idiomjægeren, Adverbier og bindeord, Bøjningsværkstedet, plus the improvement specs for Pronomenmysteriet, Sætningsmaskinen, Tidsmaskinen (tenses), Skrivekontrollen.
-
-**Gap analysis.** Nothing covers: numbers (halvfjerds, tres...), clock time (halv ti), compound words and fuge-s/-e, modal particles (jo, nok, vel), modal verb + bare infinitive, være/have auxiliary choice, listening to reduced speech, stød, false friends, dialogue situations. Every idea below avoids duplicating an existing primary mechanic.
-
-## Ranking
-
-| # | Name | Hook | Level | Effort | Score |
-|---|------|------|-------|--------|-------|
-| 1 | Klokken er halv ti | Set an analog clock to the Danish time phrase (and the reverse) | A1-A2 | S | 9.0 |
-| 2 | Halvfjerds! | Danish numbers: hear or read, type or pick the digit; vigesimal trap | A1-B1 | S | 8.6 |
-| 3 | Jo, nok, vel | Pick the modal particle that fits the speaker's stance | B1-C1 | M | 7.8 |
-| 4 | Hørt og forstået | Hear reduced speech ("haru"), choose the written phrase | A2-B2 | M | 7.4 |
-| 5 | Sammensat! | Build compounds from word tiles, choose -s-/-e-/0 joint | A2-C1 | M | 7.2 |
-| 6 | Vil, skal, kan | Modals: fill the gap with no "at"; vil vs skal; present vs past modal | A1-B1 | S | 7.0 |
-| 7 | Er eller har | Drag the participle to a bus of være or have | A2-B1 | S | 6.8 |
-| 8 | Fire i række | Danish Connections: 16 words, 4 hidden groups | A2-B2 | M | 6.5 |
-| 9 | Stødjægeren | Mor vs mord: choose the word with the stød (audio) | B1-C1 | M | 5.5 |
-| 10 | På caféen | Branching dialogue: pick the natural reply in a scene | A1-B1 | L | 5.2 |
-| 11 | Dagens ord | Daily Wordle-like five-letter Danish word, letter hints incl. æøå | A2-C1 | M | 5.0 |
-
-Score = (learning x fun x gap fit) / effort, own 1-10 judgement; not a measured value.
+Full earlier research, sources and risks: [game-ideas-raw.md](game-ideas-raw.md). All Danish examples need a native-speaker check; sources are search-result summaries.
 
 ---
 
-## 1. Klokken er halv ti (Danish clock time)
-**Pitch:** An analog pixel clock; read "halv ti" and set the hands, or see the clock and pick the phrase.
-- **Learning goal / level:** halv X means thirty minutes before X; kvart over / kvart i; fem minutter i/over halv. A1-A2 (up to B1 for 24h "klokken 21.30").
-- **Core loop:** 10 clocks per round. Mode A: tap a face to set hands via hour/minute steppers; Mode B: choose among 4 phrases. Trap distractors are the English reading (10:30 for halv ti). 2 minutes per round; wrong = show the hour-minus-one rule, replay TTS.
-- **Why it's fun:** Spatial, immediate, short. The halv trap is a documented pain point: Danes count toward the next hour, so "halv ti" is 9:30 and English speakers arrive an hour off. Sources: [elon.io halv-time mistake (fetched)](https://elon.io/grammar/danish/mistakes/halv-time), [Babbel](https://www.babbel.com/en/magazine/how-to-tell-time-in-danish).
-- **Data needed:** `{id, level, h, m, phrase, alt_accepted[], trap_phrase, note}`, about 120 items (all quarter and five-minute positions, with 12h and 24h forms). Items are generated from a rule table, then reviewed.
-- **Shared-library fit:** `quiz.mc`, `diff.check` (typed mode), `srs`, `tts`, `level`, `ui.sound`. The clock face is inline SVG.
-- **Risks:** Colloquial variants (halv ti vs "klokken ni tredive" in 24h; "fem over halv"). Keep one defensible phrase per item and accept alternates only where standard. Clock hands need keyboard steppers.
-- **Effort:** S
+## Game A – Tal og tid (A1–B1)
+*Numbers and clock time in one game; fills the biggest gap in the lineup.*
+- **Mode: Klokken** – set an analog clock to a Danish phrase, or read the clock and choose the phrase; trap is *halv ti* = 9:30; also *kvart over/i*. – [elon.io halv-time](https://elon.io/grammar/danish/mistakes/halv-time), [Babbel](https://www.babbel.com/en/magazine/how-to-tell-time-in-danish)
+- **Mode: Tal** – type the digits or pick the written word; boss levels for the base-20 numbers (*halvtreds, tres, halvfjerds, firs, halvfems*). – [learn-a-new-language.eu](https://learn-a-new-language.eu/en-learn-a-new-language/learn-danish/danish-numbers/), [Swap Language](https://swaplanguage.com/blog/is-danish-hard-to-learn/)
+- **Mode: Årstal og ordenstal** – years, ordinals, dates, prices. – [learn-a-new-language.eu](https://learn-a-new-language.eu/en-learn-a-new-language/learn-danish/danish-numbers/)
 
-## 2. Halvfjerds! (Danish numbers)
-**Pitch:** Race through numbers; the tricky vigesimal ones (halvtreds, tres, firs, halvfems) are the boss levels.
-- **Learning goal / level:** Numbers 1-100 then thousands, ordinals, years. A1 (1-20), A2 (to 100), B1 (years, large numbers, fractions).
-- **Core loop:** Round of 12 prompts. Hear a number (TTS) or see the word; type the digits or pick the written word. Distractors differ by the vigesimal trap (halvtreds 50 vs tres 60 vs halvfjerds 70). 90 s round, 3 lives optional.
-- **Why it's fun:** Fast arcade recognition with a numbers ladder. Pain point: Danish numbers become notorious after twenty because of the base-20 system; halvfjerds (70) is literally "three and a half twenties". Sources: [learn-a-new-language.eu](https://learn-a-new-language.eu/en-learn-a-new-language/learn-danish/danish-numbers/), [Swap Language](https://swaplanguage.com/blog/is-danish-hard-to-learn/); points and timed rounds modelled on [Clozemaster](https://www.clozemaster.com/blog/cloze-tests-spaced-repetition-faster-language-learning/).
-- **Data needed:** Generated by a function from 0-1000 plus curated lists (years, ordinals): `{id, level, n, word, ordinal?, note}`; about 150 curated items, rest generated.
-- **Shared-library fit:** `tts` (central, listen mode), `quiz.mc/freeText`, `diff.normalize` (digits, spaces), `srs`, `level`.
-- **Risks:** Browser Danish TTS may be missing; the silent fallback means listening mode needs a text-only fallback. Old forms (enogtyve vs enogtyvende) accepted only in standard spelling. Digit-to-word generator must be unit tested.
-- **Effort:** S
+## Game B – Ordværkstedet (A2–C1)
+*Vocabulary structure: how words are built and which words go together. No synonym/antonym items.*
+- **Mode: Sammensat** – build compounds from tiles and pick the joint (-s-/-e-/none): *bogreol, krigsskib*. – [Informationsordbogen](https://www.informationsordbogen.dk/concept_comment.php?cid=5193), [The Local DK](https://www.thelocal.dk/20260121/grammar-guide-when-to-use-compound-words-in-danish)
+- **Mode: Faste vendinger** – match verb and noun partner (*tage et bad, stille et spørgsmål, holde ferie*); type the missing word of a chunk. – [Chunking in L2](https://files.eric.ed.gov/fulltext/EJ1457275.pdf), [Lexical chunks meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC9379275/)
+- **Mode: Falske venner** – look-alike words (*gift, mad, bad, fabrik, eventuelt, aktuel*); choose the meaning in a sentence. – [elon.io false friends](https://elon.io/grammar/danish/mistakes/false-friends), [Wiktionary appendix](https://en.wiktionary.org/wiki/Appendix:False_friends_between_Danish_and_English)
+- **Mode: Fire i række** – 16 words, four hidden groups; categories limited to semantic fields, word families and shared compound parts (not synonyms/antonyms). – [Connections-style games](https://www.summerengine.com/blog/games-like-wordle)
 
-## 3. Jo, nok, vel (modal particles)
-**Pitch:** A short exchange with a gap; pick the particle that matches what the speaker assumes.
-- **Learning goal / level:** jo (shared knowledge), da (reassure/soften), vel (expects agreement), nok (probably/insistence), bare, lige. B1-C1.
-- **Core loop:** Scenario card (two speech bubbles + a one-line context in Danish, short English gloss on request); 4 particle choices; 10 cards per round. Wrong = show the nuance in one line. 3 minutes.
-- **Why it's fun:** Like a visual-novel "read the room" micro-quiz. Learning value is high because particle-free Danish sounds blunt and robotic. Sources: [pronuncia.io](https://pronuncia.io/learn/da/nuances-of-danish-modal-particles), [elon.io: jo](https://elon.io/grammar/danish/pragmatics/jo).
-- **Data needed:** `{id, level, context, line_a, line_b_with_gap, options[4], correct, note}`, about 80 items.
-- **Shared-library fit:** `quiz.mc`, `tts` (replay full line), `srs`, `level`.
-- **Risks:** HIGH grammar-ambiguity risk. Several particles often fit. Apply the `danish-grammar-qa` "one defensible answer" test: design contexts that exclude all but one, include a native-speaker review, avoid sgu. Mark as needing native review before release.
-- **Effort:** M
+## Game C – Diktatstudiet (A2–C1)
+*Writing and spelling from listening (production, not recognition). Listening supports the text; no pronunciation scoring.*
+- **Mode: Skriv det du hørte** – TTS plays a sentence, the learner types it; word-boundary and spelling errors are marked. – [Dictation and listening research](https://files.eric.ed.gov/fulltext/EJ1479870.pdf)
+- **Mode: Diktoglos** – hear a short text twice, then rebuild it from keywords or tiles. – [Dictogloss and multiword items](https://journals.sagepub.com/doi/10.1177/13621688221117242)
+- **Mode: Dagens ord** – daily Wordle-style word with æ, ø, å for spelling practice. – [Games like Wordle](https://prowritingaid.com/games-like-wordle)
 
-## 4. Hørt og forstået (reduced speech listening)
-**Pitch:** Hear a fast chunk ("haru"), pick what was actually said.
-- **Learning goal / level:** Decode reductions and fusions: har du, det er, jeg ved ikke, schwa-dropped endings. A2-B2.
-- **Core loop:** TTS plays a phrase (slow replay allowed once); choose one of 4 written phrases; 10 per round. After each answer, show the "slow" and "fast" spelled forms side by side.
-- **Why it's fun:** "What did they say?" listening puzzles, a staple of listening-comprehension apps. Documented problem: Danish reduces unstressed syllables and fuses function words ("har du" becomes one chunk), so learners listening for two words miss it. Sources: [elon.io function-word reductions](https://elon.io/grammar/danish/pronunciation/function-word-reductions), [elon.io schwa and reduction](https://elon.io/grammar/danish/pronunciation/schwa-and-reduction), [language-lab.io](https://language-lab.io/blog/how-long-to-learn-danish/).
-- **Data needed:** `{id, level, text, options[4], correct, reduction_note, minimal_pair?}`, about 100 phrases. No audio files needed, only TTS.
-- **Shared-library fit:** `tts` is the core mechanic; `quiz.mc`, `srs`, `ui.announce`.
-- **Risks:** Offline TTS speed/voice varies by device and may not reduce naturally (synthetic speech tends to articulate carefully), so the game's premise depends on voice quality. NOT VERIFIED. Accessibility: needs a visible-text alternative for deaf/hard-of-hearing users (a "show text" mode that turns it into a reading game). Static audio would break the no-assets policy.
-- **Effort:** M
+## Game D – Læs stemningen (B1–C1)
+*Pragmatics: what the speaker means and what to say in a situation.*
+- **Mode: Jo, nok, vel** – pick the modal particle that fits the speaker's stance in a short exchange (needs native review; several particles can fit). – [pronuncia.io](https://pronuncia.io/learn/da/nuances-of-danish-modal-particles), [elon.io: jo](https://elon.io/grammar/danish/pragmatics/jo)
+- **Mode: På caféen** – branching scenes (café, læge, bus, bank); pick the natural reply. Must avoid reusing Dansk Mester's greeting/small-talk content. – [Duolingo gamification overview](https://dev.to/pocket_linguist/why-duolingos-gamification-works-and-when-it-doesnt-1d4)
 
-## 5. Sammensat! (compound-word builder)
-**Pitch:** Snap word tiles into compounds and choose the glue letter: bogreol, børnetøj, aftensmad, krigsskib.
-- **Learning goal / level:** Compound formation, gender of the compound (from the last element), fuge-s/-e/0. A2 (simple), B1-C1 (fuge and long compounds).
-- **Core loop:** Given a picture-emoji-free definition ("et skib til krig") build the compound from tiles, including a joint tile (-, s, e). 8 per round, 3 minutes. Wrong = show the rule or mark as "lexical, must be learned".
-- **Why it's fun:** Tile assembly (like Scrabble-lite) plus the joy of long words. Fuge rules are admittedly unclear ("speakers are rarely in doubt"), so lean on the strong rule: -s- when the first part is itself a compound (rødvinsglas). Sources: [Informationsordbogen](https://www.informationsordbogen.dk/concept_comment.php?cid=5193), [The Local DK compound guide](https://www.thelocal.dk/20260121/grammar-guide-when-to-use-compound-words-in-danish), [DanishClass101](https://www.danishclass101.com/lesson/danish-teachers-answer-your-questions-9-what-is-compounding-in-danish).
-- **Data needed:** `{id, level, parts[], joint, compound, gender, definition, distractors[]}`, about 150 compounds.
-- **Shared-library fit:** `quiz.tiles`, `diff.check`, `nouns.js` for gender (reuse noun data), `srs`, `tts`.
-- **Risks:** Fuge has exceptions (fodboldbane, kunstbogklub per the Informationsordbogen note); only include items with a single attested form from Den Danske Ordbog; ambiguous compounds with variants must be excluded.
-- **Effort:** M
+## Game F – Læseforståelse (B1–B2) — **planned, see plan**
+*Reading comprehension in the format of Prøve i Dansk 3, over 20 original Danish texts about Denmark. Full plan: [docs/superpowers/plans/2026-10-06-laeseforstaaelse.md](docs/superpowers/plans/2026-10-06-laeseforstaaelse.md)*
+- **Mode: Find oplysningen** – scan a booklet of 8–10 short practical notices on one theme and answer 15 fact-finding questions against the clock. – [PD3 structure](https://danskogproever.dk/sprogcenter/danskproever/om-proeve-i-dansk-3-pd3-indhold-og-niveau/)
+- **Mode: Læs og vælg** – one argumentative article, 3 multiple-choice questions; a wrong answer highlights the paragraph holding the evidence. – [PD3 structure](https://danskogproever.dk/sprogcenter/danskproever/om-proeve-i-dansk-3-pd3-indhold-og-niveau/)
+- **Mode: Sæt afsnittet ind** – five paragraphs removed from an article, seven offered; place them back by following the cohesion signals. – [PD3 structure](https://danskogproever.dk/sprogcenter/danskproever/om-proeve-i-dansk-3-pd3-indhold-og-niveau/)
+- **Mode: Det manglende ord** – eight connectors and adverbs removed (contrast, consequence, clarification); choose from four. – [PD3 structure](https://sprogskolen.kolding.dk/proever/proeve-i-dansk-3)
+- **Mode: Eksamenstilstand** – all four parts in the real order and time budget, with a per-part breakdown and no pass/fail claim.
+- **Texts (20, all newly written, facts sourced):** wolves returned to Jutland, bornholmsk dying while sønderjysk survives, Rebildfesten's 4 July since 1912, allotment gardens and their ten-year waiting lists, the island ferry and depopulation, food waste as a Danish export, Samsø owning its own turbines, Christiania after Pusher Street, conscription opened to women, Bakken as the world's oldest amusement park, bison on Bornholm, Janteloven, efterskole, cash disappearing, cycle superhighways, gækkebreve, fredagsbar, the pant system, the Wadden Sea's black sun, and a language-centre course catalogue.
 
-## 6. Vil, skal, kan (modal verbs)
-**Pitch:** Fix the sentence builder: modals take no "at", and vil is not just "will".
-- **Learning goal / level:** Modal + bare infinitive, vil vs skal for the future, present vs past modal (ville/skulle), word order with modals. A1-B1.
-- **Core loop:** Sentence with a gap; choose or type; 10 items per round with a lives bar. Wrong = rule note + TTS replay.
-- **Why it's fun:** Rapid gap-fill with a mistake-catching twist: some items have a spurious "at" to remove. Documented common errors: "jeg vil at gå", and translating English "will" as vil when skal is needed. Sources: [lenguia.com B1 mistakes](https://www.lenguia.com/grammar/danish/b1), [Denmark&Me modal verbs](https://denmarkandme.com/newsletter/level-up-your-danish-with-modal-verbs/), [elon.io modals](https://elon.io/grammar/danish/verbs/modals-overview).
-- **Data needed:** `{id, level, sentence, options[], correct, accepted[], note, error_type}`, about 120 items.
-- **Shared-library fit:** `quiz.mc/freeText`, `diff`, `verbs.js` (reuse forms), `srs` pattern keys by error_type.
-- **Risks:** Overlap with Magiske Verber (verb forms) and Tidsmaskinen (tenses); differentiate by focusing on modal meaning, not bøjning. Future vil/skal has dialect nuance, so pick clear contexts only.
-- **Effort:** S
-
-## 7. Er eller har (auxiliary choice)
-**Pitch:** Sort verb participles onto the være bus or the have bus before the timer ends.
-- **Learning goal / level:** Perfect auxiliary: change of place/state takes være (er gået), others have (har spist); verbs that take both with a meaning difference. A2-B1.
-- **Core loop:** A sentence frame falls from the top; tap/press 1 or 2 (være / have) or drag; 20 items per round; streak multiplier; 3 misses ends the round.
-- **Why it's fun:** Falling-item sorter (runner/tetris-light) with two lanes, instant feedback. Pain point: "Jeg er gået hjem" not "har gået" (change-of-location verbs take være). Source: [lenguia.com B1 mistakes](https://www.lenguia.com/grammar/danish/b1).
-- **Data needed:** `{id, level, verb, participle, aux, sentence, note}`; `verbs.js` already has `perfect_auxiliary` and `participle`, so most data exists (about 200 verbs), plus 60 curated sentences for dual-auxiliary cases.
-- **Shared-library fit:** `verbs.js`, `quiz`, `srs`, `ui.sound`, `tts`.
-- **Risks:** Possible overlap with Magiske Verber and Tidsmaskinen perfect mode (check their modes before building). Dual-auxiliary verbs (er/har fløjet) must be marked ambiguous or dropped. Falling animation must respect reduced-motion (use steps, or a non-falling card).
-- **Effort:** S
-
-## 8. Fire i række (Danish Connections)
-**Pitch:** 16 words, four hidden groups: find the groups of four without four mistakes.
-- **Learning goal / level:** Semantic fields, word families, same-prefix words, synonyms and antonyms, words with same verb particle. A2-B2.
-- **Core loop:** Select four tiles and submit; correct groups lock and reveal the category; four mistakes end the round; about 3-4 minutes; each puzzle is hand-authored.
-- **Why it's fun:** Borrowed directly from NYT Connections, where categories are deliberately misleading and lateral. Sources: [summerengine games-like-wordle](https://www.summerengine.com/blog/games-like-wordle), [beebom games like Wordle](https://beebom.com/puzzle/games-like-wordle/).
-- **Data needed:** `{id, level, groups:[{name, words[4]}x4]}`, 40 puzzles (640 words); can reuse antonyms CSV.
-- **Shared-library fit:** `ui` (focus/announce, sound), `tts` per tile, `srs` at puzzle level, `level`, new tile-grid code (not in `quiz.tiles`).
-- **Risks:** Authoring effort and ambiguity (a word fitting two groups is the game, but must have one valid solution; needs solver check in `validate.js`). Colour-only group feedback fails a11y, so add group labels and icons. Partial overlap with Danske Antonymer par-spil.
-- **Effort:** M
-
-## 9. Stødjægeren (stød minimal pairs)
-**Pitch:** Two spellings, one audio: does the word have stød?
-- **Learning goal / level:** Hear the difference between words distinguished by stød (mor / mord, hun / hund). B1-C1.
-- **Core loop:** TTS plays a word; pick which of two spellings was said; 10 per round; quick follow-up shows the stød notation (e.g. hund[ˀ]).
-- **Why it's fun:** Detective audio-discrimination, pairs with the existing detective branding. Stød is regarded as among the hardest parts of Danish pronunciation, and it is never written. Sources: [Wikipedia: Stød](https://en.wikipedia.org/wiki/St%C3%B8d), [Remitly](https://www.remitly.com/blog/education/danish-phonology-guide/).
-- **Data needed:** `{id, level, word_a, word_b, audio_target, note}`, about 50 pairs.
-- **Shared-library fit:** `tts`, `quiz.mc`, `srs`.
-- **Risks:** HIGH. Browser TTS may not produce stød reliably, so the core feature may fail; this idea cannot ship without testing real voices (NOT VERIFIED) or recorded audio, which breaks the file:// no-asset rule unless embedded as base64. Ranked low for that reason.
-- **Effort:** M
-
-## 10. På caféen (dialogue situations)
-**Pitch:** A pixel-scene conversation; choose the natural reply to move the story on.
-- **Learning goal / level:** Situational Danish (café, læge, bus, bank) and register (du/De, politeness). A1-B1.
-- **Core loop:** A 6-8 turn branching scene; each turn pick one of 3 replies; the best path earns coins, odd replies lead to comic outcomes; 4 minutes.
-- **Why it's fun:** Text-adventure/visual-novel style; borrows the "situations" idea common to language apps. Overlap risk with Dansk Mester (hverdagsvendinger), so differentiate by branching play and the consequences. Source for mechanic: [Duolingo gamification overview](https://dev.to/pocket_linguist/why-duolingos-gamification-works-and-when-it-doesnt-1d4).
-- **Data needed:** Scene graph `{id, level, scene, nodes:[{id, npc_line, replies:[{text, next, quality}]}]}`, 20 scenes, about 160 nodes.
-- **Shared-library fit:** `tts`, `quiz.mc`-like renderer, `srs` per scene, `level`, `ui`.
-- **Risks:** Largest content effort; several replies may be acceptable, so "quality" scoring is subjective and risks the one-defensible-answer rule; needs native review.
-- **Effort:** L
-
-## 11. Dagens ord (daily Wordle-like)
-**Pitch:** One Danish word a day, six tries, with a keyboard that includes æ, ø, å.
-- **Learning goal / level:** Spelling and vocabulary incl. æøå, doubled consonants, silent letters. A2-C1 by word list.
-- **Core loop:** Guess a 5-letter word; green/yellow/grey feedback plus pattern colourblind markers; max 6 tries; once per day (date seeded), or practice mode; 3 minutes.
-- **Why it's fun:** Wordle's constrained, fast deduction loop. Source: [prowritingaid games like Wordle](https://prowritingaid.com/games-like-wordle), [beebom Spelling Bee vs Wordle](https://beebom.com/puzzle/spelling-bee-vs-wordle/).
-- **Data needed:** `{id, level, word, gloss_en, example_da}`, about 400 answer words plus an accepted-guess list of ~3000 (large; or accept only the answer list).
-- **Shared-library fit:** `store` (daily streak), `diff`, `level`, `tts`; custom keyboard.
-- **Risks:** The valid-guess dictionary is large and the date-seeded daily word has no server, so answers are predictable; a weak language-learning payoff compared with the other ideas (guessing rewards letter patterns, not meaning). Low priority.
-- **Effort:** M
+## Game E – Er eller har (add as a mode to Tidsmaskinen, not a new game)
+- **Mode: Auxiliary choice** – sort participles into *være* or *have* (*er gået* vs *har spist*); data already exists as `perfect_auxiliary` in the shared verbs. Check against Tidsmaskinen's "Datid eller perfektum?" before building. – [lenguia.com B1 mistakes](https://www.lenguia.com/grammar/danish/b1)
 
 ---
 
-## Top 3 recommendation
-1. **Klokken er halv ti**: Smallest build, clearest unmet gap, a documented trap, and a satisfying visual loop.
-2. **Halvfjerds!**: Pairs naturally with #1 (could ship as one "Tal og tid" game with two modes), is data-light because items are generated, and exercises TTS.
-3. **Vil, skal, kan**: Cheap to build from existing verb data and aimed at the most-cited learner error; build the more content-sensitive Jo, nok, vel only after a native-speaker review is secured.
+## Learning layer for all games (features, not games)
+Add these to the shared library once; every game then benefits.
+- **Hvor sikker er du?** – confidence slider; confident wrong answers get a highlighted correction and return sooner in SRS. – [Hypercorrection effect](https://www.researchgate.net/publication/11641193_Errors_Committed_with_High_Confidence_Are_Hypercorrected)
+- **Min fejlbank** – a drill built from the player's own mistakes, with a retest after correction. – [Benefits of experiencing errors](https://link.springer.com/article/10.3758/s13423-021-02022-8)
+- **Gæt først (forprøve)** – guess unseen items before a lesson, then get feedback. – [Pretesting effect](https://pmc.ncbi.nlm.nih.gov/articles/PMC12292081/)
+- **Skriv først, se bagefter** – typed recall before options in flashcard-style games (Verb-glosekort, Antonymer). – [Retrieval formats and L2 vocabulary](https://www.researchgate.net/publication/294443124_Effects_of_retrieval_formats_on_second_language_vocabulary_learning), [Generation effect](https://files.eric.ed.gov/fulltext/EJ1473311.pdf)
+- **Dagens repetition** – one screen listing what is due across all games (1/3/7/21-day intervals). – [Spaced practice meta-analysis](https://www.researchgate.net/publication/358406370_The_Effects_of_Spaced_Practice_on_Second_Language_Learning_A_Meta-Analysis)
+- **Blandet træning** – a mixed session across games; blocked first, then interleaved. – [Interleaved spaced repetition](https://callej.org/index.php/journal/article/view/87), [Interleaving guide](https://wordbyword.io/en/blog/interleaving-language-learning)
 
-## Sources
-Used (search results; only the elon.io halv-time page was fetched in full):
-1. https://elon.io/grammar/danish/mistakes/halv-time (fetched)
-2. https://www.babbel.com/en/magazine/how-to-tell-time-in-danish
-3. https://learn-a-new-language.eu/en-learn-a-new-language/learn-danish/danish-numbers/
-4. https://swaplanguage.com/blog/is-danish-hard-to-learn/
-5. https://www.clozemaster.com/blog/cloze-tests-spaced-repetition-faster-language-learning/
-6. https://pronuncia.io/learn/da/nuances-of-danish-modal-particles
-7. https://elon.io/grammar/danish/pragmatics/jo
-8. https://elon.io/grammar/danish/pronunciation/function-word-reductions
-9. https://elon.io/grammar/danish/pronunciation/schwa-and-reduction
-10. https://language-lab.io/blog/how-long-to-learn-danish/
-11. https://www.informationsordbogen.dk/concept_comment.php?cid=5193
-12. https://www.thelocal.dk/20260121/grammar-guide-when-to-use-compound-words-in-danish
-13. https://www.danishclass101.com/lesson/danish-teachers-answer-your-questions-9-what-is-compounding-in-danish
-14. https://www.lenguia.com/grammar/danish/b1
-15. https://denmarkandme.com/newsletter/level-up-your-danish-with-modal-verbs/
-16. https://elon.io/grammar/danish/verbs/modals-overview
-17. https://www.summerengine.com/blog/games-like-wordle
-18. https://beebom.com/puzzle/games-like-wordle/
-19. https://beebom.com/puzzle/spelling-bee-vs-wordle/
-20. https://prowritingaid.com/games-like-wordle
-21. https://en.wikipedia.org/wiki/St%C3%B8d
-22. https://www.remitly.com/blog/education/danish-phonology-guide/
-23. https://dev.to/pocket_linguist/why-duolingos-gamification-works-and-when-it-doesnt-1d4
+---
+
+## Suggested order
+1. Game A – Tal og tid (small, clearest gap, data mostly generated)
+2. Learning layer (shared, boosts all 14+ games)
+3. Game F – Læseforståelse (biggest build — ~150.000 characters of Danish to write — but the only game aimed at an exam learners actually sit; plan is ready)
+4. Game B – Ordværkstedet (start with Sammensat and Faste vendinger)
+5. Game C – Diktatstudiet
+6. Game D – Læs stemningen (last; needs native review)
 
 ## NOT VERIFIED
-- Danish browser TTS quality, speed and stød/reduction fidelity (ideas 2, 4, 9).
-- Overlap of ideas 6 and 7 with the exact modes of Magiske Verber / Tidsmaskinen (only skimmed).
-- All Danish example items need a native-speaker check; scores are own judgement.
-- Search-result summaries were used for most claims; only one page was fetched.
-
----
-
-## Round 2 – learning-focused ideas
-
-Date: 2026-10-06. Sources are web-search result summaries only (no pages fetched); the pedagogy claims are as summarised there. Danish example items still need a native check. None repeat ideas 1-11 above.
-
-- **Skriv det du hørte (diktat)** – TTS plays a short sentence, the learner types it; `diff` marks the spelling and word-boundary errors. Trains listening, spelling and grammar together (production, not recognition). – [Dictation and listening research](https://files.eric.ed.gov/fulltext/EJ1479870.pdf)
-- **Diktoglos-mini** – Hear a 2-3 sentence text twice, then rebuild it from tiles or from keywords. Learns multiword chunks through reconstruction. – [Dictation and dictogloss for multiword items](https://journals.sagepub.com/doi/10.1177/13621688221117242)
-- **Sig det selv (genkaldelse først)** – Every new word is first shown only as an English or picture cue, and the learner types the Danish form before choosing from options. Productive recall gives better productive knowledge and spelling. – [Effects of retrieval formats on L2 vocabulary](https://www.researchgate.net/publication/294443124_Effects_of_retrieval_formats_on_second_language_vocabulary_learning)
-- **Skriv først, se bagefter** – Typed-answer mode in which the Danish word is hidden until the learner has attempted it; recognition is used only for the final review. Produces the generation effect. – [Generation and L2 vocabulary learning](https://files.eric.ed.gov/fulltext/EJ1473311.pdf)
-- **Gæt først (forprøven)** – Before a lesson, the learner guesses 5 unseen words or forms, and gets corrective feedback afterwards. Errors made before teaching improve later retention. – [Pretesting effect](https://pmc.ncbi.nlm.nih.gov/articles/PMC12292081/)
-- **Hvor sikker er du?** – Add a confidence slider (sikker / usikker) to any quiz; confident wrong answers get a highlighted correction and come back sooner in `srs`. Uses the hypercorrection effect. – [Errors committed with high confidence are hypercorrected](https://www.researchgate.net/publication/11641193_Errors_Committed_with_High_Confidence_Are_Hypercorrected)
-- **Min fejlbank** – An error notebook generated from the player's own mistakes; a short drill built from error types (e.g. wrong en/et, wrong word order) with a retest after the error is fixed. – [Benefits of experiencing errors during learning](https://link.springer.com/article/10.3758/s13423-021-02022-8)
-- **Blandet træning (interleaving)** – A mixed-format session that combines items from the existing games (articles, prepositions, tenses) in a random order after basic familiarity. Trains discrimination among concepts. – [Interleaved spaced repetition and vocabulary](https://callej.org/index.php/journal/article/view/87)
-- **Blokeret eller blandet?** – A mode switch: first a blocked run (one rule) to see the pattern, then an interleaved run to choose the right rule. – [Interleaving language learning guide](https://wordbyword.io/en/blog/interleaving-language-learning)
-- **Lange pauser (spredt repetition)** – A scheduler screen that shows what is due today across all games with 1/3/7/21-day intervals. Spacing improves long-term L2 retention. – [Spaced practice meta-analysis](https://www.researchgate.net/publication/358406370_The_Effects_of_Spaced_Practice_on_Second_Language_Learning_A_Meta-Analysis)
-- **Faste vendinger (kollokationer)** – Match a verb to its noun partner (tage et bad, stille et spørgsmål, holde ferie). Trains collocations as chunks rather than single words. – [Chunking in the second language](https://files.eric.ed.gov/fulltext/EJ1457275.pdf)
-- **Hele sætningen (chunk-kloning)** – Remove one word from a high-frequency chunk (Hvad hedder du?), with the learner typing the chunk from memory. Chunk instruction improved fluency in a meta-analysis. – [Lexical chunks and formulaic language](https://pmc.ncbi.nlm.nih.gov/articles/PMC9379275/)
-- **Falske venner** – Contrast pairs of lookalike words (gift, mad, bad, fabrik, eventuelt, aktuel), choosing the correct meaning in a sentence. Noticing and contrast against English. – [False friends with English (elon.io)](https://elon.io/grammar/danish/mistakes/false-friends) and [Wiktionary appendix](https://en.wiktionary.org/wiki/Appendix:False_friends_between_Danish_and_English)
-- **Minimale par: hun eller hund** – Discrimination drill with immediate feedback and many words, mixing voices and rates if the device has several Danish voices. High-variability perception training. – [HVPT meta-analysis](https://www.cambridge.org/core/journals/studies-in-second-language-acquisition/article/high-variability-phonetic-training-hvpt-a-metaanalysis-of-l2-perceptual-training-studies/6ABB8C1F32D88D53EA8D05A4565E76F6) (feasibility with browser TTS NOT VERIFIED)
-- **Bløde d'er** – Hear or read words and decide whether the d is hard or soft (mad, glad, dag, hedder). Targets a documented pronunciation error. – [Pronouncing every d the same (elon.io)](https://elon.io/grammar/danish/mistakes/hard-soft-d)
-- **Skygge mig (shadowing)** – A listen-then-repeat loop with visible text and a self-rating (jeg sagde det rigtigt / næsten / ikke endnu). Noticing the sound-spelling gap; production practice without speech recognition. – [Dictation, shadowing and noticing](https://files.eric.ed.gov/fulltext/EJ1240717.pdf)
-- **Find fejlen i min danske sætning** – Spot and fix the error in a typical learner sentence (a missing definite suffix, a V2 slip, "jeg vil at gå"). Error detection with an explanation after each item. – [8 common Danish grammar mistakes](https://linguasteps.com/languages/learn-danish/8-common-danish-grammar-mistakes-and-how-to-fix-them)
-- **Bestemt form-bygger** – Attach the definite suffix to the noun (bog to bogen, hus to huset, and plural -ene), typed rather than chosen. Production of a feature that English speakers often skip. – [Common errors in Danish grammar (Fluenttansk)](https://fluentdansk.com/grammar_theory/common-errors-in-danish-grammar-and-how-to-avoid-them/)
-- **Du eller De?** – Choose the right register (du/De, titles, venligst) for a situation. Trains pragmatic correctness and avoids sounding too formal. – [Being too formal (elon.io)](https://elon.io/grammar/danish/mistakes/too-formal)
-- **Udtale-faldgruber** – Quick mispronunciation-spotting drill using TTS and respelling hints for common English-speaker errors. – [Pronunciation pitfalls for English speakers (elon.io)](https://elon.io/grammar/danish/pronunciation/common-mispronunciations)
-- **Ordbog over mine ord (Clozemaster-stil)** – Cloze sentences ordered by word frequency, typed answers, spaced repetition and a review queue. – [Clozemaster cloze + spaced repetition](https://www.clozemaster.com/blog/cloze-tests-spaced-repetition-faster-language-learning/)
-- **Forskelle mellem ord med samme betydning** – Show 2 near-synonyms (se/kigge, tale/snakke, glemme/miste) and ask which fits each sentence. Contrast learning to prevent overgeneralisation. – [Noticing hypothesis](https://en.wikipedia.org/wiki/Noticing_hypothesis)
-
-Round 2 caveats: the research pages are cited for the general pedagogy only (not specific effect sizes); source pages were not fetched. Several items (minimale par, bløde d'er, skygge mig) depend on browser Danish TTS quality (NOT VERIFIED). Items that extend existing games (Hvor sikker er du?, Min fejlbank, Lange pauser, Blandet træning) are cross-cutting features rather than new games. "Forskelle mellem ord" examples need native review.
+- Browser Danish TTS availability and quality (Games A listening, C).
+- Overlap with Tidsmaskinen and Skrivekontrollen is judged from their specs; their folders are not built yet.
+- Native-speaker check of all Danish examples.

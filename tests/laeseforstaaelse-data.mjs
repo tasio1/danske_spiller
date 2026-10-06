@@ -29,34 +29,52 @@ const BANNED = [
   'det er vigtigt at bemærke', 'det er værd at nævne',
   'spiller en afgørende rolle', 'en central del af', 'i takt med at samfundet'
 ];
-const CAPPED = ['derudover', 'endvidere', 'ligeledes'];            // max 1 per text
+const CAPPED = ['derudover', 'endvidere', 'ligeledes'];            // max ONE in total per text, across all three
 const OPENERS = new Set(['derudover', 'endvidere', 'ligeledes', 'desuden', 'samtidig', 'dermed', 'derfor',
   'imidlertid', 'således', 'herudover', 'yderligere', 'ydermere', 'tilmed', 'alligevel', 'dertil', 'hermed', 'følgelig']);
 const GENRES = ['forklaring', 'reportage', 'overblik', 'baggrund'];
 const GAP_TYPES = ['kontrast', 'konsekvens', 'praecisering', 'tilfoejelse', 'tid'];
 const NORMALSIDE = 2400;
-const QUOTES = /["»«„“”]/;
-// Rules every selftest run must have a bad fixture for.
-const REQUIRED_BAD = ['banned-phrase', 'quotation-mark', 'byline', 'gap-count', 'unknown-block',
-  'marker-order', 'duplicate-id', 'missing-sources', 'notice-length', 'option-count'];
+// Quotation marks of any kind. A lone apostrophe inside a word (Anders' bil) is allowed; a quoted span ('ville') is not.
+const QUOTE_CHARS = /["»«„“”‘‚‹›]/;
+const QUOTE_SPAN = /(?<![\p{L}\p{N}])['’][^'’\n]{1,80}?['’](?![\p{L}\p{N}])/u;
+const hasQuote = s => QUOTE_CHARS.test(s) || QUOTE_SPAN.test(s);
+// Every rule tag that has a bad fixture. Selftest fails if any of them loses its fixture
+// (a bad/<dir> matches a tag when its name equals the tag or starts with "<tag>-").
+const REQUIRED_BAD = ['accepted', 'bad-source-url', 'banned-phrase', 'block-count', 'block-length', 'byline', 'byline-in-text',
+  'capped-connector', 'cloze-type', 'connector-openings', 'connector-types', 'corpus-global', 'correct-range', 'dash-summary',
+  'digits', 'duplicate-id', 'duplicate-options', 'evidence-range', 'gap-count', 'gap-order', 'genre', 'invented-speaker', 'kicker',
+  'level', 'load-error', 'marker-order', 'missing-file', 'missing-sources', 'notice-count', 'notice-digits', 'notice-length',
+  'notice-ref', 'option-count', 'paragraph-variance', 'question-count', 'quotation-mark', 'sentence-variance', 'triple-list',
+  'unknown-block', 'verify-type'];
 
 // ---------- text helpers
-const nfc = s => String(s == null ? '' : s).normalize('NFC');
+// NFC, zero-width characters removed and non-breaking spaces made ordinary, so none of them can hide a phrase.
+const nfc = s => String(s == null ? '' : s).normalize('NFC').replace(/[​‌‍⁠﻿]/g, '').replace(/[   ]/g, ' ');
 const ABBR = /\b(kl|ca|nr|f\.eks|bl\.a|m\.fl|osv|mv|dvs|jf|tlf|evt|inkl|pr|st|kr)\./gi;
 const sentences = s => nfc(s).replace(ABBR, m => m.slice(0, -1) + '\u0001')
   .split(/(?<=[.!?])\s+(?=[A-ZÆØÅ0-9{])/).map(x => x.replace(/\u0001/g, '.').trim()).filter(Boolean);
 const wordCount = s => s.split(/\s+/).filter(Boolean).length;
 const firstWord = s => (nfc(s).match(/^[^\p{L}]*([\p{L}]+)/u) || [, ''])[1].toLowerCase();
 const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const phraseRe = p => new RegExp('(?<![\\p{L}])' + escRe(p).replace(/ /g, '\\s+') + '(?![\\p{L}])', 'giu');
+const phraseRe = (p, flags = 'iu') => new RegExp('(?<![\\p{L}])' + escRe(p).replace(/ /g, '\\s+') + '(?![\\p{L}])', flags);
+// One alternation compiled once: a single pass per string (18 separate lookbehind regexes were the slowest part).
+const BANNED_ALL = new RegExp(String.raw`(?<![\p{L}])(?:` + BANNED.map(b => escRe(b).replace(/ /g, String.raw`\s+`)).join('|') + String.raw`)(?![\p{L}])`, 'giu');
+const CAPPED_RE = CAPPED.map(c => phraseRe(c, 'giu'));
+const memoStr = fn => { const m = new Map(); return s => { if (!m.has(s)) m.set(s, fn(s)); return m.get(s); }; };
+const bannedIn = memoStr(s => [...new Set([...s.matchAll(BANNED_ALL)].map(m => m[0].toLowerCase().replace(/\s+/g, ' ')))]);
+const cappedIn = memoStr(s => CAPPED_RE.reduce((m, re) => m + (s.match(re) || []).length, 0));
 // Invented speakers (SKILL.md section 2). A capitalised run before a speech verb is a proper noun
 // (person or organisation): both are banned as speakers. Broad groups and connectors are allowed.
 const SPEECH = '(?:siger|sagde|fortæller|fortalte|mener|mente|slår fast|forklarer|oplyser|udtaler|påpeger|vurderer)';
 const SPEAKER_RE = new RegExp(String.raw`(?<![\p{L}])(\p{Lu}[\p{L}.-]*(?:(?: & | og | )\p{Lu}[\p{L}.-]*)*)\s+` + SPEECH + String.raw`(?![\p{L}])`, 'gu');
 const SPEAKER_OK = new Set(['man', 'det', 'der', 'de', 'den', 'vi', 'han', 'hun', 'jeg', 'du', 'ingen', 'nogen', 'alle', 'mange', 'flere',
   'nogle', 'fåreavlere', 'biologer', 'forskere', 'eksperter', 'landbrugsorganisationerne',
+  'hvad', 'hvem', 'hvordan', 'hvorfor', 'hvornår', 'hvilken', 'hvilke', 'hvilket', 'hvor',
   // connectors and adverbs that open a sentence in running prose
   ...OPENERS, 'faktisk', 'konkret', 'først', 'så', 'men', 'dog', 'nu', 'her', 'altså', 'måske', 'ofte', 'tidligere', 'senere', 'indtil', 'selvfølgelig', 'naturligvis']);
+// A capitalised run right after a preposition (Folk i Nordjylland siger, I Nordjylland siger man) is a place or body, not a speaker.
+const PREPS = new Set(['i', 'på', 'fra', 'til', 'ved', 'af', 'for', 'med', 'hos', 'om', 'mod', 'under', 'over']);
 function speakerHits(text) {
   const out = { errors: [], warns: [] };
   for (const sent of sentences(text)) {
@@ -65,48 +83,57 @@ function speakerHits(text) {
       const run = m[1];
       const words = run.split(/ & | og | /);
       const initial = m.index <= lead;
+      const before = (sent.slice(0, m.index).match(/(\p{L}+)\s*$/u) || [, ''])[1].toLowerCase();
+      if (PREPS.has(before) || (words.length > 1 && PREPS.has(words[0].toLowerCase()))) continue;
       if (!initial || words.length > 1) out.errors.push(run);
       else if (!SPEAKER_OK.has(run.toLowerCase())) out.warns.push(run);
     }
   }
   return out;
 }
+const speakersIn = memoStr(speakerHits);
 const isStr = v => typeof v === 'string' && v.trim().length > 0;
 const isInt = v => Number.isInteger(v);
 
 // The prose a reader sees, with cloze markers filled by the correct option and
-// insert blocks that solve a gap included. Distractor blocks are not part of the text.
-function prose(t) {
+// insert blocks that solve a gap included. Distractor blocks are left out of the length/variance
+// statistics (they are not part of the article) but proseAll() keeps every block for content rules.
+function prose(t, allBlocks) {
   let paras = Array.isArray(t.paragraphs) ? t.paragraphs.filter(p => typeof p === 'string') : [];
   if (t.mode === 'cloze' && Array.isArray(t.gaps)) {
-    paras = paras.map(p => p.replace(/\{\{(\d+)\}\}/g, (m, n) => {
+    paras = paras.map(p => p.replace(/\{\{([1-9]\d*)\}\}/g, (m, n) => {
       const g = t.gaps[+n - 1];
       return g && Array.isArray(g.options) && typeof g.options[g.correct] === 'string' ? g.options[g.correct] : m;
     }));
   }
-  if (t.mode === 'insert' && Array.isArray(t.blocks) && t.solution && typeof t.solution === 'object') {
-    const used = new Set(Object.values(t.solution));
-    paras = paras.concat(t.blocks.filter(b => b && used.has(b.id) && typeof b.text === 'string').map(b => b.text));
+  if (t.mode === 'insert' && Array.isArray(t.blocks)) {
+    const used = new Set(t.solution && typeof t.solution === 'object' ? Object.values(t.solution) : []);
+    paras = paras.concat(t.blocks.filter(b => b && (allBlocks || used.has(b.id)) && typeof b.text === 'string').map(b => b.text));
   }
   return paras;
 }
+const proseAll = t => prose(t, true);
 
 // ---------- loading
+const SANDBOX = { window: null, console };
+const SCRIPTS = new Map();                    // compiled scripts by source text (fixtures share data.js)
+const ctx = vm.createContext(SANDBOX);
 function load(dir) {
   const errors = [];
+  let names; try { names = new Set(fs.readdirSync(dir)); } catch (e) { names = new Set(); }
   const win = {}; win.window = win;
-  const ctx = vm.createContext({ window: win, console });
+  SANDBOX.window = win;                       // one shared context (creating one per fixture is the slow part); only window is swapped
   const run = (f) => {
-    const p = path.join(dir, f);
-    try { vm.runInContext(fs.readFileSync(p, 'utf8'), ctx, { filename: p, timeout: 1000 }); return true; }
+    const p = path.join(dir, f); const src = fs.readFileSync(p, "utf8");
+    try { let sc = SCRIPTS.get(src); if (!sc) SCRIPTS.set(src, sc = new vm.Script(src, { filename: p })); sc.runInContext(ctx, { timeout: 1000 }); return true; }
     catch (e) { errors.push({ rule: 'load-error', id: f, msg: `failed to load: ${e.message}` }); return false; }
   };
   for (const m of MODES) {
     const [f, g] = CORPUS[m];
-    if (!fs.existsSync(path.join(dir, f))) continue;               // corpus arrives task by task
+    if (!names.has(f)) continue;               // corpus arrives task by task
     if (run(f) && !Array.isArray(win[g])) errors.push({ rule: 'corpus-global', id: f, msg: `window.${g} is not an array after loading ${f}` });
   }
-  if (!fs.existsSync(path.join(dir, REGISTRY))) {
+  if (!names.has(REGISTRY)) {
     errors.push({ rule: 'missing-file', id: REGISTRY, msg: `missing data file: ${REGISTRY} (looked in ${dir})` });
     return { DATA: null, errors };
   }
@@ -144,20 +171,30 @@ function validate(dir, expect) {
     if (!Array.isArray(t.sources) || !t.sources.length) fail('missing-sources', id, 'sources[] is empty or missing');
     else for (const u of t.sources) if (typeof u !== 'string' || !/^https?:\/\/\S+$/.test(u)) fail('bad-source-url', id, `source is not an http(s) URL: ${u}`);
     if (t.verify !== undefined && typeof t.verify !== 'boolean') fail('verify-type', id, 'verify must be a boolean when present');
-    for (const txt of [...prose(t), ...(t.notices || []).map(n => n && n.body)].filter(x => typeof x === 'string')) {
-      const h = speakerHits(nfc(txt));
+    for (const k of ['byline', 'author', 'forfatter']) if (t[k] !== undefined) fail('byline', id, `"${k}" is not allowed: no invented authors`);
+
+    // Everything the learner can read: article text (cloze filled, EVERY insert block incl. distractors),
+    // notices, titles, question texts and all answer options. Accepted answers get quote/banned checks only.
+    const notices = Array.isArray(t.notices) ? t.notices.filter(Boolean) : [];
+    const qs = Array.isArray(t.questions) ? t.questions.filter(Boolean) : [];
+    const body = proseAll(t);
+    const strs = a => a.filter(x => typeof x === 'string').map(nfc);
+    const optionsOf = o => (o && Array.isArray(o.options) ? o.options : []);
+    const proseStrs = strs([t.title, t.kicker, ...body, ...notices.flatMap(n => [n.heading, n.body])]);
+    const askStrs = strs([...qs.map(q => q.q), ...qs.flatMap(optionsOf), ...(Array.isArray(t.gaps) ? t.gaps.filter(Boolean).flatMap(optionsOf) : [])]);
+    const ansStrs = strs(qs.flatMap(q => (Array.isArray(q.accepted) ? q.accepted : [])));
+
+    if ([...proseStrs, ...askStrs, ...ansStrs].some(hasQuote)) fail('quotation-mark', id, 'quotation marks are not allowed anywhere in a text (" » « „ “ ” ‘ ‚ ‹ › or a quoted span)');
+    const bylineRe = /^\s*Af\s+(?:\p{Lu}[\p{L}-]+(?:\s+\p{Lu}[\p{L}-]+)+|\p{Lu}[\p{L}-]+\s*[,.]?\s*$)/u;
+    for (const s of strs([...body, ...notices.map(n => n.body)])) if (bylineRe.test(s)) fail('byline-in-text', id, `a paragraph or notice starts like a byline: "${s.slice(0, 40)}"`);
+
+    for (const s of [...proseStrs, ...askStrs, ...ansStrs]) for (const b of bannedIn(s)) fail('banned-phrase', id, `banned phrase: "${b}"`);
+    const capped = proseStrs.reduce((n, s) => n + cappedIn(s), 0);
+    if (capped > 1) fail('capped-connector', id, `Derudover/Endvidere/Ligeledes used ${capped} times in total, max 1 per text`);
+    for (const s of [...proseStrs, ...askStrs]) {
+      const h = speakersIn(s);
       for (const r of h.errors) fail('invented-speaker', id, `"${r}" is a proper noun followed by a speech verb: no invented or named speakers`);
       for (const r of h.warns) warn(id, `invented-speaker: "${r}" + speech verb at sentence start — check it is a broad group, not a person`);
-    }
-
-    // banned phrases and capped connectors on everything the learner reads
-    const paras = prose(t);
-    const readable = [t.title, t.kicker || '', ...paras, ...(t.notices || []).flatMap(n => [n && n.heading, n && n.body]),
-      ...(t.questions || []).map(q => q && q.q)].filter(s => typeof s === 'string').map(nfc).join('\n');
-    for (const b of BANNED) if (phraseRe(b).test(readable)) fail('banned-phrase', id, `banned phrase: "${b}"`);
-    for (const c of CAPPED) {
-      const n = (readable.match(phraseRe(c)) || []).length;
-      if (n > 1) fail('capped-connector', id, `"${c}" used ${n} times, max 1`);
     }
   };
 
@@ -167,11 +204,6 @@ function validate(dir, expect) {
     if (!isStr(t.kicker)) fail('kicker', id, 'missing kicker (genre label + topic, e.g. "Overblik · Natur")');
     else if (!/^\S.* · \S/.test(t.kicker)) fail('kicker', id, `kicker should read "<Genre> · <Emne>", got "${t.kicker}"`);
     if (!GENRES.includes(t.genre)) fail('genre', id, `genre must be one of ${GENRES.join('|')}, got ${t.genre}`);
-    for (const k of ['byline', 'author', 'forfatter']) if (t[k] !== undefined) fail('byline', id, `"${k}" is not allowed: no invented authors`);
-
-    const quoted = [t.title, t.kicker, ...(t.paragraphs || []), ...(t.blocks || []).map(b => b && b.text)].filter(s => typeof s === 'string');
-    if (quoted.some(s => QUOTES.test(s))) fail('quotation-mark', id, 'quotation marks are not allowed in article text (" » « „ “ ”)');
-
     const paras = prose(t);
     const all = paras.join(' ');
     const sents = paras.flatMap(sentences);
@@ -295,8 +327,8 @@ function validate(dir, expect) {
         const gaps = Array.isArray(t.gaps) ? t.gaps : [];
         if (gaps.length !== 8) fail('gap-count', id, `${gaps.length} gaps, needs exactly 8`);
         const joined = (Array.isArray(t.paragraphs) ? t.paragraphs : []).join('\n');
-        const markers = (joined.match(/\{\{\d+\}\}/g) || []).map(m => +m.slice(2, -2));
-        const stray = (joined.replace(/\{\{\d+\}\}/g, '').match(/\{\{|\}\}/g) || []).length;
+        const markers = (joined.match(/\{\{[1-9]\d*\}\}/g) || []).map(m => +m.slice(2, -2));
+        const stray = (joined.replace(/\{\{[1-9]\d*\}\}/g, '').match(/\{\{|\}\}/g) || []).length;
         const want = Array.from({ length: gaps.length }, (_, i) => i + 1);
         if (markers.join(',') !== want.join(',') || stray) fail('marker-order', id, `gap markers are [${markers}] but must be {{1}}..{{${gaps.length}}} in order, once each, inside paragraphs${stray ? ' (malformed marker found)' : ''}`);
         for (const g of gaps) {
@@ -319,6 +351,12 @@ function validate(dir, expect) {
     });
   }
   return { errors, warns, counts };
+}
+
+// --expect=skim,mc,insert,cloze : exactly four plain non-negative integers, nothing blank.
+function parseExpect(v) {
+  const parts = String(v).split(',');
+  return parts.length === 4 && parts.every(p => /^\d+$/.test(p)) ? parts.map(Number) : null;
 }
 
 // ---------- reporting
@@ -351,10 +389,14 @@ function selftest() {
   }
   const badRoot = path.join(FIXTURES, 'bad');
   const bads = subdirs(badRoot);
-  for (const rule of REQUIRED_BAD) note(bads.includes(rule), `bad/${rule} fixture exists`);
+  for (const rule of REQUIRED_BAD) note(bads.some(d => d === rule || d.startsWith(rule + '-')), `bad/${rule}[-*] fixture exists`);
+  for (const v of ['', '1,,1,1', '1,1,1', '1,1,1,1,1', 'a,1,1,1', '1,-1,1,1', '1, ,1,1']) note(parseExpect(v) === null, `--expect=${v} is rejected`);
+  note(parseExpect('1,0,2,10') !== null, '--expect=1,0,2,10 is accepted');
   for (const rule of bads) {
     const r = validate(path.join(badRoot, rule));
-    const hit = r.errors.some(e => e.rule === rule || rule.startsWith(e.rule + '-'));   // dir may carry a suffix: invented-speaker-fullname
+    // A dir may carry a suffix (invented-speaker-fullname); its tag is the longest required tag it matches (byline-in-text, not byline).
+    const tag = REQUIRED_BAD.filter(t => rule === t || rule.startsWith(t + '-')).sort((x, y) => y.length - x.length)[0] || rule;
+    const hit = r.errors.some(e => e.rule === tag);
     const others = [...new Set(r.errors.map(e => e.rule).filter(x => x !== rule && !rule.startsWith(x + '-')))];
     note(r.errors.length > 0 && hit, `bad/${rule} fails with [${r.errors.map(e => e.rule).filter((x, i, a) => a.indexOf(x) === i).join(', ')}]` +
       (hit ? (others.length ? ` (also: ${others.join(', ')})` : '') : r.errors.length ? ` — but got: ${r.errors.map(fmt).join(' | ')}` : ' — but it PASSED'));
@@ -369,10 +411,10 @@ const arg = k => (args.find(a => a.startsWith(`--${k}=`)) || '').slice(k.length 
 if (args.includes('--selftest')) process.exit(selftest());
 const dir = path.resolve(process.cwd(), arg('dir') || path.join(ROOT, 'laeseforstaaelse'));
 let expect;
-if (arg('expect')) {
-  expect = arg('expect').split(',').map(Number);
-  if (expect.length !== 4 || expect.some(n => !Number.isInteger(n) || n < 0)) {
-    console.log('FAIL [usage] --expect must be four integers: skim,mc,insert,cloze');
+if (args.some(a => a === '--expect' || a.startsWith('--expect='))) {
+  expect = parseExpect(arg('expect'));
+  if (!expect) {
+    console.log('FAIL [usage] --expect must be four plain integers: skim,mc,insert,cloze');
     process.exit(1);
   }
 }

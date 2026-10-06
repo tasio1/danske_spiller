@@ -154,7 +154,7 @@ const REGISTRY = `// FIXTURE — stand-in for the game's data.js registry; only 
 })();
 `;
 const FILE = { skim: ['data-skim.js', 'LAESE_SKIM'], mc: ['data-mc.js', 'LAESE_MC'], insert: ['data-insert.js', 'LAESE_INSERT'], cloze: ['data-cloze.js', 'LAESE_CLOZE'] };
-const dataFile = (mode, arr) => `// FIXTURE — invented test material for tests/laeseforstaaelse-data.mjs, not game content.\nwindow.${FILE[mode][1]} = ${JSON.stringify(arr, null, 2)};\n`;
+const dataFile = (mode, arr) => `// FIXTURE — invented test material for tests/laeseforstaaelse-data.mjs, not game content.\nwindow.${FILE[mode][1]} = ${JSON.stringify(arr, null, 2).replace(/[​-‍⁠﻿ ]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'))};\n`;
 
 function write(dir, files) {
   fs.rmSync(dir, { recursive: true, force: true });
@@ -174,6 +174,15 @@ write(path.join(HERE, 'good'), good);
   mc[0].paragraphs.splice(5, 0, 'Biologer peger på, at ulven er fredet i hele EU. Fåreavlere oplever angrebene som en belastning, og landbrugsorganisationerne mener, at erstatningen er for lav.');
   mc[0].questions.forEach(q => { if (q.evidence >= 5) q.evidence += 1; });
   write(path.join(HERE, 'good', 'broad-groups'), { 'data.js': REGISTRY, 'data-mc.js': dataFile('mc', mc) });
+}
+// Third good fixture: a place or body after a preposition is not a speaker; a word-internal apostrophe is not a quote.
+{
+  const mc = clone(MC);
+  mc[0].id = 'fixture-steder-mc';
+  mc[0].questions.forEach((q, i) => { q.id = `fixture-steder-mc-q${i + 1}`; });
+  mc[0].paragraphs.splice(5, 0, "Folk i Nordjylland siger, at de vil have flere stier. Mange i Danmark mener det samme, og de fleste i Aarhus mener, at pladsen er knap. I Nordjylland siger man ofte, at vejret bestemmer, hvor mange der cykler. Flertallet i Folketinget mener, at staten skal betale en del af regningen. Aarhus' havn er trang.");
+  mc[0].questions.forEach(q => { if (q.evidence >= 5) q.evidence += 1; });
+  write(path.join(HERE, 'good', 'place-names'), { 'data.js': REGISTRY, 'data-mc.js': dataFile('mc', mc) });
 }
 
 // ---------------------------------------------------------------- bad: one fault each, named after the rule
@@ -231,6 +240,31 @@ def('sentence-variance', 'mc', a => {
   // no sentence reaches 25 words once every clause is its own sentence
   t0(a).paragraphs = t0(a).paragraphs.map(p => p.replace(/, (\p{L})/gu, (m, c) => '. ' + c.toUpperCase()));
 });
+
+
+// ---- learner-visible text outside the plain paragraphs (V1-V8)
+def('banned-phrase-distractor', 'insert', a => { t0(a).blocks[1].text += ' Alt i alt kan man sige, at det er dyrt.'; });
+def('invented-speaker-distractor', 'insert', a => { t0(a).blocks[5].text += ' Peter Hansen mener, at det er dyrt.'; });
+def('capped-connector-distractor', 'insert', a => { t0(a).blocks[1].text += ' Derudover er det dyrt.'; t0(a).paragraphs[0] += ' Derudover er det dyrt.'; });
+def('quotation-mark-distractor', 'insert', a => { t0(a).blocks[5].text += ' Det kaldes »skolevejen«.'; });
+def('banned-phrase-option', 'mc', a => { t0(a).questions[0].options[1] = 'Sammenfattende 70 meter'; });
+def('banned-phrase-cloze-option', 'cloze', a => { t0(a).gaps[0].options[0] = 'Sammenfattende'; });
+def('banned-phrase-title', 'mc', a => { t0(a).title = 'Sammenfattende om cyklen'; });
+def('banned-phrase-accepted', 'skim', a => { t0(a).questions[0].accepted.push('Alt i alt kan man sige 1. maj'); });
+def('banned-phrase-zerowidth', 'mc', a => { t0(a).paragraphs[9] += ' Sammen​fattende er det dyrt.'; });
+def('banned-phrase-nbsp', 'mc', a => { t0(a).paragraphs[9] += ' Alt i alt kan man sige, at det er dyrt.'; });
+def('quotation-mark-skim', 'skim', a => { t0(a).notices[2].body += ' Svar »tak« til formanden.'; });
+def('quotation-mark-skim-heading', 'skim', a => { t0(a).notices[0].heading = '"Vanding"'; });
+def('quotation-mark-skim-answer', 'skim', a => { t0(a).questions[0].accepted.push('"den 1. maj"'); });
+def('quotation-mark-curly', 'mc', a => { t0(a).paragraphs[7] += ' Det er en ‘mellemvej’ for byen.'; });
+def('quotation-mark-angle', 'mc', a => { t0(a).paragraphs[7] += ' Det er en ‹mellemvej› for byen.'; });
+def('quotation-mark-apostrophe', 'mc', a => { t0(a).paragraphs[7] += " Det er en 'mellemvej' for byen."; });
+def('quotation-mark-option', 'mc', a => { t0(a).questions[0].options[2] = '"50 meter"'; });
+def('byline-skim', 'skim', a => { t0(a).byline = 'Af Mette Hansen'; });
+def('byline-in-text', 'mc', a => { t0(a).paragraphs[0] = 'Af Jens Hansen, journalist. ' + t0(a).paragraphs[0]; });
+def('byline-in-text-notice', 'skim', a => { t0(a).notices[3].body = 'Af Mette Hansen, formand. ' + t0(a).notices[3].body; });
+def('capped-connector-mixed', 'mc', a => { t0(a).paragraphs[4] += ' Derudover er prisen lav.'; t0(a).paragraphs[8] += ' Endvidere er forslaget omstridt.'; });
+def('marker-order-leading-zero', 'cloze', a => { const t = t0(a); t.paragraphs = t.paragraphs.map(p => p.replace('{{8}}', '{{08}}')); });
 
 for (const [rule, [mode, fn]] of Object.entries(bad)) {
   const arr = clone(BASE[mode]);

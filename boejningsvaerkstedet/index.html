@@ -11,6 +11,14 @@
 <meta property="og:url" content="https://sjovtdansk.dk/boejningsvaerkstedet/index.html" />
 <meta property="og:locale" content="da_DK" />
 <link rel="canonical" href="https://sjovtdansk.dk/boejningsvaerkstedet/index.html" />
+<link rel="icon" href="../shared/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../shared/icons/favicon-36.png" type="image/png" sizes="36x36" />
+<link rel="apple-touch-icon" href="../shared/icons/apple-touch-icon.png" />
+<meta property="og:image" content="https://sjovtdansk.dk/shared/icons/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sjovt Dansk: lær dansk ved at spille. Pølle-maskotten i pixelstil." />
+<meta name="twitter:card" content="summary_large_image" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -372,8 +380,6 @@
 <div class="shell">
   <header class="topbar">
     <div class="brand">Bøjningsværkstedet</div>
-    <button class="icon-btn" id="btn-dark" type="button" aria-label="Skift mørk tilstand" title="Mørk tilstand">MØRK</button>
-    <button class="icon-btn" id="btn-sound" type="button" aria-label="Slå lyd til eller fra" title="Lyd">LYD</button>
   </header>
 
   <!-- ================= START SCREEN ================= -->
@@ -500,8 +506,7 @@
 
   // ---- init settings ----
   DC.ui.darkMode.init();
-  DC.ui.sound.init(prefs.get('sound') !== false);
-  syncSoundIcon();
+  DC.ui.sound.init(true);   // US-040: mute lives in the shared bar (dc:sound-enabled)
 
   // restore last mode/levels if present
   var savedMode = prefs.get('mode');
@@ -512,16 +517,6 @@
     if (!state.levels.length) state.levels = LEVELS.slice();
   }
 
-  document.getElementById('btn-dark').addEventListener('click', function(){ DC.ui.darkMode.toggle(); });
-  document.getElementById('btn-sound').addEventListener('click', function(){
-    var on = DC.ui.sound.toggle();
-    prefs.set('sound', on);
-    syncSoundIcon();
-    if (on) SOUND.select();
-  });
-  function syncSoundIcon(){
-    document.getElementById('btn-sound').textContent = DC.ui.sound.isEnabled() ? 'LYD' : 'LYD ✗';
-  }
 
   // US-030: reset only this game's SRS progress, after a Danish confirmation.
   // Storage failures are swallowed by DC.store; confirm() failures count as "cancel".
@@ -1473,5 +1468,6 @@
   if (window.Sjovt) window.Sjovt.watchScreens('#start-screen, #play-screen, #summary-screen');
 })();
 </script>
+<nav class="sd-next" aria-label="Øv videre"><p class="sd-next-h">Øv videre</p><ul><li><a href="../en-og-et/index.html">En/Et-træner – øv en eller et →</a></li><li><a href="../magiske_verber.html">Magiske Verber – øv bøjning af verber →</a></li></ul></nav>
 </body>
 </html>

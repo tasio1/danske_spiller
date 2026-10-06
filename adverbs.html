@@ -56,6 +56,14 @@
   <meta property="og:url" content="https://sjovtdansk.dk/adverbs.html" />
   <meta property="og:locale" content="da_DK" />
   <link rel="canonical" href="https://sjovtdansk.dk/adverbs.html" />
+<link rel="icon" href="shared/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="shared/icons/favicon-36.png" type="image/png" sizes="36x36" />
+<link rel="apple-touch-icon" href="shared/icons/apple-touch-icon.png" />
+<meta property="og:image" content="https://sjovtdansk.dk/shared/icons/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sjovt Dansk: lær dansk ved at spille. Pølle-maskotten i pixelstil." />
+<meta name="twitter:card" content="summary_large_image" />
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -380,7 +388,6 @@
   <header>
     <h1><span data-sd-sprite="ur" data-scale="3" class="sd-bob" aria-hidden="true"></span> <span>Sætningsbyggeren</span></h1>
     <div class="header-buttons">
-      <button id="darkToggle" title="Skift mellem lys og mørk" aria-label="Skift mellem lys og mørk tilstand">Lys / Mørk</button>
       <button id="importBtn" title="Importér CSV-data">Importér data</button>
       <button id="reviewBtn" title="Gennemgå gemte ord (R)">Repetition</button>
       <button id="settingsBtn" title="Indstillinger">Indstillinger</button>
@@ -1487,22 +1494,7 @@
       populateMap();
       // Start with a random zone/mode
       startZone(zones.find((z) => dataset.some(z.filter)) || zones[0]);
-      // Dark mode toggle
-      const darkToggle = document.getElementById("darkToggle");
-      let darkPref = null;
-      try { darkPref = localStorage.getItem("danishDarkMode"); } catch (e) { darkPref = null; }
-      if (darkPref === "true") {
-        document.body.classList.add("dark");
-        document.documentElement.setAttribute("data-theme", "dark");
-      } else if (darkPref === "false") {
-        document.documentElement.setAttribute("data-theme", "light");
-      }
-      darkToggle.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        const isDark = document.body.classList.contains("dark");
-        try { localStorage.setItem("danishDarkMode", isDark); } catch (e) {}
-        document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-      });
+      // Theme: the shared bar (shared/sjovt.js, sd:theme) owns light/dark (US-040)
       // Import modal events
       const importBtn = document.getElementById("importBtn");
       const importModal = document.getElementById("importModal");
@@ -1662,5 +1654,6 @@
       S.watchScreens("#importModal .modal-content, #settingsModal .modal-content, #reviewModal .modal-content");
     })();
   </script>
+<nav class="sd-next" aria-label="Øv videre"><p class="sd-next-h">Øv videre</p><ul><li><a href="ordstilling-detektiv/index.html">Ordstillingsdetektiven – øv dansk ordstilling →</a></li><li><a href="konjunktioner/konjunktioner.html">Konjunktion Crush – øv konjunktioner →</a></li></ul></nav>
 </body>
 </html>

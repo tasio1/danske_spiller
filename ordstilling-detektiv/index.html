@@ -11,6 +11,14 @@
 <meta property="og:url" content="https://sjovtdansk.dk/ordstilling-detektiv/index.html" />
 <meta property="og:locale" content="da_DK" />
 <link rel="canonical" href="https://sjovtdansk.dk/ordstilling-detektiv/index.html" />
+<link rel="icon" href="../shared/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../shared/icons/favicon-36.png" type="image/png" sizes="36x36" />
+<link rel="apple-touch-icon" href="../shared/icons/apple-touch-icon.png" />
+<meta property="og:image" content="https://sjovtdansk.dk/shared/icons/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sjovt Dansk: lær dansk ved at spille. Pølle-maskotten i pixelstil." />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="alternate" hreflang="da" href="https://sjovtdansk.dk/ordstilling-detektiv/index.html" />
 <link rel="alternate" hreflang="en" href="https://sjovtdansk.dk/en/danish-word-order/index.html" />
 <link rel="alternate" hreflang="x-default" href="https://sjovtdansk.dk/ordstilling-detektiv/index.html" />
@@ -1180,7 +1188,7 @@ function finishSession(){
     }
     const next=CASES.find(x=>x.n===G.caseN+1);
     area.innerHTML=
-      `<div class="res-sprites" aria-hidden="true">${passed?'<span data-sd-sprite="pokal" data-scale="3"></span>':''}<span data-sd-sprite="lup" data-scale="6" class="${passed?'sd-hop':'sd-wig'}"></span>${passed?'<span data-sd-sprite="stjerne" data-scale="3"></span>':''}</div>`+
+      `<div class="res-sprites" aria-hidden="true">${passed?'<span data-sd-sprite="pokal" data-scale="2"></span>':''}<span data-sd-sprite="lup" data-scale="6" class="${passed?'sd-hop':'sd-wig'}"></span>${passed?'<span data-sd-sprite="stjerne" data-scale="2"></span>':''}</div>`+
       (passed?`<div class="bigstamp">LØST</div>`:`<div class="bigstamp" style="color:#8a6a30;border-color:#8a6a30;transform:rotate(-4deg)">GENÅBN</div>`)+
       `<h2>${G.c.title}</h2>`+
       `<div class="score">${G.correct} / ${G.total} rigtige · ${pct} %</div>`+
@@ -1199,7 +1207,7 @@ function finishSession(){
     const m=Math.floor(G.time/60),s=G.time%60;
     const title = pct>=90?"MESTERDETEKTIV":pct>=70?"Skarp efterforsker":pct>=50?"Dygtig opklarer":"Fortsæt efterforskningen";
     area.innerHTML=
-      `<div class="res-sprites" aria-hidden="true"><span data-sd-sprite="pokal" data-scale="3"></span><span data-sd-sprite="lup" data-scale="6" class="sd-hop"></span></div>`+
+      `<div class="res-sprites" aria-hidden="true"><span data-sd-sprite="pokal" data-scale="2"></span><span data-sd-sprite="lup" data-scale="6" class="sd-hop"></span></div>`+
       `<div class="bigstamp" style="${pct>=90?'':'color:#8a6a30;border-color:#8a6a30'}">${pct>=90?'MESTER':'SAG'}</div>`+
       `<h2>${title}</h2>`+
       `<div class="score">${G.correct} / ${G.total} · ${pct} %</div>`+
@@ -1218,5 +1226,6 @@ function finishSession(){
 renderMap();
 Sjovt.watchScreens('#mapScreen, #playScreen');
 </script>
+<nav class="sd-next" aria-label="Øv videre"><p class="sd-next-h">Øv videre</p><ul><li><a href="../saetningsmaskinen/index.html">Sætningsmaskinen – øv ledsætninger →</a></li><li><a href="../adverbs.html">Adverbier og bindeord – byg sætninger →</a></li></ul></nav>
 </body>
 </html>

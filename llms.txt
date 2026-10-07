@@ -30,6 +30,7 @@ Every game page states its CEFR level and what it trains. Each English guide giv
 - [Præpositionsmester](https://sjovtdansk.dk/dansk-praepositioner.html): i, på, til, af and other prepositions. A2–B1.
 - [Pronomenmysteriet](https://sjovtdansk.dk/pronomenmysteriet/index.html): personal and possessive pronouns, sin or hans, nogen or nogle. A2–B2.
 - [Tidsmaskinen](https://sjovtdansk.dk/tidsmaskinen/index.html): choosing tenses in context, including modal verbs. A2–C1.
+- [Læseforståelse](https://sjovtdansk.dk/laeseforstaaelse/index.html): reading comprehension in the style of Prøve i Dansk 3 (not official exam material): find facts in a booklet, multiple choice, place removed paragraphs, choose connectors. B1–B2.
 - [Sætningsmaskinen](https://sjovtdansk.dk/saetningsmaskinen/index.html): placement of ikke, subordinate clauses, direct and indirect questions. A2–C1.
 - [Konjunktion Crush](https://sjovtdansk.dk/konjunktioner/konjunktioner.html): conjunctions such as fordi, og, men, selvom. B1.
 - [Forbindeord](https://sjovtdansk.dk/forbindenor/Forbindenor.html): linking words that make a text hang together. B1.

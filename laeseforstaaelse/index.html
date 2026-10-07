@@ -81,6 +81,18 @@ try {
   .lf-text p[data-par]::before { content: "¶" attr(data-par); position: absolute; right: 100%; margin-right: 8px;
               font: 700 12px/2.3 ui-monospace, "SF Mono", Consolas, monospace; color: var(--lf-muted); }
   .lf-text p.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); border-radius: 2px; }
+  /* Hæfte (skim): numbered notices and a sticky jump-list. */
+  .lf-text h1 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
+  .lf-jump { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain;
+             scrollbar-width: thin; margin: 0 0 1em; padding: 6px 0; background: var(--lf-paper); border-bottom: 1px solid var(--lf-rule);
+             font: 1rem/1.2 system-ui, sans-serif; }
+  .lf-jump .lf-btn { flex: 0 0 auto; }
+  .lf-jump .lf-btn[aria-current="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-notice { margin: 0 0 1.6em; padding: 0 0 .1em; border-radius: 2px; }
+  .lf-notice h2 { margin: 0 0 .5em; font-size: 1.3em; position: relative; }
+  .lf-haefte [data-par]::before { content: "\00a7" attr(data-par); position: absolute; right: 100%; margin-right: 8px;
+              font: 700 12px/2.3 ui-monospace, "SF Mono", Consolas, monospace; color: var(--lf-muted); }
+  .lf-text section.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); }
   .lf-foot { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--lf-rule); font: .8em/1.5 system-ui, sans-serif; color: var(--lf-muted); }
   .lf-foot p { margin: 0 0 .6em; }
   .lf-foot summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
@@ -95,6 +107,14 @@ try {
   #lf-q .dc-quiz-option:disabled { color: var(--lf-ink); opacity: 1; }
   #lf-q .dc-quiz-option.dc-correct::after { content: " \2713"; font-weight: 700; }
   #lf-q .dc-quiz-option.dc-wrong::after { content: " \2717"; font-weight: 700; }
+  .lf-ans { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .lf-ans label { flex: 1 0 100%; color: var(--lf-muted); font-size: .9rem; font-weight: 700; }
+  .lf-input { flex: 1 1 160px; min-width: 0; min-height: 44px; padding: 0 10px; font: inherit; font-size: 1rem; background: var(--lf-card);
+              color: var(--lf-ink); border: 2px solid var(--lf-ink); border-radius: 8px; }
+  .lf-input:disabled { opacity: 1; }
+  .lf-input[data-state="ok"] { border-color: var(--lf-ok); background: var(--lf-ok-bg); }
+  .lf-input[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); }
+  .lf-nudge { margin: 10px 0 0; color: var(--lf-muted); font-size: .95rem; line-height: 1.4; }
   .lf-fb-box { margin-top: 12px; padding: 12px; border-left: 4px solid var(--lf-no); background: var(--lf-no-bg); line-height: 1.45; }
   .lf-fb-box p { margin: 0 0 8px; }
   .lf-fb-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
@@ -119,7 +139,8 @@ try {
     .lf-panel[data-collapsed="true"] .lf-panel-body { display: none; }
     .lf-qnum { display: none; }
     .lf-text p[data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
-    .lf-text p.lf-evidence::before { color: #3A3220; }
+    .lf-text p.lf-evidence::before, .lf-text section.lf-evidence [data-par]::before { color: #3A3220; }
+    .lf-haefte [data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
   }
   @media (min-width: 640px) and (max-width: 1023px) and (orientation: portrait) { :root { --lf-sheet: 46dvh; } }
   @media (max-width: 480px) { .lf-brand { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); } .lf-top { padding: 6px 8px; gap: 4px; } .lf-btn { padding: 0 8px; } }
@@ -172,6 +193,7 @@ try {
 
 <script src="../shared/dansk-speech.js"></script>
 <script src="../shared/dansk-core.js"></script>
+<script src="data-skim.js"></script>
 <script src="data-mc.js"></script>
 <script src="data.js"></script>
 <script>
@@ -187,6 +209,8 @@ try {
   var PAPER_LABEL = { light: 'Lys', sepia: 'Sepia', dark: 'Mørk' };
   var LEVELS = ['B1', 'B2'];
   var FOOTER = 'Øvelsestekst skrevet til sprogtræning. Tal og fakta er dokumenterede — se kilder.';
+  var FOOTER_SKIM = 'Tider, priser og regler i opslagene er øvelsesværdier, ikke rigtige oplysninger.';
+  var NUDGE = 'Gå videre, og vend tilbage til spørgsmålet til sidst.';
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
@@ -204,6 +228,7 @@ try {
   var reading = { fs: 19, paper: 'light' };
   var anchor = { par: 1, offset: 0 };
   var lock = false, lockTimer = 0, saveTimer = 0;
+  var drafts = {}, skimFocus = false;   // skim: typed-but-unsent answers per question id; focus the input once the learner is typing
 
   function availableModes() { return D.modes.filter(function (m) { return m.available; }); }
 
@@ -251,7 +276,7 @@ try {
   /* ---------- scroll anchor: top visible paragraph, saved per text ---------- */
   function currentAnchor() {
     var pr = reader.getBoundingClientRect();
-    var ps = textEl.querySelectorAll('p[data-par]');
+    var ps = textEl.querySelectorAll('[data-par]');   // paragraphs (mc) or notice headings (skim)
     for (var i = 0; i < ps.length; i++) {
       var r = ps[i].getBoundingClientRect();
       if (r.bottom > pr.top + 4) return { par: +ps[i].getAttribute('data-par'), offset: Math.round(pr.top - r.top) };
@@ -282,13 +307,18 @@ try {
   /* ---------- reading pane ---------- */
   function renderText(text) {
     textEl.innerHTML = '';
-    textEl.appendChild(el('p', 'lf-kicker', text.kicker));
-    textEl.appendChild(el('h2', null, text.title));
-    text.paragraphs.forEach(function (para, i) {
-      var p = el('p', null, para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
-    });
+    textEl.classList.toggle('lf-haefte', text.mode === 'skim');
+    if (text.mode === 'skim') renderHaefte(text);
+    else {
+      textEl.appendChild(el('p', 'lf-kicker', text.kicker));
+      textEl.appendChild(el('h2', null, text.title));
+      text.paragraphs.forEach(function (para, i) {
+        var p = el('p', null, para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
+      });
+    }
     var foot = el('footer', 'lf-foot');
     foot.appendChild(el('p', null, FOOTER));
+    if (text.mode === 'skim') foot.appendChild(el('p', null, FOOTER_SKIM));
     var det = el('details'); det.appendChild(el('summary', null, 'Kilder'));
     var ul = el('ul');
     (text.sources || []).forEach(function (u) {
@@ -296,6 +326,58 @@ try {
       li.appendChild(a); ul.appendChild(li);
     });
     det.appendChild(ul); foot.appendChild(det); textEl.appendChild(foot);
+  }
+  /* Hæfte: title, sticky jump-list, one <section> per notice (heading carries the §N margin number). */
+  function renderHaefte(text) {
+    textEl.appendChild(el('p', 'lf-kicker', 'Hæfte · ' + text.theme));
+    textEl.appendChild(el('h1', null, text.title));
+    var nav = el('nav', 'lf-jump'); nav.setAttribute('aria-label', 'Opslag'); nav.id = 'lf-jump';
+    textEl.appendChild(nav);
+    text.notices.forEach(function (n, i) {
+      var sec = el('section', 'lf-notice'); sec.setAttribute('data-notice', n.id);
+      var h = el('h2', null, n.heading); h.setAttribute('data-par', String(i + 1)); sec.appendChild(h);
+      String(n.body).split(/\n\s*\n/).forEach(function (para) { sec.appendChild(el('p', null, para)); });
+      textEl.appendChild(sec);
+      var b = btn(n.heading, 'lf-btn', function () { jumpTo(n.id); });
+      b.setAttribute('data-jump', n.id); b.setAttribute('aria-label', 'Gå til opslag ' + (i + 1) + ': ' + n.heading);
+      nav.appendChild(b);
+    });
+    updateCurrent();
+  }
+  function noticeEl(id) { return textEl.querySelector('[data-notice="' + id + '"]'); }
+  // Scroll a notice to just below the sticky jump-list. Instant under reduced motion.
+  function scrollToNotice(id) {
+    var s = noticeEl(id), nav = $('lf-jump');
+    if (!s) return;
+    var top = s.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop - (nav ? nav.offsetHeight : 0) - 10;
+    reader.scrollTo({ top: Math.max(0, top), behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+  function setCurrent(id) {
+    var bs = textEl.querySelectorAll('[data-jump]'), nav = $('lf-jump');
+    for (var i = 0; i < bs.length; i++) {
+      var on = bs[i].getAttribute('data-jump') === id;
+      if (on) bs[i].setAttribute('aria-current', 'true'); else bs[i].removeAttribute('aria-current');
+      if (on && nav) {                           // keep the current chip visible inside the row (never scrolls the page)
+        var l = bs[i].offsetLeft - nav.offsetLeft;
+        if (l < nav.scrollLeft) nav.scrollLeft = l - 8;
+        else if (l + bs[i].offsetWidth > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = l + bs[i].offsetWidth - nav.clientWidth + 8;
+      }
+    }
+  }
+  function jumpTo(id) { setCurrent(id); scrollToNotice(id); }
+  // Current notice = the last one whose top has passed the bottom edge of the jump-list.
+  function updateCurrent() {
+    var nav = $('lf-jump'); if (!nav || !state.text || state.text.mode !== 'skim') return;
+    var edge = nav.getBoundingClientRect().bottom + 12, secs = textEl.querySelectorAll('[data-notice]'), cur = null;
+    for (var i = 0; i < secs.length; i++) if (secs[i].getBoundingClientRect().top <= edge) cur = secs[i];
+    if (!cur && secs.length) cur = secs[0];
+    if (cur) setCurrent(cur.getAttribute('data-notice'));
+  }
+  reader.addEventListener('scroll', updateCurrent);
+  function highlightNotice(id) {
+    clearHighlight();
+    var s = noticeEl(id); if (!s) return;
+    s.classList.add('lf-evidence'); scrollToNotice(id);
   }
   function clearHighlight() {
     var o = textEl.querySelectorAll('.lf-evidence');
@@ -346,24 +428,35 @@ try {
   }
   function setHead(num) { qnumEl.textContent = num; }
   function finishRound() {
-    state.token++; state.summary = true; clearHighlight();
+    state.token++; state.summary = true; clearHighlight(); clearNudge();
     var items = D.itemsOf(state.text), right = 0, weak = [];
     items.forEach(function (q) { if (state.answered[q.id] && state.answered[q.id].correct) right++; else weak.push({ label: q.q }); });
     qHost.innerHTML = ''; fbHost.innerHTML = '';
     setHead('Resultat'); peekEl.textContent = 'Resultat';
     DC.quiz.summary.render({ score: right, accuracy: items.length ? right / items.length * 100 : 0, weakItems: weak.slice(0, 3) },
-      qHost, function () { replay(); });
+      qHost, function () { replay(); }, state.mode === 'skim' ? retryErrors : undefined);
     SOUND.done(); DC.ui.announce('Runden er slut. ' + right + ' af ' + items.length + ' rigtige.');
     var again = qHost.querySelector('.dc-summary-actions button'); if (again) again.focus();
   }
   function replay() {
-    state.answered = {}; state.qi = 0; state.summary = false; render();
+    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false; render();
   }
+  // Gentag fejl (skim): only the wrongly answered questions are asked again.
+  function retryErrors() {
+    var items = D.itemsOf(state.text), first = -1;
+    items.forEach(function (q, i) {
+      if (state.answered[q.id] && !state.answered[q.id].correct) { delete state.answered[q.id]; delete drafts[q.id]; if (first < 0) first = i; }
+    });
+    if (first < 0) return;
+    state.qi = first; state.summary = false; skimFocus = true; render();
+  }
+  var nudgeTimer = 0;
+  function clearNudge() { window.clearTimeout(nudgeTimer); nudgeTimer = 0; }
 
   /* ---------- mode renderers: MODE_RENDERERS[mode](text, host, api) ---------- */
   var MODE_RENDERERS = {};
-  var api = { host: qHost, fb: fbHost, onAnswer: recordAnswer, highlight: highlight, clearHighlight: clearHighlight,
-              next: advance, finish: finishRound };
+  var api = { host: qHost, fb: fbHost, onAnswer: recordAnswer, highlight: highlight, highlightNotice: highlightNotice,
+              clearHighlight: clearHighlight, next: advance, finish: finishRound };
 
   function seeBtn(q) {
     return btn('Se afsnit ' + (q.evidence + 1), 'lf-btn', function () { highlight(q.evidence); });
@@ -419,6 +512,84 @@ try {
     });
   };
 
+  /* Skim: one short free-text answer per question, checked with DanskCore.diff.check against `accepted`. */
+  function skimWrongBox(q, withContinue, a) {
+    var box = el('div', 'lf-fb-box'), notice = null;
+    state.text.notices.forEach(function (n) { if (n.id === q.noticeId) notice = n; });
+    var ans = el('p', null, 'Rigtigt svar: '); ans.appendChild(el('strong', null, q.accepted[0]));
+    DC.ui.ttsButton(q.accepted[0], ans, 'Lyt til det rigtige svar'); box.appendChild(ans);
+    box.appendChild(el('p', null, q.note));
+    var acts = el('div', 'lf-fb-actions');
+    if (notice) acts.appendChild(btn('Se opslag ' + notice.heading, 'lf-btn', function () { highlightNotice(q.noticeId); }));
+    var cont = null;
+    if (withContinue) {
+      var last = !D.itemsOf(state.text).some(function (x) { return !state.answered[x.id]; });
+      cont = btn(last ? 'Se resultat' : 'Næste', 'lf-btn lf-btn--primary', function () { a.next(0, state.token); });
+      cont.id = 'btn-continue'; acts.appendChild(cont);
+    }
+    box.appendChild(acts); a.fb.appendChild(box);
+    return cont;
+  }
+
+  MODE_RENDERERS.skim = function (text, host, a) {
+    var q = text.questions[state.qi], n = text.questions.length, tok = ++state.token;
+    var rec = state.answered[q.id];
+    clearNudge(); host.innerHTML = ''; a.fb.innerHTML = ''; a.clearHighlight();
+    setHead('Spørgsmål ' + (state.qi + 1) + ' af ' + n);
+    peekEl.textContent = (state.qi + 1) + '/' + n + ' · ' + q.q;
+
+    var pr = el('div', 'dc-quiz-prompt'); pr.appendChild(el('span', null, q.q)); DC.ui.ttsButton(q.q, pr);
+    host.appendChild(pr);
+
+    var row = el('div', 'lf-ans');
+    var lab = el('label', null, 'Dit svar'); lab.setAttribute('for', 'lf-input'); row.appendChild(lab);
+    var input = el('input', 'lf-input'); input.type = 'text'; input.id = 'lf-input';
+    input.setAttribute('autocomplete', 'off'); input.setAttribute('autocapitalize', 'off'); input.spellcheck = false;
+    var submit = btn('Svar', 'lf-btn lf-btn--primary', function () { answer(); }); submit.id = 'btn-submit';
+    row.appendChild(input); row.appendChild(submit); host.appendChild(row);
+
+    if (rec) {                                    // already answered: static review, no second attempt
+      input.value = rec.chosen; input.disabled = true; submit.disabled = true;
+      input.setAttribute('data-state', rec.correct ? 'ok' : 'no');
+      if (!rec.correct) skimWrongBox(q, false, a);
+      return;
+    }
+    input.value = drafts[q.id] || '';
+    input.addEventListener('input', function () { drafts[q.id] = input.value; });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); answer(); } });
+    if (skimFocus) input.focus({ preventScroll: true });
+
+    // 30 s nudge: a hint to move on. It never blocks and never advances.
+    nudgeTimer = window.setTimeout(function () {
+      if (tok !== state.token || state.answered[q.id]) return;
+      var p = el('p', 'lf-nudge', NUDGE); p.id = 'lf-nudge'; host.appendChild(p);
+      DC.ui.announce(NUDGE);
+    }, 30000);
+
+    function answer() {
+      if (tok !== state.token || state.answered[q.id]) return;
+      var v = input.value;
+      if (!v.trim()) return;
+      clearNudge(); skimFocus = true;
+      var res = DC.diff.check(v, q.accepted);
+      input.disabled = true; submit.disabled = true;
+      input.setAttribute('data-state', res.correct ? 'ok' : 'no');
+      if (res.correct) a.next(800, tok);          // schedule the advance first: sound set-up must not delay it
+      a.onAnswer(q.id, res.correct, null, v);
+      var old = host.querySelector('.lf-nudge'); if (old) old.remove();
+      if (res.correct) {
+        host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
+        DC.ui.announce('Rigtigt.');
+      } else {
+        DC.ui.announce('Forkert. Rigtigt svar: ' + q.accepted[0]);
+        a.highlightNotice(q.noticeId);
+        panelCollapse(false);
+        var c = skimWrongBox(q, true, a);
+        if (c) c.focus({ preventScroll: true });
+      }
+    }
+  };
+
   function render() {
     var r = MODE_RENDERERS[state.mode];
     if (r) r(state.text, qHost, api);
@@ -441,7 +612,8 @@ try {
   function buildStart() {
     var prefs = store.get('prefs') || {};
     var modes = availableModes();
-    if (prefs.mode && modes.some(function (m) { return m.key === prefs.mode; })) state.mode = prefs.mode; else state.mode = modes[0].key;
+    if (prefs.mode && modes.some(function (m) { return m.key === prefs.mode; })) state.mode = prefs.mode;
+    else state.mode = modes.some(function (m) { return m.key === 'mc'; }) ? 'mc' : modes[0].key;   // mc stays the default
     if (Array.isArray(prefs.levels)) {
       var lv = prefs.levels.filter(function (l) { return LEVELS.indexOf(l) !== -1; });
       if (lv.length) state.levels = lv;
@@ -471,7 +643,7 @@ try {
     $('start-msg').textContent = D.textsFor(state.mode, state.levels).length ? '' : 'Der er endnu ingen tekst på det valgte niveau.';
   }
   function showStart() {
-    state.view = 'start'; state.token++; qHost.innerHTML = ''; fbHost.innerHTML = '';
+    state.view = 'start'; state.token++; clearNudge(); qHost.innerHTML = ''; fbHost.innerHTML = '';
     $('screen-play').hidden = true; $('screen-start').hidden = false; $('btn-menu').hidden = true;
     syncStart(); $('btn-play').focus({ preventScroll: true });
   }
@@ -482,12 +654,14 @@ try {
     var next = texts[0];
     for (var i = 0; i < texts.length; i++) if (texts[i].id === state.lastId && texts[i + 1]) next = texts[i + 1];
     state.text = next; state.lastId = next.id; state.qi = 0; state.answered = {}; state.summary = false;
+    drafts = {}; skimFocus = false;
     savePrefs();
     $('screen-start').hidden = true; $('screen-play').hidden = false; $('btn-menu').hidden = false; state.view = 'play';
     renderText(next); panelCollapse(false); render();
     anchor = store.get('scroll:' + next.id) || { par: 1, offset: 0 };
     reader.scrollTop = 0; applyAnchor(anchor);
-    reader.focus({ preventScroll: true });
+    if (state.mode !== 'skim') reader.focus({ preventScroll: true });   // skim: no keyboard pop-up before the learner asks for it
+    else updateCurrent();
   }
   $('btn-play').addEventListener('click', startPlay);
   $('btn-menu').addEventListener('click', showStart);
@@ -506,15 +680,16 @@ try {
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var t = e.target;
-    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
-    if (state.view !== 'play') return;
     var k = (e.key || '').toLowerCase();
-    if (k === 'j') { e.preventDefault(); step(-1); }
-    else if (k === 'k') { e.preventDefault(); step(1); }
-    else if (k === 'escape') {
+    if (state.view === 'play' && k === 'escape') {            // Escape closes overlays, also while typing an answer
       var open = textEl.querySelector('details[open]');
       if (open) open.removeAttribute('open'); else clearHighlight();
+      return;
     }
+    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    if (state.view !== 'play') return;
+    if (k === 'j') { e.preventDefault(); step(-1); }
+    else if (k === 'k') { e.preventDefault(); step(1); }
   });
 
   applyReading();

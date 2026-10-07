@@ -78,6 +78,12 @@
   .hero h1 em { font-style: normal; display: inline-block; margin-top: .22em; font-size: .3em; line-height: 1.5; background: var(--sd-ink); color: var(--sd-cream); padding: .3em .6em; text-shadow: none; }
   .hero p { margin: 0 0 28px; font-size: 19px; max-width: 46ch; font-weight: 700; }
 
+  /* hero visual column — Game Boy illustration + QR scan-tag, stacked and centered */
+  .hero-visual { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .hero-qr { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; margin: 4px 0; background: var(--sd-cream); box-shadow: var(--sd-box), var(--sd-drop); }
+  .hero-qr svg { width: 84px; height: 84px; display: block; shape-rendering: crispEdges; }
+  .hero-qr span { font-family: var(--sd-font-display); font-weight: 700; font-size: 11px; line-height: 1.3; text-transform: uppercase; letter-spacing: .04em; color: #101010; text-align: center; white-space: nowrap; }
+
   /* pixel Game Boy — body is an SVG on a 64×104 grid, screen is HTML so real sprites can animate inside */
   .gb-wrap { display: grid; place-items: center; --u: 5px; }
   .gb { position: relative; width: calc(64 * var(--u)); height: calc(104 * var(--u)); animation: gb-float 2.4s steps(4) infinite; filter: drop-shadow(calc(var(--u) * 2) calc(var(--u) * 2) 0 rgba(16,16,16,.45)); }
@@ -142,6 +148,9 @@
   @media (max-width: 560px) {
     .hero-in { padding: 24px 18px 32px; }
     .gb-wrap { --u: 4px; }
+    .hero-qr svg { width: 68px; height: 68px; }
+    .hero-qr { padding: 10px; gap: 6px; }
+    .hero-qr span { font-size: 10px; }
     .count { margin-left: 4px; }
   }
   @media (max-width: 860px) { .hero-in { grid-template-columns: 1fr; } }
@@ -162,6 +171,7 @@
           <p>Ordforråd, grammatik og vendinger i små, hurtige spil. Vælg et spil, tryk på knappen, og kom i gang på et øjeblik.</p>
           <a class="sd-btn sd-btn--ink sd-btn--lg" href="#spil" data-sd-nofx>Vælg spil ▼</a>
         </div>
+        <div class="hero-visual">
         <div class="gb-wrap" aria-hidden="true">
           <div class="gb">
             <svg viewBox="0 0 64 104" xmlns="http://www.w3.org/2000/svg">
@@ -201,6 +211,11 @@
               <div class="gb-start">TRYK START</div>
             </div>
           </div>
+        </div>
+        <div class="hero-qr" aria-hidden="true">
+          <svg viewBox="0 0 31 31" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC25A" d="M0 0h31v31H0z"/><path stroke="#101010" d="M1 1.5h7m1 0h1m4 0h1m1 0h1m1 0h2m3 0h7M1 2.5h1m5 0h1m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m3 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m3 0h1m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h3m2 0h3m3 0h1m2 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m4 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h1m2 0h1m2 0h1m2 0h2M2 9.5h2m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1m1 0h1m1 0h2m2 0h1m1 0h5M1 10.5h1m8 0h1m1 0h3m3 0h3m1 0h1m1 0h1m1 0h2m1 0h1M1 11.5h1m2 0h1m1 0h4m4 0h2m1 0h2m5 0h1m1 0h1m1 0h2M1 12.5h4m1 0h1m2 0h1m1 0h2m2 0h2m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1M1 13.5h1m1 0h6m1 0h1m1 0h1m1 0h1m2 0h2m2 0h1m1 0h2M2 14.5h2m6 0h1m1 0h1m2 0h1m3 0h1m1 0h4m3 0h2M1 15.5h1m1 0h2m2 0h1m1 0h2m3 0h5m3 0h1m1 0h1m2 0h3M3 16.5h3m4 0h3m2 0h1m1 0h1m4 0h3m4 0h1M1 17.5h1m1 0h2m1 0h3m1 0h5m1 0h1m4 0h2m3 0h1m2 0h1M2 18.5h1m1 0h1m3 0h1m1 0h3m3 0h1m1 0h1m1 0h3m1 0h1m2 0h3M1 19.5h1m4 0h4m3 0h3m4 0h3m1 0h1m3 0h2M2 20.5h4m2 0h1m2 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2M1 21.5h1m4 0h4m1 0h3m1 0h1m1 0h2m1 0h6m2 0h2M9 22.5h2m2 0h1m1 0h1m1 0h2m2 0h1m3 0h1m3 0h1M1 23.5h7m1 0h3m2 0h1m4 0h3m1 0h1m1 0h1m1 0h3M1 24.5h1m5 0h1m2 0h2m4 0h1m1 0h2m1 0h1m3 0h1m2 0h2M1 25.5h1m1 0h3m1 0h1m1 0h1m1 0h4m2 0h1m1 0h1m1 0h6m1 0h1M1 26.5h1m1 0h3m1 0h1m2 0h3m2 0h5m1 0h2m2 0h1M1 27.5h1m1 0h3m1 0h1m1 0h1m1 0h7m2 0h1m3 0h2m1 0h1m1 0h1M1 28.5h1m5 0h1m1 0h2m1 0h1m2 0h1m1 0h2m3 0h1m1 0h1m3 0h1M1 29.5h7m5 0h6m2 0h3m1 0h1m2 0h2"/></svg>
+          <span>Scan &amp; spil →</span>
+        </div>
         </div>
       </div>
     </section>

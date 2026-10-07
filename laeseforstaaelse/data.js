@@ -11,7 +11,7 @@
   var modes = [
     { key: 'skim', label: 'Find oplysningen', part: 'Læseforståelse 1', itemCount: 15, minutes: 25, available: true },
     { key: 'mc', label: 'Læs og vælg', part: 'Delprøve 2A', itemCount: 3, minutes: 15, available: true },
-    { key: 'insert', label: 'Sæt afsnittet ind', part: 'Delprøve 2B', itemCount: 5, minutes: 20, available: false },
+    { key: 'insert', label: 'Sæt afsnittet ind', part: 'Delprøve 2B', itemCount: 5, minutes: 20, available: true },
     { key: 'cloze', label: 'Det manglende ord', part: 'Delprøve 3', itemCount: 8, minutes: 15, available: false }
   ];
 

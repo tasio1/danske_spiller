@@ -83,6 +83,8 @@ try {
   .lf-text p.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); border-radius: 2px; }
   /* Hæfte (skim): numbered notices and a sticky jump-list. */
   .lf-text h1 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
+  .lf-reader--haefte { padding-top: 0; }
+  .lf-haefte { padding-top: 24px; }
   .lf-jump { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain;
              scrollbar-width: thin; margin: 0 0 1em; padding: 6px 0; background: var(--lf-paper); border-bottom: 1px solid var(--lf-rule);
              font: 1rem/1.2 system-ui, sans-serif; }
@@ -308,6 +310,7 @@ try {
   function renderText(text) {
     textEl.innerHTML = '';
     textEl.classList.toggle('lf-haefte', text.mode === 'skim');
+    reader.classList.toggle('lf-reader--haefte', text.mode === 'skim');
     if (text.mode === 'skim') renderHaefte(text);
     else {
       textEl.appendChild(el('p', 'lf-kicker', text.kicker));

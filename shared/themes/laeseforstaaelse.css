@@ -190,7 +190,7 @@ html.sd-page .lf-gap.lf-cz[data-state="ok"] { border: 0; border-bottom: 4px soli
 html.sd-page .lf-gap.lf-cz[data-state="no"] { border: 0; border-bottom: 4px solid var(--lf-no); background: var(--lf-no-bg); box-shadow: none; margin: 2px; width: auto; font-family: var(--lf-serif); font-size: .9em; }
 html.sd-page .lf-gap.lf-cz[aria-current="true"] { border-bottom-style: solid; border-bottom-color: var(--lf-accent); background: var(--lf-card); outline: 4px solid var(--lf-accent); outline-offset: 0; box-shadow: none; margin: 2px; width: auto; }
 html.sd-page .lf-gap.lf-cz[data-preview="true"] { color: var(--lf-muted); font-weight: 400; font-style: italic; }
-html.sd-page .lf-cz-n { font: 700 14px/1 var(--lf-disp); color: var(--lf-muted); }
+html.sd-page .lf-cz-n { font: 700 14px/1 var(--lf-disp); color: var(--lf-ink); }
 html.sd-page .lf-cz[data-state="ok"] .lf-cz-ic { color: var(--lf-ok); }
 html.sd-page .lf-cz[data-state="no"] .lf-cz-ic { color: var(--lf-no); }
 /* insert bank blocks */

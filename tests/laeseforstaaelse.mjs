@@ -121,7 +121,7 @@ if (want('grep')) {
   const hits = [];
   for (const f of files) {
     const src = fs.readFileSync(f, 'utf8').split('\n');
-    src.forEach((l, i) => { if (/\bfetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|googletagmanager|google-analytics|gtag\(|plausible|cdn\.|cdnjs|unpkg|jsdelivr|<script[^>]+src=["']https?:|<link[^>]+href=["']https?:|@import\s+url\(["']?https?:/i.test(l)) hits.push(path.basename(f) + ':' + (i + 1) + ' ' + l.trim().slice(0, 90)); });
+    src.forEach((l, i) => { if (!/rel=["']canonical["']/.test(l) && /\bfetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|googletagmanager|google-analytics|gtag\(|plausible|cdn\.|cdnjs|unpkg|jsdelivr|<script[^>]+src=["']https?:|<link[^>]+href=["']https?:|@import\s+url\(["']?https?:/i.test(l)) hits.push(path.basename(f) + ':' + (i + 1) + ' ' + l.trim().slice(0, 90)); });
   }
   const shared = ['dansk-core.js', 'dansk-speech.js', 'tts-button.css'].map(f => path.join(REPO, 'shared', f)).filter(fs.existsSync);
   for (const f of shared) fs.readFileSync(f, 'utf8').split('\n').forEach((l, i) => { if (/\bfetch\s*\(|XMLHttpRequest|sendBeacon|googletagmanager|gtag\(/.test(l)) hits.push('shared/' + path.basename(f) + ':' + (i + 1)); });
@@ -136,9 +136,9 @@ if (want('data')) {
   };
   const dv = path.join(REPO, 'tests', 'laeseforstaaelse-data.mjs');
   if (fs.existsSync(dv)) {
-    const r = run(dv, ['--dir=' + ROOT, '--expect=2,3,2,0']);
-    rec('data: laeseforstaaelse-data.mjs --expect=2,3,2,0 exits 0', r.code === 0, 'exit ' + r.code + ' ' + r.out.trim().split('\n').slice(-2).join(' / '));
-  } else rec('data: laeseforstaaelse-data.mjs --expect=2,3,2,0 exits 0', null, 'validator not present in ' + REPO + '/tests (run it in the tested worktree)');
+    const r = run(dv, ['--dir=' + ROOT, '--expect=2,3,2,3']);
+    rec('data: laeseforstaaelse-data.mjs --expect=2,3,2,3 exits 0', r.code === 0, 'exit ' + r.code + ' ' + r.out.trim().split('\n').slice(-2).join(' / '));
+  } else rec('data: laeseforstaaelse-data.mjs --expect=2,3,2,3 exits 0', null, 'validator not present in ' + REPO + '/tests (run it in the tested worktree)');
   const sv = path.join(REPO, 'shared', 'validate.js');
   if (fs.existsSync(sv)) {
     const r = run(sv, []);
@@ -254,7 +254,7 @@ if (want('round')) {
   // mid-round Menu + replay then answered-review (J back)
   await clickOpt(page, ((await page.evaluate(() => window.__cur().questions[0].correct)) + 1) % 3); await sleep(700);
   await page.click('#btn-continue'); await sleep(200);
-  await page.keyboard.press('j'); await sleep(200);
+  await page.keyboard.press('k'); await sleep(200);
   const rev = await page.evaluate(() => ({ q: document.getElementById('lf-qnum').textContent, enabled: document.querySelectorAll('#lf-q button.dc-quiz-option').length, marked: document.querySelectorAll('#lf-q .dc-quiz-option.dc-correct, #lf-q .dc-quiz-option.dc-wrong').length }));
   rec('round: revisiting an answered question shows static review (no second attempt)', rev.q === 'Spørgsmål 1 af 3' && rev.enabled === 0 && rev.marked === 2, JSON.stringify(rev));
   rec('round: console clean over whole flow', issues.length === 0, issues.join(' | '));
@@ -357,17 +357,17 @@ if (want('kbd')) {
   rec('kbd: ArrowDown/ArrowUp/PageDown/PageUp/Space are not captured (defaultPrevented false) and scroll the focused reading pane natively', pd.length >= 5 && pd.every(x => x.endsWith(':false')) && !tops.includes('NOMOVE'), tops.join(' ') + ' | ' + pd.join(' '));
   // J / K
   const q0 = await qnum(pg);
-  await pg.keyboard.press('k'); await sleep(250); const qk = await qnum(pg);
-  await pg.keyboard.press('j'); await sleep(250); const qj = await qnum(pg);
-  note('J/K as implemented', `start ${q0}; K → ${qk}; J → ${qj}`);
-  rec('kbd: K moves to the next question and J back to the previous (implementation: J=previous, K=next; plan decision 9 lists "J / K = next/previous")', qk === 'Spørgsmål 3 af 3' && qj === 'Spørgsmål 2 af 3', `K: ${q0}→${qk}, J: ${qk}→${qj}`);
+  await pg.keyboard.press('j'); await sleep(250); const qk = await qnum(pg);
+  await pg.keyboard.press('k'); await sleep(250); const qj = await qnum(pg);
+  note('J/K as implemented', `start ${q0}; J → ${qk}; K → ${qj}`);
+  rec('kbd: J moves to the next question and K back to the previous (plan decision 9: J / K = next/previous)', qk === 'Spørgsmål 3 af 3' && qj === 'Spørgsmål 2 af 3', `J: ${q0}→${qk}, K: ${qk}→${qj}`);
   // btn-prev / next aria-disabled behaviour
   await pg.close();
 
   // stale mc keydown listener after navigating away from an unanswered question
   const p3 = await open('1440x900'); const g3 = p3.page; await play(g3);
-  await g3.keyboard.press('k'); await sleep(200); const a1 = await qnum(g3);
-  await g3.keyboard.press('j'); await sleep(200); const a2 = await qnum(g3);
+  await g3.keyboard.press('j'); await sleep(200); const a1 = await qnum(g3);
+  await g3.keyboard.press('k'); await sleep(200); const a2 = await qnum(g3);
   await g3.keyboard.press('1'); await sleep(1000);
   const ks = await srsKeys(g3);
   rec('kbd: J/K navigation over unanswered questions then key 1 records exactly one answer, no errors', ks.length === 1 && p3.issues.length === 0, `nav ${a1} / ${a2}; srs=${ks.join(',')}; issues=${p3.issues.join('|')}`);
@@ -771,7 +771,7 @@ if (want('skim')) {
     });
     note('start screen', s);
     rec('skim boot: title Læseforståelse, #btn-play "Spil", compact mode control offers skim AND mc, mc is the default, level control, disclaimer line',
-      s.h1 === 'Læseforståelse' && s.play === 'Spil' && s.modes.length === 2 && s.modes.some(m => /^skim:/.test(m)) && s.modes.some(m => /^mc:.*\*/.test(m)) && !s.modes.some(m => /^skim:.*\*/.test(m)) && s.levels.length === 2 && s.disclaimer.length === 1 && s.disclaimer[0] === DISCLAIMER, JSON.stringify(s));
+      s.h1 === 'Læseforståelse' && s.play === 'Spil' && s.modes.length === 4 && ['skim', 'mc', 'insert', 'cloze'].every(k => s.modes.some(m => m.startsWith(k + ':'))) && s.modes.some(m => /^skim:/.test(m)) && s.modes.some(m => /^mc:.*\*/.test(m)) && !s.modes.some(m => /^skim:.*\*/.test(m)) && s.levels.length === 2 && s.disclaimer.length === 1 && s.disclaimer[0] === DISCLAIMER, JSON.stringify(s));
     rec('skim boot: mode buttons >=44x44', (await smallTapTargets(page)).length === 0, (await smallTapTargets(page)).join('; '));
     await shot(page, '1440x900', 'skim-start');
     await page.close();
@@ -932,10 +932,10 @@ if (want('skim')) {
     await page.click('#btn-prev'); await sleep(250); const v1 = await val(); const atQ1 = await qnum(page);
     await page.click('#btn-next'); await sleep(250); const v2b = await val();
     rec('skim nav: Næste/Forrige keep typed drafts per question (Q1 "udkast et", Q2 "udkast to")', atQ2 === 'Spørgsmål 2 af 15' && v2 === '' && atQ1 === 'Spørgsmål 1 af 15' && v1 === 'udkast et' && v2b === 'udkast to', JSON.stringify({ atQ2, v2, atQ1, v1, v2b }));
-    await page.evaluate(() => document.body.focus()); await page.keyboard.press('j'); await sleep(250); const j1 = await qnum(page); const jv = await val();
-    await page.keyboard.press('k'); await sleep(250); const k1 = await qnum(page);
-    note('skim J/K as implemented', `from Q2: J → ${j1}, K → ${k1}`);
-    rec('skim nav: J goes to previous and K to next question with drafts kept (as implemented; plan decision 9 text lists "J / K = next/previous")', j1 === 'Spørgsmål 1 af 15' && jv === 'udkast et' && k1 === 'Spørgsmål 2 af 15', `${j1} / "${jv}" / ${k1}`);
+    await page.evaluate(() => document.body.focus()); await page.keyboard.press('k'); await sleep(250); const j1 = await qnum(page); const jv = await val();
+    await page.keyboard.press('j'); await sleep(250); const k1 = await qnum(page);
+    note('skim J/K as implemented', `from Q2: K → ${j1}, J → ${k1}`);
+    rec('skim nav: K goes to previous and J to next question with drafts kept (plan decision 9: J / K = next/previous)', j1 === 'Spørgsmål 1 af 15' && jv === 'udkast et' && k1 === 'Spørgsmål 2 af 15', `${j1} / "${jv}" / ${k1}`);
     // typing j/k inside the input is text, not navigation
     await page.click('#lf-input'); await page.keyboard.type('jk'); const q3 = await qnum(page); const vv = await val();
     rec('skim nav: typing "jk" inside the input is plain text (no J/K navigation while typing)', q3 === 'Spørgsmål 2 af 15' && vv.endsWith('jk'), q3 + ' / ' + vv);
@@ -1265,6 +1265,615 @@ if (want('skimtheme')) {
     await mu.page.close(); }
 }
 
+
+// SPLICED:a
+// ===================================================================================================================
+// GATE-3 sections (final spec): g3boot, g3seo, g3home, g3insert, g3cloze, g3persist, g3layout, g3kbd, g3theme
+// Run alone: node tests/laeseforstaaelse.mjs --only=g3boot,g3seo,... [--shots]
+// ===================================================================================================================
+VPS['390x844'] = { width: 390, height: 844, isMobile: true, hasTouch: true };
+const zlib = await import('node:zlib');
+const ALL_VPS = process.env.G3_VPS ? process.env.G3_VPS.split(',') : ['1920x1080', '1440x900', '1280x720', '1024x768', '820x1180', '360x640', '390x844'];
+const modeOpenAt = async (vp, mode, id, opts = {}) => {
+  const o = await open(vp, opts);
+  await o.page.evaluate(m => document.querySelector(`#ctl-mode [data-mode="${m}"]`).click(), mode);
+  await playText(o.page, id);
+  return o;
+};
+const curId = page => page.evaluate(() => window.__cur() && window.__cur().id);
+// ---- insert helpers
+const insData = page => page.evaluate(() => {
+  const t = window.__cur(); const gaps = [...t.gaps].sort((a, b) => a.after - b.after); const sol = Object.values(t.solution);
+  return { id: t.id, gaps: gaps.map(g => g.id), solution: t.solution, notes: Object.fromEntries(t.gaps.map(g => [g.id, g.note])), blocks: t.blocks.map(b => b.id), distractors: t.blocks.map(b => b.id).filter(b => !sol.includes(b)) };
+});
+const insBank = page => page.$$eval('.lf-block', b => b.map(x => x.getAttribute('data-block')));
+const insClick = async (page, gapId, blockId) => { await page.evaluate(b => document.querySelector(`.lf-block[data-block="${b}"]`).click(), blockId); await sleep(80); await page.evaluate(g => document.querySelector(`[data-gap="${g}"]`).click(), gapId); };
+const insPlaceMeasured = (page, gapId, blockId) => page.evaluate(([g, b]) => new Promise(res => {
+  document.querySelector(`.lf-block[data-block="${b}"]`).click();
+  const t0 = performance.now(); document.querySelector(`[data-gap="${g}"]`).click();
+  const state = document.querySelector(`[data-gap="${g}"]`).getAttribute('data-state');
+  const iv = setInterval(() => {
+    const cur = document.querySelector('[data-gap][aria-current="true"]'); const done = !!document.querySelector('.dc-summary');
+    if (done || (cur && cur.getAttribute('data-gap') !== g)) { clearInterval(iv); res({ ms: Math.round(performance.now() - t0), state, summary: done }); }
+  }, 10);
+  setTimeout(() => { clearInterval(iv); res({ ms: -1, state }); }, 3000);
+}), [gapId, blockId]);
+const slotStates = page => page.$$eval('[data-gap]', s => s.map(x => x.getAttribute('data-state')));
+// ---- cloze helpers
+const czIdx = async page => (await qnum(page)).match(/Hul (\d+) af/) ? +(await qnum(page)).match(/Hul (\d+) af/)[1] - 1 : -1;
+const czChooseMeasured = (page, i, wait = 3000) => page.evaluate(([i, wait]) => new Promise(res => {
+  const q = document.getElementById('lf-qnum'), before = q.textContent, t0 = performance.now();
+  const mo = new MutationObserver(() => { if (q.textContent !== before) { mo.disconnect(); res({ ms: Math.round(performance.now() - t0) }); } });
+  mo.observe(q, { childList: true, characterData: true, subtree: true });
+  setTimeout(() => { mo.disconnect(); res({ ms: -1 }); }, wait);
+  document.querySelector(`#lf-q [data-opt="${i}"]`).click();
+}), [i, wait]);
+const czInfo = page => page.evaluate(() => { const t = window.__cur(); return { id: t.id, gaps: t.gaps.map(g => ({ id: g.id, type: g.type, correct: g.correct, note: g.note, options: g.options })) }; });
+const effBgFn = `(function(){const parse=c=>(c.match(/[\\d.]+/g)||[]).map(Number);const lum=([r,g,b])=>{const f=v=>(v/=255)<=0.03928?v/12.92:((v+0.055)/1.055)**2.4;return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b)};
+ window.__p=parse;window.__ratio2=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+ window.__eff=el=>{const layers=[];for(let e=el;e;e=e.parentElement){const c=parse(getComputedStyle(e).backgroundColor);if(c.length>=3){const a=c[3]===undefined?1:c[3];if(a>0)layers.push([c.slice(0,3),a]);if(a>=1)break}}
+  let base=[255,255,255];for(let i=layers.length-1;i>=0;i--){const [c,a]=layers[i];base=[0,1,2].map(k=>c[k]*a+base[k]*(1-a))}return base};
+ window.__fg=(el,pseudo)=>{const c=parse(getComputedStyle(el,pseudo).color);const a=c[3]===undefined?1:c[3];const bg=window.__eff(el);return [0,1,2].map(k=>c[k]*a+bg[k]*(1-a))};
+ window.__cr=(el,pseudo)=>window.__ratio2(window.__fg(el,pseudo),window.__eff(el));})()`;
+// minimal PNG decoder (8-bit RGB/RGBA, non-interlaced): enough to sample pixels of an element screenshot
+function decodePng(buf) {
+  let p = 8, w = 0, h = 0, ct = 0; const idat = [];
+  while (p < buf.length) { const len = buf.readUInt32BE(p), type = buf.toString('ascii', p + 4, p + 8); const d = buf.subarray(p + 8, p + 8 + len);
+    if (type === 'IHDR') { w = d.readUInt32BE(0); h = d.readUInt32BE(4); ct = d[9]; } else if (type === 'IDAT') idat.push(d); p += 12 + len; }
+  const bpp = ct === 6 ? 4 : 3, raw = zlib.inflateSync(Buffer.concat(idat)), stride = w * bpp, out = Buffer.alloc(h * stride);
+  for (let y = 0; y < h; y++) { const f = raw[y * (stride + 1)]; for (let x = 0; x < stride; x++) { const v = raw[y * (stride + 1) + 1 + x]; const a = x >= bpp ? out[y * stride + x - bpp] : 0, b = y ? out[(y - 1) * stride + x] : 0, c = (x >= bpp && y) ? out[(y - 1) * stride + x - bpp] : 0;
+    out[y * stride + x] = f === 0 ? v : f === 1 ? (v + a) & 255 : f === 2 ? (v + b) & 255 : f === 3 ? (v + ((a + b) >> 1)) & 255 : (v + (() => { const pp = a + b - c, pa = Math.abs(pp - a), pb = Math.abs(pp - b), pc = Math.abs(pp - c); return pa <= pb && pa <= pc ? a : pb <= pc ? b : c; })()) & 255; } }
+  return { w, h, px: (x, y) => [out[y * stride + x * bpp], out[y * stride + x * bpp + 1], out[y * stride + x * bpp + 2]] };
+}
+const lumRgb = ([r, g, b]) => { const f = v => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+const ratioRgb = (a, b) => { const x = lumRgb(a), y = lumRgb(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+// ============ g3boot: first visit with the preloader, start screen, modes
+if (want('g3boot')) {
+  for (const vp of ['1440x900', '360x640']) {
+    const ctx = await browser.createBrowserContext(); const page = await ctx.newPage(); const issues = []; const reqs = [];
+    page.on('console', m => { if (['error', 'warning'].includes(m.type())) issues.push(`console.${m.type()}: ${m.text()}`); });
+    page.on('pageerror', e => issues.push('pageerror: ' + e.message)); page.on('requestfailed', r => issues.push('requestfailed: ' + r.url()));
+    page.on('request', r => reqs.push(r.url()));
+    await page.setViewport(VPS[vp]); await page.evaluateOnNewDocument(INSTRUMENT);
+    await page.goto(pathToFileURL(FILE).href, { waitUntil: 'domcontentloaded' });
+    const t0 = await page.evaluate(() => ({ pre: !!document.querySelector('.sd-pre'), preCls: (document.querySelector('.sd-pre') || {}).className, seen: localStorage.getItem('sd:intro-seen') }));
+    const bb = await page.$eval('#btn-play', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+    await page.mouse.click(bb.x, bb.y); await sleep(700);
+    const after = await page.evaluate(() => ({ play: !document.getElementById('screen-play').hidden, start: !document.getElementById('screen-start').hidden }));
+    note(`g3boot ${vp} preloader state at first click`, t0);
+    rec(`g3boot ${vp}: first visit (fresh storage, curtain present: ${t0.pre}, full intro: ${t0.preCls && !/is-quick/.test(t0.preCls)}) - the very first click on Spil right after DOMContentLoaded starts the game`, t0.seen === null && after.play && !after.start, JSON.stringify({ t0, after }));
+    await sleep(1200);
+    rec(`g3boot ${vp}: curtain removed within 2 s of load (no sd-pre left over)`, !(await page.$('.sd-pre')), '');
+    rec(`g3boot ${vp}: zero console errors/warnings/failed requests during first visit + first click`, issues.length === 0, issues.join(' | '));
+    rec(`g3boot ${vp}: every request is file:// (no network)`, reqs.every(u => u.startsWith('file://') || u.startsWith('data:')), reqs.filter(u => !u.startsWith('file://')).join(' '));
+    await ctx.close();
+  }
+  { const { page, issues } = await open('1440x900'); await sleep(1500);
+    const s = await page.evaluate(() => {
+      const st = document.getElementById('screen-start'); const nx = st.querySelector('.sd-next');
+      return { h1: st.querySelector('h1').textContent, modes: [...st.querySelectorAll('#ctl-mode button')].map(b => b.getAttribute('data-mode') + ':' + b.textContent + (b.getAttribute('aria-checked') === 'true' ? '*' : '')),
+        levels: [...st.querySelectorAll('#ctl-level button')].map(b => b.textContent), disclaimer: [...st.querySelectorAll('p')].map(p => p.textContent.trim()).filter(t => t.includes('Prøve i Dansk')),
+        next: nx ? { aria: nx.getAttribute('aria-label'), head: nx.querySelector('.sd-next-h').textContent, links: [...nx.querySelectorAll('a')].map(a => a.textContent.trim() + ' -> ' + a.getAttribute('href')) } : null,
+        sprite: !!st.querySelector('.lf-start-sprite svg, .lf-start-sprite .sd-sprite'), bar: (document.querySelector('.sd-bar') || {}).textContent, barH: Math.round(document.querySelector('.sd-bar').getBoundingClientRect().height) };
+    });
+    note('g3boot start screen', s);
+    rec('g3boot: start screen has title, Spil, 4 selectable modes (mc default), B1/B2, disclaimer, "Øv videre" block with 2 links, static bar "← MENU"', s.h1 === 'Læseforståelse' && s.modes.length === 4 && s.modes.some(m => /^mc:.*\*/.test(m)) && s.levels.length === 2 && s.disclaimer.length === 1 && s.next && s.next.head === 'Øv videre' && s.next.links.length >= 2 && /MENU/.test(s.bar), JSON.stringify(s));
+    // every mode selectable and playable to the first question
+    const seen = [];
+    for (const m of ['skim', 'mc', 'insert', 'cloze']) {
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.evaluate(m => document.querySelector(`#ctl-mode [data-mode="${m}"]`).click(), m);
+      const sel = await page.$eval(`#ctl-mode [data-mode="${m}"]`, b => b.getAttribute('aria-checked'));
+      await play(page); const h = await qnum(page); seen.push(`${m}:${sel}:${h}`); await page.click('#btn-menu'); await sleep(250);
+    }
+    rec('g3boot: each of the four modes is selectable (aria-checked) and Spil opens its first screen', seen.every(x => /:true:/.test(x)) && /^skim:true:Spørgsmål 1/.test(seen[0]) && /^mc:true:Spørgsmål 1/.test(seen[1]) && /^insert:true:Sæt afsnittet ind/.test(seen[2]) && /^cloze:true:Hul 1 af/.test(seen[3]), seen.join(' | '));
+    const small = await smallTapTargets(page); rec('g3boot: start-screen tap targets >=44 px', small.length === 0, small.join('; '));
+    await shot(page, '1440x900', 'g3-start');
+    rec('g3boot: console clean over the four-mode walk', issues.length === 0, issues.join(' | ')); await page.close(); }
+}
+
+// ============ g3seo: static checks of head, icons, sitemap, JSON-LD
+if (want('g3seo')) {
+  const html = fs.readFileSync(FILE, 'utf8'); const head = html.slice(0, html.indexOf('</head>'));
+  const title = (head.match(/<title>([^<]*)<\/title>/) || [])[1] || '', desc = (head.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '';
+  rec(`g3seo: title ${title.length} chars (30-65) and description ${desc.length} chars (70-170)`, title.length >= 30 && title.length <= 65 && desc.length >= 70 && desc.length <= 170, `${title} | ${desc}`);
+  const ld = [...head.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => m[1]); let parsed = [], perr = '';
+  try { parsed = ld.map(x => JSON.parse(x)); } catch (e) { perr = e.message; }
+  rec(`g3seo: ${ld.length} JSON-LD block(s) parse (${parsed.map(p => p['@type']).join(', ')})`, ld.length >= 1 && !perr, perr);
+  const canon = (head.match(/rel="canonical" href="([^"]*)"/) || [])[1], ogimg = (head.match(/property="og:image" content="([^"]*)"/) || [])[1], icon = [...head.matchAll(/rel="(?:icon|apple-touch-icon)"[^>]*href="([^"]*)"/g)].map(m => m[1]);
+  const REPO_ROOT = REPO; const local = u => u && u.startsWith('https://sjovtdansk.dk/') ? path.join(REPO_ROOT, u.replace('https://sjovtdansk.dk/', '')) : u && !/^https?:/.test(u) ? path.resolve(ROOT, u) : null;
+  const missing = [canon, ogimg, ...icon].filter(Boolean).map(local).filter(p => p && !fs.existsSync(p));
+  rec(`g3seo: canonical ${canon}, og:image ${ogimg}, ${icon.length} icon link(s) resolve to files`, !!canon && !!ogimg && missing.length === 0, 'missing: ' + missing.join(', '));
+  const sm = fs.existsSync(path.join(REPO, 'sitemap.xml')) ? fs.readFileSync(path.join(REPO, 'sitemap.xml'), 'utf8') : '';
+  rec('g3seo: sitemap.xml lists /laeseforstaaelse/index.html', /laeseforstaaelse\/index\.html/.test(sm), '');
+  const r = (() => { try { return { code: 0, out: execFileSync('node', [path.join(REPO, 'tests', 'seo-static.mjs')], { cwd: REPO, encoding: 'utf8' }) }; } catch (e) { return { code: e.status, out: (e.stdout || '') + (e.stderr || '') }; } })();
+  rec('g3seo: tests/seo-static.mjs exits 0', r.code === 0, 'exit ' + r.code + ' ' + r.out.trim().split('\n').slice(-1)[0]);
+}
+
+// ============ g3home: the home-page card
+if (want('g3home')) {
+  for (const vp of ['1440x900', '360x640']) {
+    const ctx = await browser.createBrowserContext(); const page = await ctx.newPage(); const issues = [];
+    page.on('console', m => { if (['error', 'warning'].includes(m.type())) issues.push(`console.${m.type()}: ${m.text()}`); }); page.on('pageerror', e => issues.push('pageerror: ' + e.message));
+    await page.setViewport(VPS[vp]);
+    await page.goto(pathToFileURL(path.join(REPO, 'index.html')).href, { waitUntil: 'load' }); await sleep(2200);
+    const card = await page.evaluate(() => { const a = document.querySelector('a[href="./laeseforstaaelse/index.html"]'); if (!a) return null; a.scrollIntoView({ block: 'center' }); const r = a.getBoundingClientRect(); const cs = getComputedStyle(a); return { text: a.innerText.replace(/\s+/g, ' ').slice(0, 120), w: Math.round(r.width), h: Math.round(r.height), vis: r.width > 0 && r.height > 0 && cs.visibility !== 'hidden', inView: r.top >= 0 && r.bottom <= innerHeight + 1, hOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth }; });
+    note(`g3home ${vp} card`, card);
+    rec(`g3home ${vp}: the Læseforståelse card renders from file:// (visible, >=44 px, no page overflow)`, !!card && card.vis && card.w >= 44 && card.h >= 44 && !card.hOverflow && /læseforståelse/i.test(card.text), JSON.stringify(card));
+    await shot(page, vp, 'g3-home-card');
+    await sleep(300);
+    const rect = await page.evaluate(() => { const r = document.querySelector('a[href="./laeseforstaaelse/index.html"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+    await page.mouse.click(rect.x, rect.y); await sleep(2500);
+    const url = page.url();
+    rec(`g3home ${vp}: clicking the card opens the game (file:// laeseforstaaelse/index.html) with a start screen`, /laeseforstaaelse\/index\.html/.test(url) && !!(await page.$('#btn-play')), url);
+    rec(`g3home ${vp}: console clean`, issues.length === 0, issues.join(' | '));
+    await ctx.close();
+  }
+}
+
+// SPLICED:b
+// ============ g3insert: both insert articles played to the end
+if (want('g3insert')) {
+  for (const id of ['art-samsoe', 'art-madspild']) {
+    const tag = `insert ${id}`;
+    // --- A: clean run, mouse: 5/5, advance timing, distractors remain
+    { const { page, issues } = await modeOpenAt('1440x900', 'insert', id);
+      const d = await insData(page);
+      const bank0 = await insBank(page);
+      const top0 = await page.evaluate(() => { const r = document.getElementById('lf-reader'), k = document.querySelector('.lf-kicker').getBoundingClientRect(), rr = r.getBoundingClientRect(); return { scrollTop: Math.round(r.scrollTop), kickerRel: Math.round(k.top - rr.top) }; });
+      rec(`${tag}: opens with 5 empty slots, a bank of 7 blocks (5 correct + 2 distractors), header "0 af 5 på plads", starts at the top`, d.gaps.length === 5 && bank0.length === 7 && d.distractors.length === 2 && (await slotStates(page)).every(s => s === 'empty') && /0 af 5 på plads/.test(await qnum(page)) && top0.kickerRel >= 0, JSON.stringify({ bank0: bank0.length, top0, head: await qnum(page) }));
+      await shot(page, '1440x900', 'g3-insert-start');
+      const adv = [];
+      for (let k = 0; k < 5; k++) {
+        const g = d.gaps[k]; const r = await insPlaceMeasured(page, g, d.solution[g]);
+        adv.push(r.ms); if (r.state !== 'ok') adv.push('state:' + r.state);
+        if (k === 3) { await sleep(150); const bank = await insBank(page); rec(`${tag}: after 4 correct placements the bank holds exactly the last block + both distractors`, bank.length === 3 && d.distractors.every(x => bank.includes(x)) && bank.includes(d.solution[d.gaps[4]]), bank.join(',')); }
+        if (k < 4) await sleep(200);
+      }
+      await sleep(300);
+      const s = await sumText(page), btns = await sumBtns(page), weak = await page.$$eval('#lf-q .dc-summary-weak li', l => l.length);
+      const unused = await page.$eval('#lf-unused', n => n.textContent).catch(() => null);
+      rec(`${tag}: each correct placement advances in 700-900 ms (first of the page load included): ${adv.join(',')}`, adv.length === 5 && adv.every(x => typeof x === 'number' && x >= 700 && x <= 900), adv.join(','));
+      rec(`${tag}: clean run -> summary Point: 5, Rigtige: 100%, no weakest, one action "Spil igen", "To afsnit blev ikke brugt."`, /Point: 5/.test(s) && /Rigtige: 100%/.test(s) && weak === 0 && btns.length === 1 && btns[0] === 'Spil igen' && unused === 'To afsnit blev ikke brugt.', s.slice(0, 120) + ' | ' + btns.join('/') + ' | ' + unused);
+      const live = await page.evaluate(() => [...document.querySelectorAll('[aria-live]')].map(n => n.textContent.trim()).join(' | '));
+      rec(`${tag}: no praise text on correct placements`, !PRAISE.test(await page.$eval('#screen-play', n => n.innerText)) && !PRAISE.test(live), live);
+      const keys = await srsKeys(page);
+      rec(`${tag}: SRS keys insert:<gap-id> x5 (laeseforstaaelse:insert:<id>), no indices`, keys.length === 5 && keys.every(k => new RegExp('^insert:' + id + '-g\\d$').test(k)), keys.join(','));
+      await shot(page, '1440x900', 'g3-insert-summary');
+      rec(`${tag}: console clean (clean run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+    // --- B: wrong placement -> note + Prøv igen, first-attempt scoring, Gentag fejl
+    { const { page, issues } = await modeOpenAt('1440x900', 'insert', id);
+      const d = await insData(page); const g2 = d.gaps[1], dis = d.distractors[0];
+      await insClick(page, g2, dis); await sleep(600);
+      const w = await page.evaluate(() => { const box = document.querySelector('.lf-fb-box'); return { txt: box ? box.innerText.replace(/\s+/g, ' ') : '', btn: !!document.getElementById('btn-retry'), active: document.activeElement.id, bankDisabled: [...document.querySelectorAll('.lf-block')].every(b => b.disabled), states: [...document.querySelectorAll('[data-gap]')].map(s => s.getAttribute('data-state')) }; });
+      rec(`${tag}: wrong block (distractor) in Hul 2 -> "Afsnittet passer ikke i Hul 2.", the gap note, "Prøv igen" focused, slot marked ✗ (text, not colour only), bank locked`, /Afsnittet passer ikke i Hul 2\./.test(w.txt) && w.txt.includes(d.notes[g2].slice(0, 40)) && w.btn && w.active === 'btn-retry' && w.states[1] === 'no' && w.bankDisabled, JSON.stringify(w).slice(0, 400));
+      const slotTxt = await page.$eval(`[data-gap="${g2}"]`, s => s.innerText.replace(/\s+/g, ' '));
+      rec(`${tag}: wrong slot shows "✗ passer ikke her" text`, /✗ passer ikke her/.test(slotTxt), slotTxt.slice(0, 80));
+      await shot(page, '1440x900', 'g3-insert-wrong');
+      await sleep(1500); rec(`${tag}: wrong placement waits for input (no auto-continue after 2 s)`, !!(await page.$('#btn-retry')) && (await slotStates(page))[1] === 'no', '');
+      await page.click('#btn-retry'); await sleep(300);
+      const bk = await insBank(page); const st2 = await slotStates(page);
+      rec(`${tag}: Prøv igen returns the block to the bank (7 blocks), slot empty again`, bk.length === 7 && bk.includes(dis) && st2[1] === 'empty', `${bk.length} ${st2.join(',')}`);
+      for (let k = 0; k < 5; k++) { const g = d.gaps[k]; await insPlaceMeasured(page, g, d.solution[g]); await sleep(k < 4 ? 900 : 200); }
+      await sleep(400);
+      const s = await sumText(page), btns = await sumBtns(page), weak = await page.$$eval('#lf-q .dc-summary-weak li', l => l.length);
+      rec(`${tag}: first-attempt scoring: one wrong attempt then correct -> summary Point: 4 (80%), 1 weakest, Spil igen + Gentag fejl (not 5/5)`, /Point: 4/.test(s) && /Rigtige: 80%/.test(s) && weak === 1 && btns.includes('Gentag fejl') && btns.includes('Spil igen'), s.slice(0, 160) + ' | ' + btns.join('/'));
+      const keys = await page.evaluate(() => JSON.parse(localStorage.getItem('srs:laeseforstaaelse')).items);
+      rec(`${tag}: SRS records the first attempt (g2 box 1, others box 2)`, keys['insert:' + g2].box === 1 && d.gaps.filter(g => g !== g2).every(g => keys['insert:' + g].box === 2), JSON.stringify(Object.fromEntries(Object.entries(keys).map(([k, v]) => [k, v.box]))));
+      await clickBtn(page, 'Gentag fejl'); await sleep(500);
+      const open = (await slotStates(page)).map((x, i) => x === 'empty' ? i + 1 : null).filter(Boolean);
+      rec(`${tag}: Gentag fejl re-opens exactly the missed gap (Hul 2) and the bank offers its block + the distractors`, JSON.stringify(open) === '[2]' && (await insBank(page)).length === 3, JSON.stringify(open) + ' bank ' + (await insBank(page)).length);
+      await insPlaceMeasured(page, g2, d.solution[g2]); await sleep(1200);
+      rec(`${tag}: after the retry the round ends again with Point: 5`, /Point: 5/.test(await sumText(page)), (await sumText(page)).slice(0, 60));
+      rec(`${tag}: console clean (wrong/retry run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+    // --- C: keyboard: number keys 1-7, slot first then number, Escape
+    { const { page, issues } = await modeOpenAt('1440x900', 'insert', id);
+      const d = await insData(page);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      await page.keyboard.press('1'); await sleep(120);
+      const sel = await page.$eval('.lf-block[aria-pressed="true"]', b => b.getAttribute('data-block')).catch(() => null);
+      const first = (await insBank(page))[0];
+      rec(`${tag}: key 1 selects bank block 1 (aria-pressed, "✓ Valgt" text)`, sel === first && /✓ valgt/i.test(await page.$eval(".lf-bank", n => n.innerText)), String(sel));
+      await page.keyboard.press('Escape'); await sleep(120);
+      rec(`${tag}: Escape clears the selection`, (await page.$$('.lf-block[aria-pressed="true"]')).length === 0, '');
+      await page.keyboard.press('8'); await page.keyboard.press('9'); await sleep(100);
+      rec(`${tag}: keys 8 and 9 (no such block when 7 offered) do nothing and do not throw`, (await page.$$('.lf-block[aria-pressed="true"]')).length === 0 && issues.length === 0, issues.join('|'));
+      const used = [];
+      for (let k = 0; k < 5; k++) {
+        const g = d.gaps[k], bank = await insBank(page), idx = bank.indexOf(d.solution[g]);
+        if (k % 2 === 0) { await page.keyboard.press(String(idx + 1)); await sleep(100); await page.evaluate(g => document.querySelector(`[data-gap="${g}"]`).click(), g); }
+        else { await page.evaluate(g => document.querySelector(`[data-gap="${g}"]`).click(), g); await sleep(100); await page.keyboard.press(String(idx + 1)); }
+        await sleep(950); used.push(idx + 1);
+      }
+      await sleep(300);
+      rec(`${tag}: all 5 blocks placed with number keys (key then slot, slot then key; keys used ${used.join(',')}) -> summary Point: 5`, /Point: 5/.test(await sumText(page)), (await sumText(page)).slice(0, 60));
+      await page.close(); }
+    // --- D: resume after reload; scroll anchor
+    { const { page, issues } = await modeOpenAt('1440x900', 'insert', id);
+      const d = await insData(page);
+      await insPlaceMeasured(page, d.gaps[0], d.solution[d.gaps[0]]); await sleep(900); await insPlaceMeasured(page, d.gaps[1], d.solution[d.gaps[1]]); await sleep(900);
+      await page.evaluate(() => { document.getElementById('lf-reader').scrollTop = 700; }); await sleep(500);
+      const saved = await page.evaluate(() => ({ ins: localStorage.getItem('laeseforstaaelse:insert:' + window.__cur().id), top: Math.round(document.getElementById('lf-reader').scrollTop) }));
+      await reload(page); await play(page); await sleep(300);
+      const after = await page.evaluate(() => ({ id: window.__cur() && window.__cur().id, states: [...document.querySelectorAll('[data-gap]')].map(s => s.getAttribute('data-state')), head: document.getElementById('lf-qnum').textContent, bank: document.querySelectorAll('.lf-block').length, top: Math.round(document.getElementById('lf-reader').scrollTop) }));
+      rec(`${tag}: reload mid-round -> Spil resumes the same article with 2 placed blocks (states ${after.states.join(',')}), bank 5, header "2 af 5 på plads"`, after.id === id && after.states.slice(0, 2).every(s => s === 'ok') && after.states.slice(2).every(s => s === 'empty') && after.bank === 5 && /2 af 5 på plads/.test(after.head), JSON.stringify(after));
+      note(`${tag}: scroll before/after resume`, `${saved.top} -> ${after.top}`);
+      for (let k = 2; k < 5; k++) { await insPlaceMeasured(page, d.gaps[k], d.solution[d.gaps[k]]); await sleep(k < 4 ? 900 : 300); }
+      await sleep(500);
+      const sm = await sumText(page);
+      rec(`${tag}: finishing the resumed round gives a summary (resumed gaps keep their first-attempt result: Point: 5), the saved round state is cleared`, /Point: 5/.test(sm) && (await page.evaluate(id => localStorage.getItem('laeseforstaaelse:insert:' + id), id)) === null, sm.slice(0, 60));
+      rec(`${tag}: console clean (resume run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+  }
+}
+
+// ============ g3cloze: the 3 cloze articles, 24 gaps through the UI
+if (want('g3cloze')) {
+  const SCRIPT = { 'art-bakken': { miss: [1, 2, 4, 5], weakest: 'Svageste type: modsætning (3 af 3 forkert).' }, 'art-cykelsti': { miss: [2, 4], weakest: 'Svageste type: modsætning og tilføjelse (1 af 2 forkert).' }, 'art-gaekkebrev': { miss: [1, 6], weakest: 'Svageste type: følge (1 af 1 forkert).' } };
+  for (const id of ['art-bakken', 'art-cykelsti', 'art-gaekkebrev']) {
+    const tag = `cloze ${id}`;
+    // --- A: all correct (mouse for gaps 1-3, number keys for the rest), advance timing
+    { const { page, issues } = await modeOpenAt('1440x900', 'cloze', id);
+      const d = await czInfo(page);
+      const top0 = await page.evaluate(() => { const r = document.getElementById('lf-reader'), k = document.querySelector('.lf-kicker').getBoundingClientRect(), rr = r.getBoundingClientRect(); return { scrollTop: Math.round(r.scrollTop), kickerRel: Math.round(k.top - rr.top) }; });
+      rec(`${tag}: opens at Hul 1 af 8, 8 empty inline slots, 4 options, first open starts at the top (scrollTop 0)`, d.gaps.length === 8 && (await czIdx(page)) === 0 && (await slotStates(page)).every(s => s === 'empty') && (await page.$$('#lf-q [data-opt]')).length === 4 && top0.kickerRel >= 0, JSON.stringify(top0));
+      await shot(page, '1440x900', 'g3-cloze-start');
+      const adv = [], inline = [], marked = [];
+      for (let k = 0; k < 8; k++) {
+        const g = d.gaps[k];
+        if (k >= 3) { // number key
+          const t0 = await page.evaluate(() => performance.now());
+          await page.evaluate(() => { window.__t0 = performance.now(); const q = document.getElementById('lf-qnum'); window.__before = q.textContent; window.__ms = -1; new MutationObserver((m, o) => { if (q.textContent !== window.__before) { window.__ms = Math.round(performance.now() - window.__t0); o.disconnect(); } }).observe(q, { childList: true, characterData: true, subtree: true }); });
+          await page.keyboard.press(String(g.correct + 1)); await sleep(1050);
+          adv.push(await page.evaluate(() => window.__ms));
+        } else { const r = await czChooseMeasured(page, g.correct); adv.push(r.ms); await sleep(150); }
+        const st = await page.$eval(`[data-gap="${g.id}"]`, s => ({ state: s.getAttribute('data-state'), txt: s.innerText.replace(/\s+/g, ' ') }));
+        inline.push(st.state === 'ok' && st.txt.includes(g.options[g.correct]));
+        await sleep(k < 3 ? 900 : 100);
+      }
+      await sleep(300);
+      const sm = await sumText(page);
+      rec(`${tag}: all 8 gaps answered correctly via UI (gaps 1-3 mouse, 4-8 keys 1-4): each fills inline with its word and ✓`, inline.every(Boolean), JSON.stringify(inline));
+      rec(`${tag}: every correct answer advances in 700-900 ms (first answer of the page load included): ${adv.join(',')}`, adv.every(x => x >= 700 && x <= 900), adv.join(','));
+      rec(`${tag}: perfect run -> Point: 8, Rigtige: 100%, "Ingen svage typer i denne runde.", one action Spil igen`, /Point: 8/.test(sm) && /Rigtige: 100%/.test(sm) && /Ingen svage typer i denne runde\./.test(sm) && (await sumBtns(page)).join('/') === 'Spil igen', sm.slice(0, 160));
+      const live = await page.evaluate(() => [...document.querySelectorAll('[aria-live]')].map(n => n.textContent.trim()).join(' | '));
+      rec(`${tag}: no praise text`, !PRAISE.test(await page.$eval('#screen-play', n => n.innerText)) && !PRAISE.test(live), live);
+      const keys = await srsKeys(page); const pats = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('srs:laeseforstaaelse')).patterns || {}));
+      rec(`${tag}: SRS keys cloze:<gap-id> x8 and patterns connector:<type>, no indices (patterns: ${pats.join(',')})`, keys.length === 8 && keys.every(k => new RegExp('^cloze:' + id + '-c\\d$').test(k)) && pats.length >= 3 && pats.every(p => /^connector:(kontrast|konsekvens|praecisering|tilfoejelse|tid)$/.test(p)), keys.join(',') + ' | ' + pats.join(','));
+      await shot(page, '1440x900', 'g3-cloze-summary');
+      rec(`${tag}: console clean (perfect run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+    // --- B: scripted misses: wrong option reveals the right one + note, waits for Næste; weakest line
+    { const { page, issues } = await modeOpenAt('1440x900', 'cloze', id);
+      const d = await czInfo(page); const miss = SCRIPT[id].miss; const rows = [];
+      for (let k = 0; k < 8; k++) {
+        const g = d.gaps[k];
+        if (miss.includes(k)) {
+          const wrongI = (g.correct + 1) % 4; await czChooseMeasured(page, wrongI, 150); await sleep(1300);
+          const w = await page.evaluate(gid => { const box = document.querySelector('#lf-q .lf-fb-box'); const sl = document.querySelector(`[data-gap="${gid}"]`); return { head: document.getElementById('lf-qnum').textContent, box: box ? box.innerText.replace(/\s+/g, ' ') : '', cont: !!document.getElementById('btn-continue'), marked: [...document.querySelectorAll('#lf-q [data-opt]')].map(b => b.className + (b.disabled ? ' D' : '')), slot: sl.getAttribute('data-state'), slotTxt: sl.innerText.replace(/\s+/g, ' '), active: document.activeElement.id }; }, g.id);
+          rows.push({ k: k + 1, waits: w.head.startsWith(`Hul ${k + 1} af`), word: w.box.includes('Rigtigt ord: ' + g.options[g.correct]), note: w.box.includes(g.note.slice(0, 30)), cont: w.cont && w.active === 'btn-continue', right: w.marked[g.correct].includes('dc-correct'), wrong: w.marked[wrongI].includes('dc-wrong'), allDisabled: w.marked.every(m => / D$/.test(m)), slot: w.slot === 'no' && w.slotTxt.includes(g.options[g.correct]) && /✗/.test(w.slotTxt) });
+          if (k === miss[0]) await shot(page, '1440x900', 'g3-cloze-wrong');
+          await page.evaluate(() => document.getElementById('btn-continue').click()); await sleep(300);
+        } else { await czChooseMeasured(page, g.correct); await sleep(1000); }
+      }
+      await sleep(400);
+      const bad = rows.filter(r => !(r.waits && r.word && r.note && r.cont && r.right && r.wrong && r.allDisabled && r.slot));
+      rec(`${tag}: each scripted miss (gaps ${miss.map(x => x + 1).join(',')}): header stays, "Rigtigt ord: <word>", the gap note, right option marked + wrong marked (✓/✗ via class), options locked, slot shows ✗ + right word, Næste focused`, bad.length === 0 && rows.length === miss.length, JSON.stringify(bad.length ? bad : rows.length));
+      const sm = await sumText(page), weak = await page.$$eval('#lf-q .dc-summary-weak li', l => l.map(x => x.textContent)), btns = await sumBtns(page);
+      const wk = await page.$eval('#lf-weakest', n => n.textContent).catch(() => null);
+      rec(`${tag}: scripted run (${miss.length} misses) -> Point: ${8 - miss.length}, <=3 weakest listed, "weakest type" line = "${SCRIPT[id].weakest}"`, new RegExp('Point: ' + (8 - miss.length) + '\\b').test(sm) && weak.length === Math.min(3, miss.length) && wk === SCRIPT[id].weakest, `${sm.slice(0, 40)} | weak ${weak.length} | line "${wk}"`);
+      rec(`${tag}: summary actions Spil igen + Gentag fejl`, btns.includes('Spil igen') && btns.includes('Gentag fejl'), btns.join('/'));
+      const pat = await page.evaluate(() => JSON.parse(localStorage.getItem('srs:laeseforstaaelse')).patterns);
+      note(`${tag}: pattern counters`, pat);
+      await clickBtn(page, 'Gentag fejl'); await sleep(500);
+      const seen = [];
+      for (let k = 0; k < miss.length; k++) { const i = await czIdx(page); seen.push(i + 1); const g = d.gaps[i]; await czChooseMeasured(page, g.correct); await sleep(1050); }
+      await sleep(300);
+      rec(`${tag}: Gentag fejl asks exactly the missed gaps ${miss.map(x => x + 1).join(',')} (asked ${seen.join(',')}) then a summary`, JSON.stringify(seen) === JSON.stringify(miss.map(x => x + 1)) && /Point: 8/.test(await sumText(page)), seen.join(',') + ' | ' + (await sumText(page)).slice(0, 50));
+      rec(`${tag}: console clean (scripted run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+    // --- C: resume after reload
+    { const { page, issues } = await modeOpenAt('1440x900', 'cloze', id);
+      const d = await czInfo(page);
+      for (let k = 0; k < 3; k++) { await czChooseMeasured(page, d.gaps[k].correct); await sleep(1000); }
+      await reload(page); await play(page); await sleep(300);
+      const after = await page.evaluate(() => ({ id: window.__cur() && window.__cur().id, states: [...document.querySelectorAll('[data-gap]')].map(s => s.getAttribute('data-state')), head: document.getElementById('lf-qnum').textContent }));
+      rec(`${tag}: reload after 3 answers -> Spil resumes the same article at Hul 4 with gaps 1-3 filled`, after.id === id && after.states.slice(0, 3).every(s => s === 'ok') && after.states.slice(3).every(s => s === 'empty') && /^Hul 4 af 8/.test(after.head), JSON.stringify(after));
+      rec(`${tag}: console clean (resume run)`, issues.length === 0, issues.join(' | ')); await page.close(); }
+  }
+}
+
+// SPLICED:c
+// ============ shared per-mode definitions for the cross-mode sections
+const MD = {
+  mc: { id: 'art-ulven', psel: '#lf-text > p:not(.lf-kicker)', btn: '#btn-continue', dup: page => page.evaluate(() => window.__cur().questions[0].q),
+    wrong: async page => { const c = await page.evaluate(() => window.__cur().questions[0].correct); await clickOpt(page, (c + 1) % 3); }, wrongWait: 1100 },
+  skim: { id: 'haefte-kolonihave', psel: '#lf-text .lf-notice p', btn: '#btn-continue', dup: page => page.evaluate(() => window.__cur().questions[0].q),
+    wrong: page => submitMeasured(page, WRONG, 150), wrongWait: 1300 },
+  insert: { id: 'art-samsoe', psel: '#lf-text > p:not(.lf-kicker)', btn: '#btn-retry', dup: async () => 'Sæt afsnittet ind',
+    wrong: async page => { const d = await insData(page); await insClick(page, d.gaps[0], d.distractors[0]); }, wrongWait: 900 },
+  cloze: { id: 'art-bakken', psel: '#lf-text > p:not(.lf-kicker)', btn: '#btn-continue', dup: async () => 'Hvilket ord passer',
+    wrong: async page => { const d = await czInfo(page); const i = Math.max(0, await czIdx(page)); await czChooseMeasured(page, (d.gaps[i].correct + 1) % 4, 150); }, wrongWait: 1300 },
+};
+const cplOf = psel => { const lines = p => { const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); const map = new Map(); let n; while ((n = w.nextNode())) for (let i = 0; i < n.length; i++) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1); const b = r.getClientRects()[0]; if (!b || !b.width) continue; const k = Math.round(b.top); map.set(k, (map.get(k) || 0) + 1); } return [...map.values()]; };
+  const all = [...document.querySelectorAll(psel)].map(lines).filter(a => a.length); const full = all.flatMap(a => a.slice(0, -1)).sort((x, y) => x - y); return { n: all.length, median: full[Math.floor(full.length / 2)], max: Math.max(...all.flat()) }; };
+
+// ============ g3persist: first open at the top for all 10 texts, scroll anchor, SRS key formats
+if (want('g3persist')) {
+  const TEXTS = [['skim', 'haefte-kolonihave'], ['skim', 'haefte-rebildfest'], ['mc', 'art-ulven'], ['mc', 'art-dialekter'], ['mc', 'art-efterskole'], ['insert', 'art-samsoe'], ['insert', 'art-madspild'], ['cloze', 'art-bakken'], ['cloze', 'art-cykelsti'], ['cloze', 'art-gaekkebrev']];
+  for (const vp of ['1440x900', '360x640']) {
+    const rows = [];
+    for (const [mode, id] of TEXTS) {
+      const { page } = await modeOpenAt(vp, mode, id);
+      const m = await page.evaluate(() => { const r = document.getElementById('lf-reader'), k = document.querySelector('.lf-kicker').getBoundingClientRect(), rr = r.getBoundingClientRect(); const g = document.querySelector('[data-gap][aria-current="true"]'); const gr = g && g.getBoundingClientRect(); return { scrollTop: Math.round(r.scrollTop), kickerRel: Math.round(k.top - rr.top), gapInView: gr ? gr.top >= rr.top && gr.bottom <= rr.bottom : null }; });
+      rows.push({ id, ...m }); await page.close();
+    }
+    note(`g3persist ${vp} first-open scrollTop`, rows.map(r => `${r.id}:${r.scrollTop}${r.gapInView === null ? '' : '/gap' + r.gapInView}`).join(' '));
+    const bad = rows.filter(r => !(r.scrollTop === 0 && r.kickerRel >= 0) && !(vp === '360x640' && /cloze|bakken|cykelsti|gaekkebrev/.test(r.id) && r.gapInView === true));
+    rec(`g3persist ${vp}: every one of the 10 texts opens at scrollTop 0 with kicker visible (cloze at 360 may centre the active gap instead: ${rows.filter(r => r.scrollTop > 0).map(r => r.id).join(',') || 'none did'})`, bad.length === 0, JSON.stringify(bad));
+    if (vp === '360x640') rec('g3persist 360x640: where a cloze article opens scrolled, the active gap is fully inside the reader (accepted behaviour)', rows.filter(r => r.scrollTop > 0).every(r => r.gapInView === true), JSON.stringify(rows.filter(r => r.scrollTop > 0)));
+  }
+  for (const [mode, id] of [['skim', 'haefte-rebildfest'], ['mc', 'art-dialekter'], ['insert', 'art-madspild'], ['cloze', 'art-cykelsti']]) {
+    const { page, issues } = await modeOpenAt('1440x900', mode, id);
+    await page.evaluate(() => { document.getElementById('lf-reader').scrollTop = 1000; }); await sleep(600);
+    const st1 = await page.evaluate(() => ({ top: Math.round(document.getElementById('lf-reader').scrollTop), saved: localStorage.getItem('laeseforstaaelse:scroll:' + window.__cur().id) }));
+    await reload(page); await playText(page, id); await sleep(400);
+    const st2 = await page.evaluate(() => Math.round(document.getElementById('lf-reader').scrollTop));
+    rec(`g3persist ${mode} ${id}: reader scroll anchor survives reload (${st1.top} -> ${st2})`, st1.top > 500 && Math.abs(st2 - st1.top) <= 3 && !!st1.saved, JSON.stringify(st1));
+    rec(`g3persist ${mode} ${id}: console clean`, issues.length === 0, issues.join(' | ')); await page.close();
+  }
+  { // one answer in each mode in one storage -> key formats
+    const o = await open('1440x900'); const page = o.page;
+    for (const [mode, id] of [['mc', 'art-ulven'], ['skim', 'haefte-kolonihave'], ['insert', 'art-samsoe'], ['cloze', 'art-bakken']]) {
+      if (mode !== 'mc') { await page.click('#btn-menu'); await sleep(200); }
+      await page.evaluate(m => document.querySelector(`#ctl-mode [data-mode="${m}"]`).click(), mode); await playText(page, id);
+      if (mode === 'mc') { await clickOpt(page, await page.evaluate(() => window.__cur().questions[0].correct)); await sleep(950); }
+      if (mode === 'skim') { const q = (await skimQ(page)).q; await submitMeasured(page, q.accepted[0]); await sleep(950); }
+      if (mode === 'insert') { const d = await insData(page); await insPlaceMeasured(page, d.gaps[0], d.solution[d.gaps[0]]); await sleep(950); }
+      if (mode === 'cloze') { const d = await czInfo(page); await czChooseMeasured(page, d.gaps[0].correct); await sleep(950); }
+    }
+    const keys = await srsKeys(page); const pats = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('srs:laeseforstaaelse')).patterns || {})); const lk = await lsKeys(page);
+    note('g3persist all-mode srs keys', keys.join(',') + ' | patterns ' + pats.join(',') + ' | ls ' + lk.join(','));
+    rec('g3persist: SRS keys per mode are <mode>:<text>-<q|g|c><n> (= laeseforstaaelse:<mode>:<id>); pattern connector:<type>; no array indices anywhere in localStorage', ['mc:art-ulven-q1', 'skim:haefte-kolonihave-q01', 'insert:art-samsoe-g1', 'cloze:art-bakken-c1'].every(k => keys.includes(k)) && keys.every(k => /^(mc|skim|insert|cloze):art-[a-z]+-(q|g|c)\d+$|^skim:haefte-[a-z]+-q\d\d$/.test(k)) && pats.every(p => /^connector:/.test(p)) && lk.every(k => !/(^|:)\d+$/.test(k)), keys.join(','));
+    rec('g3persist: console clean over four-mode walk', o.issues.length === 0, o.issues.join(' | ')); await page.close();
+  }
+}
+
+// ============ g3layout: all four modes x seven viewports (six + 390x844), phone numbers
+if (want('g3layout')) {
+  for (const vp of ALL_VPS) {
+    const [W, H] = [VPS[vp].width, VPS[vp].height];
+    for (const mode of Object.keys(MD)) {
+      const def = MD[mode]; const tag = `g3layout ${vp} ${mode}`;
+      const { page, issues } = await modeOpenAt(vp, mode, def.id);
+      await page.evaluate(contrastFn);
+      const needle = await def.dup(page);
+      const m = await page.evaluate((psel, needle) => {
+        const rd = document.getElementById('lf-reader'), pn = document.getElementById('lf-panel'), tx = document.getElementById('lf-text');
+        const ps = [...document.querySelectorAll(psel)]; const lastP = ps[ps.length - 1]; const foot = tx.querySelector('.lf-foot');
+        rd.scrollTo(0, 0); const before = rd.scrollTop; rd.scrollTo(0, 1e6); const end = rd.scrollTop;
+        const rr = rd.getBoundingClientRect(), pr = pn.getBoundingClientRect(), lp = lastP.getBoundingClientRect(), fo = foot.getBoundingClientRect();
+        const sideBySide = pr.left >= rr.right - 1; const lim = sideBySide ? rr.bottom : pr.top;
+        const top = document.querySelector('.lf-top').getBoundingClientRect(), bar = document.querySelector('.sd-bar'); const peek = document.getElementById('lf-peek'), pk = peek.getBoundingClientRect();
+        const first = document.querySelector(psel.split(',')[0].includes('lf-notice') ? '#lf-text section h2' : '#lf-text [data-par]') || ps[0];
+        const cs = getComputedStyle(first, '::before'); const sp = document.createElement('span'); sp.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${cs.font}`; sp.textContent = '¶8'; document.body.appendChild(sp); const nw = sp.getBoundingClientRect().width; sp.remove();
+        const res = {
+          docScroll: [document.documentElement.scrollHeight, innerHeight, document.body.scrollHeight], hOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth || rd.scrollWidth > rd.clientWidth,
+          reader: { sh: rd.scrollHeight, ch: rd.clientHeight, moved: end - before, ofy: getComputedStyle(rd).overflowY, ov: getComputedStyle(rd).overscrollBehaviorY },
+          panel: { ofy: getComputedStyle(pn).overflowY, ov: getComputedStyle(pn).overscrollBehaviorY, h: Math.round(pr.height) }, sideBySide, below: pr.top >= rr.bottom - 1,
+          lastToLimit: Math.round(lim - lp.bottom), footToLimit: Math.round(lim - fo.bottom), readerH: Math.round(rr.height), topH: Math.round(top.height), barH: bar ? Math.round(bar.getBoundingClientRect().height) : 0,
+          peekVisible: pk.height > 2 && pk.width > 2 && getComputedStyle(peek).visibility !== 'hidden' && getComputedStyle(document.getElementById('btn-panel').parentElement).display !== 'none' && getComputedStyle(peek.closest('.lf-panel-head')).display !== 'none' && pk.width > 0,
+          dupCount: needle ? (document.getElementById('screen-play').innerText.split(needle).length - 1 - ((pk.width <= 2 || pk.height <= 2) && peek.textContent.includes(needle) ? 1 : 0)) : 0,
+          marginStacked: cs.position !== 'absolute', marginGap: Math.round(tx.getBoundingClientRect().left - rr.left), marginNeed: Math.round(nw + 8), marginContent: cs.content,
+        }; rd.scrollTo(0, 0); return res;
+      }, def.psel, needle);
+      const cpl = await page.evaluate(cplOf, def.psel);
+      const key = `${vp} ${mode}`; metrics[key] = { layout: m.sideBySide ? 'side' : 'stacked', readerH: m.readerH, readerPct: +(m.readerH / H * 100).toFixed(1), panelH: m.panel.h, topH: m.topH, barH: m.barH, cplMedian: cpl.median, cplMax: cpl.max, paras: cpl.n, peekVisibleWhenOpen: m.peekVisible, dupCount: m.dupCount };
+      const wantSide = W >= 1024;
+      rec(`${tag}: page does not scroll; reader scrolls; no horizontal overflow`, m.docScroll[0] <= m.docScroll[1] && m.docScroll[2] <= m.docScroll[1] && m.reader.sh > m.reader.ch && m.reader.moved > 50 && !m.hOverflow, JSON.stringify({ doc: m.docScroll, reader: m.reader, h: m.hOverflow }));
+      rec(`${tag}: panel is ${wantSide ? 'right of' : 'below'} the text; both panes overflow auto + overscroll contain`, (wantSide ? m.sideBySide : (m.below && !m.sideBySide)) && m.reader.ofy === 'auto' && m.panel.ofy === 'auto' && m.reader.ov === 'contain' && m.panel.ov === 'contain', `side=${m.sideBySide} below=${m.below}`);
+      rec(`${tag}: last paragraph and footer end above the panel / inside the reader at the end of the scroll`, m.lastToLimit >= 0 && m.footToLimit >= 0, `last ${m.lastToLimit}px footer ${m.footToLimit}px`);
+      const exempt = W < 640;
+      rec(`${tag}: characters per line median ${cpl.median} max ${cpl.max} (wide: expect 64/69-71; <=75; phone ~37/41-43)`, exempt ? cpl.max <= 50 : (cpl.max <= 75 && cpl.median >= 60), JSON.stringify(cpl));
+      rec(`${tag}: margin number has room (${m.marginStacked ? 'stacked above paragraph' : 'gap ' + m.marginGap + ' >= ' + m.marginNeed}) and is not clipped`, m.marginStacked || m.marginGap >= m.marginNeed, JSON.stringify({ g: m.marginGap, need: m.marginNeed, content: m.marginContent }));
+      const small = await smallTapTargets(page); rec(`${tag}: play-screen tap targets >=44 px`, small.length === 0, small.join('; '));
+      if (W < 640) note(`${tag}: PHONE numbers (before answering)`, `header ${m.topH}px, static bar ${m.barH}px, reader ${m.readerH}px = ${(m.readerH / H * 100).toFixed(0)} % of ${H}, panel ${m.panel.h}px (${(m.panel.h / H * 100).toFixed(0)} %), peek visible while panel open: ${m.peekVisible}, question/prompt text occurrences: ${m.dupCount}`);
+      if (W < 640) rec(`${tag}: duplicated question gone while the panel is open (peek hidden, prompt text appears once: ${m.dupCount}x)`, m.dupCount <= 1 && !m.peekVisible, JSON.stringify({ peek: m.peekVisible, dup: m.dupCount }));
+      if (['1440x900', '820x1180', '360x640', '390x844'].includes(vp)) await shot(page, vp, `g3-${mode}-play`);
+      // ---- wrong state
+      await def.wrong(page); await sleep(def.wrongWait);
+      const w = await page.evaluate(btn => {
+        const b = document.querySelector(btn), pn = document.getElementById('lf-panel'); if (!b) return null;
+        const r0 = b.getBoundingClientRect(); const below0 = Math.round(Math.max(0, r0.bottom - innerHeight)); const scrollable = pn.scrollHeight > pn.clientHeight + 1; const panelBottom = pn.getBoundingClientRect().bottom;
+        const hidden0 = r0.bottom > Math.min(innerHeight, panelBottom) + 1 || r0.top < 0;
+        const vis = r => r.top >= 0 && r.bottom <= Math.min(innerHeight, pn.getBoundingClientRect().bottom) + 1; let reach = !hidden0; if (!reach) { b.scrollIntoView({ block: 'nearest' }); reach = vis(b.getBoundingClientRect()); }
+        pn.scrollTop = 0; return { below0, scrollable, hidden0, reach, active: document.activeElement.id, panelSH: pn.scrollHeight, panelCH: pn.clientHeight, w: Math.round(r0.width), h: Math.round(r0.height) };
+      }, def.btn);
+      metrics[key].wrong = w;
+      rec(`${tag}: after a wrong answer "${def.btn.slice(1)}" exists, is >=44 px and is reachable (focused: ${w && w.active})`, !!w && w.w >= 44 && w.h >= 44 && w.reach, JSON.stringify(w));
+      if (W < 640) note(`${tag}: PHONE wrong-state reach`, `${def.btn} ${w && (w.hidden0 ? 'is outside the visible panel by ' + w.below0 + ' px (panel scrolls: ' + w.scrollable + ', reachable by scrolling: ' + w.reach + ')' : 'is visible without scrolling')}; panel ${w && w.panelSH}/${w && w.panelCH}`);
+      const small2 = await smallTapTargets(page); rec(`${tag}: wrong-state tap targets >=44 px, no h-overflow, page does not scroll`, small2.length === 0 && !(await hasHorizontalOverflow(page)) && (await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)), small2.join('; '));
+      if (['1440x900', '820x1180', '360x640', '390x844'].includes(vp)) await shot(page, vp, `g3-${mode}-wrong`);
+      // wheel isolation at wide + stacked
+      await page.evaluate(() => { document.getElementById('lf-reader').scrollTop = 300; document.getElementById('lf-panel').scrollTop = 0; });
+      const pb = await page.$eval('#lf-panel', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + Math.min(r.height / 2, 60) }; });
+      await page.mouse.move(pb.x, pb.y); for (let i = 0; i < 3; i++) await page.mouse.wheel({ deltaY: 400 }); await sleep(250);
+      const r1 = await page.$eval('#lf-reader', r => Math.round(r.scrollTop));
+      rec(`${tag}: wheel over the question pane does not move the reading pane (reader stays 300, got ${r1})`, r1 === 300, '');
+      rec(`${tag}: console clean`, issues.length === 0, issues.join(' | '));
+      await page.close();
+    }
+  }
+  fs.writeFileSync(path.join(OUT, 'laese-g3-metrics.json'), JSON.stringify(metrics, null, 2));
+}
+
+// SPLICED:d
+// ============ g3answers: accepted[] versus wrong near-miss values (node level, own wrong values)
+if (want('g3answers')) {
+  const norm = s => String(s).toLowerCase().replace(/[‘’`´]/g, "'").trim().replace(/\s+/g, ' ').replace(/[.!?]+$/g, '').trim();
+  const MONTH = '(?:januar|februar|marts|april|maj|juni|juli|august|september|oktober|november|december)';
+  const TOK = [new RegExp('kl\\.? ?\\d{1,2}(?:[.:]\\d{2})?(?: ?[-–] ?\\d{1,2}(?:[.:]\\d{2})?| til \\d{1,2}(?:[.:]\\d{2})?)?', 'gi'), /\d[\d.]* ?kr\.?/gi, new RegExp('\\d{1,2}\\. ' + MONTH + '(?: \\d{4})?', 'gi'), /\d[\d,.]* ?(?:meter|m²|m2|ha|år|minutter|kvadratmeter)/gi, /\b1[5-9]\d\d\b/g];
+  let tested = 0, bad = []; const perQ = [];
+  for (const t of SKIM) {
+    const allCand = new Set();
+    for (const n of t.notices) for (const re of TOK) for (const m of n.body.matchAll(re)) allCand.add(m[0].trim());
+    for (const q of t.questions) {
+      const acc = new Set(q.accepted.map(norm));
+      // 1) accepted[0] of every other question of the booklet must be rejected (unless the two answers are identical strings)
+      for (const o of t.questions) if (o.id !== q.id) { tested++; if (acc.has(norm(o.accepted[0])) && !new Set(o.accepted.map(norm)).has(norm(q.accepted[0]))) bad.push(`${q.id} accepts other answer "${o.accepted[0]}" of ${o.id}`); }
+      // 2) every time/price/date/measure token in the booklet that is not part of this answer must be rejected (with and without "kl."/"kr." decoration)
+      const own = norm(q.accepted[0]); const dg = x => norm(x).replace(/[.:]00\b/g, '').replace(/\D/g, '');
+      for (const c of allCand) { const nc = norm(c); if (own.includes(nc) || nc.includes(own) || (dg(c) && dg(c) === dg(own))) continue; for (const v of [nc, 'fra ' + nc, nc.replace(/^kl\.? ?/, '')]) { tested++; if (acc.has(v)) bad.push(`${q.id} accepts booklet value "${v}"`); } }
+      // 3) digit perturbations of accepted[0] (+1 / -1 on each digit) must be rejected
+      const a0 = q.accepted[0];
+      for (let i = 0; i < a0.length; i++) if (/\d/.test(a0[i])) for (const dlt of [1, -1]) { const nd = +a0[i] + dlt; if (nd < 0 || nd > 9) continue; const p = a0.slice(0, i) + nd + a0.slice(i + 1); tested++; if (acc.has(norm(p))) bad.push(`${q.id} accepts perturbed "${p}"`); }
+      perQ.push(q.accepted.length);
+    }
+  }
+  note('g3answers: accepted[] sizes', `min ${Math.min(...perQ)} max ${Math.max(...perQ)} total ${perQ.reduce((a, b) => a + b, 0)}`);
+  rec(`g3answers: ${tested} wrong near-miss values (other questions' answers, every other time/price/date/measure in the booklet incl. decorated forms, digit perturbations of the answer) are all rejected by accepted[]`, tested >= 125 && bad.length === 0, bad.slice(0, 8).join(' | ') + ` (tested ${tested})`);
+  const empties = []; for (const t of SKIM) for (const q of t.questions) if (!q.accepted.length || q.accepted.some(x => !String(x).trim())) empties.push(q.id);
+  rec('g3answers: no empty accepted[] entries', empties.length === 0, empties.join(','));
+  const nonVerb = []; for (const t of SKIM) for (const q of t.questions) { const own = t.notices.find(n => n.id === q.noticeId); if (!hasAnswer(own.body, q.accepted[0])) nonVerb.push(q.id + ' "' + q.accepted[0] + '"'); }
+  rec('g3answers: accepted[0] (shown to the learner as "Rigtigt svar") is verbatim in the named notice for all 30 questions', nonVerb.length === 0, nonVerb.join(' | '));
+}
+
+// ============ g3kbd: keyboard in mc / insert / cloze (skim has its own section)
+if (want('g3kbd')) {
+  for (const mode of ['mc', 'insert', 'cloze']) {
+    const def = MD[mode]; const tag = `g3kbd ${mode}`;
+    const { page, issues } = await modeOpenAt('1440x900', mode, def.id);
+    await page.evaluate(() => document.activeElement && document.activeElement.blur()); await page.mouse.click(5, 5); await page.evaluate(() => window.scrollTo(0, 0));
+    const visited = [];
+    for (let i = 0; i < 70; i++) {
+      await page.keyboard.press('Tab');
+      const r = await page.evaluate(() => { const el = document.activeElement; if (!el || el === document.body) return null; const cs = getComputedStyle(el); return { k: el.id || el.getAttribute('data-gap') || el.getAttribute('data-block') || (el.getAttribute('data-opt') !== null ? 'opt' + el.getAttribute('data-opt') : el.tagName.toLowerCase() + ':' + (el.getAttribute('aria-label') || el.textContent).trim().slice(0, 16)), ring: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) >= 2, b: cs.boxShadow !== 'none' }; });
+      if (!r) continue; if (visited.length && visited[0].k === r.k) break; visited.push(r);
+    }
+    const focusable = await page.evaluate(() => [...document.querySelectorAll('button, a[href], summary, [tabindex="0"], input, select')].filter(e => { const r = e.getBoundingClientRect(); const closed = e.tagName !== 'SUMMARY' && e.closest('details:not([open])'); return r.width && r.height && !closed && getComputedStyle(e).visibility !== 'hidden' && !e.disabled; }).map(e => e.id || e.getAttribute('data-gap') || e.getAttribute('data-block') || (e.getAttribute('data-opt') !== null ? 'opt' + e.getAttribute('data-opt') : e.tagName.toLowerCase() + ':' + (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 16))));
+    note(`${tag}: tab order`, visited.map(v => v.k).join(' > '));
+    const missed = focusable.filter(f => !visited.some(v => v.k === f));
+    rec(`${tag}: Tab reaches every visible control (${focusable.length}) incl. ${mode === 'insert' ? 'slots and bank blocks' : mode === 'cloze' ? 'gap buttons and the 4 options' : 'the 3 options'}`, missed.length === 0, 'missed: ' + missed.join(', '));
+    rec(`${tag}: every tabbed control shows a focus ring (outline >=2 px)`, visited.filter(v => !v.ring && !v.b).length === 0, visited.filter(v => !v.ring && !v.b).map(v => v.k).join(', '));
+    // Escape closes Kilder
+    await page.evaluate(() => document.querySelector('.lf-foot details').setAttribute('open', '')); await page.keyboard.press('Escape');
+    rec(`${tag}: Escape closes the Kilder details`, !(await page.$eval('.lf-foot details', d => d.open)), '');
+    // arrows / page keys not captured
+    await page.evaluate(() => { window.__pd = []; window.addEventListener('keydown', e => window.__pd.push(e.key + ':' + e.defaultPrevented)); });
+    const tops = [];
+    for (const [k, start, dir] of [['ArrowDown', 0, 1], ['PageDown', 0, 1], ['Space', 0, 1], ['ArrowUp', 600, -1], ['PageUp', 900, -1]]) {
+      await page.evaluate(t => { const r = document.getElementById('lf-reader'); r.scrollTop = t; r.focus(); }, start); await sleep(150);
+      await page.keyboard.press(k); await sleep(800);
+      const t = await page.$eval('#lf-reader', r => Math.round(r.scrollTop)); tops.push(`${k}:${start}->${t}`); if (!((t - start) * dir > 0)) tops.push('NOMOVE');
+    }
+    const pd = await page.evaluate(() => window.__pd);
+    rec(`${tag}: arrows / PageUp / PageDown / Space are not captured and scroll the focused reading pane`, pd.length >= 5 && pd.every(x => x.endsWith(':false')) && !tops.includes('NOMOVE'), tops.join(' ') + ' | ' + pd.filter(x => !x.endsWith(':false')).join(' '));
+    // J next / K previous
+    await page.evaluate(() => { document.activeElement.blur(); });
+    if (mode === 'mc') { await page.keyboard.press('j'); await sleep(200); const a = await qnum(page); await page.keyboard.press('k'); await sleep(200); const b = await qnum(page);
+      rec(`${tag}: J = next question, K = previous (${a} / ${b})`, a === 'Spørgsmål 2 af 3' && b === 'Spørgsmål 1 af 3', `${a} / ${b}`); }
+    if (mode === 'cloze') { await page.keyboard.press('j'); await sleep(250); const a = await qnum(page); await page.keyboard.press('k'); await sleep(250); const b = await qnum(page);
+      rec(`${tag}: J = next gap, K = previous (${a.slice(0, 12)} / ${b.slice(0, 12)})`, /^Hul 2 af 8/.test(a) && /^Hul 1 af 8/.test(b), `${a} / ${b}`);
+      await page.keyboard.press('5'); await sleep(100); rec(`${tag}: key 5 (no fifth option) does nothing`, (await srsKeys(page)).length === 0 && issues.length === 0, issues.join('|'));
+      // a gap button click moves the active gap
+      await page.evaluate(() => document.querySelector('[data-gap="art-bakken-c4"]').click()); await sleep(300);
+      rec(`${tag}: clicking an inline gap makes it the active question (Hul 4)`, /^Hul 4 af 8/.test(await qnum(page)), await qnum(page)); }
+    if (mode === 'insert') { const cur = () => page.$eval('[data-gap][aria-current="true"]', g => g.getAttribute('data-gap')).catch(() => null); const g0 = await cur(); await page.keyboard.press('j'); await sleep(250); const g1 = await cur(); await page.keyboard.press('k'); await sleep(250); const g2 = await cur();
+      rec(`${tag}: J = next open gap, K = previous (${g0} -> ${g1} -> ${g2})`, g0 === 'art-samsoe-g1' && g1 === 'art-samsoe-g2' && g2 === 'art-samsoe-g1', `${g0} ${g1} ${g2}`); }
+    // wrong state: focus on the continue / retry button, Enter works
+    await def.wrong(page); await sleep(def.wrongWait);
+    const act = await page.evaluate(() => document.activeElement.id);
+    rec(`${tag}: after a wrong answer focus is on ${def.btn.slice(1)} and Enter continues`, act === def.btn.slice(1), act);
+    await page.keyboard.press('Enter'); await sleep(500);
+    rec(`${tag}: Enter on ${def.btn.slice(1)} proceeds (button gone)`, !(await page.$(def.btn)), '');
+    rec(`${tag}: console clean`, issues.length === 0, issues.join(' | ')); await page.close();
+  }
+}
+
+// ============ g3theme: contrast on three papers x four modes, TTS non-text, reduced motion, muted, animation near text
+if (want('g3theme')) {
+  const measure = page => page.evaluate(() => {
+    const out = {}; const q = s => document.querySelector(s); const add = (k, el, ps) => { if (el) out[k] = +window.__cr(el, ps).toFixed(2); };
+    add('bodyText', q('#lf-text .lf-notice p') || q('#lf-text > p:not(.lf-kicker)'));
+    const par = q('#lf-text [data-par]'); if (par) add('marginNumber', par, '::before');
+    add('kicker', q('.lf-kicker')); add('evidence', q('p.lf-evidence, section.lf-evidence p'));
+    const gs = (sel, k) => { const e = q(sel); if (e) { add(k, e); const st = e.querySelector('.lf-gap-st'); if (st) add(k + 'Tag', st); const bd = e.querySelector('.lf-gap-body'); if (bd) add(k + 'Body', bd); } };
+    gs('[data-gap][data-state="empty"]:not([aria-current="true"])', 'gapEmpty'); gs('[data-gap][aria-current="true"][data-state="empty"], [data-gap][aria-current="true"]', 'gapCurrent'); gs('[data-gap][data-state="ok"]', 'gapRight'); gs('[data-gap][data-state="no"]', 'gapWrong');
+    add('optionDefault', q('#lf-q .dc-quiz-option:not(.dc-correct):not(.dc-wrong):not(:disabled)')); add('optionCorrect', q('#lf-q .dc-quiz-option.dc-correct')); add('optionWrong', q('#lf-q .dc-quiz-option.dc-wrong'));
+    add('bankBlock', q('.lf-block:not([aria-pressed="true"]):not(:disabled)')); add('bankSelected', q('.lf-block[aria-pressed="true"]'));
+    add('feedback', q('.lf-fb-box p')); add('hint', q('.lf-hint')); add('continue', q('#btn-continue')); add('retry', q('#btn-retry')); add('paperBtn', q('#btn-paper')); add('prompt', q('.dc-quiz-prompt span')); add('sentence', q('.lf-sent'));
+    add('summaryScore', q('.dc-summary-score')); add('summaryWeak', q('.dc-summary-weak li')); add('weakest', q('#lf-weakest')); add('summaryBtn', q('.dc-summary-actions button'));
+    return out;
+  });
+  const setPaper = async (page, p) => { for (let i = 0; i < 4 && (await page.evaluate(() => document.documentElement.dataset.paper)) !== p; i++) await page.click('#btn-paper'); await sleep(700); await page.evaluate(effBgFn); };
+  const ttsNonText = async (page) => {
+    await page.evaluate(() => { const b = document.querySelector('#lf-q .dc-tts-button'); if (b) { b.style.opacity = '1'; b.scrollIntoView({ block: 'nearest' }); } }); await sleep(150);
+    const r = await page.evaluate(() => { const b = document.querySelector('#lf-q .dc-tts-button'); if (!b) return null; const x = b.getBoundingClientRect(); return { x: Math.round(x.left), y: Math.round(x.top), w: Math.round(x.width), h: Math.round(x.height) }; }); if (!r) return null;
+    const pad = 6, buf = await page.screenshot({ clip: { x: Math.max(0, r.x - pad), y: Math.max(0, r.y - pad), width: r.w + 2 * pad, height: r.h + 2 * pad }, encoding: 'binary' });
+    const png = decodePng(Buffer.from(buf)); const outer = png.px(1, 1), fill = png.px(pad + 5, pad + 5); let dark = fill, best = 1;
+    for (let y = pad + 6; y < png.h - pad - 6; y++) for (let x = pad + 6; x < png.w - pad - 6; x++) { const p = png.px(x, y), q = ratioRgb(p, fill); if (q > best) { best = q; dark = p; } }
+    const frame = png.px(pad + 1, Math.floor(png.h / 2));
+    return { size: `${r.w}x${r.h}`, iconVsFill: +ratioRgb(dark, fill).toFixed(2), frameVsOuter: +ratioRgb(frame, outer).toFixed(2), fillVsOuter: +ratioRgb(fill, outer).toFixed(2) };
+  };
+  for (const mode of Object.keys(MD)) {
+    const def = MD[mode]; const tag = `g3theme ${mode}`;
+    const { page, issues } = await modeOpenAt('1440x900', mode, def.id, { scheme: 'light' });
+    await page.evaluate(effBgFn);
+    // build a state that shows as many element kinds as possible
+    if (mode === 'insert') { const d = await insData(page); await insPlaceMeasured(page, d.gaps[0], d.solution[d.gaps[0]]); await sleep(950); await page.evaluate(b => document.querySelector(`.lf-block[data-block="${b}"]`).click(), d.distractors[1]); await sleep(150); }
+    if (mode === 'cloze') { const d = await czInfo(page); await czChooseMeasured(page, d.gaps[0].correct); await sleep(1000); await czChooseMeasured(page, (d.gaps[1].correct + 1) % 4, 150); await sleep(800); await page.evaluate(() => document.getElementById('btn-continue').click()); await sleep(400); }
+    const results = [];
+    const stateRound = async (label) => { for (const paper of ['light', 'sepia', 'dark']) { await setPaper(page, paper); const r = await measure(page); const low = Object.entries(r).filter(([, v]) => v < 4.5).map(([k, v]) => k + '=' + v); results.push({ label, paper, r, low });
+      rec(`${tag} ${label} ${paper}: contrast >=4.5 (${Object.entries(r).map(([k, v]) => k + ' ' + v).join(', ')})`, low.length === 0, low.join(', ')); const lc = await lowContrast(page); rec(`${tag} ${label} ${paper}: harness lowContrast (every text element) clean`, lc.length === 0, lc.slice(0, 6).join('; ')); if (['light', 'sepia', 'dark'].includes(paper)) await shot(page, '1440x900', `g3-${mode}-${label}-${paper}`); } };
+    if (mode === 'insert') { await stateRound('bank'); await page.evaluate(() => document.querySelectorAll('.lf-block[aria-pressed="true"]').forEach(b => b.click())); await sleep(100); const d2 = await insData(page); await insClick(page, d2.gaps[1], d2.distractors[0]); await sleep(900); }
+    if (mode === 'mc' || mode === 'skim') { await def.wrong(page); await sleep(def.wrongWait); }
+    await stateRound('state');
+    for (const paper of ['light', 'sepia', 'dark']) { await setPaper(page, paper); const tts = await ttsNonText(page); note(`${tag} ${paper}: TTS button non-text contrast`, tts);
+      rec(`${tag} ${paper}: TTS button icon vs its fill >=3:1 non-text (${tts && tts.iconVsFill}; frame vs surrounding ${tts && tts.frameVsOuter}; ${tts && tts.size}; measured with opacity 1 = a Danish voice is available)`, !!tts && tts.iconVsFill >= 3, JSON.stringify(tts)); }
+    rec(`${tag}: console clean`, issues.length === 0, issues.join(' | ')); await page.close();
+  }
+  // results screens: cloze + insert + mc on the three papers
+  for (const mode of ['mc', 'insert', 'cloze']) {
+    const def = MD[mode]; const { page } = await modeOpenAt('1440x900', mode, def.id, { scheme: 'light' }); await page.evaluate(effBgFn);
+    if (mode === 'mc') await answerRound(page, [true, false, true]);
+    if (mode === 'insert') { const d = await insData(page); await insClick(page, d.gaps[0], d.distractors[0]); await sleep(500); await page.click('#btn-retry'); for (let k = 0; k < 5; k++) { await insPlaceMeasured(page, d.gaps[k], d.solution[d.gaps[k]]); await sleep(k < 4 ? 900 : 300); } }
+    if (mode === 'cloze') { const d = await czInfo(page); for (let k = 0; k < 8; k++) { if (k === 1 || k === 4) { await czChooseMeasured(page, (d.gaps[k].correct + 1) % 4, 150); await sleep(700); await page.evaluate(() => document.getElementById('btn-continue').click()); await sleep(300); } else { await czChooseMeasured(page, d.gaps[k].correct); await sleep(950); } } }
+    await sleep(400);
+    for (const paper of ['light', 'sepia', 'dark']) { await setPaper(page, paper); const r = await measure(page); const low = Object.entries(r).filter(([, v]) => v < 4.5).map(([k, v]) => k + '=' + v);
+      rec(`g3theme ${mode} results ${paper}: contrast >=4.5 (${Object.entries(r).map(([k, v]) => k + ' ' + v).join(', ')})`, low.length === 0, low.join(', ')); const lc = await lowContrast(page); rec(`g3theme ${mode} results ${paper}: harness lowContrast clean`, lc.length === 0, lc.slice(0, 6).join('; ')); await shot(page, '1440x900', `g3-${mode}-results-${paper}`); }
+    await page.close();
+  }
+  // reduced motion + animation near text, per mode
+  for (const mode of Object.keys(MD)) {
+    const def = MD[mode]; const tag = `g3motion ${mode}`;
+    const { page, issues } = await modeOpenAt('1440x900', mode, def.id, { reduced: true });
+    await sleep(300);
+    const idle = await page.evaluate(() => document.getAnimations().filter(a => a.effect && a.effect.target && (a.effect.target.closest && a.effect.target.closest('#lf-text'))).length);
+    if (mode === 'insert') { const d = await insData(page); await insPlaceMeasured(page, d.gaps[0], d.solution[d.gaps[0]]); await sleep(900); }
+    else if (mode === 'cloze') { const d = await czInfo(page); await czChooseMeasured(page, d.gaps[0].correct); await sleep(300); }
+    else if (mode === 'mc') { await clickOpt(page, await page.evaluate(() => window.__cur().questions[0].correct)); await sleep(300); }
+    else { const q = (await skimQ(page)).q; await submitMeasured(page, q.accepted[0], 150); await sleep(300); }
+    await def.wrong(page).catch(() => {}); await sleep(300);
+    const anim = await page.evaluate(() => ({ running: document.getAnimations().filter(a => a.playState === 'running').map(a => (a.animationName || a.transitionProperty || 'x') + ':' + Math.round(a.effect.getTiming().duration)).slice(0, 6), scrollBehavior: getComputedStyle(document.getElementById('lf-reader')).scrollBehavior, st: window.__st }));
+    rec(`${tag}: prefers-reduced-motion: nothing animates inside the text (idle ${idle}), css scroll-behavior auto, every scrollTo uses behavior auto (${JSON.stringify(anim.st).slice(0, 120)}), no running animation after answers (${anim.running.join(',') || 'none'})`, idle === 0 && anim.scrollBehavior === 'auto' && anim.st.every(s => s.behavior === 'auto') && anim.running.length === 0, JSON.stringify(anim));
+    rec(`${tag}: reduced motion still fully functional, console clean`, issues.length === 0, issues.join(' | ')); await page.close();
+    const n = await modeOpenAt('1440x900', mode, def.id); await sleep(300);
+    const idleN = await n.page.evaluate(() => document.getAnimations().filter(a => a.effect && a.effect.target && a.effect.target.closest && a.effect.target.closest('#lf-text') && a.effect.getTiming().iterations === Infinity).length);
+    rec(`${tag}: normal motion: no endless animation inside the running text while idle`, idleN === 0, String(idleN)); await n.page.close();
+  }
+  // muted: 0 audio nodes per mode; unmuted control > 0
+  for (const mode of Object.keys(MD)) {
+    const def = MD[mode]; const tag = `g3sound ${mode}`; const res = [];
+    for (const muted of [false, true]) {
+      const o = await open('1440x900'); const page = o.page; if (muted) await page.click('#btn-sound');
+      await page.evaluate(m => document.querySelector(`#ctl-mode [data-mode="${m}"]`).click(), mode); await playText(page, def.id);
+      if (mode === 'mc') { await clickOpt(page, await page.evaluate(() => window.__cur().questions[0].correct)); await sleep(500); await def.wrong(page); }
+      if (mode === 'skim') { const q = (await skimQ(page)).q; await submitMeasured(page, q.accepted[0], 150); await sleep(500); await def.wrong(page).catch(() => {}); }
+      if (mode === 'insert') { const d = await insData(page); await insPlaceMeasured(page, d.gaps[0], d.solution[d.gaps[0]]); await sleep(900); await insClick(page, d.gaps[1], d.distractors[0]); }
+      if (mode === 'cloze') { const d = await czInfo(page); await czChooseMeasured(page, d.gaps[0].correct); await sleep(1000); await czChooseMeasured(page, (d.gaps[1].correct + 1) % 4, 150); }
+      await sleep(600); res.push(await page.evaluate(() => window.__osc)); await page.close();
+    }
+    rec(`${tag}: unmuted correct+wrong create audio nodes (${res[0]}), muted creates 0 (${res[1]})`, res[0] > 0 && res[1] === 0, JSON.stringify(res));
+  }
+}
 
 await browser.close();
 const fails = results.filter(r => r.ok === false), nv = results.filter(r => r.ok === null);

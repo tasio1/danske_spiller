@@ -91,18 +91,18 @@
       kicker: 'Forklaring · Sprog',
       // Traceability: paragraph (1-based, = data-par) -> fact in docs/laeseforstaaelse/facts/art-dialekter.md
       // (CONFIRMED lines only; F6 is CHANGED and used only as a dated presumption, "forskere formodede"; no cause stated as fact)
-      //   1 undersøgelse 2015, interviews af unge på Bornholm / i Vendsyssel / i Sønderjylland, skole i Nexø, KU-centrene: F4;
+      //   1 undersøgelse begyndt 2015 (interviews gik i gang, intet resultat påstået), interviews af unge på Bornholm / i Vendsyssel / i Sønderjylland, skole i Nexø, KU-centrene: F4;
       //     Sprogforandringscentret grundlagt 2005 med bevilling fra Danmarks Grundforskningsfond: F9
       //   2 september 2015, foreløbigt resultat: F1, F2; Bornholm mest isoleret af de tre, forskeren ville ikke gætte, feltarbejde ca. et år (F3 note): F3; Paradisbakkeskolen i Nexø (F4 note): F4
-      //   3 december 2015, KU-sprogforsker (unnamed), et af Europas mest standardiserede lande: F5; formodning om mobilitet, tv og medier: F6 (CHANGED, so worded as presumption)
+      //   3 december 2015, KU-sprogforsker (unnamed), et af Europas mest standardiserede lande: F5; sprogforskerens formodning (dec. 2015, datid, én forsker) om mobilitet, tv og medier: F6 (CHANGED, so worded as presumption)
       //   4 januar 2024, stadig unge sønderjyder med dialekt, ændringer mod standarddansk: F7; 9. klasse, forældre og bedsteforældre, tre generationer: F8
       //   5 2019, forløber for Google Translate-agtigt program bornholmsk-dansk: F10; små 180.000 ord, mål mindst en million: F11; godt 30 frivillige, gennemsnitsalder lige over 70: F12
       //   6 closing: dates of F1-F12 only (2015, 2019, 2024); no new claim
       // Derived figures: none.
       paragraphs: [
-        'Dialekter forsvinder ikke ens overalt. Det viste en undersøgelse fra 2015. Forskere fra Sprogforandringscentret og Center for Dialektforskning ved Københavns Universitet gik i gang med at interviewe unge på tre steder: på Bornholm, i Vendsyssel og i Sønderjylland. På Bornholm indgik blandt andet Paradisbakkeskolen i Nexø. Sprogforandringscentret var grundlagt i 2005 med en bevilling fra Danmarks Grundforskningsfond.',
-        'Det første resultat kom i september 2015. Unge i Sønderjylland og Vendsyssel talte dialekt, mens unge på Bornholm stort set ikke længere talte bornholmsk. Resultatet var foreløbigt, fordi undersøgelsen lige var begyndt. Bornholm er det af de tre områder, der ligger mest isoleret, men forskeren ville endnu ikke gætte på, om det havde noget med forskellen at gøre. Forskeren regnede med, at feltarbejdet tager omkring et år, før man kan sige mere om årsagen. Det var altså ikke afklaret, hvorfor Bornholm skilte sig ud.',
-        'I december 2015 beskrev en sprogforsker fra Københavns Universitet Danmark som et af de mest standardiserede lande i Europa. Forskere formodede dengang, at dialekterne forsvandt hurtigere end før, fordi mobiliteten er høj, og fordi tv og medier giver kontakt med langt flere mennesker end tidligere. Det var kun en formodning.',
+        'I 2015 begyndte en undersøgelse af unges dialekter. Forskere fra Sprogforandringscentret og Center for Dialektforskning ved Københavns Universitet gik i gang med at interviewe unge på tre steder: på Bornholm, i Vendsyssel og i Sønderjylland. På Bornholm indgik blandt andet Paradisbakkeskolen i Nexø. Sprogforandringscentret var grundlagt i 2005 med en bevilling fra Danmarks Grundforskningsfond.',
+        'Et første, foreløbigt resultat kom i september 2015. Unge i Sønderjylland og Vendsyssel talte dialekt, mens unge på Bornholm stort set ikke længere talte bornholmsk. Resultatet var foreløbigt, fordi undersøgelsen lige var begyndt. Bornholm er det af de tre områder, der ligger mest isoleret, men forskeren ville endnu ikke gætte på, om det havde noget med forskellen at gøre. Forskeren regnede med, at feltarbejdet ville tage omkring et år, før man kunne sige mere om årsagen. Det var altså ikke afklaret, hvorfor Bornholm skilte sig ud.',
+        'I december 2015 beskrev en sprogforsker fra Københavns Universitet Danmark som et af de mest standardiserede lande i Europa. Sprogforskeren formodede, at dialekterne forsvandt hurtigere end før, fordi mobiliteten var høj, og fordi tv og medier gav kontakt med langt flere mennesker end tidligere. Det var kun en formodning.',
         'I januar 2024 beskrev Center for Dialektforskning en undersøgelse af sønderjysk. På hvert sted, forskerne besøgte, fulgte de en 9. klasse i skole- og fritidsliv, og de interviewede udvalgte forældre og bedsteforældre, så tre generationer kunne sammenlignes. Resultatet var, at der stadig var unge sønderjyder, der talte dialekt. De talte dog ikke sønderjysk på samme måde som deres forældre og bedsteforældre, og alle ændringer på nær én gik i retning af standarddansk.',
         'Bornholmsk har sit eget projekt. I 2019 havde forskere ved Københavns Universitet udviklet en forløber for en slags Google Translate, der kan oversætte fra bornholmsk til dansk og omvendt. Systemet var trænet på små 180.000 ord fra bornholmske tekster, og målet var mindst en million ord. Godt 30 frivillige bornholmere deltog, og deres gennemsnitsalder var lige over 70 år.',
         'Udsagnene hører til tre forskellige år: 2015, 2019 og 2024. De viser, hvad forskerne vidste og mente på de tidspunkter, og de fortæller ikke, hvordan unge talte senere. Årsagen til forskellen mellem Bornholm og Sønderjylland var åben i 2015, og kilderne i teksten giver ikke noget svar.'
@@ -177,7 +177,7 @@
         'I august 2026 startede 30.911 unge på efterskole i skoleåret 2026/27. Af dem gik 24.804 i 10. klasse. Det svarer til 36,2 procent af hele årgangen, altså mere end hver tredje 15-årige. Procenten gælder kun dem, der gik i 10. klasse på efterskole. Andre klassetrin er ikke med i tallet. Ti år tidligere var andelen 28,8 procent, og 36,2 procent er den højeste andel i Efterskolernes ti-årige opgørelse. Året før, i 2025/26, startede 31.018 elever på efterskole, så det samlede elevtal var lidt lavere i 2026/27.',
         'Der var 238 efterskoler i Danmark ved skolestart i august 2025. Elevtallene og skoletallet hører altså til to forskellige år.',
         'Et efterskoleophold koster penge. Forældrene betaler typisk mellem 50.000 og 100.000 kr. Det er det beløb, de selv skal betale, efter at staten har givet støtte. Støttens størrelse afhænger af, hvor meget forældrene tjener. Et eksempel fra skoleåret 2025/26 viser, hvordan det kan se ud: Koster opholdet i alt 119.700 kr., og tjener forældrene samlet 400.000 kr., er egenbetalingen for ét barn 58.800 kr. Eksemplet er kun én mulighed, for beløbet ændrer sig med indkomsten.',
-        'Staten støtter også selve skolerne. Ifølge en oversigt med tal fra 2023 består det meste af tilskuddet af taxametertilskud, som beregnes ud fra antallet af årselever. Tilskuddet er betinget af, at eleverne også selv betaler. Hvert år fastsættes et minimumsbeløb for elevbetalingen. Skolerne kan altså ikke få statens penge uden betaling fra eleverne.',
+        'Staten støtter også selve skolerne. Ifølge en oversigt med tal fra 2023 bestod det meste af tilskuddet af taxametertilskud, som blev beregnet ud fra antallet af årselever. Tilskuddet var betinget af, at eleverne også selv betalte. Hvert år blev der fastsat et minimumsbeløb for elevbetalingen. Skolerne kunne altså ikke få statens penge uden betaling fra eleverne.',
         'Tallene i teksten har forskellige år. Elevtallene gælder skoleårene 2025/26 og 2026/27, antallet af skoler gælder august 2025, og reglerne for tilskuddet er fra 2023. Prisen for forældrene er et typisk interval og ikke en fast pris.'
       ],
       questions: [
@@ -207,15 +207,15 @@
         },
         {
           id: 'art-efterskole-q3',
-          q: 'Hvad kræver statens tilskud til skolerne ifølge teksten?',
+          q: 'Hvad var en betingelse for statens tilskud til skolerne ifølge oversigten med tal fra 2023?',
           options: [
-            'At eleverne også selv betaler mindst et beløb, som fastsættes hvert år.',
-            'At skolen har mindst 238 elever.',
-            'At det meste af tilskuddet beregnes ud fra antallet af årselever.'
+            'At eleverne også selv betalte mindst et beløb, som blev fastsat hvert år.',
+            'At skolen havde mindst 238 elever.',
+            'At det meste af tilskuddet blev beregnet ud fra antallet af årselever.'
           ],
           correct: 0,
           evidence: 4,
-          note: 'Tilskuddet er betinget af elevbetaling; at taxametertilskuddet beregnes efter årselever er sandt, men er ikke et krav.'
+          note: 'Tilskuddet var betinget af elevbetaling; at taxametertilskuddet blev beregnet efter årselever er sandt, men er ikke en betingelse.'
         }
       ],
       sources: [

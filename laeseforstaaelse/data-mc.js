@@ -81,6 +81,151 @@
         'https://effektivtlandbrug.landbrugnet.dk/artikler/politik/124191/flere-ulve-kan-spaende-ben-for-naturplejen'
       ],
       verify: true
+    },
+    {
+      id: 'art-dialekter',
+      mode: 'mc',
+      level: 'B2',
+      title: 'Bornholmsk og sønderjysk: hvad forskerne vidste',
+      genre: 'forklaring',
+      kicker: 'Forklaring · Sprog',
+      // Traceability: paragraph (1-based, = data-par) -> fact in docs/laeseforstaaelse/facts/art-dialekter.md
+      // (CONFIRMED lines only; F6 is CHANGED and used only as a dated presumption, "forskere formodede"; no cause stated as fact)
+      //   1 undersøgelse 2015, interviews af unge på Bornholm / i Vendsyssel / i Sønderjylland, skole i Nexø, KU-centrene: F4;
+      //     Sprogforandringscentret grundlagt 2005 med bevilling fra Danmarks Grundforskningsfond: F9
+      //   2 september 2015, foreløbigt resultat: F1, F2; Bornholm mest isoleret af de tre, forskeren ville ikke gætte, feltarbejde ca. et år (F3 note): F3; Paradisbakkeskolen i Nexø (F4 note): F4
+      //   3 december 2015, KU-sprogforsker (unnamed), et af Europas mest standardiserede lande: F5; formodning om mobilitet, tv og medier: F6 (CHANGED, so worded as presumption)
+      //   4 januar 2024, stadig unge sønderjyder med dialekt, ændringer mod standarddansk: F7; 9. klasse, forældre og bedsteforældre, tre generationer: F8
+      //   5 2019, forløber for Google Translate-agtigt program bornholmsk-dansk: F10; små 180.000 ord, mål mindst en million: F11; godt 30 frivillige, gennemsnitsalder lige over 70: F12
+      //   6 closing: dates of F1-F12 only (2015, 2019, 2024); no new claim
+      // Derived figures: none.
+      paragraphs: [
+        'Dialekter forsvinder ikke ens overalt. Det viste en undersøgelse fra 2015. Forskere fra Sprogforandringscentret og Center for Dialektforskning ved Københavns Universitet gik i gang med at interviewe unge på tre steder: på Bornholm, i Vendsyssel og i Sønderjylland. På Bornholm indgik blandt andet Paradisbakkeskolen i Nexø. Sprogforandringscentret var grundlagt i 2005 med en bevilling fra Danmarks Grundforskningsfond.',
+        'Det første resultat kom i september 2015. Unge i Sønderjylland og Vendsyssel talte dialekt, mens unge på Bornholm stort set ikke længere talte bornholmsk. Resultatet var foreløbigt, fordi undersøgelsen lige var begyndt. Bornholm er det af de tre områder, der ligger mest isoleret, men forskeren ville endnu ikke gætte på, om det havde noget med forskellen at gøre. Forskeren regnede med, at feltarbejdet tager omkring et år, før man kan sige mere om årsagen. Det var altså ikke afklaret, hvorfor Bornholm skilte sig ud.',
+        'I december 2015 beskrev en sprogforsker fra Københavns Universitet Danmark som et af de mest standardiserede lande i Europa. Forskere formodede dengang, at dialekterne forsvandt hurtigere end før, fordi mobiliteten er høj, og fordi tv og medier giver kontakt med langt flere mennesker end tidligere. Det var kun en formodning.',
+        'I januar 2024 beskrev Center for Dialektforskning en undersøgelse af sønderjysk. På hvert sted, forskerne besøgte, fulgte de en 9. klasse i skole- og fritidsliv, og de interviewede udvalgte forældre og bedsteforældre, så tre generationer kunne sammenlignes. Resultatet var, at der stadig var unge sønderjyder, der talte dialekt. De talte dog ikke sønderjysk på samme måde som deres forældre og bedsteforældre, og alle ændringer på nær én gik i retning af standarddansk.',
+        'Bornholmsk har sit eget projekt. I 2019 havde forskere ved Københavns Universitet udviklet en forløber for en slags Google Translate, der kan oversætte fra bornholmsk til dansk og omvendt. Systemet var trænet på små 180.000 ord fra bornholmske tekster, og målet var mindst en million ord. Godt 30 frivillige bornholmere deltog, og deres gennemsnitsalder var lige over 70 år.',
+        'Udsagnene hører til tre forskellige år: 2015, 2019 og 2024. De viser, hvad forskerne vidste og mente på de tidspunkter, og de fortæller ikke, hvordan unge talte senere. Årsagen til forskellen mellem Bornholm og Sønderjylland var åben i 2015, og kilderne i teksten giver ikke noget svar.'
+      ],
+      questions: [
+        {
+          id: 'art-dialekter-q1',
+          q: 'Hvad viste det foreløbige resultat fra 2015 om de unge i de tre områder?',
+          options: [
+            'Unge på Bornholm og i Vendsyssel talte dialekt, mens unge i Sønderjylland stort set ikke gjorde.',
+            'Unge i Sønderjylland og Vendsyssel talte dialekt, mens unge på Bornholm stort set ikke længere talte bornholmsk.',
+            'Forskerne interviewede blandt andet unge på en skole i Nexø.'
+          ],
+          correct: 1,
+          evidence: 1,
+          note: 'Teksten skelner mellem Bornholm på den ene side og Sønderjylland og Vendsyssel på den anden; Nexø-skolen er et sted, ikke et resultat.'
+        },
+        {
+          id: 'art-dialekter-q2',
+          q: 'Hvad vidste forskeren i 2015 om årsagen til, at Bornholm skilte sig ud?',
+          options: [
+            'Forskeren ville endnu ikke gætte på en årsag, selv om Bornholm er det mest isolerede af de tre områder.',
+            'Forskeren forklarede, at isolationen var årsagen til, at de unge ikke talte bornholmsk.',
+            'Sprogforandringscentret var grundlagt i 2005 med en bevilling fra Danmarks Grundforskningsfond.'
+          ],
+          correct: 0,
+          evidence: 1,
+          note: 'Isolationen nævnes kun som en kendsgerning om området og ikke som bevist årsag; centrets grundlæggelse svarer ikke på spørgsmålet.'
+        },
+        {
+          id: 'art-dialekter-q3',
+          q: 'Hvad kunne den forløber til et oversættelsesprogram, som forskere havde udviklet i 2019?',
+          options: [
+            'Den var trænet på mindst en million ord fra bornholmske tekster.',
+            'Godt 30 frivillige bornholmere deltog i projektet.',
+            'Den kunne oversætte fra bornholmsk til dansk og omvendt.'
+          ],
+          correct: 2,
+          evidence: 4,
+          note: 'Systemet var trænet på små 180.000 ord; en million var kun målet. De frivillige beskriver projektet, ikke hvad programmet kunne.'
+        }
+      ],
+      sources: [
+        'https://www.dr.dk/nyheder/regionale/bornholm/soenderjysk-og-vendelbomaal-overlever-bornholmsk-doer',
+        'https://www.dr.dk/nyheder/kultur/danske-dialekter-forsvinder-hurtigere-end-nogensinde',
+        'https://dialekt.ku.dk/maanedens_emne/soenderjysk-udtale-og-boejning-gennem-tre-generationer/',
+        'https://dgcss.hum.ku.dk/om/',
+        'https://videnskab.dk/kultur-samfund/kunstig-intelligens-skal-redde-det-bornholmske-sprog-om-et-par-generationer-er-det-uddoedt/'
+      ],
+      verify: true
+    },
+    {
+      id: 'art-efterskole',
+      mode: 'mc',
+      level: 'B1',
+      title: 'Efterskole: hvem går, og hvad koster det?',
+      genre: 'baggrund',
+      kicker: 'Baggrund · Uddannelse',
+      // Traceability: paragraph (1-based, = data-par) -> fact in docs/laeseforstaaelse/facts/art-efterskole.md
+      // (CONFIRMED lines only; no motives, no start/end months, no amount of elevstøtte)
+      //   1 unge mellem 14 og 18 år, bor og går i skole sammen: F6; typisk 42 uger: F7
+      //   2 august 2026, 30.911 i 2026/27, heraf 24.804 i 10. klasse: F1, F2; 36,2 procent af årgangen (kun 10. klasse), mere end hver tredje 15-årige,
+      //     højeste i Efterskolernes ti-årige opgørelse, ti år tidligere 28,8 procent: F2, F3 (+ VERIFY-1 safe list); 31.018 i 2025/26: F5
+      //   3 238 efterskoler, august 2025: F4 (234 is only the number of schools that answered the 2026 survey, not used)
+      //   4 typisk 50.000-100.000 kr. egenbetaling, efter statens støtte: F8; støtte afhænger af forældrenes indkomst: F9;
+      //     eksempel 2025/26: 58.800 kr. ved samlet pris 119.700 kr. og forældreindkomst 400.000 kr.: F10
+      //   5 taxametertilskud efter årselever, minimumsbeløb for elevbetaling, tal fra 2023: F11, F12
+      //   6 closing: years and scopes of the figures above; no new claim
+      // Derived figures: none (no sum, ratio or difference is printed).
+      paragraphs: [
+        'En efterskole er en skole for unge mellem 14 og 18 år. Eleverne bor og går i skole sammen. Et efterskoleophold varer typisk 42 uger.',
+        'I august 2026 startede 30.911 unge på efterskole i skoleåret 2026/27. Af dem gik 24.804 i 10. klasse. Det svarer til 36,2 procent af hele årgangen, altså mere end hver tredje 15-årige. Procenten gælder kun dem, der gik i 10. klasse på efterskole. Andre klassetrin er ikke med i tallet. Ti år tidligere var andelen 28,8 procent, og 36,2 procent er den højeste andel i Efterskolernes ti-årige opgørelse. Året før, i 2025/26, startede 31.018 elever på efterskole, så det samlede elevtal var lidt lavere i 2026/27.',
+        'Der var 238 efterskoler i Danmark ved skolestart i august 2025. Elevtallene og skoletallet hører altså til to forskellige år.',
+        'Et efterskoleophold koster penge. Forældrene betaler typisk mellem 50.000 og 100.000 kr. Det er det beløb, de selv skal betale, efter at staten har givet støtte. Støttens størrelse afhænger af, hvor meget forældrene tjener. Et eksempel fra skoleåret 2025/26 viser, hvordan det kan se ud: Koster opholdet i alt 119.700 kr., og tjener forældrene samlet 400.000 kr., er egenbetalingen for ét barn 58.800 kr. Eksemplet er kun én mulighed, for beløbet ændrer sig med indkomsten.',
+        'Staten støtter også selve skolerne. Ifølge en oversigt med tal fra 2023 består det meste af tilskuddet af taxametertilskud, som beregnes ud fra antallet af årselever. Tilskuddet er betinget af, at eleverne også selv betaler. Hvert år fastsættes et minimumsbeløb for elevbetalingen. Skolerne kan altså ikke få statens penge uden betaling fra eleverne.',
+        'Tallene i teksten har forskellige år. Elevtallene gælder skoleårene 2025/26 og 2026/27, antallet af skoler gælder august 2025, og reglerne for tilskuddet er fra 2023. Prisen for forældrene er et typisk interval og ikke en fast pris.'
+      ],
+      questions: [
+        {
+          id: 'art-efterskole-q1',
+          q: 'Hvor mange af de unge, der startede på efterskole i skoleåret 2026/27, gik i 10. klasse?',
+          options: [
+            '30.911',
+            '24.804',
+            '31.018'
+          ],
+          correct: 1,
+          evidence: 1,
+          note: '30.911 er alle elever i 2026/27, og 31.018 er det samlede tal for 2025/26; 24.804 gik i 10. klasse.'
+        },
+        {
+          id: 'art-efterskole-q2',
+          q: 'Hvad står der i teksten om statens støtte til forældre, hvis barn går på efterskole?',
+          options: [
+            'Støtten er den samme for alle forældre, uanset hvad de tjener.',
+            'Et efterskoleophold varer typisk 42 uger.',
+            'Støttens størrelse afhænger af, hvor meget forældrene tjener.'
+          ],
+          correct: 2,
+          evidence: 3,
+          note: 'Støtten afhænger af forældrenes indkomst; opholdets længde er sand, men svarer ikke på spørgsmålet om støtten.'
+        },
+        {
+          id: 'art-efterskole-q3',
+          q: 'Hvad kræver statens tilskud til skolerne ifølge teksten?',
+          options: [
+            'At eleverne også selv betaler mindst et beløb, som fastsættes hvert år.',
+            'At skolen har mindst 238 elever.',
+            'At det meste af tilskuddet beregnes ud fra antallet af årselever.'
+          ],
+          correct: 0,
+          evidence: 4,
+          note: 'Tilskuddet er betinget af elevbetaling; at taxametertilskuddet beregnes efter årselever er sandt, men er ikke et krav.'
+        }
+      ],
+      sources: [
+        'https://www.efterskolerne.dk/om-efterskoleforeningen/nyheder/analyser/pressemeddelelse-rekordstor-andel-gaar-i-10-klasse-paa-efterskole/',
+        'https://www.efterskolerne.dk/om-efterskoleforeningen/nyheder/analyser/nye-elevtal-over-en-tredjedel-af-en-ungdomsaargang-vaelger-fortsat-efterskole/',
+        'https://www.vifo.dk/om-folkeoplysning/efterskoler/',
+        'https://www.efterskolerne.dk/da/Pris/Hvad_koster_det',
+        'https://lifeindenmark.borger.dk/school-and-education/school/lower-secondary-boarding-schools'
+      ],
+      verify: true
     }
   ];
 })();

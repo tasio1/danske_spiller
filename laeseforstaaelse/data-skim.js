@@ -1,0 +1,213 @@
+// Laeseforstaaelse, mode skim: two hæfter. Written from docs/laeseforstaaelse/facts/*.md (CONFIRMED lines in VERIFY-1 only).
+// Everything practical (names, rules, fees, times, deadlines, programme, prices) is an EXERCISE VALUE, invented for practice.
+// No telephone numbers are given on purpose (nothing invented could be proven not to be real).
+(function () {
+  'use strict';
+  window.LAESE_SKIM = [
+
+    // =====================================================================================
+    // HAEFTE-KOLONIHAVE
+    // NEAR-MISS PAIRS
+    //   1 opening times : n01 kontor tirsdag kl. 17-18  |  n05 nøgle til fælleshuset torsdag kl. 16-17  |  n06 storskrald første lørdag kl. 10-12
+    //   2 deadlines     : n07 tilmelding til sommerfest 10. juni  |  n03 hækken klippes inden 1. juli og 1. september  |  n04 afbud 5 dage før
+    //   3 prices        : n04 udeblivelse 300 kr.  |  n05 leje aften 350 kr. (hel dag 600 kr.)  |  n07 sommerfest 50 kr.  |  n08 venteliste 150 kr.
+    //   4 waiting time  : n08 Egebakken ca. 6 år (exercise)  |  n10 Risskov 2018, otte til ti år (real, dated)
+    //   5 season/size   : n09 Egebakken overnatning 15. april-15. oktober (exercise)  |  n09 Københavns kommuneplan 1. april-31. oktober, 60 m2 (real, scoped)
+    // TRACEABILITY (CONFIRMED facts -> sheet haefte-kolonihave.md)
+    //   n10: F2 ca. 62.000 og godt 1.000 foreninger (lex.dk, no year) | F4 knap 40.000 i Kolonihaveforbundet (kolonihaveforbundet.dk, VERIFY-1)
+    //        F1 19.773 i 2024, Danmarks Statistik via Boligforeningsweb | F5 Kolonihaveforbundet 11. maj 1908 | F6 Aalborg, København 1891/1892
+    //        F7 ca. 20.000 i 1904 (Wikipedia) | F8 loven 2001, Svend Auken | F9 mindst fem lodder, gennemsnit højst 400 m2 | F12 Risskov 2018: 410 / 195 haver / otte til ti år
+    //   n09: F11 Københavns kommuneplan (overnatning 1. april-31. oktober; hus højst 60 m2 på parceller op til 400 m2; overnatningshaver)
+    // EXERCISE VALUES (invented): n01 (foreningen Egebakken, 84 haver, stiftet 1962, 40 p-pladser, bestyrelse, generalforsamling, kontortid, kontingent 2.400 kr.),
+    //   n02 (vandtider, slangetid, aflæsning), n03 (hækhøjder og -datoer), n04 (arbejdsdage, 300 kr., afbud), n05 (fælleshus, priser, nøgletid),
+    //   n06 (affald), n07 (sommerfest), n08 (venteliste 150 kr., ca. 6 år, overdragelse), n09 first half (Egebakkens byggeregler, overnatning 15. april-15. oktober)
+    {
+      id: 'haefte-kolonihave',
+      mode: 'skim',
+      level: 'B1',
+      title: 'Haveforeningen Egebakken — medlemsmappe (eksempel)',
+      theme: 'kolonihaver',
+      exam_length: false,
+      notices: [
+        {
+          id: 'haefte-kolonihave-n01',
+          heading: 'Velkommen til Egebakken',
+          body: 'Velkommen til Haveforeningen Egebakken. Foreningen findes ikke i virkeligheden. Navnet, reglerne, tiderne og priserne i denne mappe er opfundet til sprogtræning. Egebakken har 84 haver, og hver have er cirka 300 kvadratmeter. Haverne ligger langs to grusveje. Begge veje fører forbi fælleshuset og ned til porten. Foreningen blev stiftet i 1962. Navnet kommer fra de gamle egetræer på bakken bag den sidste række af haver. Porten er åben hele året, men bilerne må kun køre ind for at læsse af. Parker uden for porten, hvor der er 40 pladser. Bestyrelsen har fem medlemmer. De vælges på generalforsamlingen, som holdes den første søndag i marts kl. 10 i fælleshuset. Indkaldelsen kommer senest 14 dage før mødet. Kontoret ligger i det lille hus ved porten. Det er åbent hver tirsdag kl. 17-18. Kassereren sidder der også den første tirsdag i måneden. Kan du ikke komme, så læg en seddel i postkassen på kontordøren. Husk dit havenummer og dit navn på sedlen. Kontingentet er 2.400 kr. om året, og det betales senest den 1. februar. Når du har betalt, får du en nøgle til porten. Flytter du, skal du give kontoret din nye adresse. Læs resten af mappen, før du går i gang med at lave om i din have. Har du spørgsmål om reglerne, kan du tage fat i en af de fem i bestyrelsen, når du møder dem på stierne. Opslagstavlen ved porten viser altid de nyeste meddelelser.'
+        },
+        {
+          id: 'haefte-kolonihave-n02',
+          heading: 'Vand og vanding',
+          body: 'Vandet i Egebakken kommer fra foreningens egen boring. Hanerne på fællesstierne åbnes den 1. april og lukkes den 1. oktober. Uden for de datoer er der ikke vand i ledningerne. Har du brug for vand i vinterhalvåret, må du tage det med hjemmefra. Du må vande med slange efter kl. 20. Om dagen er slangen forbudt, fordi trykket i ledningerne så bliver for lavt til naboerne. Vandkanden må du bruge hele dagen, og den kan du fylde ved hanen foran dit hus. Slangen må køre i højst 30 minutter ad gangen. Flyt den derefter til en anden bed eller stop vandet. Havesprinkleren er ikke tilladt, uanset tidspunktet. Husk at lukke for hanen, når du forlader haven. Hver have har en vandmåler ved indgangen. Aflæs måleren den 5. oktober, og skriv tallet og havenummeret på sedlen i kontorets postkasse. Brug mere end 25 kubikmeter om sæsonen, og du skal betale 12 kr. for hver ekstra kubikmeter. Tøm din slange og dine rør senest den 10. oktober, så de ikke fryser i stykker. Opdager du en lækage, så luk for hanen og skriv til bestyrelsen samme dag. Små dryp ved samlinger kan du selv tætne med nyt gummi. Større brud skal repareres af foreningens VVS-mand, og det sker altid i den følgende uge. Spørg naboen, hvis du er i tvivl om, hvornår der sidst er blevet vandet. Vand helst om aftenen, for så fordamper vandet ikke så hurtigt. Nye medlemmer kan få en kort rundvisning ved vandhanerne i april, hvis de beder om det på kontoret.'
+        },
+        {
+          id: 'haefte-kolonihave-n03',
+          heading: 'Hække og beplantning',
+          body: 'Hækken mod fællesstien må højst være 1,5 meter høj. Mod naboen må den være op til 1,8 meter. Målet gælder hele året, også om vinteren, hvor hækken er bar. Klip hækken inden 1. juli og igen inden 1. september. Er hækken klippet to gange, vokser den ikke ind over stien. Skær også grenene tilbage, så en barnevogn kan komme forbi. Fællesstien er 2 meter bred, og den skal være fri hele vejen. Træer i haven må højst være 4 meter høje. Det gælder frugttræer, birk og alle andre træer. Plant ikke gran, thuja eller anden stedsegrøn hæk mod stien, for den bliver hurtigt for høj. Gode valg er bøg, liguster og hvidtjørn. Planter, der vokser hurtigt og breder sig, skal holdes nede. Det gælder for eksempel bambus og kæmpebjørneklo. Bestyrelsen går en runde i haverne i begyndelsen af juli og igen i september. Er din hæk for høj, får du en seddel i postkassen. Så har du 14 dage til at klippe. Når fristen er gået, bliver hækken klippet for din regning, og det koster 400 kr. Hækkeaffald køres til komposthaugen ved porten. Du må ikke lægge det i containerne. Er du i tvivl om højden, kan du låne et målebånd på kontoret i åbningstiden. Spørg gerne naboen, før du klipper den fælles side. Nye medlemmer får ofte gode råd af naboerne om, hvilke planter der klarer sig bedst på bakken. Tag gerne en snak over hækken i foråret, så undgår I misforståelser senere.'
+        },
+        {
+          id: 'haefte-kolonihave-n04',
+          heading: 'Fællesarbejde',
+          body: 'Alle medlemmer deltager i fællesarbejde to gange om året. Første dag er lørdag 12. april, og anden dag er lørdag 18. oktober. Begge dage løber fra kl. 9 til kl. 12. Mød op ved fælleshuset med handsker og de redskaber, du har. Der er kaffe og rundstykker fra kl. 8.45. Arbejdet fordeles i grupper på fire eller fem personer. Om foråret rydder vi grøfter, retter grusvejene og maler bænkene. Om efteråret fejer vi løv, lukker for vandet og gør fælleshuset klar til vinter. Børn fra 10 år må gerne hjælpe, hvis en voksen er med. Medlemmer over 70 år er fritaget. Det samme gælder dig, hvis du er syg. Så skal du blot sende en besked til kontoret. Kan du ikke deltage, skal du melde afbud på hjemmesiden senest 5 dage før. Har du ikke meldt afbud og ikke mødt op, koster det 300 kr. Beløbet lægges på det næste kontingent. Ferie er ingen grund til at blive væk, for datoerne er kendt i god tid. Datoerne står også på opslagstavlen ved porten og på forsiden af hjemmesiden. Dagen slutter med en pølse og en sodavand, som foreningen giver. Er der meget at lave, kan arbejdet vare til kl. 13, men det sker sjældent. Skriv din deltagelse på listen ved fælleshusets dør, når du kommer. Så ved udvalget, hvem der har været med. Ved regnvejr flytter arbejdet ind i fælleshuset, hvor vi maler og sorterer redskaber.'
+        },
+        {
+          id: 'haefte-kolonihave-n05',
+          heading: 'Fælleshuset',
+          body: 'Fælleshuset kan lejes af medlemmer til private fester og møder. Der er plads til 40 personer, et lille køkken og et toilet med adgang for kørestol. Leje for en hel dag koster 600 kr. En aften efter kl. 17 koster 350 kr. Ud over lejen skal du betale et depositum på 500 kr. Du får det tilbage, når huset er afleveret rent. Reservér huset i kalenderen på hjemmesiden senest 14 dage før. Samme dag får du en bekræftelse. Nøglen hentes hos husudvalget torsdag kl. 16-17 i ugen op til din fest. Er du forhindret, kan en anden i din familie hente den. Medbring dit medlemsnummer. Musikken skal slukkes kl. 23, og gæsterne skal være gået kl. 24. Naboerne skal kunne sove, så døren bør holdes lukket om aftenen. Rygning er ikke tilladt inde i huset. Rydning og gulvvask skal være færdig kl. 10 næste formiddag. Borde og stole stilles tilbage, som de stod. Brugt service vaskes op og sættes på plads i skabene. Tøm køleskabet, og tag dine egne rester med hjem. Affald sorteres og lægges i containerne ved porten. Går noget i stykker, skal du melde det til husudvalget samme dag. Mindre skader dækkes af depositummet. Hent gerne et skema med reglerne på kontoret, så du kan se det hele på én gang. Spørg husudvalget, hvis du vil låne ekstra borde til en større fest i haven.'
+        },
+        {
+          id: 'haefte-kolonihave-n06',
+          heading: 'Affald og storskrald',
+          body: 'Husholdningsaffald lægges i sække og kommer i de grønne containere ved porten. De bliver tømt hver onsdag. Glas og papir afleveres i de to klokker ved siden af. Pap skal foldes sammen, før du putter det i papirklokken. Batterier og elpærer må ikke i containerne. De kan afleveres på kontoret. Storskrald kommer i en stor container, der står ved porten den første lørdag i måneden kl. 10-12. Det er den eneste tid, hvor du kan smide møbler, gamle redskaber og byggeaffald ud. Containeren tager højst 8 kubikmeter, så kom tidligt, hvis du har meget. Stil ikke noget uden for containeren, og lad være med at komme efter kl. 12. Haveaffald som græs, grene og løv skal på komposthaugen ved porten. Der er to bunker. Den venstre er til grene, som bliver kørt til flis, og den højre er til græs og løv. Læg ikke jord, sten eller plastik i bunkerne. Det ødelægger komposten, som medlemmerne kan hente gratis hver maj. Det er forbudt at brænde affald af i haverne, også små mængder. Sankt Hans-bålet tændes af foreningen på græsplænen foran fælleshuset. Fyld ikke sække med vådt affald, for de kan gå i stykker og trække rotter til. Tomme malerdåser tages med hjem. Har du en ting, der er for stor til containeren, så skriv til kontoret. Så kan I aftale en særlig dag. Hold området rent efter dig, så alle har lyst til at komme forbi.'
+        },
+        {
+          id: 'haefte-kolonihave-n07',
+          heading: 'Sommerfesten',
+          body: 'Sommerfesten holdes lørdag 21. juni kl. 14 på græsplænen foran fælleshuset. Alle medlemmer og deres gæster er velkomne. Billetten koster 50 kr. for voksne. Børn fra 6 til 12 år betaler 25 kr., og børn under 6 år kommer gratis ind. Prisen dækker mad, kaffe og kage. Drikkevarer køber du i baren til almindelige priser. Tilmelding sker senest 10. juni. Skriv dig på listen i fælleshuset eller på hjemmesiden. Skriv både antal voksne og antal børn, så der bliver mad nok. Du kan ikke tilmelde dig efter den dato, for så er maden bestilt. Afbud kan gives til og med 17. juni, og så får du pengene tilbage. Festen starter med fælles kaffe og kage. Kl. 16 er der konkurrence i gummistøvlekast, og kl. 17 tændes grillen. Der er grillpølser, kartoffelsalat og en stor salatbar. Husk at tage et tæppe med, hvis du vil sidde på græsset. Hvis det regner, flytter festen ind i fælleshuset. Der er dog kun plads til 40 personer, så derfor er det bedst at komme tidligt. Musikken slutter kl. 22. Oprydningen sker søndag kl. 10, og alle er velkomne til at hjælpe. Har du et særligt behov, for eksempel en allergi, så skriv det ved tilmeldingen. Maden laves så vidt muligt uden nødder. Børnene må gerne være med i konkurrencen, og de får en lille præmie.'
+        },
+        {
+          id: 'haefte-kolonihave-n08',
+          heading: 'Venteliste og overdragelse',
+          body: 'Har du ikke en have endnu, kan du skrive dig på ventelisten. Det sker på foreningens hjemmeside. Tilmeldingen koster 150 kr. om året, og beløbet betales hver januar. Ventetiden i Egebakken er cirka 6 år. Det er et gennemsnit, og den kan være kortere eller længere. Du bevarer din plads, så længe du betaler gebyret. Står du et år uden betaling, bliver du slettet fra listen. Skal du sælge din have, begynder du med at bede om en vurdering. En vurderingskomité kommer og ser haven, huset og beplantningen. Vurderingen er gyldig i 12 måneder. Prisen må ikke være højere end vurderingen. Køberen vælges fra ventelisten, og det er den, der har stået der længst. Sælgeren kan ikke selv finde en køber. Bestyrelsen godkender køberen inden 14 dage efter, at salget er aftalt. Derefter skal sælgeren aflevere nøgler og havens papirer på kontoret. Haven skal være ryddet og have et rent hus. Sælgeren betaler for at fjerne ting, der ikke hører til salget. Køberen skal betale kontingentet fra den første dag i den måned, hvor haven overtages. Overtagelsen sker altid den første i en måned. Ingen kan få to haver i foreningen. Ventelisten gennemgås hver januar, og de nye pladser meldes ud på hjemmesiden. Husk at give besked om ny adresse, så du ikke mister et tilbud.'
+        },
+        {
+          id: 'haefte-kolonihave-n09',
+          heading: 'Byggeregler og overnatning',
+          body: 'Før du bygger, bygger om eller river ned, skal du søge bestyrelsen skriftligt. Det gælder huset, skuret, drivhuset og terrassen. Send en tegning og en kort beskrivelse på hjemmesiden. Du får svar senest 21 dage efter, at du har sendt ansøgningen. Begynd ikke arbejdet, før du har svaret. Byg ikke tættere på naboens skel end 2 meter. I Egebakken må du overnatte i haven fra 15. april til 15. oktober. Resten af året må der ikke bo nogen i husene. Du må ikke have din postadresse i haven. Kommunerne har deres egne regler for kolonihaver, og de er ikke ens. I Københavns kommuneplan må man overnatte fra 1. april til 31. oktober i de haver, som er overnatningshaver. Der gælder også, at selve kolonihavehuset højst må være 60 m² på parceller op til 400 m². Det er Københavns regler. De er hverken en lov for hele landet eller en regel i Egebakken. Spørg derfor altid din egen kommune og din egen forening, før du bygger. Reglerne i Egebakken står i vedtægterne, og dem kan du få på kontoret. Husk, at en tilladelse fra bestyrelsen ikke erstatter en byggetilladelse fra kommunen, hvis den kræves. Ansøgningen skal indeholde havenummer, mål og en liste over materialer. Er din ansøgning ikke komplet, sendes den tilbage uden svar. Så skal du sende den igen, og tiden på 21 dage begynder forfra.'
+        },
+        {
+          id: 'haefte-kolonihave-n10',
+          heading: 'Kolonihaver i Danmark (baggrund)',
+          body: 'Kolonihaver er ikke noget nyt. De første kolonihaver blev dannet i Aalborg. Snart efter kom haveforeninger i København, i 1891 og 1892. Ifølge Wikipedia fandtes der allerede i 1904 cirka 20.000 kolonihaver i hele landet. Kolonihaveforbundet blev oprettet 11. maj 1908. Dengang hed det Kolonihavelejerforeningens Forbund. Kolonihaveloven blev vedtaget i 2001 på initiativ af miljøminister Svend Auken. Et kolonihaveområde har mindst fem havelodder, og lodderne må i gennemsnit ikke være større end 400 kvadratmeter. Antallet af haver afhænger af, hvem der tæller. Leksikonet lex.dk opgiver ca. 62.000 kolonihaver, som hører til godt 1.000 foreninger. Knap 40.000 af haverne er medlem af Kolonihaveforbundet. En analyse fra Boligforeningsweb bygger på tal fra Danmarks Statistik og viser 19.773 kolonihaver i 2024. Tallene er forskellige. De kommer fra forskellige kilder og år, og det er ikke oplyst, hvordan haverne er talt. Brug derfor aldrig et enkelt tal uden kilde og årstal. Ventetiden varierer meget fra sted til sted. I 2018 stod 410 personer på ventelisten til 195 haver i Haveforeningen Risskov i Aarhus. Her var ventetiden mellem otte og ti år. Det tal gælder kun for den forening og for det år. Egebakkens ventetid på 6 år er et opfundet eksempel og har intet med Risskov at gøre.'
+        }
+      ],
+      questions: [
+        { id: 'haefte-kolonihave-q01', q: 'Hvornår er kontoret i Egebakken åbent?', accepted: ['tirsdag kl. 17-18', 'tirsdag kl. 17 til 18', 'tirsdag 17-18', 'tirsdag klokken 17-18', 'tirsdag fra kl. 17 til 18', 'hver tirsdag kl. 17-18'], noticeId: 'haefte-kolonihave-n01', note: 'Står i Velkommen: kontoret er åbent hver tirsdag kl. 17-18.' },
+        { id: 'haefte-kolonihave-q02', q: 'Hvornår må du vande med slange?', accepted: ['efter kl. 20', 'efter klokken 20', 'efter 20', 'efter kl. 20.00'], noticeId: 'haefte-kolonihave-n02', note: 'Står under Vand og vanding: slangen må kun bruges efter kl. 20.' },
+        { id: 'haefte-kolonihave-q03', q: 'Hvilken dato lukkes der for vandet?', accepted: ['1. oktober', 'den 1. oktober', 'd. 1. oktober', '1. okt.'], noticeId: 'haefte-kolonihave-n02', note: 'Står under Vand og vanding: hanerne åbnes 1. april og lukkes 1. oktober.' },
+        { id: 'haefte-kolonihave-q04', q: 'Hvor høj må hækken højst være mod fællesstien?', accepted: ['1,5 meter', '1,5 m', '1,5', '150 cm', '1,5 meter høj'], noticeId: 'haefte-kolonihave-n03', note: 'Står under Hække og beplantning: mod fællesstien højst 1,5 meter.' },
+        { id: 'haefte-kolonihave-q05', q: 'Hvilken dag er det første fællesarbejde?', accepted: ['lørdag 12. april', 'lørdag den 12. april', '12. april', 'den 12. april'], noticeId: 'haefte-kolonihave-n04', note: 'Står under Fællesarbejde: første dag er lørdag 12. april.' },
+        { id: 'haefte-kolonihave-q06', q: 'Hvad koster det, hvis du ikke møder op til fællesarbejdet og ikke har meldt afbud?', accepted: ['300 kr.', '300 kr', '300 kroner', '300'], noticeId: 'haefte-kolonihave-n04', note: 'Står under Fællesarbejde: udeblivelse uden afbud koster 300 kr.' },
+        { id: 'haefte-kolonihave-q07', q: 'Hvornår kan du hente nøglen til fælleshuset?', accepted: ['torsdag kl. 16-17', 'torsdag kl. 16 til 17', 'torsdag 16-17', 'torsdag klokken 16-17', 'torsdag fra kl. 16 til 17'], noticeId: 'haefte-kolonihave-n05', note: 'Står under Fælleshuset: nøglen hentes hos husudvalget torsdag kl. 16-17.' },
+        { id: 'haefte-kolonihave-q08', q: 'Hvad koster det at leje fælleshuset en aften efter kl. 17?', accepted: ['350 kr.', '350 kr', '350 kroner', '350'], noticeId: 'haefte-kolonihave-n05', note: 'Står under Fælleshuset: en aften efter kl. 17 koster 350 kr.' },
+        { id: 'haefte-kolonihave-q09', q: 'Hvornår står containeren til storskrald ved porten?', accepted: ['den første lørdag i måneden kl. 10-12', 'første lørdag i måneden kl. 10-12', 'den første lørdag i måneden', 'første lørdag i måneden', '1. lørdag i måneden kl. 10-12'], noticeId: 'haefte-kolonihave-n06', note: 'Står under Affald og storskrald: den første lørdag i måneden kl. 10-12.' },
+        { id: 'haefte-kolonihave-q10', q: 'Hvad er sidste frist for at tilmelde sig sommerfesten?', accepted: ['10. juni', 'den 10. juni', 'senest 10. juni', 'senest den 10. juni'], noticeId: 'haefte-kolonihave-n07', note: 'Står under Sommerfesten: tilmelding senest 10. juni.' },
+        { id: 'haefte-kolonihave-q11', q: 'Hvad koster det at stå på ventelisten i Egebakken?', accepted: ['150 kr. om året', '150 kr. om året', '150 kr.', '150 kr', '150 kroner om året'], noticeId: 'haefte-kolonihave-n08', note: 'Står under Venteliste og overdragelse: 150 kr. om året.' },
+        { id: 'haefte-kolonihave-q12', q: 'Hvor lang er ventetiden på en have i Egebakken, cirka?', accepted: ['cirka 6 år', 'ca. 6 år', '6 år', 'seks år', 'cirka seks år'], noticeId: 'haefte-kolonihave-n08', note: 'Står under Venteliste og overdragelse: cirka 6 år i Egebakken.' },
+        { id: 'haefte-kolonihave-q13', q: 'Hvornår må du overnatte i haven i Egebakken?', accepted: ['fra 15. april til 15. oktober', '15. april til 15. oktober', '15. april-15. oktober', '15. april - 15. oktober', 'mellem 15. april og 15. oktober'], noticeId: 'haefte-kolonihave-n09', note: 'Står under Byggeregler og overnatning: i Egebakken fra 15. april til 15. oktober.' },
+        { id: 'haefte-kolonihave-q14', q: 'Hvor stort må kolonihavehuset højst være på en parcel op til 400 m² ifølge Københavns kommuneplan?', accepted: ['60 m²', '60 m2', '60 kvadratmeter', '60'], noticeId: 'haefte-kolonihave-n09', note: 'Står under Byggeregler og overnatning: højst 60 m² i Københavns kommuneplan.' },
+        { id: 'haefte-kolonihave-q15', q: 'Hvilken dato blev Kolonihaveforbundet oprettet?', accepted: ['11. maj 1908', 'den 11. maj 1908', '11/5 1908', '11. maj'], noticeId: 'haefte-kolonihave-n10', note: 'Står under Kolonihaver i Danmark: forbundet blev oprettet 11. maj 1908.' }
+      ],
+      sources: [
+        'https://lex.dk/kolonihave',
+        'https://trap.lex.dk/Kolonihaverne_i_Danmark',
+        'https://da.wikipedia.org/wiki/Kolonihaveområde',
+        'https://boligforeningsweb.dk/saadan-er-knapt-20-000-kolonihaver-fordelt-i-danmark/',
+        'https://kolonihaveforbundet.dk/om-os/',
+        'https://kolonihave.nu/godt-at-vide/information-om-kolonihaver/',
+        'https://kp24.kk.dk/retningslinjer/rekreation-og-natur/kolonihaver',
+        'https://www.tv2ostjylland.dk/aarhus/op-til-10-ars-ventetid-pa-kolonihaver-her-er-de-gode-fif'
+      ],
+      verify: true
+    },
+
+    // =====================================================================================
+    // HAEFTE-REBILDFEST
+    // NEAR-MISS PAIRS
+    //   1 opening times : n03 åbning kl. 13.30  |  n03 hovedprogram kl. 14.00-16.30  |  n05 p-plads kl. 10-18  |  n06 bus kl. 9.30-17.30  |  n07 madboder kl. 11-17  |  n01 informationstelt kl. 9-17  |  n08 baseball kl. 12-14
+    //   2 deadlines     : n04 forsalg til og med 25. juni  |  n09 frivillige senest 20. juni
+    //   3 prices        : n04 voksen 120 kr. ved indgangen (forsalg 100 kr.)  |  n05 parkering 60 kr.  |  n06 bus 30 kr.  |  n07 pølse 45 kr.
+    // TRACEABILITY (CONFIRMED facts -> sheet haefte-rebildfest.md), all in n10 only
+    //   F1 Rebildselskabet, første dansk-amerikanske venskabsforening, over 100 år | F2 kaldes den største 4. juli-fejring uden for USA
+    //   F3 forløber i Aarhus 1909 (Landsudstillingen) | F5/F7 tre betingelser (naturtilstand, åben for offentligheden, dansk-amerikanere må fejre amerikanske helligdage)
+    //   F6 ca. 80 ha blev købt og i 1912 overdraget til staten (Biografisk Leksikon; senere køb mere end fordoblet) | første fest i 1912, ingen dato (VERIFY-1)
+    //   F8 hvert år siden 1914 undtagen krigene og corona | F9 Disney 1961, Nixon 1962, Reagan 1972 (tidligere talere; to kilder hver)
+    //   F11 efter 2. verdenskrig op mod 50.000, de seneste år nogle få tusinde (TV 2 Nord, 2023) | F12 amerikansk fodbold og baseball på programmet (2023)
+    // EXERCISE VALUES (invented): n01-n09 in full (alle datoer, tider, priser, p-plads, bus, boder, vagter, frist, sportstider). Weekdays tie to 4. juli = lørdag in this example only.
+    {
+      id: 'haefte-rebildfest',
+      mode: 'skim',
+      level: 'B1',
+      title: 'Rebildfesten — programhæfte (eksempel)',
+      theme: 'Rebildfesten',
+      exam_length: false,
+      notices: [
+        {
+          id: 'haefte-rebildfest-n01',
+          heading: 'Velkommen og information',
+          body: 'Velkommen til Rebild Bakker. Dette er et eksempel på et programhæfte, og alle tider, priser og regler i hæftet er opfundet til sprogtræning. Festen varer fire dage, fra torsdag 2. juli til søndag 5. juli. Hovedprogrammet ligger lørdag 4. juli. Alle dage er der åbent i informationstelt ved hovedindgangen. Teltet er åbent kl. 9-17. Her kan du få et kort over området, et program og svar på dine spørgsmål. Her kan du også aflevere og hente hittegods. Hittegods opbevares til søndag kl. 16. Det, der ikke bliver hentet, sendes til politiet. Førstehjælpsteltet ligger ved scenen og har rødt kors på siden. Det er åbent, så længe der er gæster i området. Der er 20 toiletter ved p-pladsen og 12 ved scenen. Husk solcreme og en kasket, hvis det er varmt. Tag også en regnjakke med, for vejret kan skifte hurtigt. Hunde er velkomne, men de skal være i snor. Det er ikke tilladt at have åben ild i området, og der må ikke grilles uden for de opstillede pladser. Ryd op efter dig selv og tag dit affald med til containerne. Gå kun på de afmærkede stier, så heden ikke bliver slidt ned. Ældre og gangbesværede kan få en plads i den lille vogn, som kører mellem indgangen og scenen. Spørg de frivillige i gule veste, hvis du er faret vild. De kender området godt og kan vise dig vej til både scene, toiletter og madboder.'
+        },
+        {
+          id: 'haefte-rebildfest-n02',
+          heading: 'Program torsdag og fredag',
+          body: 'Torsdag 2. juli er der åbningskoncert i teltet kl. 18.00-20.00. Koncerten er gratis, og der er plads til 400 gæster. Kom i god tid, for dørene lukkes, når teltet er fuldt. Efter koncerten er baren åben til kl. 22. Fredag 3. juli begynder dagen med en vandretur i Rebild Bakker. Turen starter fra informationstelt fredag kl. 10.00. Den varer cirka 2 timer og er 5 kilometer lang. Tag gode sko på og tilmeld dig på stedet. Der er plads til 30 deltagere. Fredag kl. 13 er der foredrag i teltet om egnen og dens planter. Foredraget varer 45 minutter, og bagefter er der spørgsmål fra publikum. Kl. 15 er der udflugt for børn, hvor de kan lede efter dyr og spor i skoven. Børn under 8 år skal have en voksen med. Fredag kl. 19.30 er der dans i teltet. Orkestret spiller gamle danske og amerikanske numre. Du behøver ikke at kunne danse, for der er en lille gennemgang af trinene kl. 19.30. Dansen slutter kl. 23. Fredag aften er der også film på en stor skærm ved scenen, hvis vejret er tørt. Medbring et tæppe eller en klapstol. Der er ingen billetter til torsdag og fredag, og alle er velkomne. Der er kaffe og kage i teltet hele fredagen, og børnene kan få saft. Teltet har siddepladser til alle, og der er også en lille plads til barnevogne. Husk en trøje, for aftenerne kan være kølige.'
+        },
+        {
+          id: 'haefte-rebildfest-n03',
+          heading: 'Hovedprogrammet lørdag',
+          body: 'I dette eksempel falder 4. juli på en lørdag. Dagens hovedprogram foregår på den store græsplæne foran scenen. Gæsterne kommer ind fra kl. 12, og der spilles musik fra kl. 13.00. Åbningen er kl. 13.30, hvor flagene hejses. Så synges den danske og den amerikanske nationalsang. Hovedprogrammet er kl. 14.00-16.30. Det består af to taler, korsang og et orkester. Der er en pause på 15 minutter midt i programmet. Efter pausen er der en kort scene for børn, hvor de synger sammen. Det sidste punkt er fællessang kl. 16.15. Programmet slutter præcis kl. 16.30. Kl. 17.00 åbner en lille udstilling om områdets historie ved Lincoln-relieffet. Der er plads til cirka 3.000 mennesker på græsset, og flere kan stå bagved. Medbring en stol eller et tæppe. Højttalere er sat op på hele pladsen, så alle kan høre. Taler og sange er på dansk og engelsk, og programmet i hæftet kan hjælpe dig med at følge med. En tegnsprogstolk står ved siden af scenen. Pladserne tættest på scenen er reserveret til personer i kørestol og deres ledsagere. Se kortet på hæftets sidste side for at finde dem. Vejret kan ændre programmet. Kig på hjemmesiden om morgenen, hvis det regner. Gå ikke ind på heden bag scenen, for der er adgang forbudt under hele programmet. Vagterne hjælper dig gerne, hvis du er i tvivl om, hvor du må gå.'
+        },
+        {
+          id: 'haefte-rebildfest-n04',
+          heading: 'Billetter',
+          body: 'Du skal bruge en billet til hovedprogrammet lørdag. Torsdag, fredag og søndag er der gratis adgang til hele området. En voksenbillet koster 120 kr. ved indgangen. Køber du billetten i forsalg, koster den 100 kr. Forsalget er åbent til og med 25. juni på hjemmesiden. Efter den dato kan du kun købe billet ved indgangen. Børn under 12 år kommer gratis ind, men de skal have en voksen med. Medlemmer af Rebildselskabet kommer også gratis ind. De skal vise deres medlemskort ved indgangen. Husk at tage det med, for uden kort bliver du bedt om at betale. Billetten gælder hele dagen, også hvis du forlader området og kommer tilbage. Vis armbåndet, du får ved indgangen. Mister du det, kan du ikke få et nyt. Køb ikke billetter af folk uden for indgangen, for de er ikke gyldige. Billetter kan ikke byttes eller refunderes, medmindre festen aflyses. Så får du pengene tilbage inden 14 dage. Grupper på mere end 20 personer kan købe billetter sammen i forsalget. Du skal oplyse antallet af voksne og børn, når du bestiller. Billetter til personer i kørestol er gratis, og det samme gælder en ledsager. Tal med personalet ved indgangen, hvis du har brug for hjælp. Gem din billet i telefonen, for kontrollen ved indgangen kan også læse den digitalt. Print den ud, hvis din telefon ikke har strøm.'
+        },
+        {
+          id: 'haefte-rebildfest-n05',
+          heading: 'Parkering',
+          body: 'Der er en stor p-plads ved indgangen til området. Parkering koster 60 kr. pr. bil. Betal ved automaten eller med kort ved bommen. P-pladsen er åben kl. 10-18. Kommer du før kl. 10, er bommen stadig nede. Har du parkeret, når pladsen lukker, kan du ikke få bilen ud før næste morgen. Der er plads til 800 biler. Når pladsen er fuld, bliver bilerne sendt til en ekstra parkering 2 kilometer væk. Derfra kører der gratis busser til indgangen. Motorcykler og knallerter har en egen række og betaler 20 kr. Husbiler og campingvogne må ikke parkere på pladsen. De skal stå på campingpladsen i nærheden. Der er 20 pladser tæt ved indgangen til personer med handicapkort. Disse pladser er gratis, men du skal lægge kortet synligt i forruden. Cykler kan stilles ved cykelstativet foran området, og det er gratis. Der er plads til 150 cykler. Lås din cykel, for stativet er ikke bevogtet. Parker kun på de afmærkede pladser og følg anvisningerne fra vagterne. Efterlad ikke børn eller dyr i bilen, hvis solen skinner. Åbn ikke bagagerummet, før du er stoppet helt. Vil du hellere tage bussen, kan du læse mere under shuttlebussen på næste side. Parkering efter kl. 18 er ikke mulig, så tjek tiden, før du går ind i området. Spørg vagterne, hvis du ikke kan finde en plads.'
+        },
+        {
+          id: 'haefte-rebildfest-n06',
+          heading: 'Shuttlebus fra Skørping',
+          body: 'Du kan tage toget til Skørping station og derfra tage en shuttlebus til Rebild Bakker. Bussen holder foran stationen og kører hvert 20. minut. Den første bus kører fra stationen kl. 9.30, og den sidste kører kl. 17.30. Turen tager cirka 15 minutter. Billetten koster 30 kr. for tur og retur. Børn under 12 år kører gratis. Køb billet hos chaufføren. Du kan betale med kort eller med mobil. Kontanter tages ikke. Hjemturen går fra busstoppestedet ved hovedindgangen. Den første bus fra Rebild kører kl. 11, og den sidste bus kører kl. 18.30. Bussen er lavet til kørestole, og der er plads til to kørestole i hver bus. Du kan have en barnevogn eller en cykel med, hvis der er plads. Efter hovedprogrammet lørdag sætter vi ekstra busser ind, og så kører de hvert 10. minut. Der er ingen busser søndag efter kl. 15. Står du og venter, så kig efter det gule skilt, som viser bussens nummer. Der er 6 siddepladser og læ i ventehuset. Kommer du i bil, skal du ikke bruge bussen. Vil du have besked om forsinkelser, kan du følge med på hjemmesiden. Tjek køreplanen dagen før. Tog og bus passer sammen, men toget kan blive forsinket. Billetten gælder hele dagen, så du kan stige af og på, når du vil. Har du mistet din billet, må du købe en ny hos chaufføren.'
+        },
+        {
+          id: 'haefte-rebildfest-n07',
+          heading: 'Mad og drikke',
+          body: 'Madboderne ligger på pladsen bag scenen og er åbne kl. 11-17. Her kan du købe pølser, pandekager, sandwich og amerikansk majskolbe. En pølse med brød koster 45 kr. En stor pandekage koster 35 kr., og en sandwich koster 55 kr. Sodavand koster 25 kr., og kaffe koster 30 kr. Der er også en vegetarisk bod med bønnesuppe og grøntsagsburger. Boderne tager kun kort og mobil, ingen kontanter. Du må gerne tage din egen mad med og spise den på græsset. Husk at tage dit affald med til containerne. Glasflasker er forbudt i hele området, så hæld drikkevarer over i en plastikflaske eller en kop. Der er 10 drikkevandshaner, hvor du kan fylde din flaske gratis. Kagebordet åbner kl. 13. Det drives af frivillige og har hjemmebag. Overskuddet går til vedligeholdelsen af stierne. Ved hovedprogrammet lørdag er der ofte lang kø, så det er bedst at købe mad før kl. 13.30. Is sælges fra en cykel, som kører rundt mellem boderne. Bagved madboderne er der 30 borde med bænke. Du må ikke flytte bordene. Allergikere kan få en liste over indholdet i hver ret ved hver bod. Spørg altid, hvis du er i tvivl. Boderne lukker kl. 17, og så bliver køkkenerne rengjort. Vælg gerne den bod, hvor køen er kortest, og tag det roligt. Vandet ved boderne er koldt og gratis, og der er skygge under de store telte.'
+        },
+        {
+          id: 'haefte-rebildfest-n08',
+          heading: 'Børn og sport',
+          body: 'Børn er velkomne alle dage. Lørdag er der mest at lave, og aktiviteterne ligger på sportspladsen ved siden af scenen. Baseball for børn er kl. 12-14. Her får du udleveret et bat og en handske, og en træner viser dig reglerne. Der er plads til 40 børn ad gangen, så mød op i god tid. Tilmelding sker på stedet. Fra kl. 10 til kl. 11.30 kan alle prøve amerikansk fodbold. Der er hjelme og beskyttelse i alle størrelser, og det er gratis at låne dem. Ansigtsmaling står klar kl. 11-15 i det lille telt ved legepladsen. Der er en kø fra kl. 11, så mød op tidligt. Børn under 8 år skal have en voksen med, når de er på sportspladsen. Alle børn får et lille flag, når de kommer ind. Vil du have et armbånd med dit telefonnummer, så spørg i informationstelt. Så kan personalet ringe til dig, hvis dit barn bliver væk. Legepladsen er åben hele dagen, og den ligger i skyggen af nogle store træer. Der er 25 gynger og klatrestativer. Børnetoiletterne ligger lige ved siden af. Skifteborde finder du i det blå telt. Vil du have en pause, er der siddepladser og vand. Børn under 12 år kommer gratis ind til hovedprogrammet. Hver gruppe på sportspladsen får en lille vandflaske, så ingen skal gå tørstige. Forældre er velkomne til at se med fra kanten.'
+        },
+        {
+          id: 'haefte-rebildfest-n09',
+          heading: 'Frivillige',
+          body: 'Festen bruger hvert år 80 frivillige. Har du lyst til at hjælpe, kan du tilmelde dig på hjemmesiden. Frist for tilmelding er 20. juni. Skriv, hvilken dag du kan, og hvilken slags arbejde du helst vil have. Du får svar inden 5 dage. Vagterne er delt i to hold. Det første hold arbejder kl. 9-13, og det andet hold arbejder kl. 13-17. Du kan tage en eller to vagter. Mød op 30 minutter før din vagt hos vagtlederen i informationstelt. Her får du en gul vest og en kop kaffe. Frivillige får gratis mad og drikke under vagten. Du kan hjælpe ved indgangen, i p-pladsen, ved bussen eller i børneteltet. Mange vælger at stå i kagebordet. Der er også brug for hjælp til at rydde op søndag kl. 10, og det er en god mulighed for at møde nye mennesker. Du skal være mindst 16 år for at tage en vagt. Unge fra 14 år kan hjælpe sammen med en voksen. Alle frivillige får et T-shirt, som du må beholde. Hvis du bliver forhindret, så giv besked på hjemmesiden senest dagen før. Så kan en anden tage din plads. Efter festen holdes en lille fest for de frivillige. Den ligger den første fredag i august kl. 18. Har du spørgsmål om vagterne, kan du skrive til de frivilliges kontor via formularen på hjemmesiden. Det svarer inden for få dage.'
+        },
+        {
+          id: 'haefte-rebildfest-n10',
+          heading: 'Rebildfestens historie (baggrund)',
+          body: 'Rebildselskabet er den første dansk-amerikanske venskabsforening og er over 100 år gammelt. Selskabet står bag festen i Rebild Bakker. Rebildfesten kaldes den største fejring af 4. juli uden for USA. Forløberen for festen blev holdt i Aarhus i 1909, i forbindelse med Landsudstillingen. Den første fest i Rebild blev holdt i 1912. Et areal på cirka 80 ha blev købt og i 1912 overdraget til den danske stat. Senere køb har mere end fordoblet arealet. Gaven havde tre betingelser. Området skulle forblive i naturtilstand, det skulle være åbent for offentligheden, og dansk-amerikanere måtte fejre amerikanske helligdage der. Festen har været afholdt hvert år siden 1914. Kun under Første og Anden Verdenskrig og under coronapandemien blev den ikke holdt. Blandt de tidligere talere er Walt Disney i 1961, Richard Nixon i 1962 og Ronald Reagan i 1972. Efter Anden Verdenskrig kom der op mod 50.000 mennesker til festen. I de seneste år har der kun været nogle få tusinde. Tallet er fra en artikel i 2023. Samme år kom amerikansk fodbold og baseball på programmet for at gøre festen mere levende. Det program, du har læst i dette hæfte, er et opfundet eksempel. Det rigtige program kan du finde på Rebildfestens egen hjemmeside.'
+        }
+      ],
+      questions: [
+        { id: 'haefte-rebildfest-q01', q: 'Hvornår er informationsteltet åbent?', accepted: ['kl. 9-17', 'kl. 9 til 17', '9-17', 'klokken 9-17', 'fra kl. 9 til kl. 17'], noticeId: 'haefte-rebildfest-n01', note: 'Står under Velkommen og information: teltet er åbent kl. 9-17.' },
+        { id: 'haefte-rebildfest-q02', q: 'Hvornår starter vandreturen fredag?', accepted: ['fredag kl. 10.00', 'kl. 10.00', 'fredag kl. 10', 'kl. 10', 'klokken 10'], noticeId: 'haefte-rebildfest-n02', note: 'Står under Program torsdag og fredag: vandreturen starter fredag kl. 10.00.' },
+        { id: 'haefte-rebildfest-q03', q: 'Hvornår er åbningen af hovedprogrammet lørdag?', accepted: ['kl. 13.30', 'klokken 13.30', '13.30', 'kl. 13:30'], noticeId: 'haefte-rebildfest-n03', note: 'Står under Hovedprogrammet lørdag: åbningen er kl. 13.30.' },
+        { id: 'haefte-rebildfest-q04', q: 'Hvornår foregår selve hovedprogrammet lørdag?', accepted: ['kl. 14.00-16.30', 'kl. 14.00 til 16.30', '14.00-16.30', 'klokken 14.00-16.30', 'kl. 14-16.30'], noticeId: 'haefte-rebildfest-n03', note: 'Står under Hovedprogrammet lørdag: hovedprogrammet er kl. 14.00-16.30.' },
+        { id: 'haefte-rebildfest-q05', q: 'Hvad koster en voksenbillet til hovedprogrammet ved indgangen?', accepted: ['120 kr.', '120 kr', '120 kroner', '120'], noticeId: 'haefte-rebildfest-n04', note: 'Står under Billetter: ved indgangen koster en voksenbillet 120 kr.' },
+        { id: 'haefte-rebildfest-q06', q: 'Hvornår er forsalget af billetter slut?', accepted: ['25. juni', 'til og med 25. juni', 'den 25. juni', 'd. 25. juni'], noticeId: 'haefte-rebildfest-n04', note: 'Står under Billetter: forsalget er åbent til og med 25. juni.' },
+        { id: 'haefte-rebildfest-q07', q: 'Hvad koster det at parkere en bil på p-pladsen?', accepted: ['60 kr.', '60 kr', '60 kroner', '60 kr. pr. bil', '60'], noticeId: 'haefte-rebildfest-n05', note: 'Står under Parkering: 60 kr. pr. bil.' },
+        { id: 'haefte-rebildfest-q08', q: 'Hvornår er p-pladsen åben?', accepted: ['kl. 10-18', 'kl. 10 til 18', '10-18', 'klokken 10-18', 'fra kl. 10 til kl. 18'], noticeId: 'haefte-rebildfest-n05', note: 'Står under Parkering: p-pladsen er åben kl. 10-18.' },
+        { id: 'haefte-rebildfest-q09', q: 'Hvor ofte kører shuttlebussen fra Skørping station?', accepted: ['hvert 20. minut', 'hver 20. minut', 'hvert tyvende minut', 'hvert 20 minut', '20. minut'], noticeId: 'haefte-rebildfest-n06', note: 'Står under Shuttlebus fra Skørping: bussen kører hvert 20. minut.' },
+        { id: 'haefte-rebildfest-q10', q: 'Hvad koster en pølse med brød?', accepted: ['45 kr.', '45 kr', '45 kroner', '45'], noticeId: 'haefte-rebildfest-n07', note: 'Står under Mad og drikke: en pølse med brød koster 45 kr.' },
+        { id: 'haefte-rebildfest-q11', q: 'Hvornår er baseball for børn?', accepted: ['kl. 12-14', 'kl. 12 til 14', '12-14', 'klokken 12-14', 'fra kl. 12 til 14'], noticeId: 'haefte-rebildfest-n08', note: 'Står under Børn og sport: baseball for børn er kl. 12-14.' },
+        { id: 'haefte-rebildfest-q12', q: 'Hvad er sidste frist for at tilmelde sig som frivillig?', accepted: ['20. juni', 'den 20. juni', 'senest 20. juni', 'senest den 20. juni'], noticeId: 'haefte-rebildfest-n09', note: 'Står under Frivillige: fristen for tilmelding er 20. juni.' },
+        { id: 'haefte-rebildfest-q13', q: 'I hvilket år blev den første Rebildfest holdt?', accepted: ['1912', 'i 1912'], noticeId: 'haefte-rebildfest-n10', note: 'Står under Rebildfestens historie: den første fest i Rebild blev holdt i 1912.' },
+        { id: 'haefte-rebildfest-q14', q: 'Hvor stort var det areal, som blev overdraget til staten, cirka?', accepted: ['80 ha', 'ca. 80 ha', 'cirka 80 ha', '80 hektar', 'cirka 80 hektar'], noticeId: 'haefte-rebildfest-n10', note: 'Står under Rebildfestens historie: cirka 80 ha blev overdraget til staten.' },
+        { id: 'haefte-rebildfest-q15', q: 'I hvilket år var Walt Disney taler ved festen?', accepted: ['1961', 'i 1961'], noticeId: 'haefte-rebildfest-n10', note: 'Står under Rebildfestens historie: Walt Disney i 1961.' }
+      ],
+      sources: [
+        'https://www.rebildfesten.dk/en/about-us',
+        'https://da.wikipedia.org/wiki/Rebildfesten',
+        'https://en.wikipedia.org/wiki/Rebild_Festival',
+        'https://en.wikipedia.org/wiki/Rebild_National_Park',
+        'https://biografiskleksikon.lex.dk/Max_Henius',
+        'https://www.tv2nord.dk/rebild/har-haft-reagan-disney-og-dronningen-paa-talerstolen-saadan-vil-rebildfesten-faa-gaesterne-tilbage'
+      ],
+      verify: true
+    }
+  ];
+})();

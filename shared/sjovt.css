@@ -241,6 +241,27 @@ html.sd-page ::selection { background: var(--sd-ink); color: var(--sd-cream); }
 @media (max-width: 420px) { .sd-bar { gap: 4px; padding: 4px 6px; } .sd-bar .sd-bar-btn { padding: 0 6px; font-size: 13px; } .sd-bar a { padding: 0 6px; } }
 @media (max-width: 420px) { .sd-bar .sd-bar-logo span.t { display: none; } }
 
+/* "Om spillet": static intro + folded FAQ at the very end of a game page, below the game (never inside it) */
+.sd-about { box-sizing: border-box; width: 100%; align-self: stretch; flex: none; clear: both; position: relative; z-index: 1;
+  margin: 0; padding: 28px 16px 8px; background: var(--sd-ink); color: var(--sd-cream); border-top: 4px solid var(--sd-orange);
+  font-family: var(--sd-font-body); }
+.sd-about > * { max-width: 760px; margin-left: auto; margin-right: auto; }
+.sd-about h2 { margin-top: 0; margin-bottom: 10px; font-family: var(--sd-font-display); font-size: 20px; line-height: 1.35; color: var(--sd-cream); }
+.sd-about h3 { margin-top: 20px; margin-bottom: 6px; font-family: var(--sd-font-display); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--sd-cream); }
+.sd-about p { margin-top: 0; margin-bottom: 12px; font-size: 15px; line-height: 1.65; color: var(--sd-cream); }
+.sd-about details { border-top: 2px solid rgba(255, 194, 90, .35); border-top-color: color-mix(in srgb, var(--sd-cream) 35%, transparent); }
+.sd-about details:last-of-type { border-bottom: 2px solid rgba(255, 194, 90, .35); border-bottom-color: color-mix(in srgb, var(--sd-cream) 35%, transparent); }
+.sd-about summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 12px; list-style: none;
+  font-weight: 700; font-size: 15px; color: var(--sd-cream); }
+.sd-about summary::-webkit-details-marker { display: none; }
+.sd-about summary::after { content: "+"; margin-left: auto; font-family: var(--sd-font-display); font-size: 20px; line-height: 1; }
+.sd-about details[open] > summary::after { content: "−"; }
+.sd-about details p { padding-left: 4px; }
+.sd-about a { color: var(--sd-cream); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px;
+  display: inline-flex; align-items: center; min-height: 44px; }
+.sd-about .sd-about-en { margin-top: 14px; }
+.sd-about + .sd-next { border-top: 0; padding-top: 4px; }
+
 /* "Øv videre": static related-game links at the end of each game page (crawlable internal links) */
 .sd-next { box-sizing: border-box; width: 100%; align-self: stretch; flex: none; clear: both; position: relative; z-index: 1;
   margin: 0; padding: 20px 16px 28px; background: var(--sd-ink); color: var(--sd-cream); border-top: 4px solid var(--sd-orange);

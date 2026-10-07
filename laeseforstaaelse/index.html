@@ -125,6 +125,28 @@ try {
   @keyframes lf-flash { from { box-shadow: 0 0 0 6px var(--lf-ok-bg); } to { box-shadow: 0 0 0 0 transparent; } }
   .dc-summary-stats { font-size: 1.1rem; font-weight: 700; }
 
+  /* Insert (Sæt afsnittet ind): dashed slots stay in the text; the bank lives in the question pane. */
+  .lf-gap { display: block; width: 100%; margin: 0 0 1em; padding: 10px 14px; min-height: 56px; text-align: left; font: inherit;
+            line-height: 1.55; background: transparent; color: var(--lf-ink); border: 2px dashed var(--lf-muted); border-radius: 8px; cursor: pointer; }
+  .lf-gap-tag { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font: 700 .8em/1.5 system-ui, sans-serif; letter-spacing: .03em; }
+  .lf-gap-st { font-weight: 400; color: var(--lf-muted); }
+  .lf-gap-body { display: block; margin-top: .35em; }
+  .lf-gap[data-state="ok"] { border-style: solid; border-color: var(--lf-rule); border-left: 6px solid var(--lf-ok); background: var(--lf-card); cursor: default; }
+  .lf-gap[data-state="ok"] .lf-gap-st { color: var(--lf-ok); font-weight: 700; }
+  .lf-gap[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); cursor: default; }
+  .lf-gap[data-state="no"] .lf-gap-st { color: var(--lf-no); font-weight: 700; }
+  .lf-gap[aria-disabled="true"]:not([data-state]) { cursor: default; }
+  .lf-gap[aria-current="true"] { box-shadow: 0 0 0 4px var(--lf-focus); }
+  .lf-hint { margin: 0 0 10px; color: var(--lf-muted); font-size: .95rem; line-height: 1.45; }
+  .lf-bank { display: flex; flex-direction: column; gap: 8px; }
+  .lf-block { display: block; width: 100%; min-height: 44px; padding: 10px 12px; text-align: left; font-size: .95rem; line-height: 1.45;
+              background: var(--lf-card); color: var(--lf-ink); border: 2px solid var(--lf-ink); border-radius: 8px; cursor: pointer; }
+  .lf-block[aria-pressed="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-block:disabled { opacity: 1; cursor: default; border-style: dashed; }
+  .lf-block-n { display: inline-block; min-width: 1.4em; font-weight: 700; }
+  .lf-block-sel { display: block; margin-top: 4px; font-weight: 700; font-size: .85rem; }
+  .lf-status { margin: 10px 0 0; font-weight: 700; font-size: .95rem; line-height: 1.4; }
+
   @media (min-width: 1024px) and (max-width: 1279px) { :root { --lf-panel: 360px; } }
   /* Tablet landscape stays split with a 38 % panel. */
   @media (min-width: 640px) and (max-width: 1023px) and (orientation: landscape) {
@@ -197,6 +219,7 @@ try {
 <script src="../shared/dansk-core.js"></script>
 <script src="data-skim.js"></script>
 <script src="data-mc.js"></script>
+<script src="data-insert.js"></script>
 <script src="data.js"></script>
 <script>
 (function () {
@@ -317,6 +340,12 @@ try {
       textEl.appendChild(el('h2', null, text.title));
       text.paragraphs.forEach(function (para, i) {
         var p = el('p', null, para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
+        if (text.mode === 'insert') insGaps(text).forEach(function (g) {
+          if (g.after !== i) return;
+          var b = el('button', 'lf-gap'); b.type = 'button'; b.setAttribute('data-gap', g.id);
+          b.addEventListener('click', function () { insOnSlot(g.id); });
+          textEl.appendChild(b);
+        });
       });
     }
     var foot = el('footer', 'lf-foot');
@@ -424,6 +453,7 @@ try {
     if (state.view !== 'play') return;
     var n = D.itemsOf(state.text).length;
     if (state.summary) { if (d < 0) { state.summary = false; render(); } return; }
+    if (state.mode === 'insert') { if (!insOpen().length) { if (d > 0) finishRound(); } else insMove(d); return; }
     var i = state.qi + d;
     if (i < 0) return;
     if (i >= n) { if (allAnswered()) finishRound(); return; }
@@ -433,19 +463,27 @@ try {
   function finishRound() {
     state.token++; state.summary = true; clearHighlight(); clearNudge();
     var items = D.itemsOf(state.text), right = 0, weak = [];
-    items.forEach(function (q) { if (state.answered[q.id] && state.answered[q.id].correct) right++; else weak.push({ label: q.q }); });
+    items.forEach(function (q) { if (state.answered[q.id] && state.answered[q.id].correct) right++; else weak.push({ label: q.q || q.note }); });
     qHost.innerHTML = ''; fbHost.innerHTML = '';
     setHead('Resultat'); peekEl.textContent = 'Resultat';
     DC.quiz.summary.render({ score: right, accuracy: items.length ? right / items.length * 100 : 0, weakItems: weak.slice(0, 3) },
-      qHost, function () { replay(); }, state.mode === 'skim' ? retryErrors : undefined);
+      qHost, function () { replay(); }, (state.mode === 'skim' || state.mode === 'insert') ? retryErrors : undefined);
+    if (state.mode === 'insert') {
+      store.remove('insert:' + state.text.id);
+      var un = el('p', 'lf-hint', 'To afsnit blev ikke brugt.'); un.id = 'lf-unused'; qHost.appendChild(un);
+    }
     SOUND.done(); DC.ui.announce('Runden er slut. ' + right + ' af ' + items.length + ' rigtige.');
     var again = qHost.querySelector('.dc-summary-actions button'); if (again) again.focus();
   }
   function replay() {
-    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false; render();
+    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false;
+    if (state.mode === 'insert') { store.remove('insert:' + state.text.id); insInit(state.text, null); state.token++; }
+    render();
+    if (state.mode === 'insert') insCenter(ins.cur);
   }
   // Gentag fejl (skim): only the wrongly answered questions are asked again.
   function retryErrors() {
+    if (state.mode === 'insert') { insRetryErrors(); return; }
     var items = D.itemsOf(state.text), first = -1;
     items.forEach(function (q, i) {
       if (state.answered[q.id] && !state.answered[q.id].correct) { delete state.answered[q.id]; delete drafts[q.id]; if (first < 0) first = i; }
@@ -593,9 +631,187 @@ try {
     }
   };
 
+  /* Insert: five slots stay in the text, the bank of seven blocks sits in the question pane.
+     Select a block then a slot (or a slot then a block). The first attempt per gap is what counts. */
+  var ins = null;   // { placed:{gapId:blockId}, sel, armed, cur, pending:{gapId,blockId}|null }
+  function insGaps(text) { return text.gaps.slice().sort(function (a, b) { return a.after - b.after; }); }
+  function insNo(gapId) { var g = insGaps(state.text); for (var i = 0; i < g.length; i++) if (g[i].id === gapId) return i + 1; return 0; }
+  function insBlock(id) { var b = state.text.blocks; for (var i = 0; i < b.length; i++) if (b[i].id === id) return b[i]; return null; }
+  function insLoad(text) {
+    var s = store.get('insert:' + text.id);
+    if (!s || typeof s.placed !== 'object' || !s.placed) return null;
+    var placed = {}, answered = {};
+    text.gaps.forEach(function (g) {
+      var b = s.placed[g.id];
+      if (b && text.solution[g.id] === b) placed[g.id] = b;
+      var a = s.answered && s.answered[g.id];
+      if (a && typeof a.correct === 'boolean') answered[g.id] = { correct: a.correct, chosen: a.chosen };
+    });
+    return { placed: placed, answered: answered };
+  }
+  function insSave() {
+    if (!state.text || state.mode !== 'insert') return;
+    store.set('insert:' + state.text.id, { placed: ins.placed, answered: state.answered });
+  }
+  function insOpen() { return insGaps(state.text).filter(function (g) { return !ins.placed[g.id]; }); }
+  function insInit(text, saved) {
+    ins = { placed: saved ? saved.placed : {}, sel: null, armed: null, cur: null, pending: null };
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+  }
+  function insBank() {
+    var used = {}, k;
+    for (k in ins.placed) used[ins.placed[k]] = true;
+    if (ins.pending) used[ins.pending.blockId] = true;
+    return state.text.blocks.filter(function (b) { return !used[b.id]; });
+  }
+  // Scroll a slot to the vertical centre of the reading pane (instant under reduced motion).
+  function insCenter(gapId) {
+    var b = gapId && textEl.querySelector('[data-gap="' + gapId + '"]'); if (!b) return;
+    var top = b.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - Math.max(0, (reader.clientHeight - b.offsetHeight) / 2)),
+                      behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+  function insSyncSlots() {
+    insGaps(state.text).forEach(function (g, i) {
+      var b = textEl.querySelector('[data-gap="' + g.id + '"]'); if (!b) return;
+      var bid = ins.placed[g.id] || (ins.pending && ins.pending.gapId === g.id ? ins.pending.blockId : null);
+      var st = ins.placed[g.id] ? 'ok' : (bid ? 'no' : 'empty');
+      var no = i + 1;
+      b.innerHTML = '';
+      b.setAttribute('data-state', st);
+      var tag = el('span', 'lf-gap-tag'); tag.appendChild(el('strong', null, 'Hul ' + no));
+      tag.appendChild(el('span', 'lf-gap-st', st === 'ok' ? '✓ på plads' : st === 'no' ? '✗ passer ikke her' : 'tomt'));
+      b.appendChild(tag);
+      b.removeAttribute('aria-describedby');
+      if (bid) {
+        var body = el('span', 'lf-gap-body', insBlock(bid).text); body.id = 'lf-gap-body-' + g.id; b.appendChild(body);
+        b.setAttribute('aria-describedby', body.id);
+      }
+      b.setAttribute('aria-label', 'Hul ' + no + (st === 'ok' ? ', udfyldt' : st === 'no' ? ', udfyldt, passer ikke' : ', tomt'));
+      b.setAttribute('aria-disabled', (st !== 'empty' || ins.pending) ? 'true' : 'false');
+      if (g.id === ins.cur && st !== 'ok') b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  function insRender() {
+    var gaps = insGaps(state.text), total = gaps.length;
+    var done = gaps.filter(function (g) { return ins.placed[g.id]; }).length, full = done === total;
+    var ae = document.activeElement, key = ae && ae.getAttribute ? ae.getAttribute('data-block') : null;
+    insSyncSlots();
+    qHost.innerHTML = ''; fbHost.innerHTML = '';
+    setHead('Sæt afsnittet ind · ' + done + ' af ' + total + ' på plads');
+    peekEl.textContent = 'Sæt afsnittet ind · ' + done + '/' + total;
+    if (ins.pending) {
+      var p = ins.pending, box = el('div', 'lf-fb-box'), gap = null;
+      gaps.forEach(function (g) { if (g.id === p.gapId) gap = g; });
+      var h = el('p'); h.appendChild(el('strong', null, 'Afsnittet passer ikke i Hul ' + insNo(p.gapId) + '.')); box.appendChild(h);
+      var np = el('p', null, gap.note + ' '); DC.ui.ttsButton(gap.note, np, 'Lyt til forklaringen'); box.appendChild(np);
+      var acts = el('div', 'lf-fb-actions');
+      var again = btn('Prøv igen', 'lf-btn lf-btn--primary', insRetry); again.id = 'btn-retry'; acts.appendChild(again);
+      box.appendChild(acts); qHost.appendChild(box);
+    } else if (full) {
+      qHost.appendChild(el('p', 'lf-hint', 'To afsnit blev ikke brugt.'));
+    } else {
+      qHost.appendChild(el('p', 'lf-hint', 'Vælg et afsnit, og sæt det ind i et hul. To af afsnittene skal ikke bruges.'));
+    }
+    var bank = insBank();
+    var list = el('div', 'lf-bank'); list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'Afsnit at sætte ind');
+    bank.forEach(function (b, i) {
+      var bb = el('button', 'lf-block'); bb.type = 'button'; bb.setAttribute('data-block', b.id);
+      bb.appendChild(el('span', 'lf-block-n', (i + 1) + '.')); bb.appendChild(document.createTextNode(' ' + b.text));
+      var on = ins.sel === b.id;
+      bb.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on) bb.appendChild(el('span', 'lf-block-sel', '✓ Valgt'));
+      if (ins.pending || full) bb.disabled = true;
+      bb.addEventListener('click', function () { insOnBlock(b.id); });
+      list.appendChild(bb);
+    });
+    qHost.appendChild(list);
+    var selIdx = bank.map(function (b) { return b.id; }).indexOf(ins.sel);
+    var msg = ins.sel && selIdx >= 0 ? 'Afsnit ' + (selIdx + 1) + ' er valgt. Vælg et hul i teksten.'
+            : ins.armed ? 'Hul ' + insNo(ins.armed) + ' er valgt. Vælg et afsnit.' : '';
+    if (msg) qHost.appendChild(el('p', 'lf-status', msg));
+    if (key) { var back = qHost.querySelector('[data-block="' + key + '"]'); if (back && !back.disabled) back.focus({ preventScroll: true }); }
+    var op = insOpen().map(function (g) { return g.id; }), oi = op.indexOf(ins.cur);
+    $('btn-prev').setAttribute('aria-label', 'Forrige hul (J)'); $('btn-next').setAttribute('aria-label', 'Næste hul (K)');
+    $('btn-prev').setAttribute('aria-disabled', (oi <= 0 || ins.pending) ? 'true' : 'false');
+    $('btn-next').setAttribute('aria-disabled', (oi < 0 || oi >= op.length - 1 || ins.pending) ? 'true' : 'false');
+  }
+  function insOnSlot(gapId) {
+    if (state.summary || ins.pending || ins.placed[gapId]) return;
+    ins.cur = gapId;
+    if (ins.sel) { insPlace(gapId, ins.sel); return; }
+    ins.armed = gapId; insRender(); insCenter(gapId);
+    DC.ui.announce('Hul ' + insNo(gapId) + ' er valgt. Vælg et afsnit.');
+  }
+  function insOnBlock(blockId) {
+    if (state.summary || ins.pending) return;
+    if (ins.armed) { insPlace(ins.armed, blockId); return; }
+    ins.sel = ins.sel === blockId ? null : blockId;
+    insRender();
+    if (ins.sel) { insCenter(ins.cur); DC.ui.announce('Afsnit valgt. Vælg et hul i teksten.'); }
+  }
+  function insEscape() {
+    if (state.view !== 'play' || state.mode !== 'insert' || !ins || ins.pending || state.summary) return;
+    if (ins.sel || ins.armed) { ins.sel = null; ins.armed = null; insRender(); }
+  }
+  function insMove(d) {
+    if (ins.pending) return;
+    var op = insOpen(), i = -1;
+    op.forEach(function (g, k) { if (g.id === ins.cur) i = k; });
+    var j = i + d;
+    if (j < 0 || j >= op.length) return;
+    ins.cur = op[j].id; insRender(); insCenter(ins.cur);
+  }
+  function insPlace(gapId, blockId) {
+    var ok = state.text.solution[gapId] === blockId, tok = ++state.token, first = !state.answered[gapId];
+    ins.sel = null; ins.armed = null; ins.cur = gapId;
+    if (ok) ins.placed[gapId] = blockId; else ins.pending = { gapId: gapId, blockId: blockId };
+    var done = insOpen().length === 0;
+    if (ok) {
+      window.setTimeout(function () {             // schedule first: sound set-up must not delay it
+        if (tok !== state.token) return;
+        if (done) { finishRound(); return; }
+        if (ins.cur === gapId) { var o = insOpen(); ins.cur = o.length ? o[0].id : null; }
+        insRender(); insCenter(ins.cur);
+      }, 800);
+    }
+    if (first) recordAnswer(gapId, ok, null, blockId); else (ok ? SOUND.correct : SOUND.wrong)();
+    insSave(); insRender(); insCenter(gapId);
+    if (ok) {
+      var f = qHost.querySelector('.lf-block'); if (f) f.focus({ preventScroll: true });
+      var ge = textEl.querySelector('[data-gap="' + gapId + '"]');
+      if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); }
+      DC.ui.announce('Rigtigt. Hul ' + insNo(gapId) + ' er fyldt.');
+    } else {
+      DC.ui.announce('Forkert. ' + insGaps(state.text).filter(function (g) { return g.id === gapId; })[0].note);
+      panelCollapse(false); panel.scrollTop = 0;
+      var r = $('btn-retry'); if (r) r.focus({ preventScroll: true });
+    }
+  }
+  function insRetry() {
+    if (!ins.pending) return;
+    var bid = ins.pending.blockId, gid = ins.pending.gapId;
+    ins.pending = null; ins.cur = gid; state.token++;
+    insRender(); insCenter(gid);
+    var b = qHost.querySelector('[data-block="' + bid + '"]'); if (b) b.focus({ preventScroll: true });
+  }
+  function insRetryErrors() {
+    var missed = false;
+    D.itemsOf(state.text).forEach(function (g) {
+      if (state.answered[g.id] && !state.answered[g.id].correct) { delete state.answered[g.id]; delete ins.placed[g.id]; missed = true; }
+    });
+    if (!missed) return;
+    ins.sel = ins.armed = ins.pending = null;
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+    state.summary = false; state.token++; insSave(); render(); insCenter(ins.cur);
+  }
+  MODE_RENDERERS.insert = function () { insRender(); };
+
   function render() {
     var r = MODE_RENDERERS[state.mode];
     if (r) r(state.text, qHost, api);
+    if (state.mode === 'insert') return;           // insert sets its own nav state
+    $('btn-prev').setAttribute('aria-label', 'Forrige spørgsmål (J)'); $('btn-next').setAttribute('aria-label', 'Næste spørgsmål (K)');
     var n = D.itemsOf(state.text).length;
     $('btn-prev').setAttribute('aria-disabled', (state.qi === 0 && !state.summary) ? 'true' : 'false');
     $('btn-next').setAttribute('aria-disabled', (state.qi >= n - 1 && !allAnswered()) ? 'true' : 'false');
@@ -654,10 +870,18 @@ try {
     try { DC.ui.sound.playCtx(); } catch (err) { /* sound is optional */ }   // build the AudioContext on the Spil gesture
     var texts = D.textsFor(state.mode, state.levels);
     if (!texts.length) { syncStart(); return; }
-    var next = texts[0];
+    var next = texts[0], saved = null;
     for (var i = 0; i < texts.length; i++) if (texts[i].id === state.lastId && texts[i + 1]) next = texts[i + 1];
+    if (state.mode === 'insert') {                 // an unfinished round resumes where it was left (placed blocks survive reload)
+      for (var j = 0; j < texts.length; j++) {
+        var sv = texts[j].id === state.lastId ? insLoad(texts[j]) : null;
+        if (sv && Object.keys(sv.placed).length && Object.keys(sv.placed).length < texts[j].gaps.length) { next = texts[j]; saved = sv; }
+      }
+    }
     state.text = next; state.lastId = next.id; state.qi = 0; state.answered = {}; state.summary = false;
     drafts = {}; skimFocus = false;
+    state.token++;
+    if (state.mode === 'insert') { insInit(next, saved); if (saved) state.answered = saved.answered; }
     savePrefs();
     $('screen-start').hidden = true; $('screen-play').hidden = false; $('btn-menu').hidden = false; state.view = 'play';
     renderText(next); panelCollapse(false); render();
@@ -674,7 +898,7 @@ try {
     if (!ok) return;
     srs.items = {}; srs.patterns = {};
     DC.store.set('srs:' + NS, { items: {}, patterns: {} });
-    ['skim', 'mc', 'insert', 'cloze'].forEach(function (m) { D.textsFor(m).forEach(function (t) { store.remove('scroll:' + t.id); }); });
+    ['skim', 'mc', 'insert', 'cloze'].forEach(function (m) { D.textsFor(m).forEach(function (t) { store.remove('scroll:' + t.id); store.remove('insert:' + t.id); }); });
     store.remove('prefs'); state.lastId = null;
     DC.ui.announce('Fremskridt nulstillet.');
   });
@@ -686,11 +910,16 @@ try {
     var k = (e.key || '').toLowerCase();
     if (state.view === 'play' && k === 'escape') {            // Escape closes overlays, also while typing an answer
       var open = textEl.querySelector('details[open]');
-      if (open) open.removeAttribute('open'); else clearHighlight();
+      if (open) open.removeAttribute('open'); else { clearHighlight(); insEscape(); }
       return;
     }
     if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
     if (state.view !== 'play') return;
+    if (state.mode === 'insert' && !state.summary && /^[1-9]$/.test(k)) {
+      var bank = insBank(), bl = bank[+k - 1];
+      if (bl && !ins.pending) { e.preventDefault(); insOnBlock(bl.id); }
+      return;
+    }
     if (k === 'j') { e.preventDefault(); step(-1); }
     else if (k === 'k') { e.preventDefault(); step(1); }
   });

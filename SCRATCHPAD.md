@@ -11,15 +11,15 @@ This file is run *history + hand-off*. Never edit `prd.md` / `specs.md` because 
 
 ## 1. Resume Here  (OVERWRITE this block at the end of every run)
 
-- **Last updated:** 2026-10-04 (this run)
-- **Active task:** Verified and marked completed `boejning-data` — Bøjningsværkstedet data.js (3,273 items, all 6 modes)
-- **Last completed step:** Verified that boejningsvaerkstedet/data.js has all 6 modes fully populated and exceeds prd § 2.4 targets. Ran validation: 3,273 total items, 0 errors, 0 warnings. Updated PROGRESS.md to mark boejning-data as completed with commit 252f0c3. Updated SCRATCHPAD.md with completion event.
-- **Exact next action:** Next task is `saetning-game-1` (index.html shell with Baba Is You block tile theme, implement Modes 1–4 renderers with tile mechanics, SRS routing, sound). saetning-data is already completed (1,020 items). Estimated size: large (game shell + 4 mode renderers + integration).
+- **Last updated:** 2026-10-07 (this run)
+- **Active task:** `saetning-data` (in-progress) — authored 100 new hand-written items for Mode 1 (adverb_placement), bringing it to 140/140.
+- **Last completed step:** saetningsmaskinen/data.js adverb_placement grown from 40 to 140 items (50 main/subordinate sentence-core pairs, all 9 required adverbs, 3 verb-form classes, 8 conjunctions). Validated with shared/validate.js (0 errors/0 warnings) and a custom sanity script (movable_token∈tokens, accepted_orders is a permutation of tokens, main clause_type unchanged vs subordinate requires movement) — 0 problems across all 140 items. Updated PROGRESS.md (saetning-data status → in-progress with detailed notes).
+- **Exact next action:** Continue `saetning-data`. Author main_to_subordinate (Mode 2) next — currently 10/160, the largest remaining gap. Schema: id/level/mode/source/frame/tiles/accepted_orders/full_answer/note (improvement/specs.md § 6.6 "Transformation item"). Cover conjunctions at/fordi/selvom/hvis/når/da/mens/før/efter at. Hand-write each item (do NOT use Array.fill/map clone generators — that is exactly what caused US-051/the task reopening). After authoring, validate with shared/validate.js and re-run a sanity script analogous to the one used for Mode 1 (check tiles reorder into accepted_orders, full_answer matches frame+accepted_orders). Then do direct_question (10/140), indirect_question (10/140), relative_clause (10/180), der_or_det (9/160), clause_chain (10/100) in subsequent runs. Current total: 199/1,020.
 - **Open problems / do not repeat:**
   - Latent bug: `shared/data/nouns.js` `lærer` entry yields `lærerene`; should be `lærerne`. Not yet fixed (low priority).
   - 28 adjectives flagged `verify: true` in adjectives.js (native-speaker review still pending).
-  - Stray `tmp_*.js` files in repo root (debug harnesses). Clean up before final commit.
-- **Queue after this:** saetning-game-1 → saetning-game-2 → tids-data-polish → tids-native-review → seo-tidsmaskinen → tids-ux-polish → tids-caption-review → skrive-* tasks → qa-pass (see PROGRESS.md).
+  - saetning-game-1/saetning-game-2 remain blocked_by saetning-data until the dataset reaches target size — do not unblock them early.
+- **Queue after this:** saetning-data (continue) → saetning-game-1 → saetning-game-2 → tids-data-polish → tids-native-review → seo-tidsmaskinen → tids-ux-polish → tids-caption-review → skrive-* tasks → qa-pass (see PROGRESS.md).
 
 ---
 
@@ -173,5 +173,17 @@ This file is run *history + hand-off*. Never edit `prd.md` / `specs.md` because 
   - Total: 3,273 items (target 2,450), all validated zero errors/warnings
   - Game shell (boejning-shell) + renderers (boejning-modes-1-3, boejning-modes-4-6) already implemented
 - Next: Mark boejning-data as completed in PROGRESS.md; move to next task (saetning-game-1)
+
+### 2026-10-07 · start · saetning-data
+- What: Picked `saetning-data` (first unblocked `status: todo` task in Next Up; saetning-game-1/2 are blocked_by it). Read specs.md § saetningsmaskinen + improvement/specs.md § 6 (modes, data schemas § 6.6, dataset targets § 6.7, QA rules § 6.8). Invoked the `danish-grammar-qa` skill before authoring.
+- Result: ok (start)
+- Next: author Mode 1 (adverb_placement) to target, since it is the most mechanically verifiable mode (single rule: adverb before/after the finite verb depending on main vs. subordinate clause).
+
+### 2026-10-07 · commit · saetning-data
+- What: Hand-authored 100 new items for saetningsmaskinen/data.js `adverb_placement` (40 → 140/140). 50 sentence cores × (main + subordinate) pair, covering all 9 required adverbs (ikke/altid/aldrig/ofte/måske/sandsynligvis/heldigvis/desværre/allerede), 3 verb-form classes (simple present/preterite, modal+infinitive, perfect har/er+participle) and 8 subordinating conjunctions (fordi, selvom, hvis, når, mens, før, efter at, at). Every item hand-written individually (no template/clone generator) to avoid repeating the US-051 mistake.
+- Result: ok
+- State left behind: saetningsmaskinen/data.js adverb_placement = 140 items; other 6 modes unchanged (main_to_subordinate 10, direct_question 10, indirect_question 10, relative_clause 10, der_or_det 9, clause_chain 10). Total 199/1,020.
+- Next: main_to_subordinate (10/160) is the next largest gap — author it next following the same hand-written approach, schema in improvement/specs.md § 6.6 "Transformation item".
+- Gotchas: validated with `shared/validate.js` (DanskValidate.validateDataset, full requiredFields list) = 0 errors/0 warnings, plus a one-off sanity script checking movable_token membership, accepted_orders permutation integrity, and main-vs-subordinate movement direction — 0 problems across all 140 items. The file's own built-in placeholder/duplicate-id guard (IIFE at the bottom of data.js) also reported 0 warnings.
 
 <!-- APPEND NEW EVENTS BELOW THIS LINE -->

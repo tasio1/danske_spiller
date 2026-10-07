@@ -157,6 +157,7 @@ try {
     :root { --lf-gutter: 16px; }
     .lf-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
     .lf-panel { border-left: 0; border-top: 2px solid var(--lf-rule); max-height: var(--lf-sheet); padding: 0 16px 16px; }
+    .lf-panel { scroll-padding-top: 64px; }   /* a focused block never hides under the sticky peek bar */
     .lf-panel-head { display: block; position: sticky; top: 0; background: var(--lf-paper); padding-top: 6px; z-index: 1; }
     #btn-panel { width: 100%; display: flex; align-items: center; gap: 8px; text-align: left; justify-content: space-between; }
     .lf-peek { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

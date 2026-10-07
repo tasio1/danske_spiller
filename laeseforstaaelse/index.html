@@ -188,6 +188,9 @@ try {
   @media (max-width: 480px) { .lf-brand { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); } .lf-top { padding: 6px 8px; gap: 4px; } .lf-btn { padding: 0 8px; } }
   @media (prefers-reduced-motion: reduce) { .lf-flash { animation: none; } * { scroll-behavior: auto !important; transition: none !important; } }
 </style>
+<link rel="stylesheet" href="../shared/sjovt.css" />
+<script src="../shared/sjovt.js"></script>
+<link rel="stylesheet" href="../shared/themes/laeseforstaaelse.css" />
 </head>
 <body>
 <div class="lf-app">
@@ -202,6 +205,7 @@ try {
 
   <section class="lf-start" id="screen-start" aria-label="Start">
     <h1>Læseforståelse</h1>
+    <span class="lf-start-sprite sd-bob" data-sd-sprite="lup" data-scale="6" aria-hidden="true"></span>
     <button type="button" class="lf-btn lf-btn--primary" id="btn-play">Spil</button>
     <div class="lf-ctl" id="ctl-mode" role="radiogroup" aria-label="Øvelse"></div>
     <div class="lf-ctl" id="ctl-level" role="group" aria-label="Niveau"><span class="lf-ctl-label">Niveau</span></div>
@@ -225,8 +229,8 @@ try {
         <div id="lf-q"></div>
         <div id="lf-fb" aria-live="polite"></div>
         <div class="lf-nav" id="lf-nav">
-          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (J)">← Forrige</button>
-          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (K)">Næste →</button>
+          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (J)"><span class="sd-arr" aria-hidden="true"></span> Forrige</button>
+          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (K)">Næste <span class="sd-arr sd-arr--r" aria-hidden="true"></span></button>
         </div>
       </div>
     </aside>
@@ -257,6 +261,9 @@ try {
   var NUDGE = 'Gå videre, og vend tilbage til spørgsmålet til sidst.';
 
   function $(id) { return document.getElementById(id); }
+  /* Sjovt feedback hooks: purely visual, guarded so the game works without window.Sjovt */
+  function fx(name, node) { try { if (window.Sjovt && Sjovt.fx && node) Sjovt.fx[name](node); } catch (e) { /* decorative */ } }
+  try { if (window.Sjovt && Sjovt.watchScreens) Sjovt.watchScreens('#screen-start'); } catch (e) { /* decorative */ }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function btn(label, cls, onClick, aria) {
     var b = el('button', cls || 'lf-btn', label); b.type = 'button';
@@ -499,6 +506,14 @@ try {
       store.remove('cloze:' + state.text.id); czSyncGaps();
       var wl = el('p', 'lf-weakest', czWeakest(items)); wl.id = 'lf-weakest'; qHost.appendChild(wl);
     }
+    var sum = qHost.querySelector('.dc-summary');
+    if (sum) {
+      var spr = el('span', 'lf-result-sprite'); spr.setAttribute('aria-hidden', 'true');
+      try { if (window.Sjovt) spr.innerHTML = '<span class="sd-sprite sd-hop">' + Sjovt.spriteSVG(right === items.length ? 'pokal' : 'stjerne', 6) + '</span>'; } catch (e) { /* decorative */ }
+      sum.insertBefore(spr, sum.firstChild);
+      fx('bump', sum.querySelector('.dc-summary-score'));
+      if (items.length && right / items.length >= 0.6) fx('correct', spr);   // local burst by the sprite, not confetti over the text
+    }
     SOUND.done(); DC.ui.announce('Runden er slut. ' + right + ' af ' + items.length + ' rigtige.');
     var again = qHost.querySelector('.dc-summary-actions button'); if (again) again.focus();
   }
@@ -571,6 +586,7 @@ try {
       a.onAnswer(q.id, correct, null, q.options.indexOf(option));
       if (correct) {
         host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
+        fx('correct', host.querySelector('.dc-correct') || host.querySelector('.dc-quiz-option'));
         DC.ui.announce('Rigtigt.');
       } else {
         DC.ui.announce('Forkert. Rigtigt svar: ' + q.options[q.correct]);
@@ -649,6 +665,7 @@ try {
       var old = host.querySelector('.lf-nudge'); if (old) old.remove();
       if (res.correct) {
         host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
+        fx('correct', submit);
         DC.ui.announce('Rigtigt.');
       } else {
         DC.ui.announce('Forkert. Rigtigt svar: ' + q.accepted[0]);
@@ -809,7 +826,7 @@ try {
     if (ok) {
       var f = qHost.querySelector('.lf-block'); if (f) f.focus({ preventScroll: true });
       var ge = textEl.querySelector('[data-gap="' + gapId + '"]');
-      if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); }
+      if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); fx('correct', ge); }
       DC.ui.announce('Rigtigt. Hul ' + insNo(gapId) + ' er fyldt.');
     } else {
       DC.ui.announce('Forkert. ' + insGaps(state.text).filter(function (g) { return g.id === gapId; })[0].note);
@@ -992,7 +1009,7 @@ try {
         Array.prototype.forEach.call(list.children, function (b, k) { b.disabled = true; if (k === g.correct) b.classList.add('dc-correct'); });
         czSyncGaps();
         var ge = textEl.querySelector('[data-gap="' + g.id + '"]');
-        if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); }
+        if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); fx('correct', ge); }
         DC.ui.announce('Rigtigt.');
       } else {
         czJustWrong = g.id;

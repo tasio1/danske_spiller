@@ -225,8 +225,8 @@ try {
         <div id="lf-q"></div>
         <div id="lf-fb" aria-live="polite"></div>
         <div class="lf-nav" id="lf-nav">
-          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (J)">← Forrige</button>
-          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (K)">Næste →</button>
+          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (K)">← Forrige</button>
+          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (J)">Næste →</button>
         </div>
       </div>
     </aside>
@@ -410,9 +410,9 @@ try {
       var on = bs[i].getAttribute('data-jump') === id;
       if (on) bs[i].setAttribute('aria-current', 'true'); else bs[i].removeAttribute('aria-current');
       if (on && nav) {                           // keep the current chip visible inside the row (never scrolls the page)
-        var l = bs[i].offsetLeft - nav.offsetLeft;
-        if (l < nav.scrollLeft) nav.scrollLeft = l - 8;
-        else if (l + bs[i].offsetWidth > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = l + bs[i].offsetWidth - nav.clientWidth + 8;
+        var cr = bs[i].getBoundingClientRect(), nr = nav.getBoundingClientRect();
+        if (cr.left < nr.left + 4) nav.scrollLeft -= nr.left + 12 - cr.left;
+        else if (cr.right > nr.right - 4) nav.scrollLeft += cr.right - nr.right + 12;
       }
     }
   }
@@ -761,7 +761,7 @@ try {
     if (msg) qHost.appendChild(el('p', 'lf-status', msg));
     if (key) { var back = qHost.querySelector('[data-block="' + key + '"]'); if (back && !back.disabled) back.focus({ preventScroll: true }); }
     var op = insOpen().map(function (g) { return g.id; }), oi = op.indexOf(ins.cur);
-    $('btn-prev').setAttribute('aria-label', 'Forrige hul (J)'); $('btn-next').setAttribute('aria-label', 'Næste hul (K)');
+    $('btn-prev').setAttribute('aria-label', 'Forrige hul (K)'); $('btn-next').setAttribute('aria-label', 'Næste hul (J)');
     $('btn-prev').setAttribute('aria-disabled', (oi <= 0 || ins.pending) ? 'true' : 'false');
     $('btn-next').setAttribute('aria-disabled', (oi < 0 || oi >= op.length - 1 || ins.pending) ? 'true' : 'false');
   }
@@ -1006,7 +1006,7 @@ try {
     var r = MODE_RENDERERS[state.mode];
     if (r) r(state.text, qHost, api);
     if (state.mode === 'insert') return;           // insert sets its own nav state
-    $('btn-prev').setAttribute('aria-label', 'Forrige spørgsmål (J)'); $('btn-next').setAttribute('aria-label', 'Næste spørgsmål (K)');
+    $('btn-prev').setAttribute('aria-label', 'Forrige spørgsmål (K)'); $('btn-next').setAttribute('aria-label', 'Næste spørgsmål (J)');
     var n = D.itemsOf(state.text).length;
     $('btn-prev').setAttribute('aria-disabled', (state.qi === 0 && !state.summary) ? 'true' : 'false');
     $('btn-next').setAttribute('aria-disabled', (state.qi >= n - 1 && !allAnswered()) ? 'true' : 'false');
@@ -1089,10 +1089,15 @@ try {
     $('screen-start').hidden = true; $('screen-play').hidden = false; $('btn-menu').hidden = false; state.view = 'play';
     renderText(next); panelCollapse(false); render();
     var savedScroll = store.get('scroll:' + next.id);
-    anchor = savedScroll || { par: 1, offset: 0 };
-    reader.scrollTop = 0;
-    if (state.mode === 'cloze' && !savedScroll) { czCenter(next.gaps[state.qi].id, true); anchor = currentAnchor(); }
-    else applyAnchor(anchor);
+    reader.scrollTop = 0;                          // no saved anchor: start at the very top (title and kicker visible)
+    if (savedScroll) { anchor = savedScroll; applyAnchor(anchor); }
+    else {
+      anchor = { par: 1, offset: 0 };
+      if (state.mode === 'cloze') {                // the active gap must still be visible: centre it only when it is not at the top
+        var cg = textEl.querySelector('[data-gap="' + next.gaps[state.qi].id + '"]');
+        if (cg && cg.getBoundingClientRect().bottom > reader.getBoundingClientRect().bottom - 8) { czCenter(next.gaps[state.qi].id, true); anchor = currentAnchor(); }
+      }
+    }
     if (state.mode !== 'skim') reader.focus({ preventScroll: true });   // skim: no keyboard pop-up before the learner asks for it
     else updateCurrent();
   }
@@ -1109,7 +1114,7 @@ try {
     DC.ui.announce('Fremskridt nulstillet.');
   });
 
-  /* ---------- keys: numbers answer (shared quiz), J/K questions, Escape. Arrow keys are never handled. ---------- */
+  /* ---------- keys: numbers answer (shared quiz), J next / K previous, Escape. Arrow keys are never handled. ---------- */
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var t = e.target;
@@ -1131,8 +1136,8 @@ try {
       if (ob && !ob.disabled) { e.preventDefault(); ob.click(); }
       return;
     }
-    if (k === 'j') { e.preventDefault(); step(-1); }
-    else if (k === 'k') { e.preventDefault(); step(1); }
+    if (k === 'k') { e.preventDefault(); step(-1); }
+    else if (k === 'j') { e.preventDefault(); step(1); }
   });
 
   applyReading();

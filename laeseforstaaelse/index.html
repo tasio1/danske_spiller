@@ -125,6 +125,45 @@ try {
   @keyframes lf-flash { from { box-shadow: 0 0 0 6px var(--lf-ok-bg); } to { box-shadow: 0 0 0 0 transparent; } }
   .dc-summary-stats { font-size: 1.1rem; font-weight: 700; }
 
+  /* Insert (Sæt afsnittet ind): dashed slots stay in the text; the bank lives in the question pane. */
+  .lf-gap { display: block; width: 100%; margin: 0 0 1em; padding: 10px 14px; min-height: 56px; text-align: left; font: inherit;
+            line-height: 1.55; background: transparent; color: var(--lf-ink); border: 2px dashed var(--lf-muted); border-radius: 8px; cursor: pointer; }
+  .lf-gap-tag { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font: 700 .8em/1.5 system-ui, sans-serif; letter-spacing: .03em; }
+  .lf-gap-st { font-weight: 400; color: var(--lf-muted); }
+  .lf-gap-body { display: block; margin-top: .35em; }
+  .lf-gap[data-state="ok"] { border-style: solid; border-color: var(--lf-rule); border-left: 6px solid var(--lf-ok); background: var(--lf-card); cursor: default; }
+  .lf-gap[data-state="ok"] .lf-gap-st { color: var(--lf-ok); font-weight: 700; }
+  .lf-gap[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); cursor: default; }
+  .lf-gap[data-state="no"] .lf-gap-st { color: var(--lf-no); font-weight: 700; }
+  .lf-gap[aria-disabled="true"]:not([data-state]) { cursor: default; }
+  .lf-gap[aria-current="true"] { box-shadow: 0 0 0 4px var(--lf-focus); }
+  .lf-hint { margin: 0 0 10px; color: var(--lf-muted); font-size: .95rem; line-height: 1.45; }
+  .lf-bank { display: flex; flex-direction: column; gap: 8px; }
+  .lf-block { display: block; width: 100%; min-height: 44px; padding: 10px 12px; text-align: left; font-size: .95rem; line-height: 1.45;
+              background: var(--lf-card); color: var(--lf-ink); border: 2px solid var(--lf-ink); border-radius: 8px; cursor: pointer; }
+  .lf-block[aria-pressed="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-block:disabled { opacity: 1; cursor: default; border-style: dashed; }
+  .lf-block-n { display: inline-block; min-width: 1.4em; font-weight: 700; }
+  .lf-block-sel { display: block; margin-top: 4px; font-weight: 700; font-size: .85rem; }
+  .lf-status { margin: 10px 0 0; font-weight: 700; font-size: .95rem; line-height: 1.4; }
+
+  /* Cloze (Det manglende ord): inline gap buttons in running text; options in the question pane. */
+  .lf-gap.lf-cz { display: inline-block; width: auto; max-width: 100%; margin: 2px 1px; padding: 6px 10px; min-height: 44px; min-width: 64px;
+                  text-align: center; vertical-align: middle; font: 700 .85em/1.3 system-ui, sans-serif; border-radius: 6px; }
+  .lf-gap.lf-cz[data-state="ok"], .lf-gap.lf-cz[data-state="no"] { border-left-width: 2px; font-family: inherit; font-weight: 700; }
+  .lf-gap.lf-cz[data-state="ok"] { border-color: var(--lf-ok); background: var(--lf-ok-bg); }
+  .lf-gap.lf-cz[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); }
+  .lf-gap.lf-cz[aria-current="true"] { outline: 3px solid var(--lf-focus); outline-offset: 2px; box-shadow: none; }
+  .lf-cz-n { font: 700 .75em/1 ui-monospace, Consolas, monospace; color: var(--lf-muted); margin-right: 4px; }
+  .lf-cz-ic { margin-right: 4px; }
+  .lf-gap.lf-cz[data-state="ok"] .lf-cz-ic { color: var(--lf-ok); }
+  .lf-gap.lf-cz[data-state="no"] .lf-cz-ic { color: var(--lf-no); }
+  .lf-gap.lf-cz[data-preview="true"] { color: var(--lf-muted); font-style: italic; font-weight: 400; }
+  .lf-sent { margin: 0 0 12px; padding: 8px 10px; border-left: 3px solid var(--lf-rule); color: var(--lf-muted); font-size: .95rem; line-height: 1.5; }
+  .lf-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .lf-opts .dc-quiz-option { min-height: 48px; }
+  .lf-weakest { margin: 12px 0 0; font-weight: 700; line-height: 1.45; }
+
   @media (min-width: 1024px) and (max-width: 1279px) { :root { --lf-panel: 360px; } }
   /* Tablet landscape stays split with a 38 % panel. */
   @media (min-width: 640px) and (max-width: 1023px) and (orientation: landscape) {
@@ -135,6 +174,7 @@ try {
     :root { --lf-gutter: 16px; }
     .lf-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
     .lf-panel { border-left: 0; border-top: 2px solid var(--lf-rule); max-height: var(--lf-sheet); padding: 0 16px 16px; }
+    .lf-panel { scroll-padding-top: 64px; }   /* a focused block never hides under the sticky peek bar */
     .lf-panel-head { display: block; position: sticky; top: 0; background: var(--lf-paper); padding-top: 6px; z-index: 1; }
     #btn-panel { width: 100%; display: flex; align-items: center; gap: 8px; text-align: left; justify-content: space-between; }
     .lf-peek { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -185,8 +225,8 @@ try {
         <div id="lf-q"></div>
         <div id="lf-fb" aria-live="polite"></div>
         <div class="lf-nav" id="lf-nav">
-          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (J)">← Forrige</button>
-          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (K)">Næste →</button>
+          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (K)">← Forrige</button>
+          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (J)">Næste →</button>
         </div>
       </div>
     </aside>
@@ -197,6 +237,8 @@ try {
 <script src="../shared/dansk-core.js"></script>
 <script src="data-skim.js"></script>
 <script src="data-mc.js"></script>
+<script src="data-insert.js"></script>
+<script src="data-cloze.js"></script>
 <script src="data.js"></script>
 <script>
 (function () {
@@ -316,7 +358,14 @@ try {
       textEl.appendChild(el('p', 'lf-kicker', text.kicker));
       textEl.appendChild(el('h2', null, text.title));
       text.paragraphs.forEach(function (para, i) {
-        var p = el('p', null, para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
+        var p = el('p', null, text.mode === 'cloze' ? null : para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
+        if (text.mode === 'cloze') czFill(p, para, text);
+        if (text.mode === 'insert') insGaps(text).forEach(function (g) {
+          if (g.after !== i) return;
+          var b = el('button', 'lf-gap'); b.type = 'button'; b.setAttribute('data-gap', g.id);
+          b.addEventListener('click', function () { insOnSlot(g.id); });
+          textEl.appendChild(b);
+        });
       });
     }
     var foot = el('footer', 'lf-foot');
@@ -361,9 +410,9 @@ try {
       var on = bs[i].getAttribute('data-jump') === id;
       if (on) bs[i].setAttribute('aria-current', 'true'); else bs[i].removeAttribute('aria-current');
       if (on && nav) {                           // keep the current chip visible inside the row (never scrolls the page)
-        var l = bs[i].offsetLeft - nav.offsetLeft;
-        if (l < nav.scrollLeft) nav.scrollLeft = l - 8;
-        else if (l + bs[i].offsetWidth > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = l + bs[i].offsetWidth - nav.clientWidth + 8;
+        var cr = bs[i].getBoundingClientRect(), nr = nav.getBoundingClientRect();
+        if (cr.left < nr.left + 4) nav.scrollLeft -= nr.left + 12 - cr.left;
+        else if (cr.right > nr.right - 4) nav.scrollLeft += cr.right - nr.right + 12;
       }
     }
   }
@@ -424,6 +473,7 @@ try {
     if (state.view !== 'play') return;
     var n = D.itemsOf(state.text).length;
     if (state.summary) { if (d < 0) { state.summary = false; render(); } return; }
+    if (state.mode === 'insert') { if (!insOpen().length) { if (d > 0) finishRound(); } else insMove(d); return; }
     var i = state.qi + d;
     if (i < 0) return;
     if (i >= n) { if (allAnswered()) finishRound(); return; }
@@ -433,25 +483,42 @@ try {
   function finishRound() {
     state.token++; state.summary = true; clearHighlight(); clearNudge();
     var items = D.itemsOf(state.text), right = 0, weak = [];
-    items.forEach(function (q) { if (state.answered[q.id] && state.answered[q.id].correct) right++; else weak.push({ label: q.q }); });
+    items.forEach(function (q, qi) {
+      if (state.answered[q.id] && state.answered[q.id].correct) right++;
+      else weak.push({ label: state.mode === 'cloze' ? 'Hul ' + (qi + 1) + ': ' + q.note : (q.q || q.note) });
+    });
     qHost.innerHTML = ''; fbHost.innerHTML = '';
     setHead('Resultat'); peekEl.textContent = 'Resultat';
     DC.quiz.summary.render({ score: right, accuracy: items.length ? right / items.length * 100 : 0, weakItems: weak.slice(0, 3) },
-      qHost, function () { replay(); }, state.mode === 'skim' ? retryErrors : undefined);
+      qHost, function () { replay(); }, (state.mode === 'skim' || state.mode === 'insert' || state.mode === 'cloze') ? retryErrors : undefined);
+    if (state.mode === 'insert') {
+      store.remove('insert:' + state.text.id);
+      var un = el('p', 'lf-hint', 'To afsnit blev ikke brugt.'); un.id = 'lf-unused'; qHost.appendChild(un);
+    }
+    if (state.mode === 'cloze') {
+      store.remove('cloze:' + state.text.id); czSyncGaps();
+      var wl = el('p', 'lf-weakest', czWeakest(items)); wl.id = 'lf-weakest'; qHost.appendChild(wl);
+    }
     SOUND.done(); DC.ui.announce('Runden er slut. ' + right + ' af ' + items.length + ' rigtige.');
     var again = qHost.querySelector('.dc-summary-actions button'); if (again) again.focus();
   }
   function replay() {
-    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false; render();
+    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false;
+    if (state.mode === 'insert') { store.remove('insert:' + state.text.id); insInit(state.text, null); state.token++; }
+    if (state.mode === 'cloze') { store.remove('cloze:' + state.text.id); czJustWrong = null; }
+    render();
+    if (state.mode === 'insert') insCenter(ins.cur);
   }
   // Gentag fejl (skim): only the wrongly answered questions are asked again.
   function retryErrors() {
+    if (state.mode === 'insert') { insRetryErrors(); return; }
     var items = D.itemsOf(state.text), first = -1;
     items.forEach(function (q, i) {
       if (state.answered[q.id] && !state.answered[q.id].correct) { delete state.answered[q.id]; delete drafts[q.id]; if (first < 0) first = i; }
     });
     if (first < 0) return;
-    state.qi = first; state.summary = false; skimFocus = true; render();
+    state.qi = first; state.summary = false; skimFocus = true; czJustWrong = null; render();
+    if (state.mode === 'cloze') czSave();
   }
   var nudgeTimer = 0;
   function clearNudge() { window.clearTimeout(nudgeTimer); nudgeTimer = 0; }
@@ -593,9 +660,353 @@ try {
     }
   };
 
+  /* Insert: five slots stay in the text, the bank of seven blocks sits in the question pane.
+     Select a block then a slot (or a slot then a block). The first attempt per gap is what counts. */
+  var ins = null;   // { placed:{gapId:blockId}, sel, armed, cur, pending:{gapId,blockId}|null }
+  function insGaps(text) { return text.gaps.slice().sort(function (a, b) { return a.after - b.after; }); }
+  function insNo(gapId) { var g = insGaps(state.text); for (var i = 0; i < g.length; i++) if (g[i].id === gapId) return i + 1; return 0; }
+  function insBlock(id) { var b = state.text.blocks; for (var i = 0; i < b.length; i++) if (b[i].id === id) return b[i]; return null; }
+  function insLoad(text) {
+    var s = store.get('insert:' + text.id);
+    if (!s || typeof s.placed !== 'object' || !s.placed) return null;
+    var placed = {}, answered = {};
+    text.gaps.forEach(function (g) {
+      var b = s.placed[g.id];
+      if (b && text.solution[g.id] === b) placed[g.id] = b;
+      var a = s.answered && s.answered[g.id];
+      if (a && typeof a.correct === 'boolean') answered[g.id] = { correct: a.correct, chosen: a.chosen };
+    });
+    return { placed: placed, answered: answered };
+  }
+  function insSave() {
+    if (!state.text || state.mode !== 'insert') return;
+    store.set('insert:' + state.text.id, { placed: ins.placed, answered: state.answered });
+  }
+  function insOpen() { return insGaps(state.text).filter(function (g) { return !ins.placed[g.id]; }); }
+  function insInit(text, saved) {
+    ins = { placed: saved ? saved.placed : {}, sel: null, armed: null, cur: null, pending: null };
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+  }
+  function insBank() {
+    var used = {}, k;
+    for (k in ins.placed) used[ins.placed[k]] = true;
+    if (ins.pending) used[ins.pending.blockId] = true;
+    return state.text.blocks.filter(function (b) { return !used[b.id]; });
+  }
+  // Scroll a slot to the vertical centre of the reading pane (instant under reduced motion).
+  function insCenter(gapId) {
+    var b = gapId && textEl.querySelector('[data-gap="' + gapId + '"]'); if (!b) return;
+    var top = b.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - Math.max(0, (reader.clientHeight - b.offsetHeight) / 2)),
+                      behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+  function insSyncSlots() {
+    insGaps(state.text).forEach(function (g, i) {
+      var b = textEl.querySelector('[data-gap="' + g.id + '"]'); if (!b) return;
+      var bid = ins.placed[g.id] || (ins.pending && ins.pending.gapId === g.id ? ins.pending.blockId : null);
+      var st = ins.placed[g.id] ? 'ok' : (bid ? 'no' : 'empty');
+      var no = i + 1;
+      b.innerHTML = '';
+      b.setAttribute('data-state', st);
+      var tag = el('span', 'lf-gap-tag'); tag.appendChild(el('strong', null, 'Hul ' + no));
+      tag.appendChild(el('span', 'lf-gap-st', st === 'ok' ? '✓ på plads' : st === 'no' ? '✗ passer ikke her' : 'tomt'));
+      b.appendChild(tag);
+      b.removeAttribute('aria-describedby');
+      if (bid) {
+        var body = el('span', 'lf-gap-body', insBlock(bid).text); body.id = 'lf-gap-body-' + g.id; b.appendChild(body);
+        b.setAttribute('aria-describedby', body.id);
+      }
+      b.setAttribute('aria-label', 'Hul ' + no + (st === 'ok' ? ', udfyldt' : st === 'no' ? ', udfyldt, passer ikke' : ', tomt'));
+      b.setAttribute('aria-disabled', (st !== 'empty' || ins.pending) ? 'true' : 'false');
+      if (g.id === ins.cur && st !== 'ok') b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  function insRender() {
+    var gaps = insGaps(state.text), total = gaps.length;
+    var done = gaps.filter(function (g) { return ins.placed[g.id]; }).length, full = done === total;
+    var ae = document.activeElement, key = ae && ae.getAttribute ? ae.getAttribute('data-block') : null;
+    insSyncSlots();
+    qHost.innerHTML = ''; fbHost.innerHTML = '';
+    setHead('Sæt afsnittet ind · ' + done + ' af ' + total + ' på plads');
+    peekEl.textContent = 'Sæt afsnittet ind · ' + done + '/' + total;
+    if (ins.pending) {
+      var p = ins.pending, box = el('div', 'lf-fb-box'), gap = null;
+      gaps.forEach(function (g) { if (g.id === p.gapId) gap = g; });
+      var h = el('p'); h.appendChild(el('strong', null, 'Afsnittet passer ikke i Hul ' + insNo(p.gapId) + '.')); box.appendChild(h);
+      var np = el('p', null, gap.note + ' '); DC.ui.ttsButton(gap.note, np, 'Lyt til forklaringen'); box.appendChild(np);
+      var acts = el('div', 'lf-fb-actions');
+      var again = btn('Prøv igen', 'lf-btn lf-btn--primary', insRetry); again.id = 'btn-retry'; acts.appendChild(again);
+      box.appendChild(acts); qHost.appendChild(box);
+    } else if (full) {
+      qHost.appendChild(el('p', 'lf-hint', 'To afsnit blev ikke brugt.'));
+    } else {
+      qHost.appendChild(el('p', 'lf-hint', 'Vælg et afsnit, og sæt det ind i et hul. To af afsnittene skal ikke bruges.'));
+    }
+    var bank = insBank();
+    var list = el('div', 'lf-bank'); list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'Afsnit at sætte ind');
+    bank.forEach(function (b, i) {
+      var bb = el('button', 'lf-block'); bb.type = 'button'; bb.setAttribute('data-block', b.id);
+      bb.appendChild(el('span', 'lf-block-n', (i + 1) + '.')); bb.appendChild(document.createTextNode(' ' + b.text));
+      var on = ins.sel === b.id;
+      bb.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on) bb.appendChild(el('span', 'lf-block-sel', '✓ Valgt'));
+      if (ins.pending || full) bb.disabled = true;
+      bb.addEventListener('click', function () { insOnBlock(b.id); });
+      list.appendChild(bb);
+    });
+    qHost.appendChild(list);
+    var selIdx = bank.map(function (b) { return b.id; }).indexOf(ins.sel);
+    var msg = ins.sel && selIdx >= 0 ? 'Afsnit ' + (selIdx + 1) + ' er valgt. Vælg et hul i teksten.'
+            : ins.armed ? 'Hul ' + insNo(ins.armed) + ' er valgt. Vælg et afsnit.' : '';
+    if (msg) qHost.appendChild(el('p', 'lf-status', msg));
+    if (key) { var back = qHost.querySelector('[data-block="' + key + '"]'); if (back && !back.disabled) back.focus({ preventScroll: true }); }
+    var op = insOpen().map(function (g) { return g.id; }), oi = op.indexOf(ins.cur);
+    $('btn-prev').setAttribute('aria-label', 'Forrige hul (K)'); $('btn-next').setAttribute('aria-label', 'Næste hul (J)');
+    $('btn-prev').setAttribute('aria-disabled', (oi <= 0 || ins.pending) ? 'true' : 'false');
+    $('btn-next').setAttribute('aria-disabled', (oi < 0 || oi >= op.length - 1 || ins.pending) ? 'true' : 'false');
+  }
+  function insOnSlot(gapId) {
+    if (state.summary || ins.pending || ins.placed[gapId]) return;
+    ins.cur = gapId;
+    if (ins.sel) { insPlace(gapId, ins.sel); return; }
+    ins.armed = gapId; insRender(); insCenter(gapId);
+    DC.ui.announce('Hul ' + insNo(gapId) + ' er valgt. Vælg et afsnit.');
+  }
+  function insOnBlock(blockId) {
+    if (state.summary || ins.pending) return;
+    if (ins.armed) { insPlace(ins.armed, blockId); return; }
+    ins.sel = ins.sel === blockId ? null : blockId;
+    insRender();
+    if (ins.sel) { insCenter(ins.cur); DC.ui.announce('Afsnit valgt. Vælg et hul i teksten.'); }
+  }
+  function insEscape() {
+    if (state.view !== 'play' || state.mode !== 'insert' || !ins || ins.pending || state.summary) return;
+    if (ins.sel || ins.armed) { ins.sel = null; ins.armed = null; insRender(); }
+  }
+  function insMove(d) {
+    if (ins.pending) return;
+    var op = insOpen(), i = -1;
+    op.forEach(function (g, k) { if (g.id === ins.cur) i = k; });
+    var j = i + d;
+    if (j < 0 || j >= op.length) return;
+    ins.cur = op[j].id; insRender(); insCenter(ins.cur);
+  }
+  function insPlace(gapId, blockId) {
+    var ok = state.text.solution[gapId] === blockId, tok = ++state.token, first = !state.answered[gapId];
+    ins.sel = null; ins.armed = null; ins.cur = gapId;
+    if (ok) ins.placed[gapId] = blockId; else ins.pending = { gapId: gapId, blockId: blockId };
+    var done = insOpen().length === 0;
+    if (ok) {
+      window.setTimeout(function () {             // schedule first: sound set-up must not delay it
+        if (tok !== state.token) return;
+        if (done) { finishRound(); return; }
+        if (ins.cur === gapId) { var o = insOpen(); ins.cur = o.length ? o[0].id : null; }
+        insRender(); insCenter(ins.cur);
+      }, 800);
+    }
+    if (first) recordAnswer(gapId, ok, null, blockId); else (ok ? SOUND.correct : SOUND.wrong)();
+    insSave(); insRender(); insCenter(gapId);
+    if (ok) {
+      var f = qHost.querySelector('.lf-block'); if (f) f.focus({ preventScroll: true });
+      var ge = textEl.querySelector('[data-gap="' + gapId + '"]');
+      if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); }
+      DC.ui.announce('Rigtigt. Hul ' + insNo(gapId) + ' er fyldt.');
+    } else {
+      DC.ui.announce('Forkert. ' + insGaps(state.text).filter(function (g) { return g.id === gapId; })[0].note);
+      panelCollapse(false); panel.scrollTop = 0;
+      var r = $('btn-retry'); if (r) r.focus({ preventScroll: true });
+    }
+  }
+  function insRetry() {
+    if (!ins.pending) return;
+    var bid = ins.pending.blockId, gid = ins.pending.gapId;
+    ins.pending = null; ins.cur = gid; state.token++;
+    insRender(); insCenter(gid);
+    var b = qHost.querySelector('[data-block="' + bid + '"]'); if (b) b.focus({ preventScroll: true });
+  }
+  function insRetryErrors() {
+    var missed = false;
+    D.itemsOf(state.text).forEach(function (g) {
+      if (state.answered[g.id] && !state.answered[g.id].correct) { delete state.answered[g.id]; delete ins.placed[g.id]; missed = true; }
+    });
+    if (!missed) return;
+    ins.sel = ins.armed = ins.pending = null;
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+    state.summary = false; state.token++; insSave(); render(); insCenter(ins.cur);
+  }
+  MODE_RENDERERS.insert = function () { insRender(); };
+
+  /* Cloze: markers {{n}} in the paragraphs become inline gap buttons; the four options sit in the question pane.
+     state.qi = index of the active gap. The first answer per gap counts and is never retried. */
+  var czPrev = null, czJustWrong = null;
+  var CZ_LABEL = { kontrast: 'modsætning', konsekvens: 'følge', praecisering: 'præcisering', tilfoejelse: 'tilføjelse', tid: 'tid' };
+  var CZ_ORDER = ['kontrast', 'konsekvens', 'praecisering', 'tilfoejelse', 'tid'];
+  function czGaps() { return state.text.gaps; }
+  function czFill(p, para, text) {
+    para.split(/(\{\{\d+\}\})/).forEach(function (part) {
+      var m = /^\{\{(\d+)\}\}$/.exec(part), g = m && text.gaps[+m[1] - 1];
+      if (!m || !g) { if (part) p.appendChild(document.createTextNode(part)); return; }
+      var b = el('button', 'lf-gap lf-cz'); b.type = 'button'; b.setAttribute('data-gap', g.id);
+      b.addEventListener('click', function () { czGoto(g.id); });
+      p.appendChild(b);
+    });
+  }
+  function czSyncGaps() {
+    czGaps().forEach(function (g, i) {
+      var b = textEl.querySelector('[data-gap="' + g.id + '"]'); if (!b) return;
+      var rec = state.answered[g.id], no = i + 1, cur = state.view === 'play' && !state.summary && i === state.qi;
+      var st = rec ? (rec.correct ? 'ok' : 'no') : 'empty', word = g.options[g.correct];
+      b.innerHTML = ''; b.setAttribute('data-state', st); b.removeAttribute('data-preview');
+      if (rec) {
+        b.appendChild(el('span', 'lf-cz-n', String(no)));
+        var ic = el('span', 'lf-cz-ic', rec.correct ? '✓' : '✗'); ic.setAttribute('aria-hidden', 'true'); b.appendChild(ic);
+        b.appendChild(document.createTextNode(word));
+        b.setAttribute('aria-label', 'Hul ' + no + ': ' + word + (rec.correct ? '' : ', du valgte et andet ord'));
+      } else if (cur && czPrev) {
+        b.appendChild(document.createTextNode(czPrev)); b.setAttribute('data-preview', 'true');
+        b.setAttribute('aria-label', 'Hul ' + no + ', tomt');
+      } else {
+        b.appendChild(document.createTextNode('Hul ' + no)); b.setAttribute('aria-label', 'Hul ' + no + ', tomt');
+      }
+      if (cur) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  function czCenter(gapId, instant) {
+    var b = gapId && textEl.querySelector('[data-gap="' + gapId + '"]'); if (!b) return;
+    var top = b.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - Math.max(0, (reader.clientHeight - b.offsetHeight) / 2)),
+                      behavior: (instant || DC.ui.motion.isReduced()) ? 'auto' : 'smooth' });
+  }
+  function czGoto(gapId) {
+    if (state.summary || state.view !== 'play') return;
+    var i = czGaps().map(function (g) { return g.id; }).indexOf(gapId);
+    if (i < 0) return;
+    state.qi = i; czJustWrong = null; panelCollapse(false); render();
+  }
+  // The sentence around gap g: gaps already answered show their word, all others (and g itself until answered) say "hul".
+  function czSentence(g, speech) {
+    var text = state.text, n = czGaps().indexOf(g) + 1, hit = '';
+    text.paragraphs.some(function (para) {
+      return para.split(/(?<=[.!?])\s+(?=[A-ZÆØÅ{\d])/).some(function (s) {
+        if (s.indexOf('{{' + n + '}}') === -1) return false; hit = s; return true;
+      });
+    });
+    return hit.replace(/\{\{(\d+)\}\}/g, function (all, k) {
+      var gg = czGaps()[+k - 1], rec = gg && state.answered[gg.id];
+      if (rec) return gg.options[gg.correct];
+      return (gg === g && !speech) ? '[ ___ ]' : 'hul';
+    });
+  }
+  function czSave() {
+    if (!state.text || state.mode !== 'cloze') return;
+    store.set('cloze:' + state.text.id, { answered: state.answered, qi: state.qi });
+  }
+  function czLoad(text) {
+    var s = store.get('cloze:' + text.id);
+    if (!s || typeof s.answered !== 'object' || !s.answered) return null;
+    var answered = {}, n = 0;
+    text.gaps.forEach(function (g) {
+      var a = s.answered[g.id];
+      if (a && typeof a.correct === 'boolean' && typeof a.chosen === 'number') { answered[g.id] = { correct: a.correct, chosen: a.chosen }; n++; }
+    });
+    return { answered: answered, n: n, qi: (s.qi >= 0 && s.qi < text.gaps.length) ? s.qi : 0 };
+  }
+  function czWide() { try { return window.matchMedia('(min-width: 1024px) and (hover: hover)').matches; } catch (e) { return false; } }
+  function czSetPreview(word) {
+    if (!czWide() || state.summary) return;
+    czPrev = word; czSyncGaps();
+  }
+  function czWeakest(items) {
+    var by = {};
+    items.forEach(function (g) {
+      var r = state.answered[g.id]; if (!r) return;
+      var t = by[g.type] || (by[g.type] = { type: g.type, n: 0, miss: 0 });
+      t.n++; if (!r.correct) t.miss++;
+    });
+    var list = CZ_ORDER.map(function (t) { return by[t]; }).filter(function (t) { return t && t.miss > 0; });
+    if (!list.length) return 'Ingen svage typer i denne runde.';
+    function hist(t) {
+      var p = srs.patterns && srs.patterns['connector:' + t.type], tot = p ? p.correct + p.incorrect : 0;
+      return tot ? p.incorrect / tot : 0;
+    }
+    function cmp(a, b) { return (b.miss - a.miss) || (b.miss / b.n - a.miss / a.n) || (hist(b) - hist(a)); }
+    list.sort(cmp);
+    var top = list.filter(function (t) { return cmp(list[0], t) === 0; });
+    return 'Svageste type: ' + top.map(function (t) { return CZ_LABEL[t.type]; }).join(' og ') +
+      ' (' + top[0].miss + ' af ' + top[0].n + ' forkert).';
+  }
+  function czNote(g, withContinue, a) {
+    var box = el('div', 'lf-fb-box');
+    var ans = el('p', null, 'Rigtigt ord: '); ans.appendChild(el('strong', null, g.options[g.correct])); box.appendChild(ans);
+    var np = el('p', null, g.note + ' '); DC.ui.ttsButton(czSentence(g, true), np, 'Lyt til sætningen'); box.appendChild(np);
+    var cont = null;
+    if (withContinue) {
+      var acts = el('div', 'lf-fb-actions'), last = !czGaps().some(function (x) { return !state.answered[x.id]; });
+      cont = btn(last ? 'Se resultat' : 'Næste', 'lf-btn lf-btn--primary', function () { czJustWrong = null; a.next(0, state.token); });
+      cont.id = 'btn-continue'; acts.appendChild(cont); box.appendChild(acts);
+    }
+    return { box: box, cont: cont };
+  }
+  MODE_RENDERERS.cloze = function (text, host, a) {
+    var g = text.gaps[state.qi], n = text.gaps.length, tok = ++state.token, no = state.qi + 1;
+    var rec = state.answered[g.id];
+    host.innerHTML = ''; a.fb.innerHTML = ''; czPrev = null;
+    setHead('Hul ' + no + ' af ' + n + ' · Hvilket ord passer?');
+    peekEl.textContent = 'Hul ' + no + '/' + n + ' · Hvilket ord passer?';
+    czSyncGaps(); czSave();
+
+    var pr = el('div', 'dc-quiz-prompt'); pr.appendChild(el('span', null, 'Hvilket ord passer i Hul ' + no + '?'));
+    DC.ui.ttsButton(czSentence(g, !rec), pr, 'Lyt til sætningen'); host.appendChild(pr);
+    if (!(rec && !rec.correct)) host.appendChild(el('p', 'lf-sent', czSentence(g, false)));   // a missed gap shows its note instead: keeps "Næste" in view on phones
+    var cont = null;
+    if (rec && !rec.correct) {                    // note first, above the options: "Næste" stays in view on phones
+      var nb = czNote(g, czJustWrong === g.id, a); host.appendChild(nb.box); cont = nb.cont;
+    }
+    var list = el('div', 'lf-opts'); list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'Ord til Hul ' + no);
+    g.options.forEach(function (o, i) {
+      var b = el('button', 'dc-quiz-option', (i + 1) + '. ' + o); b.type = 'button'; b.setAttribute('data-opt', String(i));
+      if (rec) {
+        b.disabled = true;
+        if (i === g.correct) b.classList.add('dc-correct'); else if (i === rec.chosen) b.classList.add('dc-wrong');
+      } else {
+        b.addEventListener('click', function () { choose(i); });
+        b.addEventListener('focus', function () { czSetPreview(o); });
+        b.addEventListener('mouseenter', function () { czSetPreview(o); });
+        b.addEventListener('blur', function () { czSetPreview(null); });
+        b.addEventListener('mouseleave', function () { if (document.activeElement !== b) czSetPreview(null); });
+      }
+      list.appendChild(b);
+    });
+    host.appendChild(list);
+    czCenter(g.id);                               // after the pane has its final height, so the reading pane has too
+    if (cont) cont.focus({ preventScroll: true });
+
+    function choose(i) {
+      if (tok !== state.token || state.answered[g.id]) return;
+      var ok = i === g.correct;
+      czPrev = null;
+      if (ok) a.next(800, tok);                   // schedule the advance first: sound set-up must not delay it
+      a.onAnswer(g.id, ok, 'connector:' + g.type, i);
+      czSave();
+      if (ok) {
+        Array.prototype.forEach.call(list.children, function (b, k) { b.disabled = true; if (k === g.correct) b.classList.add('dc-correct'); });
+        czSyncGaps();
+        var ge = textEl.querySelector('[data-gap="' + g.id + '"]');
+        if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); }
+        DC.ui.announce('Rigtigt.');
+      } else {
+        czJustWrong = g.id;
+        DC.ui.announce('Forkert. Rigtigt ord: ' + g.options[g.correct] + '. ' + g.note);
+        panelCollapse(false); render(); panel.scrollTop = 0;
+      }
+    }
+  };
+
   function render() {
     var r = MODE_RENDERERS[state.mode];
     if (r) r(state.text, qHost, api);
+    if (state.mode === 'insert') return;           // insert sets its own nav state
+    $('btn-prev').setAttribute('aria-label', 'Forrige spørgsmål (K)'); $('btn-next').setAttribute('aria-label', 'Næste spørgsmål (J)');
     var n = D.itemsOf(state.text).length;
     $('btn-prev').setAttribute('aria-disabled', (state.qi === 0 && !state.summary) ? 'true' : 'false');
     $('btn-next').setAttribute('aria-disabled', (state.qi >= n - 1 && !allAnswered()) ? 'true' : 'false');
@@ -654,15 +1065,39 @@ try {
     try { DC.ui.sound.playCtx(); } catch (err) { /* sound is optional */ }   // build the AudioContext on the Spil gesture
     var texts = D.textsFor(state.mode, state.levels);
     if (!texts.length) { syncStart(); return; }
-    var next = texts[0];
+    var next = texts[0], saved = null;
     for (var i = 0; i < texts.length; i++) if (texts[i].id === state.lastId && texts[i + 1]) next = texts[i + 1];
+    if (state.mode === 'insert') {                 // an unfinished round resumes where it was left (placed blocks survive reload)
+      for (var j = 0; j < texts.length; j++) {
+        var sv = texts[j].id === state.lastId ? insLoad(texts[j]) : null;
+        if (sv && Object.keys(sv.placed).length && Object.keys(sv.placed).length < texts[j].gaps.length) { next = texts[j]; saved = sv; }
+      }
+    }
+    var czSaved = null;
+    if (state.mode === 'cloze') {                  // an unfinished round resumes where it was left
+      for (var c = 0; c < texts.length; c++) {
+        var cs = texts[c].id === state.lastId ? czLoad(texts[c]) : null;
+        if (cs && cs.n > 0 && cs.n < texts[c].gaps.length) { next = texts[c]; czSaved = cs; }
+      }
+    }
     state.text = next; state.lastId = next.id; state.qi = 0; state.answered = {}; state.summary = false;
-    drafts = {}; skimFocus = false;
+    drafts = {}; skimFocus = false; czJustWrong = null; czPrev = null;
+    if (czSaved) { state.answered = czSaved.answered; state.qi = czSaved.qi; }
+    state.token++;
+    if (state.mode === 'insert') { insInit(next, saved); if (saved) state.answered = saved.answered; }
     savePrefs();
     $('screen-start').hidden = true; $('screen-play').hidden = false; $('btn-menu').hidden = false; state.view = 'play';
     renderText(next); panelCollapse(false); render();
-    anchor = store.get('scroll:' + next.id) || { par: 1, offset: 0 };
-    reader.scrollTop = 0; applyAnchor(anchor);
+    var savedScroll = store.get('scroll:' + next.id);
+    reader.scrollTop = 0;                          // no saved anchor: start at the very top (title and kicker visible)
+    if (savedScroll) { anchor = savedScroll; applyAnchor(anchor); }
+    else {
+      anchor = { par: 1, offset: 0 };
+      if (state.mode === 'cloze') {                // the active gap must still be visible: centre it only when it is not at the top
+        var cg = textEl.querySelector('[data-gap="' + next.gaps[state.qi].id + '"]');
+        if (cg && cg.getBoundingClientRect().bottom > reader.getBoundingClientRect().bottom - 8) { czCenter(next.gaps[state.qi].id, true); anchor = currentAnchor(); }
+      }
+    }
     if (state.mode !== 'skim') reader.focus({ preventScroll: true });   // skim: no keyboard pop-up before the learner asks for it
     else updateCurrent();
   }
@@ -674,25 +1109,35 @@ try {
     if (!ok) return;
     srs.items = {}; srs.patterns = {};
     DC.store.set('srs:' + NS, { items: {}, patterns: {} });
-    ['skim', 'mc', 'insert', 'cloze'].forEach(function (m) { D.textsFor(m).forEach(function (t) { store.remove('scroll:' + t.id); }); });
+    ['skim', 'mc', 'insert', 'cloze'].forEach(function (m) { D.textsFor(m).forEach(function (t) { store.remove('scroll:' + t.id); store.remove('insert:' + t.id); store.remove('cloze:' + t.id); }); });
     store.remove('prefs'); state.lastId = null;
     DC.ui.announce('Fremskridt nulstillet.');
   });
 
-  /* ---------- keys: numbers answer (shared quiz), J/K questions, Escape. Arrow keys are never handled. ---------- */
+  /* ---------- keys: numbers answer (shared quiz), J next / K previous, Escape. Arrow keys are never handled. ---------- */
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var t = e.target;
     var k = (e.key || '').toLowerCase();
     if (state.view === 'play' && k === 'escape') {            // Escape closes overlays, also while typing an answer
       var open = textEl.querySelector('details[open]');
-      if (open) open.removeAttribute('open'); else clearHighlight();
+      if (open) open.removeAttribute('open'); else { clearHighlight(); insEscape(); }
       return;
     }
     if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
     if (state.view !== 'play') return;
-    if (k === 'j') { e.preventDefault(); step(-1); }
-    else if (k === 'k') { e.preventDefault(); step(1); }
+    if (state.mode === 'insert' && !state.summary && /^[1-9]$/.test(k)) {
+      var bank = insBank(), bl = bank[+k - 1];
+      if (bl && !ins.pending) { e.preventDefault(); insOnBlock(bl.id); }
+      return;
+    }
+    if (state.mode === 'cloze' && !state.summary && /^[1-4]$/.test(k)) {
+      var ob = qHost.querySelector('[data-opt="' + (+k - 1) + '"]');
+      if (ob && !ob.disabled) { e.preventDefault(); ob.click(); }
+      return;
+    }
+    if (k === 'k') { e.preventDefault(); step(-1); }
+    else if (k === 'j') { e.preventDefault(); step(1); }
   });
 
   applyReading();

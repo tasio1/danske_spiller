@@ -18,3 +18,15 @@ Contrast (spec, all papers, both widths) all >= 4.5: light body 14.9 / evidence 
 - Sprite: no reading/newspaper sprite exists; start uses `lup` (belongs to Ordstillingsdetektiven). Request `avis`.
 - 360x640 reading pane is 195 px (was ~250) because of the shared bar; a `data-sd-nobar` or slimmer bar on phones would help.
 - Dark paper: the shared `.dc-tts-button` icon looks dim (tts-button.css, frozen).
+
+## Phone tune (laese-ux-tune)
+Theme file only. At <=639 px: shared bar 56 -> 36 px (MENU link keeps a 44 px box via negative margin), game header 56 -> 48 px (44 px buttons, inset frames), docked sheet 52 -> 40 dvh. Docked panel (<=1023 portrait too): expanded toggle reads "Skjul spørgsmål" (peek stays in the accessible name, visually hidden), peek with number + question only when collapsed; the wrong-answer box is ordered first in the panel (CSS `order`, DOM unchanged). `.dc-tts-button` opacity forced to 1 (DanskCore sets an inline .5 when no speech voice exists; icon #E6E2D8 on #1F2328 and mustard frame on dark paper, both >3:1).
+Measured (reader px / % of viewport), bar 36 + header 48 = 84 px chrome:
+
+| viewport | mode | panel open | panel collapsed | panel px | after wrong |
+|---|---|---|---|---|---|
+| 360x640 | mc, skim, insert, cloze | 300 / 47 % | 492 / 77 % | 256 | 300 / 47 %, "Næste"/"Prøv igen" 0-100 px below the panel fold (panel scrolls, page never) |
+| 390x844 | mc, skim, insert, cloze | 422 / 50 % | 696 / 82 % | 338 | 422 / 50 %, button in view except cloze (panel scroll) |
+| before (360 / 390) | all | 195 / 31 % ; 293 / 35 % | 452 / 71 % ; 656 / 78 % | 333 ; 439 | |
+
+Peek visible while expanded: false in all 16 cases (duplicate removed). Active gap visible in insert/cloze, skim notice heading below the nav, page never scrolls, no horizontal overflow. 820x1180: reader 55 / 45 % (open / wrong), unchanged by the tune.

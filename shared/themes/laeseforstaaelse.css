@@ -236,3 +236,43 @@ html.sd-page .lf-result-sprite .sd-hop { animation-iteration-count: 3; }
   html.sd-page .lf-flash, html.sd-page .lf-result-sprite .sd-hop { animation: none; }
   html.sd-page .lf-btn, html.sd-page #lf-q .dc-quiz-option, html.sd-page .lf-block { transition: none; }
 }
+
+/* =============================================================================
+   Phone tune (laese-ux-tune): the text must be readable on every device.
+   ============================================================================= */
+/* T4: DanskCore dims the Lyt button with an inline opacity:.5 when no speech voice is found, which made it fade into the dark paper.
+   Keep it fully visible (the speaker icon is currentColor on the card, frame = --lf-frame). */
+html.sd-page .dc-tts-button.dc-tts-button { opacity: 1 !important; color: var(--lf-ink); }
+
+/* T2: docked panel, expanded: the toggle shows "Skjul spørgsmål" and the one-line peek is kept for the accessible name only;
+   collapsed: the peek (number + question) is the visible label. */
+@media (max-width: 1023px) and (orientation: portrait), (max-width: 639px) {
+  html.sd-page #btn-panel[aria-expanded="true"] .lf-peek { position: absolute; width: 1px; height: 1px; flex: none; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  html.sd-page #btn-panel[aria-expanded="true"]::before { content: "Skjul spørgsmål"; flex: 1; text-align: left; font-family: var(--lf-disp); text-transform: uppercase; }
+  /* wrong-answer box first (the learner sees it and "Næste" without scrolling the panel); DOM order is unchanged */
+  html.sd-page .lf-panel-body { display: flex; flex-direction: column; }
+  html.sd-page #lf-fb { order: -1; }
+  html.sd-page .lf-qnum { align-self: flex-start; margin: 2px 0 8px; }
+  html.sd-page .lf-nav { margin-top: 6px; }
+  html.sd-page #btn-panel { margin: 2px 4px; }
+  html.sd-page .lf-fb-box { margin: 4px 8px 6px 4px; padding: 8px 12px 6px; }
+  html.sd-page .lf-fb-box::before { margin: 0 0 4px; }
+  html.sd-page .lf-fb-box p { margin: 0 0 4px; }
+  html.sd-page .lf-fb-actions { margin-top: 0; }
+}
+
+/* T1 + T3: slim chrome and a shorter docked sheet on phones */
+@media (max-width: 639px) {
+  html.sd-page { --lf-sheet: 40dvh; }
+  html.sd-page .sd-bar { min-height: 36px; padding: 0 6px; border-bottom-width: 2px; gap: 6px; }
+  html.sd-page .sd-bar a { min-height: 44px; margin: -6px 0; }            /* 44 px hit area, bar stays 36 px */
+  html.sd-page .sd-bar .sd-bar-logo { gap: 4px; }
+  html.sd-page .lf-top { min-height: 0; height: 48px; padding: 0 2px; border-bottom-width: 4px; }
+  html.sd-page .lf-top .lf-btn { margin: 0 2px; min-height: 44px; box-shadow: inset 0 0 0 3px var(--lf-frame); }
+  html.sd-page .lf-top .lf-btn:active:not(:disabled) { box-shadow: inset 0 0 0 3px var(--lf-frame); }
+  html.sd-page .lf-top .lf-btn[aria-disabled="true"] { box-shadow: inset 0 0 0 3px var(--lf-muted); }
+  html.sd-page .lf-panel { padding-bottom: 8px; }
+  html.sd-page .lf-text h1, html.sd-page .lf-text h2 { font-size: 1.3em; margin-bottom: .45em; }
+  html.sd-page .lf-notice h2 { font-size: 1.2em; }
+  html.sd-page .lf-reader:not(.lf-reader--haefte) { padding-top: 12px; }
+}

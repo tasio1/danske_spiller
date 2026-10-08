@@ -241,6 +241,34 @@ html.sd-page ::selection { background: var(--sd-ink); color: var(--sd-cream); }
 @media (max-width: 420px) { .sd-bar { gap: 4px; padding: 4px 6px; } .sd-bar .sd-bar-btn { padding: 0 6px; font-size: 13px; } .sd-bar a { padding: 0 6px; } }
 @media (max-width: 420px) { .sd-bar .sd-bar-logo span.t { display: none; } }
 
+/* ------------------------------------------------------------- nav drawer */
+.sd-menu-btn { appearance: none; border: 0; background: transparent; color: var(--sd-cream); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px;
+  font-size: 22px; line-height: 1; padding: 0; }
+.sd-bar .sd-menu-btn { margin-left: 4px; }
+.sd-menu-btn:hover, .sd-menu-btn:focus-visible { background: var(--sd-orange); color: #101010; outline: none; }
+.sd-menu-btn--floating { position: fixed !important; top: 12px !important; right: 12px !important; z-index: 950; background: var(--sd-ink); box-shadow: var(--sd-drop); }
+
+.sd-drawer[hidden] { display: none; }
+.sd-drawer { position: fixed; inset: 0; z-index: 980; }
+.sd-drawer-scrim { position: absolute; inset: 0; background: rgba(16,16,16,.6); opacity: 0; transition: opacity .2s linear; }
+.sd-drawer.is-open .sd-drawer-scrim { opacity: 1; }
+.sd-drawer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(320px, 86vw); box-sizing: border-box;
+  background: var(--sd-ink); color: var(--sd-cream); border-left: 4px solid var(--sd-orange);
+  padding: var(--sd-7) var(--sd-4) var(--sd-4); overflow-y: auto; font-family: var(--sd-font-body);
+  transform: translateX(100%); transition: transform .22s linear; }
+.sd-drawer.is-open .sd-drawer-panel { transform: translateX(0); }
+.sd-drawer-close { position: absolute !important; top: var(--sd-3) !important; right: var(--sd-3) !important; min-width: 44px; min-height: 44px;
+  background: transparent; border: 0; color: var(--sd-cream); font-size: 20px; cursor: pointer; }
+.sd-drawer-close:hover, .sd-drawer-close:focus-visible { background: var(--sd-orange); color: #101010; outline: none; }
+.sd-drawer-section { margin-top: var(--sd-6); }
+.sd-drawer-section h2 { font-family: var(--sd-font-logo); font-size: 11px; color: var(--sd-orange);
+  text-transform: uppercase; letter-spacing: .06em; margin: 0 0 var(--sd-2); }
+.sd-drawer-section a { display: flex; align-items: center; min-height: 44px; color: var(--sd-cream);
+  text-decoration: none; font-weight: 700; font-size: 15px; letter-spacing: .01em; padding: 8px 4px;
+  border-bottom: 2px solid rgba(255,255,255,.08); }
+.sd-drawer-section a:hover, .sd-drawer-section a:focus-visible { background: var(--sd-orange); color: #101010; outline: none; }
+
 /* "Om spillet": static intro + folded FAQ at the very end of a game page, below the game (never inside it) */
 .sd-about { box-sizing: border-box; width: 100%; align-self: stretch; flex: none; clear: both; position: relative; z-index: 1;
   margin: 0; padding: 28px 16px 8px; background: var(--sd-ink); color: var(--sd-cream); border-top: 4px solid var(--sd-orange);
@@ -338,7 +366,9 @@ html.sd-page ::selection { background: var(--sd-ink); color: var(--sd-cream); }
   .sd-pre-row span, .sd-bob, .sd-hop, .sd-wig, .sd-blink, .sd-enter, .sd-fx-correct, .sd-fx-wrong, .sd-fx-bump, .sd-conf i, .sd-burst i { animation: none !important; }
   .sd-conf, .sd-burst { display: none !important; }
   .sd-btn, .sd-card { transition: none !important; }
+  .sd-drawer-scrim, .sd-drawer-panel { transition: none !important; }
 }
+html[data-sd-motion="off"] .sd-drawer-scrim, html[data-sd-motion="off"] .sd-drawer-panel { transition: none !important; }
 html[data-sd-motion="off"] .sd-pre, html[data-sd-motion="off"] .sd-pre.is-quick { transition: opacity .15s linear !important; clip-path: none !important; }
 html[data-sd-motion="off"] .sd-pre.is-out { opacity: 0; }
 html[data-sd-motion="off"] :is(.sd-pre-row span, .sd-bob, .sd-hop, .sd-wig, .sd-blink, .sd-enter, .sd-fx-correct, .sd-fx-wrong, .sd-fx-bump) { animation: none !important; }

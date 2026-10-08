@@ -44,31 +44,37 @@ function add(mode, it) { it.mode = mode; items[mode].push(it); }
 // ---------------- KLOKKEN ----------------
 const HW = ['', 'et', 'to', 'tre', 'fire', 'fem', 'seks', 'syv', 'otte', 'ni', 'ti', 'elleve', 'tolv'];
 const nx = h => (h % 12) + 1;
-const MIN_W = { 5: 'fem', 10: 'ti', 20: 'tyve', 40: 'tyve', 50: 'ti', 55: 'fem' };
+const MIN_W = { 5: 'fem', 10: 'ti', 50: 'ti', 55: 'fem' };
+// Traditional :20 / :40 are "ti i halv X" / "ti over halv X"; "tyve over X" / "tyve i X" are accepted variants only (alt_phrases).
+function altPhrase(h, m) { return m === 20 ? 'klokken tyve over ' + HW[h] : m === 40 ? 'klokken tyve i ' + HW[nx(h)] : null; }
 function phrase(h, m) {
   switch (m) {
     case 0: return 'klokken ' + HW[h];
-    case 5: case 10: case 20: return 'klokken ' + MIN_W[m] + ' over ' + HW[h];
+    case 5: case 10: return 'klokken ' + MIN_W[m] + ' over ' + HW[h];
+    case 20: return 'klokken ti i halv ' + HW[nx(h)];
+    case 40: return 'klokken ti over halv ' + HW[nx(h)];
     case 15: return 'klokken kvart over ' + HW[h];
     case 25: return 'klokken fem i halv ' + HW[nx(h)];
     case 30: return 'klokken halv ' + HW[nx(h)];
     case 35: return 'klokken fem over halv ' + HW[nx(h)];
-    case 40: case 50: case 55: return 'klokken ' + MIN_W[m] + ' i ' + HW[nx(h)];
+    case 50: case 55: return 'klokken ' + MIN_W[m] + ' i ' + HW[nx(h)];
     case 45: return 'klokken kvart i ' + HW[nx(h)];
   }
   throw new Error('bad minute ' + m);
 }
 const tstr = (h, m) => pad(h) + ':' + pad(m);
-function minLevel(m) { return m === 0 || m === 30 ? 'A1' : (m === 25 || m === 35) ? 'B1' : 'A2'; }
-function timeNote(h, m) {
-  const t = h + ':' + pad(m), H = HW[h], N = HW[nx(h)];
+function minLevel(m) { return m === 0 || m === 30 ? 'A1' : (m === 20 || m === 25 || m === 35 || m === 40) ? 'B1' : 'A2'; }
+function timeNote(h, m, tOverride) {
+  const t = tOverride || (h + ':' + pad(m)), H = HW[h], N = HW[nx(h)];
   switch (m) {
     case 0: return 'Hel time: klokken + timetallet, så klokken ' + H + ' er ' + t + '.';
     case 30: return 'Halv ' + N + ' = ' + t + ': halv tæller frem mod den næste time (' + N + '), ikke fra den forrige.';
     case 15: return 'Kvart over ' + H + ' = ' + t + ': et kvarter efter ' + H + '.';
     case 45: return 'Kvart i ' + N + ' = ' + t + ': et kvarter før ' + N + '.';
-    case 5: case 10: case 20: return MIN_W[m][0].toUpperCase() + MIN_W[m].slice(1) + ' over ' + H + ' = ' + t + ': ' + (m === 5 ? 'fem' : m === 10 ? 'ti' : 'tyve') + ' minutter efter ' + H + '.';
-    case 40: case 50: case 55: return MIN_W[m][0].toUpperCase() + MIN_W[m].slice(1) + ' i ' + N + ' = ' + t + ': ' + (60 - m === 5 ? 'fem' : 60 - m === 10 ? 'ti' : 'tyve') + ' minutter før ' + N + '.';
+    case 20: return 'Ti i halv ' + N + ' = ' + t + ': ti minutter før halv ' + N + ' (også sagt "tyve over ' + H + '").';
+    case 40: return 'Ti over halv ' + N + ' = ' + t + ': ti minutter efter halv ' + N + ' (også sagt "tyve i ' + N + '").';
+    case 5: case 10: return MIN_W[m][0].toUpperCase() + MIN_W[m].slice(1) + ' over ' + H + ' = ' + t + ': ' + (m === 5 ? 'fem' : m === 10 ? 'ti' : 'tyve') + ' minutter efter ' + H + '.';
+    case 50: case 55: return MIN_W[m][0].toUpperCase() + MIN_W[m].slice(1) + ' i ' + N + ' = ' + t + ': ' + (60 - m === 5 ? 'fem' : 60 - m === 10 ? 'ti' : 'tyve') + ' minutter før ' + N + '.';
     case 25: return 'Fem i halv ' + N + ' = ' + t + ': fem minutter før halv ' + N + '.';
     case 35: return 'Fem over halv ' + N + ' = ' + t + ': fem minutter efter halv ' + N + '.';
   }
@@ -93,12 +99,12 @@ for (let h = 1; h <= 12; h++) {
     const d = clockDistractors(h, m);
     add('klokken', {
       id: 'k-aflaes-' + id, level: lvl, group: 'aflaes', kind: 'clock_to_phrase', pattern: 'min-' + pad(m),
-      prompt_da: 'Hvad er klokken?', clock: tstr(h, m),
+      prompt_da: 'Hvad er klokken?', clock: tstr(h, m), alt_phrases: altPhrase(h, m) ? [altPhrase(h, m)] : undefined,
       options: [ph].concat(d.map(x => phrase(x[0], x[1]))), correct: ph, tts: spoken(ph), note
     });
     add('klokken', {
       id: 'k-find-' + id, level: lvl, group: 'find', kind: 'phrase_to_clock', pattern: 'min-' + pad(m),
-      prompt_da: 'Find det rigtige ur.', show: ph, tts_prompt: spoken(ph), tts: spoken(ph),
+      prompt_da: 'Find det rigtige ur.', show: ph, alt_phrases: altPhrase(h, m) ? [altPhrase(h, m)] : undefined, tts_prompt: spoken(ph), tts: spoken(ph),
       option_type: 'clock', options: [tstr(h, m)].concat(d.map(x => tstr(x[0], x[1]))), correct: tstr(h, m),
       correct_label: tstr(h, m), note
     });
@@ -106,10 +112,11 @@ for (let h = 1; h <= 12; h++) {
     const pm = hash('dig' + id) % 2 === 1;
     const h24 = h === 12 ? (pm ? 12 : 0) : (pm ? h + 12 : h);
     const is24 = h24 >= 13 || h24 === 0;
-    const dnote = is24 ? (h24 === 0 ? 'Kl. 0 svarer til 12 på det analoge ur, så ' : 'Træk 12 fra ' + h24 + ' (= ' + h + '), så ') + note.charAt(0).toLowerCase() + note.slice(1) : note;
+    const dn = timeNote(h, m, tstr(h24, m));
+    const dnote = is24 ? (h24 === 0 ? 'Kl. 00 er midnat og står som 12 på det analoge ur. ' : 'Kl. ' + h24 + ' står som ' + h + ' på det analoge ur. ') + dn : dn;
     add('klokken', {
       id: 'k-digital-' + pad(h24) + pad(m), level: is24 ? maxLv(lvl, 'A2') : lvl, group: 'digital', kind: 'digital_to_phrase', pattern: 'min-' + pad(m),
-      prompt_da: 'Hvad er klokken?', show: tstr(h24, m),
+      prompt_da: 'Hvad er klokken?', show: tstr(h24, m), alt_phrases: altPhrase(h, m) ? [altPhrase(h, m)] : undefined,
       options: [ph].concat(d.map(x => phrase(x[0], x[1]))), correct: ph, tts: spoken(ph), note: dnote
     });
   }
@@ -327,7 +334,7 @@ const ORD_CLOZE = [
   ['Det er hendes ___ barn.', '2.', 'andet', ['anden', 'to'], 'A2', 'Barn er et intetkønsord (et barn), så 2. hedder andet.'],
   ['Det er hans ___ år i Danmark.', '2.', 'andet', ['anden', 'to'], 'A2', 'År er et intetkønsord (et år), så 2. hedder andet.'],
   ['Det er den ___ dag i træk, det sner.', '2.', 'anden', ['andet', 'to'], 'A2', 'Dag er et fælleskønsord (en dag), så 2. hedder anden.'],
-  ['Dronning Margrethe den ___ blev født i 1940.', '2.', 'anden', ['andet', 'to'], 'A2', 'Efter et regentnavn siger man den + ordenstal: Margrethe den anden.'],
+  ['Dronning Margrethe den ___ blev født i 1940.', '2.', 'Anden', ['Andet', 'To'], 'A2', 'Efter et regentnavn skrives ordenstallet med stort: Margrethe den Anden.', true],
   ['Nu ringer han for ___ gang i dag.', '3.', 'tredje', ['tre', 'tredive'], 'A2', 'Gentagelser tælles med ordenstal: for første, anden, tredje gang.'],
   ['Marts er den ___ måned i året.', '3.', 'tredje', ['tre', 'tredive'], 'A2', 'Rækkefølge udtrykkes med ordenstal: den tredje måned.'],
   ['Det er min ___ dag på arbejdet.', '4.', 'fjerde', ['fire', 'fjorten'], 'A2', 'Rækkefølge udtrykkes med ordenstal: fjerde, ikke fire.'],
@@ -338,8 +345,8 @@ const ORD_CLOZE = [
   ['Børnene går i ___ klasse.', '8.', 'ottende', ['otte', 'attende'], 'A2', 'Klassetrin siges med ordenstal: ottende klasse.'],
   ['Hun går i ___ klasse.', '9.', 'niende', ['ni', 'nittende'], 'A2', 'Klassetrin siges med ordenstal: niende klasse.'],
   ['Oktober er den ___ måned i året.', '10.', 'tiende', ['ti', 'tyvende'], 'A2', 'Rækkefølge udtrykkes med ordenstal: den tiende måned.'],
-  ['Kongen hedder Frederik den ___.', '10.', 'tiende', ['ti', 'niende'], 'A2', 'Regentnavne bruger den + ordenstal: Frederik den tiende.'],
-  ['Christian den ___ var konge fra 1912 til 1947.', '10.', 'tiende', ['niende', 'ti'], 'B1', 'Regentnavne bruger den + ordenstal: Christian den tiende.'],
+  ['Kongen hedder Frederik den ___.', '10.', 'Tiende', ['Ti', 'Niende'], 'A2', 'Efter et regentnavn skrives ordenstallet med stort: Frederik den Tiende.', true],
+  ['Christian den ___ var konge fra 1912 til 1947.', '10.', 'Tiende', ['Niende', 'Ti'], 'B1', 'Efter et regentnavn skrives ordenstallet med stort: Christian den Tiende.', true],
   ['Hun løber sit ___ maraton i år.', '11.', 'ellevte', ['elleve', 'ellevende'], 'B1', 'Ordenstallene 11. og 12. er uregelmæssige: ellevte, tolvte.'],
   ['December er den ___ måned i året.', '12.', 'tolvte', ['tolv', 'trettende'], 'B1', 'Ordenstallene 11. og 12. er uregelmæssige: ellevte, tolvte.'],
   ['H.C. Andersen levede i det ___ århundrede.', '19.', 'nittende', ['nitten', 'attende'], 'B1', 'Århundreder siges med ordenstal: det nittende århundrede.'],
@@ -350,7 +357,7 @@ ORD_CLOZE.forEach(c => {
   add('aarstal', {
     id: 'a-ordenstal-saetning-' + slug(c[0].replace('___', c[2])), level: c[4], group: 'ordenstal', kind: 'cloze_mc', pattern: 'ordenstal',
     prompt_da: 'Vælg det rigtige ordenstal.', sentence_da: c[0], show: c[1],
-    options: [c[2]].concat(c[3]), correct: c[2], tts: c[0].replace('___', c[2]), note: c[5]
+    options: [c[2]].concat(c[3]), correct: c[2], tts: c[0].replace('___', c[2]), note: c[5], verify: c[6] ? true : undefined
   });
 });
 

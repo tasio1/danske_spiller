@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 
 DIRS=(
   "boejningsvaerkstedet" "danish_flashcards" "danske-phraser" "en-og-et" "forbindenor"
-  "konjunktioner" "ordstilling-detektiv" "pronomenmysteriet" "saetningsmaskinen"
+  "konjunktioner" "laeseforstaaelse" "ordstilling-detektiv" "pronomenmysteriet" "saetningsmaskinen"
   "shared" "tidsmaskinen" "blog" "en"
 )
 

@@ -53,6 +53,7 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 | Sætningsmaskinen | `saetningsmaskinen/` | A2–C1 | 7 | 1,020 target (current: 99) | Cream #F2E7CC, Coral #D96D5F, Blue #4E82A6 |
 | Tidsmaskinen | `tidsmaskinen/` | A2–C1 | 9 + Timed | 1,260 | Deep blue #17263B, Amber #B67A3D, Cyan #3C93A8 |
 | Skrivekontrollen | `skrivekontrollen/` | B1–C1 | 7 | 1,190 | Paper #E8E0C8, Ink #23231F, Proof red #A13D3D |
+| Læseforståelse | `laeseforstaaelse/` | B1–B2 | 4 + Eksamenstilstand | 10 texts phase 1 (20 phase 2) | Paper #F4F0E6, Ink #1E1C1A, Highlighter #E0B43C, Teal #2F6F6B |
 
 **Import pattern for every game:**
 ```html
@@ -70,6 +71,209 @@ Sound `sequence(steps)`: `[{ type, frequency, duration, gain, delay? }]` — ini
 ---
 
 ## Next Up
+
+# Læseforståelse (spec: specs.md § laeseforstaaelse; plan: docs/superpowers/plans/2026-10-06-laeseforstaaelse-pipeline.md; step-0 files: docs/laeseforstaaelse/step0/)
+# Fact-sheet tasks are docs-only: the tester checks format (counts, URL syntax, verbatim-quote lines); factual accuracy is the job of laese-facts-verify + user spot-check.
+
+- id: laese-validator
+  spec: laeseforstaaelse
+  type: test
+  status: review
+  priority: P1
+  title: "tester: tests/laeseforstaaelse-data.mjs — corpus validator (test-first, before any text exists)"
+  acceptance: "fails on a bad fixture for each rule (banned phrase, quotation mark, wrong gap/question counts, bad solution map, bad {{n}} markers); passes on a good fixture; --expect=a,b,c,d asserts per-mode text counts; runs in under 1 s. Pattern: tests/pronomen-data-guard.mjs; code in reference plan Task 2."
+  notes: "Done: task/laese-validator@e3ac2c7 (selftest 2 good + 41 bad fixtures, 0.6 s; PM mutation-tested). Known gaps accepted: speaker after the verb (mener X), other verbs (spoerger), pronoun-only attribution; a sentence-initial single name only warns. Needs an independent tester pass before release. Allowed files: tests/laeseforstaaelse-data.mjs, tests/fixtures/laese/*. Rules come from .claude/skills/laese-text-authoring."
+
+- id: laese-facts-a
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  title: "fact sheets (web): art-ulven, art-dialekter, art-efterskole"
+  acceptance: "docs/laeseforstaaelse/facts/<text-id>.md per text; 6-12 facts each with verbatim source sentence, URL, fetch date; figures that cannot be confirmed are marked UNCONFIRMED; no game prose written"
+  notes: "Dispatch a general-purpose agent (coder and tester have no web tools). Ulven, dialekter are already partly verified in the reference plan's Sources; efterskole needs full research."
+
+- id: laese-facts-b
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  title: "fact sheets (web): haefte-kolonihave, haefte-rebildfest"
+  acceptance: "same as laese-facts-a; plus a list of practical details (times, prices) that will be exercise values and must not be presented as real"
+
+- id: laese-facts-c
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  title: "fact sheets (web): art-samsoe, art-madspild"
+  acceptance: "same as laese-facts-a"
+
+- id: laese-facts-d
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  title: "fact sheets (web): art-bakken, art-cykelsti, art-gaekkebrev"
+  acceptance: "same as laese-facts-a"
+
+- id: laese-facts-verify-1
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  depends_on: [laese-facts-a, laese-facts-b]
+  title: "independent verification of fact sheets: ulven, dialekter, efterskole, kolonihave, rebildfest"
+  acceptance: "every fact line has a final status + verified line; VERIFY-1.md written; author never verifies own sheet"
+  notes: "Done: task/laese-facts-verify-1@fa69077 (60 facts: 58 CONFIRMED, 2 CHANGED; curl on raw pages, no WebFetch). PM spot-check: ulveatlas 11 kobler/61 hvalpe reproduces. Next: tester format gate, then release together with the facts-a/-b branches it contains."
+
+- id: laese-facts-verify-2
+  spec: laeseforstaaelse
+  type: chore
+  status: review
+  priority: P1
+  depends_on: [laese-facts-c, laese-facts-d]
+  title: "independent verification of fact sheets: bakken, cykelsti, gaekkebrev, madspild, samsoe"
+  acceptance: "same as laese-facts-verify-1; VERIFY-2.md written"
+  notes: "Done: task/laese-facts-verify-2@af6e5a4 (51 facts: 49 CONFIRMED, 1 CHANGED, 1 UNCONFIRMED). PM spot-check: bakken.dk 'altid gratis entré' and supercykelstier.dk 244 km/16 ruter reproduce on raw pages. Next: tester format gate, then release."
+
+- id: laese-shell
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P1
+  depends_on: [laese-validator]
+  title: "Læseforståelse — index.html shell + data.js registry + split-reader layout + mode mc on art-ulven"
+  acceptance: "boots from file:// with zero console errors; start button id btn-play; start screen = title + Spil + mode/level controls + disclaimer; reading pane and question pane scroll independently while the page does not; mc mode playable on art-ulven; SRS keys laeseforstaaelse:mc:<id>; validator exits 0"
+  notes: "Allowed files: laeseforstaaelse/index.html, laeseforstaaelse/data.js, laeseforstaaelse/data-mc.js. Structural CSS only; theme belongs to the designer. Reuse the CSS block and api design from the reference plan Task 3. art-ulven is written from the calibration text in the laese-text-authoring skill."
+
+- id: laese-theme
+  spec: laeseforstaaelse
+  type: design
+  status: todo
+  priority: P1
+  depends_on: [laese-shell]
+  title: "Læseforståelse — newsprint theme: papers (light/sepia/dark), evidence highlighter"
+  acceptance: "shared/themes/laeseforstaaelse.css only; contrast >= 4.5:1 on all three papers; screenshots at 360, 820, 1440; reduced-motion safe; index.html untouched"
+
+- id: laese-mode-skim
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P1
+  depends_on: [laese-shell]
+  title: "Læseforståelse — mode skim: 15 short-answer questions, hæfte jump-list"
+  acceptance: "answers checked with DanskCore.diff.check against accepted[]; jump-list of notice headings; 30 s nudge never auto-advances; one sample hæfte passes the validator"
+  notes: "Allowed files: laeseforstaaelse/index.html, laeseforstaaelse/data-skim.js. index.html is serial: only one coder branch at a time."
+
+- id: laese-mode-insert
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-skim]
+  title: "Læseforståelse — mode insert: place 5 removed paragraphs (7 offered)"
+  acceptance: "tap-to-select then tap-to-place; slots are inline dashed buttons; two blocks stay unused; wrong placement shows the cohesion note; keyboard reaches every block and slot"
+  notes: "Allowed files: laeseforstaaelse/index.html, laeseforstaaelse/data-insert.js."
+
+- id: laese-mode-cloze
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-insert]
+  title: "Læseforståelse — mode cloze: 8 connector/adverb gaps"
+  acceptance: "{{n}} markers become inline buttons; 4 options, keys 1-4; summary names the weakest connector type via DanskCore.srs.pattern"
+  notes: "Allowed files: laeseforstaaelse/index.html, laeseforstaaelse/data-cloze.js."
+
+- id: laese-summary-exam
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-cloze]
+  title: "Læseforståelse — round-end screen and Eksamenstilstand"
+  acceptance: "round-end shows score, accuracy, <=3 weakest, Spil igen, optional Gentag fejl; Eksamenstilstand chains the four parts (25 + 65 min), Træning is default, never claims a pass or grade"
+  notes: "Allowed files: laeseforstaaelse/index.html."
+
+- id: laese-data-mc
+  spec: laeseforstaaelse
+  type: data
+  status: todo
+  priority: P1
+  depends_on: [laese-shell, laese-facts-verify-1, laese-facts-verify-2]
+  title: "Læseforståelse data-mc.js — art-dialekter, art-efterskole (art-ulven comes with the shell)"
+  acceptance: "3 mc texts in total (--expect mc=3); written only from CONFIRMED facts of the fact sheets; validator exits 0; verify:true where unsure; no filler or clone-generators"
+  notes: "ANGLE CORRECTIONS from verification (VERIFY-1/2.md win over the plan): art-ulven use only the VERIFY-1 Safe-to-use list, EU status is now only beskyttet, no biologist/L&F positions, state the year of every wolf figure; art-dialekter no causal why (DR 2015 gives only a researcher formodning), no i dag, sources 2015/2019/2024; art-efterskole use 238 schools (Aug 2025) not 234, 36,2 % is 10th grade only. Allowed files: laeseforstaaelse/data-mc.js. Load .claude/skills/laese-text-authoring first."
+
+- id: laese-data-skim
+  spec: laeseforstaaelse
+  type: data
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-skim, laese-facts-verify-1, laese-facts-verify-2]
+  title: "Læseforståelse data-skim.js — haefte-kolonihave, haefte-rebildfest"
+  acceptance: "2 hæfter, 8-10 notices of 1200-1800 chars each, 15 questions each, >= 3 near-miss pairs each; validator exits 0 with --expect skim=2; practical times and prices are exercise values and the footer says so"
+  notes: "ANGLE CORRECTIONS: haefte-rebildfest say only 1912 (not a date), no 56 ha (sources: ca. 80 ha / 200 acres / 140 tonder), Nixon only if a second source is added; haefte-kolonihave counts differ by scope (19.773 Danmarks Statistik 2024; ca. 62.000 lex.dk; knap 40.000 = Kolonihaveforbundet members), building/season rules are municipal not national, Risskov waiting list 8-10 years is from 2018. Allowed files: laeseforstaaelse/data-skim.js."
+
+- id: laese-data-insert
+  spec: laeseforstaaelse
+  type: data
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-insert, laese-facts-verify-1, laese-facts-verify-2]
+  title: "Læseforståelse data-insert.js — art-samsoe, art-madspild"
+  acceptance: "2 insert texts, 5 gaps and 7 blocks each, each gap note names the cohesion signal; validator exits 0 with --expect insert=2"
+  notes: "ANGLE CORRECTIONS: art-madspild drop the export angle (unsupported); use Stop Spild Af Mad 2008, Too Good To Go created in Denmark 2015, Wefood 2016; the 881.062 t figure is UNCONFIRMED. art-samsoe never say the island owns its turbines (2018 sale of 9 of 10 offshore turbines was announced and conditional); self-sufficiency year unresolved (2007 vs 2003); 70 % of 440 mio. kr. is a share of investment, 3700 is the island population. Allowed files: laeseforstaaelse/data-insert.js."
+
+- id: laese-data-cloze
+  spec: laeseforstaaelse
+  type: data
+  status: todo
+  priority: P1
+  depends_on: [laese-mode-cloze, laese-facts-verify-1, laese-facts-verify-2]
+  title: "Læseforståelse data-cloze.js — art-bakken, art-cykelsti, art-gaekkebrev"
+  acceptance: "3 cloze texts, 8 gaps each, >= 3 connector types each, markers {{1}}..{{8}} in order; validator exits 0 with --expect cloze=3"
+  notes: "ANGLE CORRECTIONS: art-bakken 1583 is only the Kirsten Piil legend date (ifolge traditionen), free entry is a present-day fact with no start year, use 1,8 mio. visitors (2025, anslaet); art-cykelsti omit route lengths and the Cykelslangen length, 43 % (2025) vs 46 % (2024) are Copenhagen work/education trips; art-gaekkebrev 1770 is the oldest known letter, say ifolge en udbredt regel for the egg rule, palmesondag is a tradition. Allowed files: laeseforstaaelse/data-cloze.js."
+
+- id: laese-seo
+  spec: laeseforstaaelse
+  type: chore
+  status: todo
+  priority: P2
+  depends_on: [laese-summary-exam, laese-data-mc, laese-data-skim, laese-data-insert, laese-data-cloze]
+  title: "seo agent: head copy, JSON-LD, sitemap entry for laeseforstaaelse/index.html"
+  acceptance: "primary keyword 'læseforståelse dansk øvelser'; JSON-LD parses; 'ikke officielt prøvemateriale' stays visible; sitemap.xml lists the page; tests/seo-static.mjs passes"
+
+- id: laese-home-card
+  spec: laeseforstaaelse
+  type: code
+  status: todo
+  priority: P2
+  depends_on: [laese-seo]
+  title: "root index.html — Læseforståelse card (games array and static cards)"
+  acceptance: "card opens the game; both places in sync; existing sprite reused; a new sprite is a shared-system request to the user"
+  notes: "Allowed files: root index.html only."
+
+- id: laese-ux-tune
+  spec: laeseforstaaelse
+  type: design
+  status: todo
+  priority: P2
+  depends_on: [laese-summary-exam]
+  title: "Læseforståelse reading-view tuning from six-viewport measurements"
+  acceptance: "1920x1080, 1440x900, 1280x720, 1024x768, 820x1180, 360x640: chars/line, visible-text share and panel height measured per mode; the 10-point checklist from the reference plan Task 13 with before/after numbers; items that did not improve listed open"
+  notes: "designer then tester. Allowed files: shared/themes/laeseforstaaelse.css, docs/redesign/reports/laeseforstaaelse-layout.md."
+
+- id: laese-native-review
+  spec: laeseforstaaelse
+  type: data
+  status: todo
+  priority: P1
+  depends_on: [laese-data-mc, laese-data-skim, laese-data-insert, laese-data-cloze]
+  title: "native-speaker review of all phase-1 texts and every verify:true item"
+  acceptance: "every phase-1 text read aloud by a native speaker; verdict recorded per text; flags cleared or the text fixed; validator and tester re-run"
+  notes: "Human task. Until done every text carries verify:true."
 
 - id: pronomen-data
   spec: pronomenmysteriet

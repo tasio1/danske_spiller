@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Læseforståelse dansk – øv læsning på B1–B2 | Sjovt Dansk</title>
+<meta name="description" content="Læseforståelse dansk: øv at læse tekster og svare på spørgsmål i formatet fra Prøve i Dansk 3. Gratis øvelser, B1–B2. Ikke officielt prøvemateriale." />
+<meta property="og:title" content="Læseforståelse dansk – øv læsning på B1–B2 | Sjovt Dansk" />
+<meta property="og:description" content="Læseforståelse dansk: øv at læse tekster og svare på spørgsmål i formatet fra Prøve i Dansk 3. Gratis øvelser, B1–B2. Ikke officielt prøvemateriale." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://sjovtdansk.dk/laeseforstaaelse/index.html" />
+<meta property="og:locale" content="da_DK" />
+<link rel="canonical" href="https://sjovtdansk.dk/laeseforstaaelse/index.html" />
+<link rel="icon" href="../shared/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../shared/icons/favicon-36.png" type="image/png" sizes="36x36" />
+<link rel="apple-touch-icon" href="../shared/icons/apple-touch-icon.png" />
+<meta property="og:image" content="https://sjovtdansk.dk/shared/icons/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sjovt Dansk: lær dansk ved at spille. Pølle-maskotten i pixelstil." />
+<meta name="twitter:card" content="summary_large_image" />
+<script>
+/* Apply saved reader prefs before first paint (no flash). Failures are harmless. */
+try {
+  var r = JSON.parse(window.localStorage.getItem('laeseforstaaelse:reader') || 'null') || {};
+  var d = document.documentElement;
+  var p = r.paper;
+  if (p !== 'light' && p !== 'sepia' && p !== 'dark') {
+    p = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  d.setAttribute('data-paper', p);
+  if (r.fs === 17 || r.fs === 19 || r.fs === 22) d.style.setProperty('--lf-fs', r.fs + 'px');
+} catch (e) { /* storage unavailable */ }
+</script>
+<link rel="stylesheet" href="../shared/tts-button.css" />
+<style>
+  /* Reading room, minimal tokens. The designer polishes this later. */
+  :root {
+    --lf-paper:#F4F0E6; --lf-card:#FBF9F3; --lf-ink:#1E1C1A; --lf-muted:#5E574C; --lf-rule:#CFC6B2;
+    --lf-mark:#E0B43C; --lf-mark-ink:#1E1C1A; --lf-accent:#2F6F6B; --lf-focus:#1F5A56;
+    --lf-ok:#2F6B45; --lf-ok-bg:rgba(47,107,69,.14); --lf-no:#9B3D3D; --lf-no-bg:rgba(155,61,61,.13);
+    --lf-fs:19px; --lf-panel:420px; --lf-sheet:52dvh; --lf-gutter:clamp(36px,4vw,48px);
+    --dc-fg:var(--lf-ink); --dc-btn-bg:var(--lf-card); --dc-border:var(--lf-ink); --dc-accent:var(--lf-accent);
+    --dc-accent-fg:#fff; --dc-correct:var(--lf-ok); --dc-correct-bg:var(--lf-ok-bg);
+    --dc-wrong:var(--lf-no); --dc-wrong-bg:var(--lf-no-bg);
+    color-scheme: light;
+  }
+  :root[data-paper="sepia"] { --lf-paper:#EADFC8; --lf-card:#F2E9D5; --lf-ink:#2B2418; --lf-muted:#574C38; --lf-rule:#C4B592; }
+  :root[data-paper="dark"] {
+    --lf-paper:#16191C; --lf-card:#1F2328; --lf-ink:#E6E2D8; --lf-muted:#ABA598; --lf-rule:#39414A; --lf-focus:#8FD6CF;
+    --lf-ok:#8FCB9F; --lf-ok-bg:rgba(143,203,159,.18); --lf-no:#EE9A9A; --lf-no-bg:rgba(238,154,154,.16);
+    color-scheme: dark;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; background: var(--lf-paper); color: var(--lf-ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; color: inherit; }
+  :focus-visible, .lf-app .dc-quiz-option:focus-visible { outline: 3px solid var(--lf-focus); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  .lf-app { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100vh; height: 100dvh; }
+  .lf-top { display: flex; align-items: center; gap: 6px; padding: 6px 12px; min-height: 56px;
+            border-bottom: 2px solid var(--lf-rule); flex-wrap: nowrap; }
+  .lf-brand { font-weight: 700; margin: 0 auto 0 0; font-size: 1.05rem; white-space: nowrap; }
+  .lf-btn { min-height: 44px; min-width: 44px; padding: 0 12px; background: var(--lf-card); color: var(--lf-ink);
+            border: 2px solid var(--lf-ink); border-radius: 8px; cursor: pointer; white-space: nowrap; }
+  .lf-btn--primary { background: var(--lf-accent); color: #fff; border-color: var(--lf-accent); font-weight: 700; }
+  .lf-btn[aria-pressed="true"], .lf-btn[aria-checked="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-btn[aria-disabled="true"] { border-style: dashed; cursor: default; }
+
+  /* Start screen */
+  .lf-start { overflow-y: auto; overscroll-behavior: contain; padding: 24px 16px; display: flex; flex-direction: column;
+              align-items: center; gap: 18px; text-align: center; }
+  .lf-start h1 { margin: 8px 0 0; font: 700 clamp(1.8rem, 6vw, 2.6rem)/1.15 Georgia, "Iowan Old Style", "Times New Roman", serif; }
+  .lf-start .lf-btn--primary { font-size: 1.25rem; min-width: 180px; min-height: 56px; }
+  .lf-ctl { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+  .lf-ctl-label { color: var(--lf-muted); font-size: .9rem; margin-right: 4px; }
+  .lf-disclaimer, .lf-msg { max-width: 46ch; margin: 0; color: var(--lf-muted); font-size: .95rem; line-height: 1.5; }
+  .lf-msg { color: var(--lf-ink); min-height: 1.5em; }
+
+  /* App frame: the PAGE never scrolls; the two panes do. */
+  .lf-main { display: grid; min-height: 0; grid-template-rows: minmax(0, 1fr);
+             grid-template-columns: minmax(0, 1fr) minmax(340px, var(--lf-panel)); }
+  .lf-reader { position: relative; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+               scrollbar-width: thin; min-height: 0; padding: 24px var(--lf-gutter) 40px; }
+  .lf-panel { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; min-height: 0;
+              border-left: 2px solid var(--lf-rule); padding: 16px 20px 24px; background: var(--lf-paper); }
+
+  /* Reading column: one measure, centred, system serif. */
+  .lf-text { max-width: 29em; margin-inline: auto; font: var(--lf-fs)/1.65 Georgia, "Iowan Old Style", "Times New Roman", serif; }
+  .lf-kicker { margin: 0 0 4px; font: 700 .72em/1.4 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--lf-muted); }
+  .lf-text h2 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
+  .lf-text p { margin: 0 0 1em; position: relative; }
+  .lf-text p[data-par]::before { content: "¶" attr(data-par); position: absolute; right: 100%; margin-right: 8px;
+              font: 700 12px/2.3 ui-monospace, "SF Mono", Consolas, monospace; color: var(--lf-muted); }
+  .lf-text p.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); border-radius: 2px; }
+  /* Hæfte (skim): numbered notices and a sticky jump-list. */
+  .lf-text h1 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
+  .lf-reader--haefte { padding-top: 0; }
+  .lf-haefte { padding-top: 24px; }
+  .lf-jump { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain;
+             scrollbar-width: thin; margin: 0 0 1em; padding: 6px 0; background: var(--lf-paper); border-bottom: 1px solid var(--lf-rule);
+             font: 1rem/1.2 system-ui, sans-serif; }
+  .lf-jump .lf-btn { flex: 0 0 auto; }
+  .lf-jump .lf-btn[aria-current="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-notice { margin: 0 0 1.6em; padding: 0 0 .1em; border-radius: 2px; }
+  .lf-notice h2 { margin: 0 0 .5em; font-size: 1.3em; position: relative; }
+  .lf-haefte [data-par]::before { content: "\00a7" attr(data-par); position: absolute; right: 100%; margin-right: 8px;
+              font: 700 12px/2.3 ui-monospace, "SF Mono", Consolas, monospace; color: var(--lf-muted); }
+  .lf-text section.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); }
+  .lf-foot { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--lf-rule); font: .8em/1.5 system-ui, sans-serif; color: var(--lf-muted); }
+  .lf-foot p { margin: 0 0 .6em; }
+  .lf-foot summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+  .lf-foot ul { margin: 0; padding-left: 1.2em; }
+  .lf-foot a { display: inline-block; min-height: 44px; padding: 12px 0; overflow-wrap: anywhere; color: var(--lf-focus); }
+
+  /* Question pane */
+  .lf-panel-head { display: none; }
+  .lf-qnum { margin: 0 0 8px; color: var(--lf-muted); font-size: .9rem; font-weight: 700; }
+  #lf-q .dc-quiz-prompt { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
+  #lf-q .dc-quiz-option { width: 100%; font-size: 1rem; line-height: 1.4; border-width: 2px; background: var(--lf-card); color: var(--lf-ink); }
+  #lf-q .dc-quiz-option:disabled { color: var(--lf-ink); opacity: 1; }
+  #lf-q .dc-quiz-option.dc-correct::after { content: " \2713"; font-weight: 700; }
+  #lf-q .dc-quiz-option.dc-wrong::after { content: " \2717"; font-weight: 700; }
+  .lf-ans { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .lf-ans label { flex: 1 0 100%; color: var(--lf-muted); font-size: .9rem; font-weight: 700; }
+  .lf-input { flex: 1 1 160px; min-width: 0; min-height: 44px; padding: 0 10px; font: inherit; font-size: 1rem; background: var(--lf-card);
+              color: var(--lf-ink); border: 2px solid var(--lf-ink); border-radius: 8px; }
+  .lf-input:disabled { opacity: 1; }
+  .lf-input[data-state="ok"] { border-color: var(--lf-ok); background: var(--lf-ok-bg); }
+  .lf-input[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); }
+  .lf-nudge { margin: 10px 0 0; color: var(--lf-muted); font-size: .95rem; line-height: 1.4; }
+  .lf-fb-box { margin-top: 12px; padding: 12px; border-left: 4px solid var(--lf-no); background: var(--lf-no-bg); line-height: 1.45; }
+  .lf-fb-box p { margin: 0 0 8px; }
+  .lf-fb-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .lf-nav { display: flex; gap: 8px; margin-top: 14px; }
+  .lf-flash { animation: lf-flash .5s ease-out; }
+  @keyframes lf-flash { from { box-shadow: 0 0 0 6px var(--lf-ok-bg); } to { box-shadow: 0 0 0 0 transparent; } }
+  .dc-summary-stats { font-size: 1.1rem; font-weight: 700; }
+
+  /* Insert (Sæt afsnittet ind): dashed slots stay in the text; the bank lives in the question pane. */
+  .lf-gap { display: block; width: 100%; margin: 0 0 1em; padding: 10px 14px; min-height: 56px; text-align: left; font: inherit;
+            line-height: 1.55; background: transparent; color: var(--lf-ink); border: 2px dashed var(--lf-muted); border-radius: 8px; cursor: pointer; }
+  .lf-gap-tag { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font: 700 .8em/1.5 system-ui, sans-serif; letter-spacing: .03em; }
+  .lf-gap-st { font-weight: 400; color: var(--lf-muted); }
+  .lf-gap-body { display: block; margin-top: .35em; }
+  .lf-gap[data-state="ok"] { border-style: solid; border-color: var(--lf-rule); border-left: 6px solid var(--lf-ok); background: var(--lf-card); cursor: default; }
+  .lf-gap[data-state="ok"] .lf-gap-st { color: var(--lf-ok); font-weight: 700; }
+  .lf-gap[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); cursor: default; }
+  .lf-gap[data-state="no"] .lf-gap-st { color: var(--lf-no); font-weight: 700; }
+  .lf-gap[aria-disabled="true"]:not([data-state]) { cursor: default; }
+  .lf-gap[aria-current="true"] { box-shadow: 0 0 0 4px var(--lf-focus); }
+  .lf-hint { margin: 0 0 10px; color: var(--lf-muted); font-size: .95rem; line-height: 1.45; }
+  .lf-bank { display: flex; flex-direction: column; gap: 8px; }
+  .lf-block { display: block; width: 100%; min-height: 44px; padding: 10px 12px; text-align: left; font-size: .95rem; line-height: 1.45;
+              background: var(--lf-card); color: var(--lf-ink); border: 2px solid var(--lf-ink); border-radius: 8px; cursor: pointer; }
+  .lf-block[aria-pressed="true"] { background: var(--lf-ink); color: var(--lf-paper); }
+  .lf-block:disabled { opacity: 1; cursor: default; border-style: dashed; }
+  .lf-block-n { display: inline-block; min-width: 1.4em; font-weight: 700; }
+  .lf-block-sel { display: block; margin-top: 4px; font-weight: 700; font-size: .85rem; }
+  .lf-status { margin: 10px 0 0; font-weight: 700; font-size: .95rem; line-height: 1.4; }
+
+  /* Cloze (Det manglende ord): inline gap buttons in running text; options in the question pane. */
+  .lf-gap.lf-cz { display: inline-block; width: auto; max-width: 100%; margin: 2px 1px; padding: 6px 10px; min-height: 44px; min-width: 64px;
+                  text-align: center; vertical-align: middle; font: 700 .85em/1.3 system-ui, sans-serif; border-radius: 6px; }
+  .lf-gap.lf-cz[data-state="ok"], .lf-gap.lf-cz[data-state="no"] { border-left-width: 2px; font-family: inherit; font-weight: 700; }
+  .lf-gap.lf-cz[data-state="ok"] { border-color: var(--lf-ok); background: var(--lf-ok-bg); }
+  .lf-gap.lf-cz[data-state="no"] { border-color: var(--lf-no); background: var(--lf-no-bg); }
+  .lf-gap.lf-cz[aria-current="true"] { outline: 3px solid var(--lf-focus); outline-offset: 2px; box-shadow: none; }
+  .lf-cz-n { font: 700 .75em/1 ui-monospace, Consolas, monospace; color: var(--lf-muted); margin-right: 4px; }
+  .lf-cz-ic { margin-right: 4px; }
+  .lf-gap.lf-cz[data-state="ok"] .lf-cz-ic { color: var(--lf-ok); }
+  .lf-gap.lf-cz[data-state="no"] .lf-cz-ic { color: var(--lf-no); }
+  .lf-gap.lf-cz[data-preview="true"] { color: var(--lf-muted); font-style: italic; font-weight: 400; }
+  .lf-sent { margin: 0 0 12px; padding: 8px 10px; border-left: 3px solid var(--lf-rule); color: var(--lf-muted); font-size: .95rem; line-height: 1.5; }
+  .lf-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .lf-opts .dc-quiz-option { min-height: 48px; }
+  .lf-weakest { margin: 12px 0 0; font-weight: 700; line-height: 1.45; }
+
+  @media (min-width: 1024px) and (max-width: 1279px) { :root { --lf-panel: 360px; } }
+  /* Tablet landscape stays split with a 38 % panel. */
+  @media (min-width: 640px) and (max-width: 1023px) and (orientation: landscape) {
+    .lf-main { grid-template-columns: minmax(0, 1fr) minmax(300px, 38%); }
+  }
+  /* Narrow screens: text on top, docked collapsible panel below. */
+  @media (max-width: 1023px) and (orientation: portrait), (max-width: 639px) {
+    :root { --lf-gutter: 16px; }
+    .lf-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+    .lf-panel { border-left: 0; border-top: 2px solid var(--lf-rule); max-height: var(--lf-sheet); padding: 0 16px 16px; }
+    .lf-panel { scroll-padding-top: 64px; }   /* a focused block never hides under the sticky peek bar */
+    .lf-panel-head { display: block; position: sticky; top: 0; background: var(--lf-paper); padding-top: 6px; z-index: 1; }
+    #btn-panel { width: 100%; display: flex; align-items: center; gap: 8px; text-align: left; justify-content: space-between; }
+    .lf-peek { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lf-panel[data-collapsed="true"] .lf-panel-body { display: none; }
+    .lf-qnum { display: none; }
+    .lf-text p[data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
+    .lf-text p.lf-evidence::before, .lf-text section.lf-evidence [data-par]::before { color: #3A3220; }
+    .lf-haefte [data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
+  }
+  @media (min-width: 640px) and (max-width: 1023px) and (orientation: portrait) { :root { --lf-sheet: 46dvh; } }
+  @media (max-width: 480px) { .lf-brand { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); } .lf-top { padding: 6px 8px; gap: 4px; } .lf-btn { padding: 0 8px; } }
+  @media (prefers-reduced-motion: reduce) { .lf-flash { animation: none; } * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+<link rel="stylesheet" href="../shared/sjovt.css" />
+<script src="../shared/sjovt.js"></script>
+<link rel="stylesheet" href="../shared/themes/laeseforstaaelse.css" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "name": "Læseforståelse",
+  "description": "Læseforståelse dansk: øv at læse tekster og svare på spørgsmål i formatet fra Prøve i Dansk 3. Gratis øvelser, B1–B2. Ikke officielt prøvemateriale.",
+  "url": "https://sjovtdansk.dk/laeseforstaaelse/index.html",
+  "author": {
+    "@type": "Organization",
+    "name": "Sjovt Dansk"
+  },
+  "teaches": [
+    "Læseforståelse",
+    "Læsning af danske tekster",
+    "Bindeord i sammenhæng"
+  ],
+  "educationalLevel": [
+    "B1",
+    "B2"
+  ],
+  "learningResourceType": [
+    "Spil",
+    "Øvelse"
+  ],
+  "inLanguage": "da",
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hjem",
+      "item": "https://sjovtdansk.dk/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Læseforståelse",
+      "item": "https://sjovtdansk.dk/laeseforstaaelse/index.html"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<nav class="sd-bar" aria-label="Sjovt Dansk" data-sd-static><a class="sd-bar-home" href="../index.html">← MENU</a></nav>
+<div class="lf-app">
+  <header class="lf-top">
+    <p class="lf-brand">Læseforståelse</p>
+    <button type="button" class="lf-btn" id="btn-menu" hidden>Menu</button>
+    <button type="button" class="lf-btn" id="btn-fs-down" aria-label="Mindre tekst">A−</button>
+    <button type="button" class="lf-btn" id="btn-fs-up" aria-label="Større tekst">A+</button>
+    <button type="button" class="lf-btn" id="btn-paper" aria-label="Skift papir">Papir</button>
+    <button type="button" class="lf-btn" id="btn-sound" aria-label="Lyd til eller fra">Lyd</button>
+  </header>
+
+  <section class="lf-start" id="screen-start" aria-label="Start">
+    <h1>Læseforståelse</h1>
+    <span class="lf-start-sprite sd-bob" data-sd-sprite="lup" data-scale="6" aria-hidden="true"></span>
+    <button type="button" class="lf-btn lf-btn--primary" id="btn-play">Spil</button>
+    <div class="lf-ctl" id="ctl-mode" role="radiogroup" aria-label="Øvelse"></div>
+    <div class="lf-ctl" id="ctl-level" role="group" aria-label="Niveau"><span class="lf-ctl-label">Niveau</span></div>
+    <p class="lf-msg" id="start-msg" role="status"></p>
+    <p class="lf-disclaimer">Øvelsesopgaver i samme format som Prøve i Dansk 3. Ikke officielt prøvemateriale.</p>
+    <button type="button" class="lf-btn" id="btn-reset">Nulstil fremgang</button>
+    <nav class="sd-next" aria-label="Øv videre"><p class="sd-next-h">Øv videre</p><ul><li><a href="../konjunktioner/konjunktioner.html">Konjunktion Crush – øv bindeord →</a></li><li><a href="../adverbs.html">Adverbier og bindeord – øv adverbier →</a></li></ul></nav>
+  </section>
+
+  <main class="lf-main" id="screen-play" hidden>
+    <section class="lf-reader" id="lf-reader" role="region" tabindex="0" aria-label="Tekst">
+      <article class="lf-text" id="lf-text"></article>
+    </section>
+    <aside class="lf-panel" id="lf-panel" aria-label="Spørgsmål" data-collapsed="false">
+      <div class="lf-panel-head">
+        <button type="button" class="lf-btn" id="btn-panel" aria-expanded="true" aria-controls="lf-panel-body">
+          <span class="lf-peek" id="lf-peek"></span><span aria-hidden="true">▾</span>
+        </button>
+      </div>
+      <div class="lf-panel-body" id="lf-panel-body">
+        <p class="lf-qnum" id="lf-qnum"></p>
+        <div id="lf-q"></div>
+        <div id="lf-fb" aria-live="polite"></div>
+        <div class="lf-nav" id="lf-nav">
+          <button type="button" class="lf-btn" id="btn-prev" aria-label="Forrige spørgsmål (K)"><span class="sd-arr" aria-hidden="true"></span> Forrige</button>
+          <button type="button" class="lf-btn" id="btn-next" aria-label="Næste spørgsmål (J)">Næste <span class="sd-arr sd-arr--r" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script src="../shared/dansk-speech.js"></script>
+<script src="../shared/dansk-core.js"></script>
+<script src="data-skim.js"></script>
+<script src="data-mc.js"></script>
+<script src="data-insert.js"></script>
+<script src="data-cloze.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var DC = window.DanskCore;
+  var D = window.LAESE_DATA;
+  var NS = 'laeseforstaaelse';
+  var store = DC.store.namespace(NS);
+  var srs = DC.srs.load(NS);
+  var FS = [17, 19, 22];
+  var PAPERS = ['light', 'sepia', 'dark'];
+  var PAPER_LABEL = { light: 'Lys', sepia: 'Sepia', dark: 'Mørk' };
+  var LEVELS = ['B1', 'B2'];
+  var FOOTER = 'Øvelsestekst skrevet til sprogtræning. Tal og fakta er dokumenterede — se kilder.';
+  var FOOTER_SKIM = 'Tider, priser og regler i opslagene er øvelsesværdier, ikke rigtige oplysninger.';
+  var NUDGE = 'Gå videre, og vend tilbage til spørgsmålet til sidst.';
+
+  function $(id) { return document.getElementById(id); }
+  /* Sjovt feedback hooks: purely visual, guarded so the game works without window.Sjovt */
+  function fx(name, node) { try { if (window.Sjovt && Sjovt.fx && node) Sjovt.fx[name](node); } catch (e) { /* decorative */ } }
+  try { if (window.Sjovt && Sjovt.watchScreens) Sjovt.watchScreens('#screen-start'); } catch (e) { /* decorative */ }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(label, cls, onClick, aria) {
+    var b = el('button', cls || 'lf-btn', label); b.type = 'button';
+    if (aria) b.setAttribute('aria-label', aria);
+    b.addEventListener('click', onClick); return b;
+  }
+
+  var reader = $('lf-reader'), textEl = $('lf-text'), panel = $('lf-panel');
+  var qHost = $('lf-q'), fbHost = $('lf-fb'), qnumEl = $('lf-qnum'), peekEl = $('lf-peek');
+
+  var state = { mode: 'mc', levels: LEVELS.slice(), text: null, qi: 0, answered: {}, token: 0,
+                view: 'start', summary: false };
+  var reading = { fs: 19, paper: 'light' };
+  var anchor = { par: 1, offset: 0 };
+  var lock = false, lockTimer = 0, saveTimer = 0;
+  var drafts = {}, skimFocus = false;   // skim: typed-but-unsent answers per question id; focus the input once the learner is typing
+
+  function availableModes() { return D.modes.filter(function (m) { return m.available; }); }
+
+  /* ---------- reader prefs (text size, paper) ---------- */
+  (function loadReading() {
+    var r = store.get('reader') || {};
+    reading.fs = FS.indexOf(r.fs) !== -1 ? r.fs : 19;
+    reading.paper = PAPERS.indexOf(r.paper) !== -1 ? r.paper : (DC.ui.darkMode.init() === 'dark' ? 'dark' : 'light');
+  })();
+  function applyReading() {
+    document.documentElement.setAttribute('data-paper', reading.paper);
+    document.documentElement.style.setProperty('--lf-fs', reading.fs + 'px');
+    $('btn-paper').textContent = 'Papir: ' + PAPER_LABEL[reading.paper];
+    $('btn-paper').setAttribute('aria-label', 'Papir: ' + PAPER_LABEL[reading.paper] + '. Skift papir');
+    $('btn-fs-down').setAttribute('aria-disabled', reading.fs === FS[0] ? 'true' : 'false');
+    $('btn-fs-up').setAttribute('aria-disabled', reading.fs === FS[FS.length - 1] ? 'true' : 'false');
+    $('btn-sound').textContent = DC.ui.sound.isEnabled() ? 'Lyd til' : 'Lyd fra';
+  }
+  function saveReading() { store.set('reader', { fs: reading.fs, paper: reading.paper }); }
+  function stepFs(d) {
+    var i = FS.indexOf(reading.fs) + d;
+    if (i < 0 || i >= FS.length) return;
+    reading.fs = FS[i]; applyReading(); saveReading();
+    if (state.view === 'play') applyAnchor(anchor);
+  }
+  $('btn-fs-down').addEventListener('click', function () { stepFs(-1); });
+  $('btn-fs-up').addEventListener('click', function () { stepFs(1); });
+  $('btn-paper').addEventListener('click', function () {
+    reading.paper = PAPERS[(PAPERS.indexOf(reading.paper) + 1) % PAPERS.length]; applyReading(); saveReading();
+  });
+  $('btn-sound').addEventListener('click', function () { DC.ui.sound.toggle(); applyReading(); });
+
+  /* ---------- sound cues ---------- */
+  var SOUND = {
+    correct: function () { DC.ui.sound.sequence([
+      { type: 'square', frequency: 220, duration: 0.06, gain: 0.05 },
+      { type: 'triangle', frequency: 330, duration: 0.07, gain: 0.06, delay: 0.07 },
+      { type: 'sine', frequency: 494, duration: 0.10, gain: 0.05, delay: 0.14 }]); },
+    wrong: function () { DC.ui.sound.sequence([{ type: 'triangle', frequency: 140, duration: 0.15, gain: 0.04 }]); },
+    done: function () { DC.ui.sound.sequence([
+      { type: 'triangle', frequency: 392, duration: 0.1, gain: 0.05 },
+      { type: 'triangle', frequency: 523, duration: 0.16, gain: 0.05, delay: 0.1 }]); }
+  };
+
+  /* ---------- scroll anchor: top visible paragraph, saved per text ---------- */
+  function currentAnchor() {
+    var pr = reader.getBoundingClientRect();
+    var ps = textEl.querySelectorAll('[data-par]');   // paragraphs (mc) or notice headings (skim)
+    for (var i = 0; i < ps.length; i++) {
+      var r = ps[i].getBoundingClientRect();
+      if (r.bottom > pr.top + 4) return { par: +ps[i].getAttribute('data-par'), offset: Math.round(pr.top - r.top) };
+    }
+    return { par: 1, offset: 0 };
+  }
+  function applyAnchor(a) {
+    var p = textEl.querySelector('[data-par="' + a.par + '"]');
+    if (!p) return;
+    reader.scrollTop += p.getBoundingClientRect().top - reader.getBoundingClientRect().top + a.offset;
+  }
+  reader.addEventListener('scroll', function () {
+    if (lock || !state.text) return;
+    anchor = currentAnchor();
+    window.clearTimeout(saveTimer);
+    var id = state.text.id, a = anchor;
+    saveTimer = window.setTimeout(function () { store.set('scroll:' + id, a); }, 250);
+  });
+  function reanchor() {
+    if (state.view !== 'play') return;
+    lock = true; applyAnchor(anchor);
+    window.clearTimeout(lockTimer);
+    lockTimer = window.setTimeout(function () { applyAnchor(anchor); lock = false; }, 200);
+  }
+  window.addEventListener('resize', reanchor);
+  window.addEventListener('orientationchange', reanchor);
+
+  /* ---------- reading pane ---------- */
+  function renderText(text) {
+    textEl.innerHTML = '';
+    textEl.classList.toggle('lf-haefte', text.mode === 'skim');
+    reader.classList.toggle('lf-reader--haefte', text.mode === 'skim');
+    if (text.mode === 'skim') renderHaefte(text);
+    else {
+      textEl.appendChild(el('p', 'lf-kicker', text.kicker));
+      textEl.appendChild(el('h2', null, text.title));
+      text.paragraphs.forEach(function (para, i) {
+        var p = el('p', null, text.mode === 'cloze' ? null : para); p.setAttribute('data-par', String(i + 1)); textEl.appendChild(p);
+        if (text.mode === 'cloze') czFill(p, para, text);
+        if (text.mode === 'insert') insGaps(text).forEach(function (g) {
+          if (g.after !== i) return;
+          var b = el('button', 'lf-gap'); b.type = 'button'; b.setAttribute('data-gap', g.id);
+          b.addEventListener('click', function () { insOnSlot(g.id); });
+          textEl.appendChild(b);
+        });
+      });
+    }
+    var foot = el('footer', 'lf-foot');
+    foot.appendChild(el('p', null, FOOTER));
+    if (text.mode === 'skim') foot.appendChild(el('p', null, FOOTER_SKIM));
+    var det = el('details'); det.appendChild(el('summary', null, 'Kilder'));
+    var ul = el('ul');
+    (text.sources || []).forEach(function (u) {
+      var li = el('li'), a = el('a', null, u); a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      li.appendChild(a); ul.appendChild(li);
+    });
+    det.appendChild(ul); foot.appendChild(det); textEl.appendChild(foot);
+  }
+  /* Hæfte: title, sticky jump-list, one <section> per notice (heading carries the §N margin number). */
+  function renderHaefte(text) {
+    textEl.appendChild(el('p', 'lf-kicker', 'Hæfte · ' + text.theme));
+    textEl.appendChild(el('h1', null, text.title));
+    var nav = el('nav', 'lf-jump'); nav.setAttribute('aria-label', 'Opslag'); nav.id = 'lf-jump';
+    textEl.appendChild(nav);
+    text.notices.forEach(function (n, i) {
+      var sec = el('section', 'lf-notice'); sec.setAttribute('data-notice', n.id);
+      var h = el('h2', null, n.heading); h.setAttribute('data-par', String(i + 1)); sec.appendChild(h);
+      String(n.body).split(/\n\s*\n/).forEach(function (para) { sec.appendChild(el('p', null, para)); });
+      textEl.appendChild(sec);
+      var b = btn(n.heading, 'lf-btn', function () { jumpTo(n.id); });
+      b.setAttribute('data-jump', n.id); b.setAttribute('aria-label', 'Gå til opslag ' + (i + 1) + ': ' + n.heading);
+      nav.appendChild(b);
+    });
+    updateCurrent();
+  }
+  function noticeEl(id) { return textEl.querySelector('[data-notice="' + id + '"]'); }
+  // Scroll a notice to just below the sticky jump-list. Instant under reduced motion.
+  function scrollToNotice(id) {
+    var s = noticeEl(id), nav = $('lf-jump');
+    if (!s) return;
+    var top = s.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop - (nav ? nav.offsetHeight : 0) - 10;
+    reader.scrollTo({ top: Math.max(0, top), behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+  function setCurrent(id) {
+    var bs = textEl.querySelectorAll('[data-jump]'), nav = $('lf-jump');
+    for (var i = 0; i < bs.length; i++) {
+      var on = bs[i].getAttribute('data-jump') === id;
+      if (on) bs[i].setAttribute('aria-current', 'true'); else bs[i].removeAttribute('aria-current');
+      if (on && nav) {                           // keep the current chip visible inside the row (never scrolls the page)
+        var cr = bs[i].getBoundingClientRect(), nr = nav.getBoundingClientRect();
+        if (cr.left < nr.left + 4) nav.scrollLeft -= nr.left + 12 - cr.left;
+        else if (cr.right > nr.right - 4) nav.scrollLeft += cr.right - nr.right + 12;
+      }
+    }
+  }
+  function jumpTo(id) { setCurrent(id); scrollToNotice(id); }
+  // Current notice = the last one whose top has passed the bottom edge of the jump-list.
+  function updateCurrent() {
+    var nav = $('lf-jump'); if (!nav || !state.text || state.text.mode !== 'skim') return;
+    var edge = nav.getBoundingClientRect().bottom + 12, secs = textEl.querySelectorAll('[data-notice]'), cur = null;
+    for (var i = 0; i < secs.length; i++) if (secs[i].getBoundingClientRect().top <= edge) cur = secs[i];
+    if (!cur && secs.length) cur = secs[0];
+    if (cur) setCurrent(cur.getAttribute('data-notice'));
+  }
+  reader.addEventListener('scroll', updateCurrent);
+  function highlightNotice(id) {
+    clearHighlight();
+    var s = noticeEl(id); if (!s) return;
+    s.classList.add('lf-evidence'); scrollToNotice(id);
+  }
+  function clearHighlight() {
+    var o = textEl.querySelectorAll('.lf-evidence');
+    for (var i = 0; i < o.length; i++) o[i].classList.remove('lf-evidence');
+  }
+  // paragraphIndex is 0-based (the data's `evidence`); data-par in the DOM is 1-based.
+  function highlight(paragraphIndex) {
+    clearHighlight();
+    var p = textEl.querySelector('[data-par="' + (paragraphIndex + 1) + '"]');
+    if (!p) return;
+    p.classList.add('lf-evidence');
+    var top = p.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - (reader.clientHeight - p.offsetHeight) / 2),
+                      behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+
+  /* ---------- round bookkeeping ---------- */
+  function recordAnswer(itemId, correct, patternKey, chosen) {
+    if (state.answered[itemId]) return;
+    state.answered[itemId] = { correct: correct, chosen: chosen };
+    DC.srs.record(srs, state.mode + ':' + itemId, correct);   // srs namespace + key = laeseforstaaelse:mc:<question-id>
+    if (patternKey) DC.srs.pattern(srs, patternKey, correct);
+    (correct ? SOUND.correct : SOUND.wrong)();
+  }
+  function allAnswered() {
+    return D.itemsOf(state.text).every(function (q) { return state.answered[q.id]; });
+  }
+  function advance(delay, tok) {
+    function go() {
+      if (tok !== undefined && tok !== state.token) return;
+      var items = D.itemsOf(state.text), n = items.length;
+      for (var k = 1; k <= n; k++) {
+        var i = (state.qi + k) % n;
+        if (!state.answered[items[i].id]) { state.qi = i; render(); return; }
+      }
+      finishRound();
+    }
+    if (delay > 0) window.setTimeout(go, delay); else go();
+  }
+  function step(d) {
+    if (state.view !== 'play') return;
+    var n = D.itemsOf(state.text).length;
+    if (state.summary) { if (d < 0) { state.summary = false; render(); } return; }
+    if (state.mode === 'insert') { if (!insOpen().length) { if (d > 0) finishRound(); } else insMove(d); return; }
+    var i = state.qi + d;
+    if (i < 0) return;
+    if (i >= n) { if (allAnswered()) finishRound(); return; }
+    state.qi = i; render();
+  }
+  function setHead(num) { qnumEl.textContent = num; }
+  function finishRound() {
+    state.token++; state.summary = true; clearHighlight(); clearNudge();
+    var items = D.itemsOf(state.text), right = 0, weak = [];
+    items.forEach(function (q, qi) {
+      if (state.answered[q.id] && state.answered[q.id].correct) right++;
+      else weak.push({ label: state.mode === 'cloze' ? 'Hul ' + (qi + 1) + ': ' + q.note : (q.q || q.note) });
+    });
+    qHost.innerHTML = ''; fbHost.innerHTML = '';
+    setHead('Resultat'); peekEl.textContent = 'Resultat';
+    DC.quiz.summary.render({ score: right, accuracy: items.length ? right / items.length * 100 : 0, weakItems: weak.slice(0, 3) },
+      qHost, function () { replay(); }, (state.mode === 'skim' || state.mode === 'insert' || state.mode === 'cloze') ? retryErrors : undefined);
+    if (state.mode === 'insert') {
+      store.remove('insert:' + state.text.id);
+      var un = el('p', 'lf-hint', 'To afsnit blev ikke brugt.'); un.id = 'lf-unused'; qHost.appendChild(un);
+    }
+    if (state.mode === 'cloze') {
+      store.remove('cloze:' + state.text.id); czSyncGaps();
+      var wl = el('p', 'lf-weakest', czWeakest(items)); wl.id = 'lf-weakest'; qHost.appendChild(wl);
+    }
+    var sum = qHost.querySelector('.dc-summary');
+    if (sum) {
+      var spr = el('span', 'lf-result-sprite'); spr.setAttribute('aria-hidden', 'true');
+      try { if (window.Sjovt) spr.innerHTML = '<span class="sd-sprite sd-hop">' + Sjovt.spriteSVG(right === items.length ? 'pokal' : 'stjerne', 6) + '</span>'; } catch (e) { /* decorative */ }
+      sum.insertBefore(spr, sum.firstChild);
+      fx('bump', sum.querySelector('.dc-summary-score'));
+      if (items.length && right / items.length >= 0.6) fx('correct', spr);   // local burst by the sprite, not confetti over the text
+    }
+    SOUND.done(); DC.ui.announce('Runden er slut. ' + right + ' af ' + items.length + ' rigtige.');
+    var again = qHost.querySelector('.dc-summary-actions button'); if (again) again.focus();
+  }
+  function replay() {
+    state.answered = {}; drafts = {}; state.qi = 0; state.summary = false;
+    if (state.mode === 'insert') { store.remove('insert:' + state.text.id); insInit(state.text, null); state.token++; }
+    if (state.mode === 'cloze') { store.remove('cloze:' + state.text.id); czJustWrong = null; }
+    render();
+    if (state.mode === 'insert') insCenter(ins.cur);
+  }
+  // Gentag fejl (skim): only the wrongly answered questions are asked again.
+  function retryErrors() {
+    if (state.mode === 'insert') { insRetryErrors(); return; }
+    var items = D.itemsOf(state.text), first = -1;
+    items.forEach(function (q, i) {
+      if (state.answered[q.id] && !state.answered[q.id].correct) { delete state.answered[q.id]; delete drafts[q.id]; if (first < 0) first = i; }
+    });
+    if (first < 0) return;
+    state.qi = first; state.summary = false; skimFocus = true; czJustWrong = null; render();
+    if (state.mode === 'cloze') czSave();
+  }
+  var nudgeTimer = 0;
+  function clearNudge() { window.clearTimeout(nudgeTimer); nudgeTimer = 0; }
+
+  /* ---------- mode renderers: MODE_RENDERERS[mode](text, host, api) ---------- */
+  var MODE_RENDERERS = {};
+  var api = { host: qHost, fb: fbHost, onAnswer: recordAnswer, highlight: highlight, highlightNotice: highlightNotice,
+              clearHighlight: clearHighlight, next: advance, finish: finishRound };
+
+  function seeBtn(q) {
+    return btn('Se afsnit ' + (q.evidence + 1), 'lf-btn', function () { highlight(q.evidence); });
+  }
+  function wrongBox(q, withContinue, a) {
+    var box = el('div', 'lf-fb-box');
+    var ans = el('p', null, 'Rigtigt svar: '); ans.appendChild(el('strong', null, q.options[q.correct])); box.appendChild(ans);
+    box.appendChild(el('p', null, q.note));
+    var acts = el('div', 'lf-fb-actions'); acts.appendChild(seeBtn(q));
+    var cont = null;
+    if (withContinue) {
+      var last = !D.itemsOf(state.text).some(function (x) { return !state.answered[x.id]; });
+      cont = btn(last ? 'Se resultat' : 'Næste', 'lf-btn lf-btn--primary', function () { a.next(0, state.token); });
+      cont.id = 'btn-continue'; acts.appendChild(cont);
+    }
+    box.appendChild(acts); a.fb.appendChild(box);
+    return cont;
+  }
+
+  MODE_RENDERERS.mc = function (text, host, a) {
+    var q = text.questions[state.qi], n = text.questions.length, tok = ++state.token;
+    var rec = state.answered[q.id];
+    host.innerHTML = ''; a.fb.innerHTML = ''; a.clearHighlight();
+    setHead('Spørgsmål ' + (state.qi + 1) + ' af ' + n);
+    peekEl.textContent = (state.qi + 1) + '/' + n + ' · ' + q.q;
+    if (rec) {                                   // already answered: static review, no second attempt
+      var pr = el('div', 'dc-quiz-prompt'); pr.appendChild(el('span', null, q.q)); DC.ui.ttsButton(q.q, pr);
+      host.appendChild(pr);
+      var list = el('div', 'dc-quiz-options'); list.setAttribute('role', 'group');
+      q.options.forEach(function (o, i) {
+        var b = el('div', 'dc-quiz-option', (i + 1) + '. ' + o);
+        if (i === q.correct) b.classList.add('dc-correct'); else if (i === rec.chosen) b.classList.add('dc-wrong');
+        list.appendChild(b);
+      });
+      host.appendChild(list);
+      if (!rec.correct) wrongBox(q, false, a);
+      return;
+    }
+    DC.quiz.mc.render({ prompt: q.q, options: q.options, correct: q.options[q.correct] }, host, function (correct, option) {
+      if (tok !== state.token) return;           // stale handler from a question we left
+      if (correct) a.next(800, tok);            // schedule the advance first: sound set-up must not delay it
+      a.onAnswer(q.id, correct, null, q.options.indexOf(option));
+      if (correct) {
+        host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
+        fx('correct', host.querySelector('.dc-correct') || host.querySelector('.dc-quiz-option'));
+        DC.ui.announce('Rigtigt.');
+      } else {
+        DC.ui.announce('Forkert. Rigtigt svar: ' + q.options[q.correct]);
+        a.highlight(q.evidence);
+        panelCollapse(false);
+        var c = wrongBox(q, true, a);
+        if (c) c.focus({ preventScroll: true });
+      }
+    });
+  };
+
+  /* Skim: one short free-text answer per question, checked with DanskCore.diff.check against `accepted`. */
+  function skimWrongBox(q, withContinue, a) {
+    var box = el('div', 'lf-fb-box'), notice = null;
+    state.text.notices.forEach(function (n) { if (n.id === q.noticeId) notice = n; });
+    var ans = el('p', null, 'Rigtigt svar: '); ans.appendChild(el('strong', null, q.accepted[0]));
+    DC.ui.ttsButton(q.accepted[0], ans, 'Lyt til det rigtige svar'); box.appendChild(ans);
+    box.appendChild(el('p', null, q.note));
+    var acts = el('div', 'lf-fb-actions');
+    if (notice) acts.appendChild(btn('Se opslag ' + notice.heading, 'lf-btn', function () { highlightNotice(q.noticeId); }));
+    var cont = null;
+    if (withContinue) {
+      var last = !D.itemsOf(state.text).some(function (x) { return !state.answered[x.id]; });
+      cont = btn(last ? 'Se resultat' : 'Næste', 'lf-btn lf-btn--primary', function () { a.next(0, state.token); });
+      cont.id = 'btn-continue'; acts.appendChild(cont);
+    }
+    box.appendChild(acts); a.fb.appendChild(box);
+    return cont;
+  }
+
+  MODE_RENDERERS.skim = function (text, host, a) {
+    var q = text.questions[state.qi], n = text.questions.length, tok = ++state.token;
+    var rec = state.answered[q.id];
+    clearNudge(); host.innerHTML = ''; a.fb.innerHTML = ''; a.clearHighlight();
+    setHead('Spørgsmål ' + (state.qi + 1) + ' af ' + n);
+    peekEl.textContent = (state.qi + 1) + '/' + n + ' · ' + q.q;
+
+    var pr = el('div', 'dc-quiz-prompt'); pr.appendChild(el('span', null, q.q)); DC.ui.ttsButton(q.q, pr);
+    host.appendChild(pr);
+
+    var row = el('div', 'lf-ans');
+    var lab = el('label', null, 'Dit svar'); lab.setAttribute('for', 'lf-input'); row.appendChild(lab);
+    var input = el('input', 'lf-input'); input.type = 'text'; input.id = 'lf-input';
+    input.setAttribute('autocomplete', 'off'); input.setAttribute('autocapitalize', 'off'); input.spellcheck = false;
+    var submit = btn('Svar', 'lf-btn lf-btn--primary', function () { answer(); }); submit.id = 'btn-submit';
+    row.appendChild(input); row.appendChild(submit); host.appendChild(row);
+
+    if (rec) {                                    // already answered: static review, no second attempt
+      input.value = rec.chosen; input.disabled = true; submit.disabled = true;
+      input.setAttribute('data-state', rec.correct ? 'ok' : 'no');
+      if (!rec.correct) skimWrongBox(q, false, a);
+      return;
+    }
+    input.value = drafts[q.id] || '';
+    input.addEventListener('input', function () { drafts[q.id] = input.value; });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); answer(); } });
+    if (skimFocus) input.focus({ preventScroll: true });
+
+    // 30 s nudge: a hint to move on. It never blocks and never advances.
+    nudgeTimer = window.setTimeout(function () {
+      if (tok !== state.token || state.answered[q.id]) return;
+      var p = el('p', 'lf-nudge', NUDGE); p.id = 'lf-nudge'; host.appendChild(p);
+      DC.ui.announce(NUDGE);
+    }, 30000);
+
+    function answer() {
+      if (tok !== state.token || state.answered[q.id]) return;
+      var v = input.value;
+      if (!v.trim()) return;
+      clearNudge(); skimFocus = true;
+      var res = DC.diff.check(v, q.accepted);
+      input.disabled = true; submit.disabled = true;
+      input.setAttribute('data-state', res.correct ? 'ok' : 'no');
+      if (res.correct) a.next(800, tok);          // schedule the advance first: sound set-up must not delay it
+      a.onAnswer(q.id, res.correct, null, v);
+      var old = host.querySelector('.lf-nudge'); if (old) old.remove();
+      if (res.correct) {
+        host.classList.remove('lf-flash'); void host.offsetWidth; host.classList.add('lf-flash');
+        fx('correct', submit);
+        DC.ui.announce('Rigtigt.');
+      } else {
+        DC.ui.announce('Forkert. Rigtigt svar: ' + q.accepted[0]);
+        a.highlightNotice(q.noticeId);
+        panelCollapse(false);
+        var c = skimWrongBox(q, true, a);
+        if (c) c.focus({ preventScroll: true });
+      }
+    }
+  };
+
+  /* Insert: five slots stay in the text, the bank of seven blocks sits in the question pane.
+     Select a block then a slot (or a slot then a block). The first attempt per gap is what counts. */
+  var ins = null;   // { placed:{gapId:blockId}, sel, armed, cur, pending:{gapId,blockId}|null }
+  function insGaps(text) { return text.gaps.slice().sort(function (a, b) { return a.after - b.after; }); }
+  function insNo(gapId) { var g = insGaps(state.text); for (var i = 0; i < g.length; i++) if (g[i].id === gapId) return i + 1; return 0; }
+  function insBlock(id) { var b = state.text.blocks; for (var i = 0; i < b.length; i++) if (b[i].id === id) return b[i]; return null; }
+  function insLoad(text) {
+    var s = store.get('insert:' + text.id);
+    if (!s || typeof s.placed !== 'object' || !s.placed) return null;
+    var placed = {}, answered = {};
+    text.gaps.forEach(function (g) {
+      var b = s.placed[g.id];
+      if (b && text.solution[g.id] === b) placed[g.id] = b;
+      var a = s.answered && s.answered[g.id];
+      if (a && typeof a.correct === 'boolean') answered[g.id] = { correct: a.correct, chosen: a.chosen };
+    });
+    return { placed: placed, answered: answered };
+  }
+  function insSave() {
+    if (!state.text || state.mode !== 'insert') return;
+    store.set('insert:' + state.text.id, { placed: ins.placed, answered: state.answered });
+  }
+  function insOpen() { return insGaps(state.text).filter(function (g) { return !ins.placed[g.id]; }); }
+  function insInit(text, saved) {
+    ins = { placed: saved ? saved.placed : {}, sel: null, armed: null, cur: null, pending: null };
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+  }
+  function insBank() {
+    var used = {}, k;
+    for (k in ins.placed) used[ins.placed[k]] = true;
+    if (ins.pending) used[ins.pending.blockId] = true;
+    return state.text.blocks.filter(function (b) { return !used[b.id]; });
+  }
+  // Scroll a slot to the vertical centre of the reading pane (instant under reduced motion).
+  function insCenter(gapId) {
+    var b = gapId && textEl.querySelector('[data-gap="' + gapId + '"]'); if (!b) return;
+    var top = b.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - Math.max(0, (reader.clientHeight - b.offsetHeight) / 2)),
+                      behavior: DC.ui.motion.isReduced() ? 'auto' : 'smooth' });
+  }
+  function insSyncSlots() {
+    insGaps(state.text).forEach(function (g, i) {
+      var b = textEl.querySelector('[data-gap="' + g.id + '"]'); if (!b) return;
+      var bid = ins.placed[g.id] || (ins.pending && ins.pending.gapId === g.id ? ins.pending.blockId : null);
+      var st = ins.placed[g.id] ? 'ok' : (bid ? 'no' : 'empty');
+      var no = i + 1;
+      b.innerHTML = '';
+      b.setAttribute('data-state', st);
+      var tag = el('span', 'lf-gap-tag'); tag.appendChild(el('strong', null, 'Hul ' + no));
+      tag.appendChild(el('span', 'lf-gap-st', st === 'ok' ? '✓ på plads' : st === 'no' ? '✗ passer ikke her' : 'tomt'));
+      b.appendChild(tag);
+      b.removeAttribute('aria-describedby');
+      if (bid) {
+        var body = el('span', 'lf-gap-body', insBlock(bid).text); body.id = 'lf-gap-body-' + g.id; b.appendChild(body);
+        b.setAttribute('aria-describedby', body.id);
+      }
+      b.setAttribute('aria-label', 'Hul ' + no + (st === 'ok' ? ', udfyldt' : st === 'no' ? ', udfyldt, passer ikke' : ', tomt'));
+      b.setAttribute('aria-disabled', (st !== 'empty' || ins.pending) ? 'true' : 'false');
+      if (g.id === ins.cur && st !== 'ok') b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  function insRender() {
+    var gaps = insGaps(state.text), total = gaps.length;
+    var done = gaps.filter(function (g) { return ins.placed[g.id]; }).length, full = done === total;
+    var ae = document.activeElement, key = ae && ae.getAttribute ? ae.getAttribute('data-block') : null;
+    insSyncSlots();
+    qHost.innerHTML = ''; fbHost.innerHTML = '';
+    setHead('Sæt afsnittet ind · ' + done + ' af ' + total + ' på plads');
+    peekEl.textContent = 'Sæt afsnittet ind · ' + done + '/' + total;
+    if (ins.pending) {
+      var p = ins.pending, box = el('div', 'lf-fb-box'), gap = null;
+      gaps.forEach(function (g) { if (g.id === p.gapId) gap = g; });
+      var h = el('p'); h.appendChild(el('strong', null, 'Afsnittet passer ikke i Hul ' + insNo(p.gapId) + '.')); box.appendChild(h);
+      var np = el('p', null, gap.note + ' '); DC.ui.ttsButton(gap.note, np, 'Lyt til forklaringen'); box.appendChild(np);
+      var acts = el('div', 'lf-fb-actions');
+      var again = btn('Prøv igen', 'lf-btn lf-btn--primary', insRetry); again.id = 'btn-retry'; acts.appendChild(again);
+      box.appendChild(acts); qHost.appendChild(box);
+    } else if (full) {
+      qHost.appendChild(el('p', 'lf-hint', 'To afsnit blev ikke brugt.'));
+    } else {
+      qHost.appendChild(el('p', 'lf-hint', 'Vælg et afsnit, og sæt det ind i et hul. To af afsnittene skal ikke bruges.'));
+    }
+    var bank = insBank();
+    var list = el('div', 'lf-bank'); list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'Afsnit at sætte ind');
+    bank.forEach(function (b, i) {
+      var bb = el('button', 'lf-block'); bb.type = 'button'; bb.setAttribute('data-block', b.id);
+      bb.appendChild(el('span', 'lf-block-n', (i + 1) + '.')); bb.appendChild(document.createTextNode(' ' + b.text));
+      var on = ins.sel === b.id;
+      bb.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on) bb.appendChild(el('span', 'lf-block-sel', '✓ Valgt'));
+      if (ins.pending || full) bb.disabled = true;
+      bb.addEventListener('click', function () { insOnBlock(b.id); });
+      list.appendChild(bb);
+    });
+    qHost.appendChild(list);
+    var selIdx = bank.map(function (b) { return b.id; }).indexOf(ins.sel);
+    var msg = ins.sel && selIdx >= 0 ? 'Afsnit ' + (selIdx + 1) + ' er valgt. Vælg et hul i teksten.'
+            : ins.armed ? 'Hul ' + insNo(ins.armed) + ' er valgt. Vælg et afsnit.' : '';
+    if (msg) qHost.appendChild(el('p', 'lf-status', msg));
+    if (key) { var back = qHost.querySelector('[data-block="' + key + '"]'); if (back && !back.disabled) back.focus({ preventScroll: true }); }
+    var op = insOpen().map(function (g) { return g.id; }), oi = op.indexOf(ins.cur);
+    $('btn-prev').setAttribute('aria-label', 'Forrige hul (K)'); $('btn-next').setAttribute('aria-label', 'Næste hul (J)');
+    $('btn-prev').setAttribute('aria-disabled', (oi <= 0 || ins.pending) ? 'true' : 'false');
+    $('btn-next').setAttribute('aria-disabled', (oi < 0 || oi >= op.length - 1 || ins.pending) ? 'true' : 'false');
+  }
+  function insOnSlot(gapId) {
+    if (state.summary || ins.pending || ins.placed[gapId]) return;
+    ins.cur = gapId;
+    if (ins.sel) { insPlace(gapId, ins.sel); return; }
+    ins.armed = gapId; insRender(); insCenter(gapId);
+    DC.ui.announce('Hul ' + insNo(gapId) + ' er valgt. Vælg et afsnit.');
+  }
+  function insOnBlock(blockId) {
+    if (state.summary || ins.pending) return;
+    if (ins.armed) { insPlace(ins.armed, blockId); return; }
+    ins.sel = ins.sel === blockId ? null : blockId;
+    insRender();
+    if (ins.sel) { insCenter(ins.cur); DC.ui.announce('Afsnit valgt. Vælg et hul i teksten.'); }
+  }
+  function insEscape() {
+    if (state.view !== 'play' || state.mode !== 'insert' || !ins || ins.pending || state.summary) return;
+    if (ins.sel || ins.armed) { ins.sel = null; ins.armed = null; insRender(); }
+  }
+  function insMove(d) {
+    if (ins.pending) return;
+    var op = insOpen(), i = -1;
+    op.forEach(function (g, k) { if (g.id === ins.cur) i = k; });
+    var j = i + d;
+    if (j < 0 || j >= op.length) return;
+    ins.cur = op[j].id; insRender(); insCenter(ins.cur);
+  }
+  function insPlace(gapId, blockId) {
+    var ok = state.text.solution[gapId] === blockId, tok = ++state.token, first = !state.answered[gapId];
+    ins.sel = null; ins.armed = null; ins.cur = gapId;
+    if (ok) ins.placed[gapId] = blockId; else ins.pending = { gapId: gapId, blockId: blockId };
+    var done = insOpen().length === 0;
+    if (ok) {
+      window.setTimeout(function () {             // schedule first: sound set-up must not delay it
+        if (tok !== state.token) return;
+        if (done) { finishRound(); return; }
+        if (ins.cur === gapId) { var o = insOpen(); ins.cur = o.length ? o[0].id : null; }
+        insRender(); insCenter(ins.cur);
+      }, 800);
+    }
+    if (first) recordAnswer(gapId, ok, null, blockId); else (ok ? SOUND.correct : SOUND.wrong)();
+    insSave(); insRender(); insCenter(gapId);
+    if (ok) {
+      var f = qHost.querySelector('.lf-block'); if (f) f.focus({ preventScroll: true });
+      var ge = textEl.querySelector('[data-gap="' + gapId + '"]');
+      if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); fx('correct', ge); }
+      DC.ui.announce('Rigtigt. Hul ' + insNo(gapId) + ' er fyldt.');
+    } else {
+      DC.ui.announce('Forkert. ' + insGaps(state.text).filter(function (g) { return g.id === gapId; })[0].note);
+      panelCollapse(false); panel.scrollTop = 0;
+      var r = $('btn-retry'); if (r) r.focus({ preventScroll: true });
+    }
+  }
+  function insRetry() {
+    if (!ins.pending) return;
+    var bid = ins.pending.blockId, gid = ins.pending.gapId;
+    ins.pending = null; ins.cur = gid; state.token++;
+    insRender(); insCenter(gid);
+    var b = qHost.querySelector('[data-block="' + bid + '"]'); if (b) b.focus({ preventScroll: true });
+  }
+  function insRetryErrors() {
+    var missed = false;
+    D.itemsOf(state.text).forEach(function (g) {
+      if (state.answered[g.id] && !state.answered[g.id].correct) { delete state.answered[g.id]; delete ins.placed[g.id]; missed = true; }
+    });
+    if (!missed) return;
+    ins.sel = ins.armed = ins.pending = null;
+    var o = insOpen(); ins.cur = o.length ? o[0].id : null;
+    state.summary = false; state.token++; insSave(); render(); insCenter(ins.cur);
+  }
+  MODE_RENDERERS.insert = function () { insRender(); };
+
+  /* Cloze: markers {{n}} in the paragraphs become inline gap buttons; the four options sit in the question pane.
+     state.qi = index of the active gap. The first answer per gap counts and is never retried. */
+  var czPrev = null, czJustWrong = null;
+  var CZ_LABEL = { kontrast: 'modsætning', konsekvens: 'følge', praecisering: 'præcisering', tilfoejelse: 'tilføjelse', tid: 'tid' };
+  var CZ_ORDER = ['kontrast', 'konsekvens', 'praecisering', 'tilfoejelse', 'tid'];
+  function czGaps() { return state.text.gaps; }
+  function czFill(p, para, text) {
+    para.split(/(\{\{\d+\}\})/).forEach(function (part) {
+      var m = /^\{\{(\d+)\}\}$/.exec(part), g = m && text.gaps[+m[1] - 1];
+      if (!m || !g) { if (part) p.appendChild(document.createTextNode(part)); return; }
+      var b = el('button', 'lf-gap lf-cz'); b.type = 'button'; b.setAttribute('data-gap', g.id);
+      b.addEventListener('click', function () { czGoto(g.id); });
+      p.appendChild(b);
+    });
+  }
+  function czSyncGaps() {
+    czGaps().forEach(function (g, i) {
+      var b = textEl.querySelector('[data-gap="' + g.id + '"]'); if (!b) return;
+      var rec = state.answered[g.id], no = i + 1, cur = state.view === 'play' && !state.summary && i === state.qi;
+      var st = rec ? (rec.correct ? 'ok' : 'no') : 'empty', word = g.options[g.correct];
+      b.innerHTML = ''; b.setAttribute('data-state', st); b.removeAttribute('data-preview');
+      if (rec) {
+        b.appendChild(el('span', 'lf-cz-n', String(no)));
+        var ic = el('span', 'lf-cz-ic', rec.correct ? '✓' : '✗'); ic.setAttribute('aria-hidden', 'true'); b.appendChild(ic);
+        b.appendChild(document.createTextNode(word));
+        b.setAttribute('aria-label', 'Hul ' + no + ': ' + word + (rec.correct ? '' : ', du valgte et andet ord'));
+      } else if (cur && czPrev) {
+        b.appendChild(document.createTextNode(czPrev)); b.setAttribute('data-preview', 'true');
+        b.setAttribute('aria-label', 'Hul ' + no + ', tomt');
+      } else {
+        b.appendChild(document.createTextNode('Hul ' + no)); b.setAttribute('aria-label', 'Hul ' + no + ', tomt');
+      }
+      if (cur) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+  function czCenter(gapId, instant) {
+    var b = gapId && textEl.querySelector('[data-gap="' + gapId + '"]'); if (!b) return;
+    var top = b.getBoundingClientRect().top - reader.getBoundingClientRect().top + reader.scrollTop;
+    reader.scrollTo({ top: Math.max(0, top - Math.max(0, (reader.clientHeight - b.offsetHeight) / 2)),
+                      behavior: (instant || DC.ui.motion.isReduced()) ? 'auto' : 'smooth' });
+  }
+  function czGoto(gapId) {
+    if (state.summary || state.view !== 'play') return;
+    var i = czGaps().map(function (g) { return g.id; }).indexOf(gapId);
+    if (i < 0) return;
+    state.qi = i; czJustWrong = null; panelCollapse(false); render();
+  }
+  // The sentence around gap g: gaps already answered show their word, all others (and g itself until answered) say "hul".
+  function czSentence(g, speech) {
+    var text = state.text, n = czGaps().indexOf(g) + 1, hit = '';
+    text.paragraphs.some(function (para) {
+      return para.split(/(?<=[.!?])\s+(?=[A-ZÆØÅ{\d])/).some(function (s) {
+        if (s.indexOf('{{' + n + '}}') === -1) return false; hit = s; return true;
+      });
+    });
+    return hit.replace(/\{\{(\d+)\}\}/g, function (all, k) {
+      var gg = czGaps()[+k - 1], rec = gg && state.answered[gg.id];
+      if (rec) return gg.options[gg.correct];
+      return (gg === g && !speech) ? '[ ___ ]' : 'hul';
+    });
+  }
+  function czSave() {
+    if (!state.text || state.mode !== 'cloze') return;
+    store.set('cloze:' + state.text.id, { answered: state.answered, qi: state.qi });
+  }
+  function czLoad(text) {
+    var s = store.get('cloze:' + text.id);
+    if (!s || typeof s.answered !== 'object' || !s.answered) return null;
+    var answered = {}, n = 0;
+    text.gaps.forEach(function (g) {
+      var a = s.answered[g.id];
+      if (a && typeof a.correct === 'boolean' && typeof a.chosen === 'number') { answered[g.id] = { correct: a.correct, chosen: a.chosen }; n++; }
+    });
+    return { answered: answered, n: n, qi: (s.qi >= 0 && s.qi < text.gaps.length) ? s.qi : 0 };
+  }
+  function czWide() { try { return window.matchMedia('(min-width: 1024px) and (hover: hover)').matches; } catch (e) { return false; } }
+  function czSetPreview(word) {
+    if (!czWide() || state.summary) return;
+    czPrev = word; czSyncGaps();
+  }
+  function czWeakest(items) {
+    var by = {};
+    items.forEach(function (g) {
+      var r = state.answered[g.id]; if (!r) return;
+      var t = by[g.type] || (by[g.type] = { type: g.type, n: 0, miss: 0 });
+      t.n++; if (!r.correct) t.miss++;
+    });
+    var list = CZ_ORDER.map(function (t) { return by[t]; }).filter(function (t) { return t && t.miss > 0; });
+    if (!list.length) return 'Ingen svage typer i denne runde.';
+    function hist(t) {
+      var p = srs.patterns && srs.patterns['connector:' + t.type], tot = p ? p.correct + p.incorrect : 0;
+      return tot ? p.incorrect / tot : 0;
+    }
+    function cmp(a, b) { return (b.miss - a.miss) || (b.miss / b.n - a.miss / a.n) || (hist(b) - hist(a)); }
+    list.sort(cmp);
+    var top = list.filter(function (t) { return cmp(list[0], t) === 0; });
+    return 'Svageste type: ' + top.map(function (t) { return CZ_LABEL[t.type]; }).join(' og ') +
+      ' (' + top[0].miss + ' af ' + top[0].n + ' forkert).';
+  }
+  function czNote(g, withContinue, a) {
+    var box = el('div', 'lf-fb-box');
+    var ans = el('p', null, 'Rigtigt ord: '); ans.appendChild(el('strong', null, g.options[g.correct])); box.appendChild(ans);
+    var np = el('p', null, g.note + ' '); DC.ui.ttsButton(czSentence(g, true), np, 'Lyt til sætningen'); box.appendChild(np);
+    var cont = null;
+    if (withContinue) {
+      var acts = el('div', 'lf-fb-actions'), last = !czGaps().some(function (x) { return !state.answered[x.id]; });
+      cont = btn(last ? 'Se resultat' : 'Næste', 'lf-btn lf-btn--primary', function () { czJustWrong = null; a.next(0, state.token); });
+      cont.id = 'btn-continue'; acts.appendChild(cont); box.appendChild(acts);
+    }
+    return { box: box, cont: cont };
+  }
+  MODE_RENDERERS.cloze = function (text, host, a) {
+    var g = text.gaps[state.qi], n = text.gaps.length, tok = ++state.token, no = state.qi + 1;
+    var rec = state.answered[g.id];
+    host.innerHTML = ''; a.fb.innerHTML = ''; czPrev = null;
+    setHead('Hul ' + no + ' af ' + n + ' · Hvilket ord passer?');
+    peekEl.textContent = 'Hul ' + no + '/' + n + ' · Hvilket ord passer?';
+    czSyncGaps(); czSave();
+
+    var pr = el('div', 'dc-quiz-prompt'); pr.appendChild(el('span', null, 'Hvilket ord passer i Hul ' + no + '?'));
+    DC.ui.ttsButton(czSentence(g, !rec), pr, 'Lyt til sætningen'); host.appendChild(pr);
+    if (!(rec && !rec.correct)) host.appendChild(el('p', 'lf-sent', czSentence(g, false)));   // a missed gap shows its note instead: keeps "Næste" in view on phones
+    var cont = null;
+    if (rec && !rec.correct) {                    // note first, above the options: "Næste" stays in view on phones
+      var nb = czNote(g, czJustWrong === g.id, a); host.appendChild(nb.box); cont = nb.cont;
+    }
+    var list = el('div', 'lf-opts'); list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'Ord til Hul ' + no);
+    g.options.forEach(function (o, i) {
+      var b = el('button', 'dc-quiz-option', (i + 1) + '. ' + o); b.type = 'button'; b.setAttribute('data-opt', String(i));
+      if (rec) {
+        b.disabled = true;
+        if (i === g.correct) b.classList.add('dc-correct'); else if (i === rec.chosen) b.classList.add('dc-wrong');
+      } else {
+        b.addEventListener('click', function () { choose(i); });
+        b.addEventListener('focus', function () { czSetPreview(o); });
+        b.addEventListener('mouseenter', function () { czSetPreview(o); });
+        b.addEventListener('blur', function () { czSetPreview(null); });
+        b.addEventListener('mouseleave', function () { if (document.activeElement !== b) czSetPreview(null); });
+      }
+      list.appendChild(b);
+    });
+    host.appendChild(list);
+    czCenter(g.id);                               // after the pane has its final height, so the reading pane has too
+    if (cont) cont.focus({ preventScroll: true });
+
+    function choose(i) {
+      if (tok !== state.token || state.answered[g.id]) return;
+      var ok = i === g.correct;
+      czPrev = null;
+      if (ok) a.next(800, tok);                   // schedule the advance first: sound set-up must not delay it
+      a.onAnswer(g.id, ok, 'connector:' + g.type, i);
+      czSave();
+      if (ok) {
+        Array.prototype.forEach.call(list.children, function (b, k) { b.disabled = true; if (k === g.correct) b.classList.add('dc-correct'); });
+        czSyncGaps();
+        var ge = textEl.querySelector('[data-gap="' + g.id + '"]');
+        if (ge) { ge.classList.remove('lf-flash'); void ge.offsetWidth; ge.classList.add('lf-flash'); fx('correct', ge); }
+        DC.ui.announce('Rigtigt.');
+      } else {
+        czJustWrong = g.id;
+        DC.ui.announce('Forkert. Rigtigt ord: ' + g.options[g.correct] + '. ' + g.note);
+        panelCollapse(false); render(); panel.scrollTop = 0;
+      }
+    }
+  };
+
+  function render() {
+    var r = MODE_RENDERERS[state.mode];
+    if (r) r(state.text, qHost, api);
+    if (state.mode === 'insert') return;           // insert sets its own nav state
+    $('btn-prev').setAttribute('aria-label', 'Forrige spørgsmål (K)'); $('btn-next').setAttribute('aria-label', 'Næste spørgsmål (J)');
+    var n = D.itemsOf(state.text).length;
+    $('btn-prev').setAttribute('aria-disabled', (state.qi === 0 && !state.summary) ? 'true' : 'false');
+    $('btn-next').setAttribute('aria-disabled', (state.qi >= n - 1 && !allAnswered()) ? 'true' : 'false');
+  }
+
+  /* ---------- docked panel (narrow screens) ---------- */
+  function panelCollapse(on) {
+    panel.setAttribute('data-collapsed', on ? 'true' : 'false');
+    $('btn-panel').setAttribute('aria-expanded', on ? 'false' : 'true');
+  }
+  $('btn-panel').addEventListener('click', function () { panelCollapse(panel.getAttribute('data-collapsed') !== 'true'); });
+  $('btn-prev').addEventListener('click', function () { step(-1); });
+  $('btn-next').addEventListener('click', function () { step(1); });
+
+  /* ---------- start screen ---------- */
+  function savePrefs() { store.set('prefs', { mode: state.mode, levels: state.levels, last: state.text ? state.text.id : null }); }
+  function buildStart() {
+    var prefs = store.get('prefs') || {};
+    var modes = availableModes();
+    if (prefs.mode && modes.some(function (m) { return m.key === prefs.mode; })) state.mode = prefs.mode;
+    else state.mode = modes.some(function (m) { return m.key === 'mc'; }) ? 'mc' : modes[0].key;   // mc stays the default
+    if (Array.isArray(prefs.levels)) {
+      var lv = prefs.levels.filter(function (l) { return LEVELS.indexOf(l) !== -1; });
+      if (lv.length) state.levels = lv;
+    }
+    var cm = $('ctl-mode'); cm.innerHTML = '';
+    modes.forEach(function (m) {
+      var b = btn(m.label, 'lf-btn', function () { state.mode = m.key; savePrefs(); syncStart(); });
+      b.setAttribute('role', 'radio'); b.setAttribute('data-mode', m.key); b.title = m.part; cm.appendChild(b);
+    });
+    var cl = $('ctl-level');
+    LEVELS.forEach(function (l) {
+      var b = btn(l, 'lf-btn', function () {
+        var i = state.levels.indexOf(l);
+        if (i === -1) state.levels.push(l); else if (state.levels.length > 1) state.levels.splice(i, 1);
+        savePrefs(); syncStart();
+      });
+      b.setAttribute('data-level', l); cl.appendChild(b);
+    });
+    syncStart();
+    if (prefs.last) state.lastId = prefs.last;
+  }
+  function syncStart() {
+    Array.prototype.forEach.call($('ctl-mode').children, function (b) { b.setAttribute('aria-checked', b.getAttribute('data-mode') === state.mode ? 'true' : 'false'); });
+    Array.prototype.forEach.call($('ctl-level').querySelectorAll('[data-level]'), function (b) {
+      b.setAttribute('aria-pressed', state.levels.indexOf(b.getAttribute('data-level')) !== -1 ? 'true' : 'false');
+    });
+    $('start-msg').textContent = D.textsFor(state.mode, state.levels).length ? '' : 'Der er endnu ingen tekst på det valgte niveau.';
+  }
+  function showStart() {
+    state.view = 'start'; state.token++; clearNudge(); qHost.innerHTML = ''; fbHost.innerHTML = '';
+    $('screen-play').hidden = true; $('screen-start').hidden = false; $('btn-menu').hidden = true;
+    syncStart(); $('btn-play').focus({ preventScroll: true });
+  }
+  function startPlay() {
+    try { DC.ui.sound.playCtx(); } catch (err) { /* sound is optional */ }   // build the AudioContext on the Spil gesture
+    var texts = D.textsFor(state.mode, state.levels);
+    if (!texts.length) { syncStart(); return; }
+    var next = texts[0], saved = null;
+    for (var i = 0; i < texts.length; i++) if (texts[i].id === state.lastId && texts[i + 1]) next = texts[i + 1];
+    if (state.mode === 'insert') {                 // an unfinished round resumes where it was left (placed blocks survive reload)
+      for (var j = 0; j < texts.length; j++) {
+        var sv = texts[j].id === state.lastId ? insLoad(texts[j]) : null;
+        if (sv && Object.keys(sv.placed).length && Object.keys(sv.placed).length < texts[j].gaps.length) { next = texts[j]; saved = sv; }
+      }
+    }
+    var czSaved = null;
+    if (state.mode === 'cloze') {                  // an unfinished round resumes where it was left
+      for (var c = 0; c < texts.length; c++) {
+        var cs = texts[c].id === state.lastId ? czLoad(texts[c]) : null;
+        if (cs && cs.n > 0 && cs.n < texts[c].gaps.length) { next = texts[c]; czSaved = cs; }
+      }
+    }
+    state.text = next; state.lastId = next.id; state.qi = 0; state.answered = {}; state.summary = false;
+    drafts = {}; skimFocus = false; czJustWrong = null; czPrev = null;
+    if (czSaved) { state.answered = czSaved.answered; state.qi = czSaved.qi; }
+    state.token++;
+    if (state.mode === 'insert') { insInit(next, saved); if (saved) state.answered = saved.answered; }
+    savePrefs();
+    $('screen-start').hidden = true; $('screen-play').hidden = false; $('btn-menu').hidden = false; state.view = 'play';
+    renderText(next); panelCollapse(false); render();
+    var savedScroll = store.get('scroll:' + next.id);
+    reader.scrollTop = 0;                          // no saved anchor: start at the very top (title and kicker visible)
+    if (savedScroll) { anchor = savedScroll; applyAnchor(anchor); }
+    else {
+      anchor = { par: 1, offset: 0 };
+      if (state.mode === 'cloze') {                // the active gap must still be visible: centre it only when it is not at the top
+        var cg = textEl.querySelector('[data-gap="' + next.gaps[state.qi].id + '"]');
+        if (cg && cg.getBoundingClientRect().bottom > reader.getBoundingClientRect().bottom - 8) { czCenter(next.gaps[state.qi].id, true); anchor = currentAnchor(); }
+      }
+    }
+    if (state.mode !== 'skim') reader.focus({ preventScroll: true });   // skim: no keyboard pop-up before the learner asks for it
+    else updateCurrent();
+  }
+  $('btn-play').addEventListener('click', startPlay);
+  $('btn-menu').addEventListener('click', showStart);
+  $('btn-reset').addEventListener('click', function () {
+    var ok = false;
+    try { ok = window.confirm('Vil du nulstille alle fremskridt i Læseforståelse? Det kan ikke fortrydes.'); } catch (err) { ok = false; }
+    if (!ok) return;
+    srs.items = {}; srs.patterns = {};
+    DC.store.set('srs:' + NS, { items: {}, patterns: {} });
+    ['skim', 'mc', 'insert', 'cloze'].forEach(function (m) { D.textsFor(m).forEach(function (t) { store.remove('scroll:' + t.id); store.remove('insert:' + t.id); store.remove('cloze:' + t.id); }); });
+    store.remove('prefs'); state.lastId = null;
+    DC.ui.announce('Fremskridt nulstillet.');
+  });
+
+  /* ---------- keys: numbers answer (shared quiz), J next / K previous, Escape. Arrow keys are never handled. ---------- */
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    var k = (e.key || '').toLowerCase();
+    if (state.view === 'play' && k === 'escape') {            // Escape closes overlays, also while typing an answer
+      var open = textEl.querySelector('details[open]');
+      if (open) open.removeAttribute('open'); else { clearHighlight(); insEscape(); }
+      return;
+    }
+    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    if (state.view !== 'play') return;
+    if (state.mode === 'insert' && !state.summary && /^[1-9]$/.test(k)) {
+      var bank = insBank(), bl = bank[+k - 1];
+      if (bl && !ins.pending) { e.preventDefault(); insOnBlock(bl.id); }
+      return;
+    }
+    if (state.mode === 'cloze' && !state.summary && /^[1-4]$/.test(k)) {
+      var ob = qHost.querySelector('[data-opt="' + (+k - 1) + '"]');
+      if (ob && !ob.disabled) { e.preventDefault(); ob.click(); }
+      return;
+    }
+    if (k === 'k') { e.preventDefault(); step(-1); }
+    else if (k === 'j') { e.preventDefault(); step(1); }
+  });
+
+  applyReading();
+  buildStart();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+/* =============================================================================
+   Læseforståelse - theme "newsprint reading room" on the Sjovt Dansk system.
+   Chrome (bar, toolbar, buttons, chips, gaps, feedback, results) = Sjovt frames/typography.
+   Reading pane = calm paper (light / sepia / dark), system serif, highlighter #E0B43C family.
+   The game's own paper switch (html[data-paper]) drives ALL colours here, so the shared MØRK
+   toggle (data-theme) can never put a light reading pane on a dark chrome or vice versa:
+   every --sd-* token the shared files read is re-declared per paper below (specificity 0,2,1).
+   Layout (grid, breakpoints, pane scrolling, .lf-text measure) is untouched.
+   ============================================================================= */
+
+/* ---------------------------------------------------------------- tokens per paper */
+html.sd-page[data-paper="light"], html.sd-page[data-paper="sepia"], html.sd-page[data-paper="dark"] {
+  --sd-line: var(--lf-frame); --sd-text: var(--lf-ink); --sd-text-soft: var(--lf-muted);
+  --sd-panel: var(--lf-card); --sd-focus: var(--lf-ring);
+  --sd-box: 0 -4px 0 0 var(--lf-frame), 0 4px 0 0 var(--lf-frame), -4px 0 0 0 var(--lf-frame), 4px 0 0 0 var(--lf-frame);
+  --sd-drop: 4px 4px 0 0 var(--lf-shadow);
+  --sd-primary: #F94F37; --sd-on-primary: #101010;
+  --lf-box-soft: 0 -3px 0 0 var(--lf-muted), 0 3px 0 0 var(--lf-muted), -3px 0 0 0 var(--lf-muted), 3px 0 0 0 var(--lf-muted);
+  --lf-box-ok: 0 -4px 0 0 var(--lf-ok), 0 4px 0 0 var(--lf-ok), -4px 0 0 0 var(--lf-ok), 4px 0 0 0 var(--lf-ok);
+  --lf-box-no: 0 -4px 0 0 var(--lf-no), 0 4px 0 0 var(--lf-no), -4px 0 0 0 var(--lf-no), 4px 0 0 0 var(--lf-no);
+  --lf-box-cur: 0 -4px 0 0 var(--lf-accent), 0 4px 0 0 var(--lf-accent), -4px 0 0 0 var(--lf-accent), 4px 0 0 0 var(--lf-accent);
+  --lf-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --lf-mono: var(--sd-font-body);
+  --lf-disp: var(--sd-font-display);
+  --dc-border: var(--lf-frame); --dc-btn-bg: var(--lf-card);
+}
+html.sd-page[data-paper="light"] {
+  --sd-bg: #E1AD12; --sd-grid: rgba(16,16,16,.10); --sd-panel-2: #FFE9B0; --sd-ok: #2F6B45; --sd-ok-bg: #dee5db; --sd-bad: #B3174F; --sd-bad-bg: #f2dedf;
+  --lf-frame: #101010; --lf-shadow: #101010; --lf-ring: #2B3FD6;
+  --lf-paper: #F4F0E6; --lf-card: #FBF9F3; --lf-ink: #1E1C1A; --lf-muted: #5E574C; --lf-rule: #CFC6B2;
+  --lf-accent: #275F5B; --lf-focus: #1F5A56; --lf-ok: #2F6B45; --lf-ok-bg: #dee5db; --lf-no: #B3174F; --lf-no-bg: #f2dedf;
+  --lf-mark: #E0B43C; --lf-mark-ink: #1E1C1A; --lf-mark-frame: #101010;
+  --lf-hover-bg: #FFE9B0; --lf-hover-fg: #101010; --lf-sel-bg: #101010; --lf-sel-fg: #FFE9B0; --lf-badge-bg: #101010; --lf-badge-fg: #FFC25A;
+  --dc-fg: #1E1C1A; --dc-correct: #2F6B45; --dc-correct-bg: #dee5db; --dc-wrong: #B3174F; --dc-wrong-bg: #f2dedf;
+}
+html.sd-page[data-paper="sepia"] {
+  --sd-bg: #E1AD12; --sd-grid: rgba(16,16,16,.10); --sd-panel-2: #FFE9B0; --sd-ok: #245A38; --sd-ok-bg: #d3d5be; --sd-bad: #A31446; --sd-bad-bg: #ead0c5;
+  --lf-frame: #101010; --lf-shadow: #101010; --lf-ring: #2B3FD6;
+  --lf-paper: #EADFC8; --lf-card: #F2E9D5; --lf-ink: #2B2418; --lf-muted: #574C38; --lf-rule: #C4B592;
+  --lf-accent: #265B57; --lf-focus: #1F5A56; --lf-ok: #245A38; --lf-ok-bg: #d3d5be; --lf-no: #A31446; --lf-no-bg: #ead0c5;
+  --lf-mark: #E0B43C; --lf-mark-ink: #1E1C1A; --lf-mark-frame: #101010;
+  --lf-hover-bg: #FFE9B0; --lf-hover-fg: #101010; --lf-sel-bg: #101010; --lf-sel-fg: #FFE9B0; --lf-badge-bg: #101010; --lf-badge-fg: #FFC25A;
+  --dc-fg: #2B2418; --dc-correct: #245A38; --dc-correct-bg: #d3d5be; --dc-wrong: #A31446; --dc-wrong-bg: #ead0c5;
+}
+html.sd-page[data-paper="dark"] {
+  --sd-bg: #101010; --sd-grid: rgba(225,173,18,.12); --sd-panel-2: #2A2414; --sd-ok: #8FCB9F; --sd-ok-bg: #33413d; --sd-bad: #FF8FB0; --sd-bad-bg: #43343e;
+  --lf-frame: #E1AD12; --lf-shadow: #000000; --lf-ring: #FFC25A;
+  --lf-paper: #16191C; --lf-card: #1F2328; --lf-ink: #E6E2D8; --lf-muted: #ABA598; --lf-rule: #39414A;
+  --lf-accent: #8FD6CF; --lf-focus: #8FD6CF; --lf-ok: #8FCB9F; --lf-ok-bg: #33413d; --lf-no: #FF8FB0; --lf-no-bg: #43343e;
+  --lf-mark: #6F540C; --lf-mark-ink: #FFF1C4; --lf-mark-frame: #E0B43C;
+  --lf-hover-bg: #2A2414; --lf-hover-fg: #FFE9B0; --lf-sel-bg: #E1AD12; --lf-sel-fg: #101010; --lf-badge-bg: #E1AD12; --lf-badge-fg: #101010;
+  --dc-fg: #E6E2D8; --dc-correct: #8FCB9F; --dc-correct-bg: #33413d; --dc-wrong: #FF8FB0; --dc-wrong-bg: #43343e;
+}
+
+/* ---------------------------------------------------------------- frame of the page */
+/* the preloader curtain must never swallow the first click (it fades out by itself) */
+.sd-pre { pointer-events: none; }
+/* shared bar stays (home link + wordmark); its MØRK / LYD duplicate the game's own Papir / Lyd, so they are hidden here */
+html.sd-page .sd-bar #sd-theme-btn, html.sd-page .sd-bar #sd-sound-btn { display: none; }
+html.sd-page, html.sd-page body { overflow: hidden; }
+html.sd-page .lf-app { height: calc(100vh - var(--sd-bar-h)); height: calc(100dvh - var(--sd-bar-h)); background: transparent; }
+html.sd-page body { font-family: var(--lf-mono); color: var(--lf-ink); }
+html.sd-page .sd-bar { box-shadow: none; }
+
+/* ---------------------------------------------------------------- toolbar */
+html.sd-page .lf-top { min-height: 56px; padding: 0 8px; gap: 0; background: transparent; border-bottom: 4px solid var(--lf-frame); color: var(--lf-ink); }
+html.sd-page[data-paper="dark"] .lf-top { color: var(--lf-ink); }
+html.sd-page .lf-brand { font-family: var(--lf-disp); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: .02em;
+  color: #101010; background: var(--sd-panel-2); box-shadow: var(--sd-box); padding: 4px 10px; margin: 0 auto 0 4px; }
+html.sd-page[data-paper="dark"] .lf-brand { color: #FFE9B0; }
+
+/* ---------------------------------------------------------------- buttons (.sd-btn look, game classes) */
+html.sd-page .lf-btn {
+  min-height: 44px; min-width: 44px; margin: 4px; padding: 0 12px; border: 0; border-radius: 0;
+  background: var(--lf-card); color: var(--lf-ink); font-family: var(--lf-disp); font-weight: 700; font-size: 14px; line-height: 1.2; letter-spacing: .02em;
+  box-shadow: var(--sd-box), var(--sd-drop); cursor: pointer; touch-action: manipulation;
+  transition: transform .08s steps(2), background-color .08s steps(2);
+}
+html.sd-page .lf-btn:hover:not([aria-disabled="true"]):not(:disabled) { background: var(--lf-hover-bg); color: var(--lf-hover-fg); transform: translate(-2px, -2px); }
+html.sd-page .lf-btn:active:not([aria-disabled="true"]):not(:disabled) { transform: translate(2px, 2px); box-shadow: var(--sd-box); }
+html.sd-page .lf-btn--primary { background: var(--sd-primary); color: #101010; border: 0; font-size: 16px; text-transform: uppercase; }
+html.sd-page .lf-btn--primary:hover:not(:disabled) { background: #FFC25A; color: #101010; }
+html.sd-page[data-paper="dark"] .lf-btn--primary { box-shadow: var(--sd-box), 4px 4px 0 0 #000; }
+html.sd-page .lf-btn[aria-pressed="true"], html.sd-page .lf-btn[aria-checked="true"] { background: var(--lf-sel-bg); color: var(--lf-sel-fg); }
+html.sd-page .lf-btn[aria-pressed="true"]::before, html.sd-page .lf-btn[aria-checked="true"]::before { content: "\2713\00a0"; }
+html.sd-page .lf-btn[aria-disabled="true"], html.sd-page .lf-btn:disabled { background: var(--lf-paper); color: var(--lf-muted); box-shadow: var(--lf-box-soft); transform: none; cursor: default; }
+html.sd-page .lf-btn--primary:disabled { background: var(--lf-paper); }
+html.sd-page .lf-top .lf-btn { margin: 4px; }
+html.sd-page .lf-top .lf-btn:hover:not(:disabled) { transform: none; }
+html.sd-page .sd-arr { vertical-align: -3px; }
+
+/* ---------------------------------------------------------------- start screen */
+html.sd-page .lf-start { gap: 14px; padding: 24px 16px 32px; color: var(--lf-ink); }
+html.sd-page .lf-start > * { position: relative; }
+html.sd-page .lf-start h1 { font: 700 clamp(26px, 6vw, 40px)/1.2 var(--lf-disp); text-transform: uppercase; letter-spacing: 0; margin: 4px 0 0;
+  background: var(--lf-card); color: var(--lf-ink); box-shadow: var(--sd-box), var(--sd-drop); padding: 12px 20px; max-width: 100%; overflow-wrap: anywhere; }
+html.sd-page .lf-start-sprite { display: block; margin: 4px 0 0; }
+html.sd-page .lf-start .lf-btn--primary { font-size: 22px; min-width: 200px; min-height: 60px; }
+html.sd-page .lf-ctl { gap: 4px 6px; }
+html.sd-page .lf-ctl-label { color: #101010; font: 700 14px/1.4 var(--lf-disp); text-transform: uppercase; margin-right: 6px; background: var(--sd-panel-2); padding: 2px 8px; }
+html.sd-page[data-paper="dark"] .lf-ctl-label { color: #FFE9B0; }
+html.sd-page .lf-disclaimer, html.sd-page .lf-msg { font: 400 14px/1.5 var(--lf-mono); max-width: 46ch; color: #101010; background: var(--sd-panel-2); padding: 6px 10px; }
+html.sd-page[data-paper="dark"] .lf-disclaimer, html.sd-page[data-paper="dark"] .lf-msg { color: #FFE9B0; }
+html.sd-page .lf-msg:empty { display: none; }
+html.sd-page .lf-start #btn-reset { font-size: 14px; }
+
+/* ---------------------------------------------------------------- reading pane (paper) */
+html.sd-page .lf-reader { background: var(--lf-paper); color: var(--lf-ink); }
+html.sd-page .lf-panel { background: var(--lf-card); color: var(--lf-ink); border-left: 4px solid var(--lf-frame); font-family: var(--lf-mono); }
+html.sd-page .lf-text { color: var(--lf-ink); font-family: var(--lf-serif); }
+html.sd-page .lf-kicker { font: 700 14px/1.4 var(--lf-disp); letter-spacing: .06em; color: var(--lf-muted); border-top: 4px solid var(--lf-ink); padding-top: 8px; margin: 0 0 8px; }
+html.sd-page .lf-text h1, html.sd-page .lf-text h2 { font-family: var(--lf-serif); font-weight: 700; color: var(--lf-ink); }
+html.sd-page .lf-text p[data-par]::before, html.sd-page .lf-haefte [data-par]::before { font: 700 14px/2 var(--lf-disp); color: var(--lf-muted); }
+/* evidence highlighter: marker fill + black/gold pixel frame inside the 5px fill ring (never colour only) */
+html.sd-page .lf-text p.lf-evidence, html.sd-page .lf-text section.lf-evidence {
+  background: var(--lf-mark); color: var(--lf-mark-ink); border-radius: 0; box-shadow: 0 0 0 5px var(--lf-mark);
+  outline: 3px solid var(--lf-mark-frame); outline-offset: 2px; }
+html.sd-page .lf-text p.lf-evidence::before, html.sd-page .lf-text section.lf-evidence [data-par]::before { color: var(--lf-mark-ink); }
+html.sd-page .lf-notice { border-radius: 0; }
+html.sd-page .lf-notice h2 { border-bottom: 2px dotted var(--lf-rule); padding-bottom: 4px; }
+html.sd-page .lf-foot { border-top: 4px solid var(--lf-ink); font: 400 max(14px, .8em)/1.5 var(--lf-mono); color: var(--lf-muted); }
+html.sd-page .lf-foot summary { list-style: none; font-family: var(--lf-disp); text-transform: uppercase; color: var(--lf-ink); gap: 8px; }
+html.sd-page .lf-foot summary::-webkit-details-marker { display: none; }
+html.sd-page .lf-foot summary::before, html.sd-page #btn-panel::after {
+  content: ""; display: inline-block; flex: none; width: 16px; height: 16px; background: currentColor; font-size: 0; image-rendering: pixelated;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath d='M3 0h1v1H3zM2 1h2v1H2zM1 2h7v1H1zM0 3h8v2H0zM1 5h7v1H1zM2 6h2v1H2zM3 7h1v1H3z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath d='M3 0h1v1H3zM2 1h2v1H2zM1 2h7v1H1zM0 3h8v2H0zM1 5h7v1H1zM2 6h2v1H2zM3 7h1v1H3z'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+html.sd-page .lf-foot summary::before { transform: scaleX(-1); }
+html.sd-page .lf-foot details[open] summary::before { transform: rotate(-90deg); }
+html.sd-page #btn-panel [aria-hidden="true"] { display: none; }
+html.sd-page #btn-panel::after { transform: rotate(-90deg); }
+html.sd-page #btn-panel[aria-expanded="false"]::after { transform: rotate(90deg); }
+html.sd-page .lf-foot a { color: var(--lf-accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* ---------------------------------------------------------------- skim: sticky notice chips */
+html.sd-page .lf-jump { padding: 8px 8px; gap: 8px; background: var(--lf-paper); border-bottom: 4px solid var(--lf-frame); font-family: var(--lf-disp); }
+html.sd-page .lf-jump .lf-btn { margin: 0 4px; min-height: 44px; box-shadow: var(--sd-box); }
+html.sd-page .lf-jump .lf-btn[aria-current="true"] { background: var(--lf-sel-bg); color: var(--lf-sel-fg); }
+html.sd-page .lf-jump .lf-btn[aria-current="true"]::before { content: ""; width: 8px; height: 8px; background: #F94F37; margin-right: 8px; display: inline-block; vertical-align: 0; }
+
+/* ---------------------------------------------------------------- question pane */
+html.sd-page .lf-panel-head { background: var(--lf-card); }
+html.sd-page .lf-qnum { display: inline-block; margin: 6px 0 12px; padding: 2px 8px; background: var(--lf-badge-bg); color: var(--lf-badge-fg);
+  font: 700 14px/1.5 var(--lf-disp); text-transform: uppercase; letter-spacing: .02em; }
+html.sd-page #lf-q .dc-quiz-prompt { font: 700 17px/1.45 var(--lf-mono); color: var(--lf-ink); }
+html.sd-page #lf-q .dc-quiz-options, html.sd-page .lf-opts, html.sd-page .lf-bank { padding: 4px 8px 8px 4px; gap: 14px; margin-top: 6px; }
+html.sd-page #lf-q .dc-quiz-option {
+  width: 100%; min-height: 48px; border: 0; border-radius: 0; padding: 10px 12px; background: var(--lf-card); color: var(--lf-ink);
+  font: 400 16px/1.45 var(--lf-mono); box-shadow: var(--sd-box), var(--sd-drop); transition: transform .08s steps(2); }
+html.sd-page #lf-q button.dc-quiz-option:hover:not(:disabled) { background: var(--lf-hover-bg); color: var(--lf-hover-fg); transform: translate(-2px, -2px); }
+html.sd-page #lf-q .dc-quiz-option:disabled { color: var(--lf-ink); opacity: 1; box-shadow: var(--lf-box-soft); transform: none; background: var(--lf-paper); }
+html.sd-page #lf-q .dc-quiz-option.dc-correct { background: var(--lf-ok-bg); color: var(--lf-ink); box-shadow: var(--lf-box-ok), 4px 4px 0 0 var(--lf-ok); }
+html.sd-page #lf-q .dc-quiz-option.dc-wrong { background: var(--lf-no-bg); color: var(--lf-ink); box-shadow: var(--lf-box-no), 4px 4px 0 0 var(--lf-no); }
+html.sd-page #lf-q .dc-quiz-option.dc-correct::after { content: "\00a0\2713 Rigtigt"; font-weight: 700; color: var(--lf-ok); white-space: nowrap; }
+html.sd-page #lf-q .dc-quiz-option.dc-wrong::after { content: "\00a0\2717 Dit valg"; font-weight: 700; color: var(--lf-no); white-space: nowrap; }
+html.sd-page .lf-opts .dc-quiz-option { min-height: 48px; }
+html.sd-page .lf-ans label { color: var(--lf-ink); font: 700 14px/1.4 var(--lf-disp); text-transform: uppercase; }
+html.sd-page .lf-input { margin: 4px; min-height: 48px; border: 0; border-radius: 0; background: var(--lf-paper); color: var(--lf-ink);
+  font: 400 16px/1.4 var(--lf-mono); box-shadow: var(--sd-box), inset 4px 4px 0 rgba(16,16,16,.12); }
+html.sd-page .lf-input[data-state="ok"] { box-shadow: var(--lf-box-ok); background: var(--lf-ok-bg); }
+html.sd-page .lf-input[data-state="no"] { box-shadow: var(--lf-box-no); background: var(--lf-no-bg); }
+html.sd-page .lf-input[data-state="ok"]::after { content: ""; }
+html.sd-page .lf-nudge, html.sd-page .lf-hint, html.sd-page .lf-sent { font: 400 16px/1.5 var(--lf-mono); color: var(--lf-muted); }
+html.sd-page .lf-sent { border-left: 4px solid var(--lf-frame); }
+html.sd-page .lf-status { font: 700 16px/1.45 var(--lf-mono); color: var(--lf-ink); border-left: 4px solid var(--lf-accent); padding-left: 10px; }
+html.sd-page .lf-nav { padding: 0 4px 8px; gap: 8px; }
+
+/* wrong feedback: calm, icon + tag + text */
+html.sd-page .lf-fb-box { position: relative; margin: 14px 8px 8px 4px; padding: 14px 14px 10px; border: 0; background: var(--lf-no-bg); color: var(--lf-ink);
+  box-shadow: var(--lf-box-no); font: 400 16px/1.5 var(--lf-mono); }
+html.sd-page .lf-fb-box::before { content: "\2717  Ikke rigtigt"; display: block; margin: -2px 0 8px; font: 700 14px/1.4 var(--lf-disp); text-transform: uppercase; letter-spacing: .02em; color: var(--lf-no); }
+html.sd-page .lf-fb-actions { gap: 4px; }
+
+/* ---------------------------------------------------------------- insert + cloze gaps */
+html.sd-page .lf-gap { border: 4px dashed var(--lf-muted); border-radius: 0; background: var(--lf-card); color: var(--lf-ink); margin-bottom: 1em; font-family: var(--lf-serif); }
+html.sd-page .lf-gap-tag { font: 700 14px/1.5 var(--lf-disp); text-transform: uppercase; letter-spacing: .02em; }
+html.sd-page .lf-gap-st { font: 700 14px/1.5 var(--lf-mono); color: var(--lf-muted); text-transform: none; }
+html.sd-page .lf-gap-body { font-family: var(--lf-serif); }
+html.sd-page .lf-gap[data-state="ok"] { border: 0; box-shadow: var(--lf-box-ok); margin: 4px 4px 1em; width: calc(100% - 8px); border-left: 0; background: var(--lf-ok-bg); }
+html.sd-page .lf-gap[data-state="ok"] .lf-gap-st { color: var(--lf-ok); }
+html.sd-page .lf-gap[data-state="no"] { border: 0; box-shadow: var(--lf-box-no); margin: 4px 4px 1em; width: calc(100% - 8px); background: var(--lf-no-bg); }
+html.sd-page .lf-gap[data-state="no"] .lf-gap-st { color: var(--lf-no); }
+html.sd-page .lf-gap[aria-current="true"]:not([data-state="ok"]):not([data-state="no"]) { border: 0; margin: 4px 4px 1em; width: calc(100% - 8px); box-shadow: var(--lf-box-cur), 4px 4px 0 0 var(--lf-accent); }
+html.sd-page .lf-gap[aria-current="true"] .lf-gap-tag::after { content: "\25A0 Valgt hul"; font-weight: 700; color: var(--lf-accent); }
+html.sd-page .lf-gap[data-state="no"][aria-current="true"] .lf-gap-tag::after { content: ""; }
+html.sd-page .lf-gap[data-state="ok"] .lf-gap-tag::after { content: ""; }
+/* cloze: inline gap = sd-gap look (dashed underline), number + icon + word */
+html.sd-page .lf-gap.lf-cz { border: 0; border-bottom: 4px dashed var(--lf-muted); background: var(--lf-card); margin: 2px 2px; padding: 6px 10px; font: 700 15px/1.3 var(--lf-disp); text-transform: none; color: var(--lf-ink); box-shadow: none; width: auto; }
+html.sd-page .lf-gap.lf-cz[data-state="ok"] { border: 0; border-bottom: 4px solid var(--lf-ok); background: var(--lf-ok-bg); box-shadow: none; margin: 2px; width: auto; font-family: var(--lf-serif); font-size: .9em; }
+html.sd-page .lf-gap.lf-cz[data-state="no"] { border: 0; border-bottom: 4px solid var(--lf-no); background: var(--lf-no-bg); box-shadow: none; margin: 2px; width: auto; font-family: var(--lf-serif); font-size: .9em; }
+html.sd-page .lf-gap.lf-cz[aria-current="true"] { border-bottom-style: solid; border-bottom-color: var(--lf-accent); background: var(--lf-card); outline: 4px solid var(--lf-accent); outline-offset: 0; box-shadow: none; margin: 2px; width: auto; }
+html.sd-page .lf-gap.lf-cz[data-preview="true"] { color: var(--lf-muted); font-weight: 400; font-style: italic; }
+html.sd-page .lf-cz-n { font: 700 14px/1 var(--lf-disp); color: var(--lf-ink); }
+html.sd-page .lf-cz[data-state="ok"] .lf-cz-ic { color: var(--lf-ok); }
+html.sd-page .lf-cz[data-state="no"] .lf-cz-ic { color: var(--lf-no); }
+/* insert bank blocks */
+html.sd-page .lf-block { border: 0; border-radius: 0; background: var(--lf-card); color: var(--lf-ink); font: 400 16px/1.45 var(--lf-mono); box-shadow: var(--sd-box), var(--sd-drop); padding: 10px 12px; }
+html.sd-page .lf-block:hover:not(:disabled) { background: var(--lf-hover-bg); color: var(--lf-hover-fg); transform: translate(-2px, -2px); }
+html.sd-page .lf-block[aria-pressed="true"] { background: var(--lf-sel-bg); color: var(--lf-sel-fg); }
+html.sd-page .lf-block:disabled { box-shadow: var(--lf-box-soft); background: var(--lf-paper); color: var(--lf-ink); }
+html.sd-page .lf-block-n { background: var(--lf-badge-bg); color: var(--lf-badge-fg); padding: 0 6px; margin-right: 4px; font-family: var(--lf-disp); min-width: 0; }
+html.sd-page .lf-block-sel { font: 700 14px/1.4 var(--lf-disp); text-transform: uppercase; }
+
+/* motion that stays: one-shot, stepped, never on reading text */
+html.sd-page .lf-flash { animation: lf-flash-px .4s steps(4); }
+@keyframes lf-flash-px { from { outline: 6px solid var(--lf-ok); outline-offset: 0; } to { outline: 0 solid transparent; } }
+
+/* ---------------------------------------------------------------- results */
+html.sd-page .dc-summary { align-items: center; text-align: center; gap: 14px; padding: 4px 8px 8px 4px; color: var(--lf-ink); }
+html.sd-page .dc-summary-stats { justify-content: center; gap: 12px; font: 700 18px/1.3 var(--lf-disp); }
+html.sd-page .dc-summary-stats > * { background: var(--sd-panel-2); color: #101010; box-shadow: var(--sd-box); padding: 8px 14px; margin: 4px; }
+html.sd-page[data-paper="dark"] .dc-summary-stats > * { color: #FFE9B0; }
+html.sd-page .dc-summary-weak { width: 100%; text-align: left; padding: 12px 14px; background: var(--lf-card); box-shadow: var(--sd-box); font: 400 16px/1.45 var(--lf-mono); }
+html.sd-page .dc-summary-weak li + li { margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--lf-frame); }
+html.sd-page .dc-summary-actions { justify-content: center; gap: 4px; }
+html.sd-page .dc-summary-actions button { min-height: 48px; border: 0; border-radius: 0; background: var(--lf-card); color: var(--lf-ink); font: 700 16px/1.2 var(--lf-disp); text-transform: uppercase;
+  box-shadow: var(--sd-box), var(--sd-drop); margin: 4px; padding: 0 16px; cursor: pointer; }
+html.sd-page .dc-summary-actions button:first-child { background: var(--sd-primary); color: #101010; }
+html.sd-page .dc-summary-actions button:hover { background: #FFC25A; color: #101010; }
+html.sd-page .lf-weakest { font: 700 16px/1.45 var(--lf-mono); border-left: 4px solid var(--lf-accent); padding-left: 10px; text-align: left; }
+html.sd-page .lf-result-sprite { display: block; margin: 4px auto 0; }
+html.sd-page .lf-result-sprite .sd-hop { animation-iteration-count: 3; }
+
+/* ---------------------------------------------------------------- narrow screens */
+@media (max-width: 1023px) and (orientation: portrait), (max-width: 639px) {
+  html.sd-page .lf-panel { border-left: 0; border-top: 4px solid var(--lf-frame); }
+  html.sd-page .lf-panel-head { padding-top: 4px; }
+  html.sd-page #btn-panel { width: calc(100% - 8px); }
+  html.sd-page .lf-text p.lf-evidence::before, html.sd-page .lf-text section.lf-evidence [data-par]::before { color: var(--lf-mark-ink); }
+}
+@media (max-width: 480px) {
+  html.sd-page .lf-top { padding: 0 2px; }
+  html.sd-page .lf-top .lf-btn { padding: 0 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.sd-page .lf-flash, html.sd-page .lf-result-sprite .sd-hop { animation: none; }
+  html.sd-page .lf-btn, html.sd-page #lf-q .dc-quiz-option, html.sd-page .lf-block { transition: none; }
+}
+
+/* =============================================================================
+   Phone tune (laese-ux-tune): the text must be readable on every device.
+   ============================================================================= */
+/* T4: DanskCore dims the Lyt button with an inline opacity:.5 when no speech voice is found, which made it fade into the dark paper.
+   Keep it fully visible (the speaker icon is currentColor on the card, frame = --lf-frame). */
+html.sd-page .dc-tts-button.dc-tts-button { opacity: 1 !important; color: var(--lf-ink); }
+
+/* T2: docked panel, expanded: the toggle shows "Skjul spørgsmål" and the one-line peek is kept for the accessible name only;
+   collapsed: the peek (number + question) is the visible label. */
+@media (max-width: 1023px) and (orientation: portrait), (max-width: 639px) {
+  html.sd-page #btn-panel[aria-expanded="true"] .lf-peek { position: absolute; width: 1px; height: 1px; flex: none; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  html.sd-page #btn-panel[aria-expanded="true"]::before { content: "Skjul spørgsmål"; flex: 1; text-align: left; font-family: var(--lf-disp); text-transform: uppercase; }
+  /* wrong-answer box first (the learner sees it and "Næste" without scrolling the panel); DOM order is unchanged */
+  html.sd-page .lf-panel-body { display: flex; flex-direction: column; }
+  html.sd-page #lf-fb { order: -1; }
+  html.sd-page .lf-qnum { align-self: flex-start; margin: 2px 0 8px; }
+  html.sd-page .lf-nav { margin-top: 6px; }
+  html.sd-page #btn-panel { margin: 2px 4px; }
+  html.sd-page .lf-fb-box { margin: 4px 8px 6px 4px; padding: 8px 12px 6px; }
+  html.sd-page .lf-fb-box::before { margin: 0 0 4px; }
+  html.sd-page .lf-fb-box p { margin: 0 0 4px; }
+  html.sd-page .lf-fb-actions { margin-top: 0; }
+}
+
+/* T1 + T3: slim chrome and a shorter docked sheet on phones */
+@media (max-width: 639px) {
+  html.sd-page { --lf-sheet: 40dvh; }
+  html.sd-page .sd-bar { min-height: 36px; padding: 0 6px; border-bottom-width: 2px; gap: 6px; }
+  html.sd-page .sd-bar a { min-height: 44px; margin: -6px 0; }            /* 44 px hit area, bar stays 36 px */
+  html.sd-page .sd-bar .sd-bar-logo { gap: 4px; }
+  html.sd-page .lf-top { min-height: 0; height: 48px; padding: 0 2px; border-bottom-width: 4px; }
+  html.sd-page .lf-top .lf-btn { margin: 0 2px; min-height: 44px; box-shadow: inset 0 0 0 3px var(--lf-frame); }
+  html.sd-page .lf-top .lf-btn:active:not(:disabled) { box-shadow: inset 0 0 0 3px var(--lf-frame); }
+  html.sd-page .lf-top .lf-btn[aria-disabled="true"] { box-shadow: inset 0 0 0 3px var(--lf-muted); }
+  html.sd-page .lf-panel { padding-bottom: 8px; }
+  html.sd-page .lf-text h1, html.sd-page .lf-text h2 { font-size: 1.3em; margin-bottom: .45em; }
+  html.sd-page .lf-notice h2 { font-size: 1.2em; }
+  html.sd-page .lf-reader:not(.lf-reader--haefte) { padding-top: 12px; }
+}

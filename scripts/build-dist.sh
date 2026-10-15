@@ -15,6 +15,7 @@ rm -rf dist dist.manifest
 mkdir dist
 
 cp ./*.html robots.txt sitemap.xml llms.txt .htaccess dist/
+rm -f dist/pixel-animation.html  # scratch page, never deployed
 for d in "${DIRS[@]}"; do
   [ -d "$d" ] || { echo "ERROR: expected directory '$d' is missing" >&2; exit 1; }
   mkdir -p "dist/$d"

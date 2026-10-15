@@ -92,8 +92,6 @@ try {
   .lf-kicker { margin: 0 0 4px; font: 700 .72em/1.4 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--lf-muted); }
   .lf-text h2 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
   .lf-text p { margin: 0 0 1em; position: relative; }
-  .lf-text p[data-par]::before { content: "¶" attr(data-par); position: absolute; right: 100%; margin-right: 8px;
-              font: 700 12px/2.3 ui-monospace, "SF Mono", Consolas, monospace; color: var(--lf-muted); }
   .lf-text p.lf-evidence { background: var(--lf-mark); color: var(--lf-mark-ink); box-shadow: 0 0 0 5px var(--lf-mark); border-radius: 2px; }
   /* Hæfte (skim): numbered notices and a sticky jump-list. */
   .lf-text h1 { margin: 0 0 .7em; font-size: 1.55em; line-height: 1.25; }
@@ -194,8 +192,6 @@ try {
     .lf-peek { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lf-panel[data-collapsed="true"] .lf-panel-body { display: none; }
     .lf-qnum { display: none; }
-    .lf-text p[data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
-    .lf-text p.lf-evidence::before, .lf-text section.lf-evidence [data-par]::before { color: #3A3220; }
     .lf-haefte [data-par]::before { position: static; display: block; margin: 0; line-height: 1.6; }
   }
   @media (min-width: 640px) and (max-width: 1023px) and (orientation: portrait) { :root { --lf-sheet: 46dvh; } }

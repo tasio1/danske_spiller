@@ -1,4 +1,5 @@
 - [Harness contrast vs color-mix](harness-color-mix-contrast.md) — use hex not color-mix; play selectors per game; shots dir trap
 - [Worktree harness setup](worktree-harness-setup.md) — node_modules junction, own shot script, heredoc/stdin trap
 - [Inline CSS leftovers](inline-css-leftovers-in-themes.md) — reset game inline transform/animation; scrollTo(0,0) in shots
+- [Large files via Write](large-files-use-write-tool.md) — no big heredocs in Bash; split long shot runs
 - [Theme token specificity](theme-token-specificity.md) — override --sd-* in light and both dark selectors

@@ -50,3 +50,28 @@ Rerun: `cd <worktree> && SHOT_ROOT=<main>/docs/redesign/screenshots node <main>/
 - Whether `scripts/gen-tal-og-tid-data.js` regenerates data.js byte-identically (not run, would overwrite game data).
 - Cross-game link (`en-og-et`) target correctness beyond href presence; real touch devices.
 - Retest cycle: this was the first test of this commit; nothing retested.
+
+---
+
+# Retest cycle 1 - 547dea6364d4df4b204e988cd1035ecfa26c9953
+
+Verdict: PASS (TT-1 fixed; flag 1 and 2 resolved in data; native flags 3-7 remain)
+Tested: task/tal-og-tid@547dea6364d4df4b204e988cd1035ecfa26c9953 (index.html and shared/ unchanged since fde2633; data.js, generator, tests changed)
+
+| Check | Result | Evidence |
+|---|---|---|
+| Data structure + independent recomputation | PASS | 965 items; klokken A1 60 / A2 228 / B1 144; my clock parser agrees with all 432 (x:20 = `ti i halv X`, x:40 = `ti over halv X`), no option shares the correct meaning; numbers/years/ordinals unchanged and still match; 0 duplicates |
+| TT-1 midnight notes | PASS | `k-digital-0000`: "Kl. 00 er midnat og står som 12 på det analoge ur. Hel time: ... klokken tolv er 00:00." |
+| Flag 1 (tyve over/i) | RESOLVED | primary answers now `ti i halv X`/`ti over halv X`; 72 items carry `alt_phrases` (`tyve over/i X`), none appear as options. Note: `alt_phrases` is data only - the game never reads it; no impact |
+| Flag 2 (regent capitals) | RESOLVED | `Tiende`, `Anden` (3 items) |
+| Full spec, run 1 | PASS | 73/73 |
+| bulk + typed repeated, runs 2 and 3 | PASS | 12/12 each (every one of 965 items at 360 px; 1567 typed variants) |
+| Smoke | PASS | all green |
+
+## The reported "flake" (bulk 144/432 klokken seen, typed section failing) was a harness defect, not a game flake
+- Cause: every puppeteer page on `file://` shares one localStorage. The `func` section's group-sweep leaves the last chosen group saved (`tal-og-tid:group:<mode>`), and the next section (bulk/typed) inherited it. Numbers reproduce exactly: klokken 144 = group *Digitalt ur*, tal 17 = *Hundreder*, aarstal 58 = *Priser*. The typed section then hit an empty pool (Hundreder has no typed items): the game correctly showed its "Der er ingen opgaver" empty state, which my oracle read as `no marker`. Observed once in my own combined run and once by the coder, both when `func` preceded the later sections; every section passes when run alone.
+- Fix (in `tests/tal-og-tid.mjs`, main repo): each page gets its own browser context. Evidence after fix: full spec 73/73, then bulk+typed twice more 12/12 and 12/12 (3 consecutive green runs, 0 flakes).
+- The branch's committed copy of `tests/tal-og-tid.mjs` is the pre-fix version and will still fail when run as a full combined spec; copy `tests/tal-og-tid.mjs` from the main repo (or the PM merges mine).
+- Harness note: two overlapping background runs also killed each other's Chrome ("Target closed"); that was my own scheduling mistake, not the game.
+
+Not covered (unchanged): native judgement of Danish, real TTS, screen reader.

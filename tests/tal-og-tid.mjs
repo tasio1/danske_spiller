@@ -10,6 +10,8 @@ const results = [];
 const rec = (check, ok, evidence) => { results.push({ check, ok, evidence }); console.log((ok ? 'PASS  ' : 'FAIL  ') + check + (evidence ? '  -- ' + evidence : '')); };
 
 const browser = await launch();
+// isolate every page in its own browser context: file:// pages share one localStorage origin, so saved group/level prefs and SRS state from one section leaked into the next (empty pools, starved rounds)
+{ const realNewPage = browser.newPage.bind(browser); browser.newPage = async () => { const ctx = await browser.createBrowserContext(); return ctx.newPage(); }; }
 async function fresh(opts = {}) {
   const { page, issues } = await openGame(browser, FILE, opts);
   await page.evaluate(DRIVER_SRC);

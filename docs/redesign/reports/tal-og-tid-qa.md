@@ -75,3 +75,55 @@ Tested: task/tal-og-tid@547dea6364d4df4b204e988cd1035ecfa26c9953 (index.html and
 - Harness note: two overlapping background runs also killed each other's Chrome ("Target closed"); that was my own scheduling mistake, not the game.
 
 Not covered (unchanged): native judgement of Danish, real TTS, screen reader.
+
+---
+
+# Retest cycle 2 (branch tip) - fa0c0fc
+
+Tested: task/tal-og-tid@fa0c0fc1d398d935033c32a04f61690a26a46993 (HEAD re-checked after the run, worktree clean)
+Verdict: PASS
+
+Changes since 547dea6: committed spec + QA appendix, portal registration (index.html card + GAMES entry, llms.txt, sitemap.xml, build-dist.sh DIRS).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Full spec (committed tests/tal-og-tid.mjs) | PASS | 73/73, exit 0; smoke exit 0 |
+| Root portal loads, zero console errors | PASS | worktree tree and built dist, 360 and 1440 px, light and dark: 0 issues, no h-scroll, 15 cards incl. Tal og tid, card visible, no small tap target in the card |
+| Card links to the game | PASS | click on `./tal-og-tid/index.html` card at 360 px lands on `tal-og-tid/index.html`, title "Tal og tid på dansk …", `#btn-play` present, 0 issues (tree and dist) |
+| Card visual | PASS | screenshot `docs/redesign/screenshots/tal-og-tid/portal-card-small.png` viewed: stopur sprite, title, tag Tal, A1-B1, description, Spil button |
+| sitemap.xml | PASS | XML parses; 29 `<url>`, 29 `<loc>` unique; new entry `https://sjovtdansk.dk/tal-og-tid/index.html` |
+| llms.txt | PASS | entry added with matching URL |
+| build-dist.sh | PASS | `bash -n` OK; run in a `git archive` copy under scratchpad (repo untouched): "dist ready: 118 files", `dist/tal-og-tid/{index.html,data.js}` and `dist/shared/themes/tal-og-tid.css` present, 3 manifest entries |
+
+Observations (not caused by this change): portal has one contrast item `TRYK START` (1.62:1), identical on master; the portal search box did not filter cards in my quick test on either master or the branch (not investigated). `build-dist.sh` was not run in the repo itself.
+
+---
+
+# Retest cycle 3 (after merge of origin/master) - 42d5502
+
+Tested: task/tal-og-tid@42d5502eb3c6b5528469560302318dfab3a7113b (HEAD unchanged after the run; only releaser agent-memory files dirty in the worktree, none of them game files)
+Verdict: PASS
+
+| Check | Result | Evidence |
+|---|---|---|
+| No conflict markers | PASS | `git grep` for `<<<<<<<`, `=======`, `>>>>>>>` over all tracked non-PNG files: none |
+| Portal, both cards | PASS | tree and built dist, 360/1440 px, light/dark: 16 cards, `Tal og tid` and `Læseforståelse` both visible, no h-scroll, 0 console issues |
+| Both cards link and games open | PASS | clicks land on `tal-og-tid/index.html` and `laeseforstaaelse/index.html` (tree and dist), titles correct, buttons render, 0 console issues |
+| sitemap.xml | PASS | parses; 30 `<loc>`, no duplicates; both entries present |
+| llms.txt | PASS | both entries present (1 each) |
+| build-dist.sh | PASS | `bash -n` OK; throwaway `git archive` copy: "dist ready: 126 files", both dirs in dist, 8 manifest entries under the two dirs |
+| Spec (tests/tal-og-tid.mjs) | PASS | 73/73, exit 0 |
+
+Not covered: Læseforståelse itself beyond opening it (another task's scope).
+
+---
+
+# Retest cycle 4 (merge of cb53f74) - f1831f0
+
+Tested: task/tal-og-tid@f1831f0cd0cd6a2eaf86637995ab4bb420b07b8f
+Verdict: PASS
+
+- `git diff 42d5502 f1831f0 --stat`: only `index.html`, 1 insertion: `<!-- <meta name="google-site-verification" content="REPLACE_WITH_TOKEN"> -->` (an HTML comment, inert).
+- Portal (tree and throwaway dist, 360/1440, light/dark): 16 cards, Tal og tid and Læseforståelse visible, 0 console issues, no h-scroll; both cards open their games, 0 issues.
+- sitemap.xml parses, 0 duplicate locs; no conflict markers; build-dist copy "dist ready: 126 files".
+- tests/tal-og-tid.mjs: 73/73, exit 0. HEAD unchanged after the run.

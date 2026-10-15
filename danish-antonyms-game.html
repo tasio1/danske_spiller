@@ -69,6 +69,46 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Hvad er en antonym?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En antonym er et ord, der betyder det modsatte af et andet ord, som varm og kold."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hvorfor er det nyttigt at lære modsætninger sammen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Når du kender begge ord i et par, er det lettere at huske dem, og du kan ofte gætte betydningen af et nyt ord, hvis du kender dets modsætning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hvilket niveau er Danske Modsætninger til?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Spillet går fra B1 til C1, så både øvede og viderekomne kan finde ord på deres niveau."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Er spillet kun quiz, eller kan jeg også spille et parspil?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Begge dele: du kan både blive testet i quizform og matche par i et hukommelsesspil."
+      }
+    }
+  ]
+}
+</script>
 <style>
   /* =========================================================
      THEME / DESIGN TOKENS
@@ -1647,6 +1687,15 @@ init();
   window.recordAnswer = function(){ origRec.apply(this, arguments); S.fx.bump(document.getElementById("runStreak")); };
 })();
 </script>
+<section class="sd-about" aria-labelledby="sd-about-h">
+  <h2 id="sd-about-h">Danske Modsætninger: øv antonymer</h2>
+  <p>Danske Modsætninger er gratis ordforrådsøvelser på B1–C1-niveau, hvor du lærer ord, der betyder det modsatte af hinanden. I quiz og par-spil matcher du modsætninger som stor og lille eller hurtig og langsom, og du støder på mere avancerede par, efterhånden som niveauet stiger. At kende modsætningerne gør det lettere at huske nye ord og at udtrykke sig mere præcist, når det modsatte ord ligger lige på tungen.</p>
+  <h3>Ofte stillede spørgsmål</h3>
+  <details><summary>Hvad er en antonym?</summary><p>En antonym er et ord, der betyder det modsatte af et andet ord, som varm og kold.</p></details>
+  <details><summary>Hvorfor er det nyttigt at lære modsætninger sammen?</summary><p>Når du kender begge ord i et par, er det lettere at huske dem, og du kan ofte gætte betydningen af et nyt ord, hvis du kender dets modsætning.</p></details>
+  <details><summary>Hvilket niveau er Danske Modsætninger til?</summary><p>Spillet går fra B1 til C1, så både øvede og viderekomne kan finde ord på deres niveau.</p></details>
+  <details><summary>Er spillet kun quiz, eller kan jeg også spille et parspil?</summary><p>Begge dele: du kan både blive testet i quizform og matche par i et hukommelsesspil.</p></details>
+</section>
 <nav class="sd-next" aria-label="Øv videre"><p class="sd-next-h">Øv videre</p><ul><li><a href="idiomjaeger.html">Idiomjægeren – danske talemåder og idiomer →</a></li><li><a href="danish_flashcards/danish_flashcards_game/index.html">Verb-glosekort – lær verbernes former →</a></li></ul></nav>
 </body>
 </html>

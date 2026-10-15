@@ -1,0 +1,1 @@
+Retest of 175918a: full spec 999 pass/0 fail; validators/smoke/seo exit 0; contrast all pairs (4 modes x 3 papers) >=4.5, frames/focus >=3.7; cloze 24-gap re-simulation: no second defensible answer; see chat report.

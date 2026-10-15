@@ -50,3 +50,80 @@ Rerun: `cd <worktree> && SHOT_ROOT=<main>/docs/redesign/screenshots node <main>/
 - Whether `scripts/gen-tal-og-tid-data.js` regenerates data.js byte-identically (not run, would overwrite game data).
 - Cross-game link (`en-og-et`) target correctness beyond href presence; real touch devices.
 - Retest cycle: this was the first test of this commit; nothing retested.
+
+---
+
+# Retest cycle 1 - 547dea6364d4df4b204e988cd1035ecfa26c9953
+
+Verdict: PASS (TT-1 fixed; flag 1 and 2 resolved in data; native flags 3-7 remain)
+Tested: task/tal-og-tid@547dea6364d4df4b204e988cd1035ecfa26c9953 (index.html and shared/ unchanged since fde2633; data.js, generator, tests changed)
+
+| Check | Result | Evidence |
+|---|---|---|
+| Data structure + independent recomputation | PASS | 965 items; klokken A1 60 / A2 228 / B1 144; my clock parser agrees with all 432 (x:20 = `ti i halv X`, x:40 = `ti over halv X`), no option shares the correct meaning; numbers/years/ordinals unchanged and still match; 0 duplicates |
+| TT-1 midnight notes | PASS | `k-digital-0000`: "Kl. 00 er midnat og står som 12 på det analoge ur. Hel time: ... klokken tolv er 00:00." |
+| Flag 1 (tyve over/i) | RESOLVED | primary answers now `ti i halv X`/`ti over halv X`; 72 items carry `alt_phrases` (`tyve over/i X`), none appear as options. Note: `alt_phrases` is data only - the game never reads it; no impact |
+| Flag 2 (regent capitals) | RESOLVED | `Tiende`, `Anden` (3 items) |
+| Full spec, run 1 | PASS | 73/73 |
+| bulk + typed repeated, runs 2 and 3 | PASS | 12/12 each (every one of 965 items at 360 px; 1567 typed variants) |
+| Smoke | PASS | all green |
+
+## The reported "flake" (bulk 144/432 klokken seen, typed section failing) was a harness defect, not a game flake
+- Cause: every puppeteer page on `file://` shares one localStorage. The `func` section's group-sweep leaves the last chosen group saved (`tal-og-tid:group:<mode>`), and the next section (bulk/typed) inherited it. Numbers reproduce exactly: klokken 144 = group *Digitalt ur*, tal 17 = *Hundreder*, aarstal 58 = *Priser*. The typed section then hit an empty pool (Hundreder has no typed items): the game correctly showed its "Der er ingen opgaver" empty state, which my oracle read as `no marker`. Observed once in my own combined run and once by the coder, both when `func` preceded the later sections; every section passes when run alone.
+- Fix (in `tests/tal-og-tid.mjs`, main repo): each page gets its own browser context. Evidence after fix: full spec 73/73, then bulk+typed twice more 12/12 and 12/12 (3 consecutive green runs, 0 flakes).
+- The branch's committed copy of `tests/tal-og-tid.mjs` is the pre-fix version and will still fail when run as a full combined spec; copy `tests/tal-og-tid.mjs` from the main repo (or the PM merges mine).
+- Harness note: two overlapping background runs also killed each other's Chrome ("Target closed"); that was my own scheduling mistake, not the game.
+
+Not covered (unchanged): native judgement of Danish, real TTS, screen reader.
+
+---
+
+# Retest cycle 2 (branch tip) - fa0c0fc
+
+Tested: task/tal-og-tid@fa0c0fc1d398d935033c32a04f61690a26a46993 (HEAD re-checked after the run, worktree clean)
+Verdict: PASS
+
+Changes since 547dea6: committed spec + QA appendix, portal registration (index.html card + GAMES entry, llms.txt, sitemap.xml, build-dist.sh DIRS).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Full spec (committed tests/tal-og-tid.mjs) | PASS | 73/73, exit 0; smoke exit 0 |
+| Root portal loads, zero console errors | PASS | worktree tree and built dist, 360 and 1440 px, light and dark: 0 issues, no h-scroll, 15 cards incl. Tal og tid, card visible, no small tap target in the card |
+| Card links to the game | PASS | click on `./tal-og-tid/index.html` card at 360 px lands on `tal-og-tid/index.html`, title "Tal og tid på dansk …", `#btn-play` present, 0 issues (tree and dist) |
+| Card visual | PASS | screenshot `docs/redesign/screenshots/tal-og-tid/portal-card-small.png` viewed: stopur sprite, title, tag Tal, A1-B1, description, Spil button |
+| sitemap.xml | PASS | XML parses; 29 `<url>`, 29 `<loc>` unique; new entry `https://sjovtdansk.dk/tal-og-tid/index.html` |
+| llms.txt | PASS | entry added with matching URL |
+| build-dist.sh | PASS | `bash -n` OK; run in a `git archive` copy under scratchpad (repo untouched): "dist ready: 118 files", `dist/tal-og-tid/{index.html,data.js}` and `dist/shared/themes/tal-og-tid.css` present, 3 manifest entries |
+
+Observations (not caused by this change): portal has one contrast item `TRYK START` (1.62:1), identical on master; the portal search box did not filter cards in my quick test on either master or the branch (not investigated). `build-dist.sh` was not run in the repo itself.
+
+---
+
+# Retest cycle 3 (after merge of origin/master) - 42d5502
+
+Tested: task/tal-og-tid@42d5502eb3c6b5528469560302318dfab3a7113b (HEAD unchanged after the run; only releaser agent-memory files dirty in the worktree, none of them game files)
+Verdict: PASS
+
+| Check | Result | Evidence |
+|---|---|---|
+| No conflict markers | PASS | `git grep` for `<<<<<<<`, `=======`, `>>>>>>>` over all tracked non-PNG files: none |
+| Portal, both cards | PASS | tree and built dist, 360/1440 px, light/dark: 16 cards, `Tal og tid` and `Læseforståelse` both visible, no h-scroll, 0 console issues |
+| Both cards link and games open | PASS | clicks land on `tal-og-tid/index.html` and `laeseforstaaelse/index.html` (tree and dist), titles correct, buttons render, 0 console issues |
+| sitemap.xml | PASS | parses; 30 `<loc>`, no duplicates; both entries present |
+| llms.txt | PASS | both entries present (1 each) |
+| build-dist.sh | PASS | `bash -n` OK; throwaway `git archive` copy: "dist ready: 126 files", both dirs in dist, 8 manifest entries under the two dirs |
+| Spec (tests/tal-og-tid.mjs) | PASS | 73/73, exit 0 |
+
+Not covered: Læseforståelse itself beyond opening it (another task's scope).
+
+---
+
+# Retest cycle 4 (merge of cb53f74) - f1831f0
+
+Tested: task/tal-og-tid@f1831f0cd0cd6a2eaf86637995ab4bb420b07b8f
+Verdict: PASS
+
+- `git diff 42d5502 f1831f0 --stat`: only `index.html`, 1 insertion: `<!-- <meta name="google-site-verification" content="REPLACE_WITH_TOKEN"> -->` (an HTML comment, inert).
+- Portal (tree and throwaway dist, 360/1440, light/dark): 16 cards, Tal og tid and Læseforståelse visible, 0 console issues, no h-scroll; both cards open their games, 0 issues.
+- sitemap.xml parses, 0 duplicate locs; no conflict markers; build-dist copy "dist ready: 126 files".
+- tests/tal-og-tid.mjs: 73/73, exit 0. HEAD unchanged after the run.

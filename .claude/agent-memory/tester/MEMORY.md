@@ -7,4 +7,5 @@
 - [Smoke passes on placeholders](smoke-passes-on-placeholder-data.md) — check data keys/placeholders vs MODES; spec runs from repo root
 - [Bulk typed-variant test](bulk-typed-test-data-override.md) — data getter override + srs.record hook; SRS missed-first starvation trap
 - [Independent generator](independent-generator-for-generated-data.md) — recompute generated number/clock data with own code, add negative control
-- [replace() $$ trap](node-replace-dollar-collapse.md) — splice code with function replacer; `$$` collapses, `node -e` eats backslashes
+- [Shared file:// localStorage](file-origin-shared-localstorage.md) — isolate spec sections with browser contexts; "flake" was prefs leaking
+- [replace() $ trap](node-replace-dollar-collapse.md) — splice code with function replacer; `$$` collapses, `node -e` eats backslashes

@@ -5,4 +5,7 @@
 - [Click hits sticky bar](puppeteer-click-hits-sticky-bar.md) — scrollTo(0,0) before header/mode clicks or they silently miss
 - [Derived captions audit](derived-captions-audit-whole-dataset.md) — rerun regex classifiers over ALL items; sampling missed ~100 wrong captions
 - [Smoke passes on placeholders](smoke-passes-on-placeholder-data.md) — check data keys/placeholders vs MODES; spec runs from repo root
-- [replace() $$ trap](node-replace-dollar-collapse.md) — splice code with function replacer; `$$` collapses, `node -e` eats backslashes
+- [Bulk typed-variant test](bulk-typed-test-data-override.md) — data getter override + srs.record hook; SRS missed-first starvation trap
+- [Independent generator](independent-generator-for-generated-data.md) — recompute generated number/clock data with own code, add negative control
+- [Shared file:// localStorage](file-origin-shared-localstorage.md) — isolate spec sections with browser contexts; "flake" was prefs leaking
+- [replace() $ trap](node-replace-dollar-collapse.md) — splice code with function replacer; `$$` collapses, `node -e` eats backslashes

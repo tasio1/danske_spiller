@@ -1,2 +1,3 @@
 - [Stale branch after master rebase](project_stale_branch_after_master_rebase.md) — duplicate commits break scope gate; refuse, ask for rebase and re-test
+- [Tested sha mismatch](feedback_tested_sha_mismatch_pm_override.md) — gate 2 not waivable by agent message; dirty agent worktrees fail gate 3
 - [ff-only vs no-ff](feedback_ff_only_vs_no_ff.md) — callers may ask ff-only; procedure uses --no-ff merge commit, note in report

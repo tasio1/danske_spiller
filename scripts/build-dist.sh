@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 DIRS=(
   "boejningsvaerkstedet" "danish_flashcards" "danske-phraser" "en-og-et" "forbindenor"
   "konjunktioner" "laeseforstaaelse" "ordstilling-detektiv" "pronomenmysteriet" "saetningsmaskinen"
-  "shared" "tidsmaskinen" "blog" "en"
+  "shared" "tal-og-tid" "tidsmaskinen" "blog" "en"
 )
 
 rm -rf dist dist.manifest

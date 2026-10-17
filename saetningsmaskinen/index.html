@@ -243,7 +243,7 @@
   var DATA = window.SAETNINGS_DATA || {};
   var GAME_ID = 'saetningsmaskinen';
   var ROUND_SIZE = 10;
-  var LEVELS = ['A2', 'B1', 'B2'];
+  var LEVELS = ['A2', 'B1', 'B2', 'C1'];
 
   var MODES = [
     { key: 'adverb_placement',    num: 1, name: 'Ikke-flytteren',               ready: true },
@@ -376,7 +376,7 @@
       }
       return m === 'direct_question' ? 'ja-nej' : 'om';
     }
-    if (m === 'relative_clause') return slug((item.accepted_answers || [])[0] || 'other');
+    if (m === 'relative_clause') return slug(((item.accepted_answers || [])[0] || 'other').split(' ')[0]);
     if (m === 'der_or_det') return slug(item.correct || 'other');
     if (m === 'clause_chain') return 'chain';
     return 'other';
@@ -695,9 +695,10 @@
       wrap.appendChild(frame);
     }
 
-    var tiles = item.tiles.slice();
+    var tiles = (opts.tokens || item.tiles).slice();
     var slotCount = tiles.length;
     var shuffled = shuffle(tiles.slice());
+    var tileClass = opts.tileClass ? (' ' + opts.tileClass) : '';
 
     var trayLabel = document.createElement('p');
     trayLabel.className = 'group-label';
@@ -728,7 +729,7 @@
         if (entry) {
           var b = document.createElement('button');
           b.type = 'button';
-          b.className = 'slot-item';
+          b.className = 'slot-item' + tileClass;
           b.textContent = entry.token;
           b.setAttribute('aria-label', 'Fjern ' + entry.token);
           b.addEventListener('click', (function(index){ return function(){ removeFromSlot(index); }; })(i));
@@ -789,7 +790,7 @@
     shuffled.forEach(function(token, index){
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'tile';
+      btn.className = 'tile' + tileClass;
       btn.textContent = token;
       btn.addEventListener('click', function(){ placeToken(index); });
       bankButtons.push(btn);
@@ -908,6 +909,208 @@
     }
   };
 
+  // Mode 5 — Relativværkstedet: free-text relative clause, accepts the marker form and omission.
+  RENDERERS.relative_clause = function(item){
+    var wrap = document.createElement('div');
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Opgave');
+
+    var tag = document.createElement('p');
+    tag.className = 'mode-tag';
+    tag.textContent = 'Opgave ' + (state.idx + 1) + ' · Relativværkstedet';
+    wrap.appendChild(tag);
+
+    var ctx = document.createElement('div');
+    ctx.className = 'source-line';
+    var ctxSpan = document.createElement('span');
+    ctxSpan.textContent = item.context;
+    ctx.appendChild(ctxSpan);
+    DC.ui.ttsButton(item.context, ctx);
+    wrap.appendChild(ctx);
+
+    var frameLine = document.createElement('div');
+    frameLine.className = 'frame-line';
+    var blank = null;
+    String(item.target_frame).split(/_{2,}/).forEach(function(seg, i, arr){
+      frameLine.appendChild(document.createTextNode(seg));
+      if (i < arr.length - 1) {
+        blank = document.createElement('span');
+        blank.className = 'blank';
+        blank.textContent = '?';
+        blank.setAttribute('aria-label', 'tomt felt');
+        frameLine.appendChild(blank);
+      }
+    });
+    wrap.appendChild(frameLine);
+    DC.ui.ttsButton(String(item.target_frame).replace(/_{2,}/g, '…'), frameLine);
+
+    var trayLabel = document.createElement('p');
+    trayLabel.className = 'group-label';
+    trayLabel.textContent = 'Skriv relativsætningen';
+    wrap.appendChild(trayLabel);
+
+    var form = document.createElement('div');
+    form.className = 'answer-actions';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer';
+    input.setAttribute('aria-label', 'Dit svar');
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('autocapitalize', 'off');
+    input.spellcheck = false;
+    var submit = document.createElement('button');
+    submit.type = 'button';
+    submit.className = 'btn accent';
+    submit.textContent = 'Svar';
+    form.appendChild(input);
+    form.appendChild(submit);
+    wrap.appendChild(form);
+
+    var slip = document.createElement('div');
+    wrap.appendChild(slip);
+
+    el.itemHost.innerHTML = '';
+    el.itemHost.appendChild(wrap);
+    input.focus();
+
+    var accepted = Array.isArray(item.accepted_answers) ? item.accepted_answers : [];
+    var answered = false;
+
+    function submitAnswer(){
+      if (answered) return;
+      var value = input.value.trim();
+      if (!value) return;
+      answered = true;
+      SOUND.select();
+      input.disabled = true;
+      submit.disabled = true;
+      var result = DC.diff.check(value, accepted);
+      var correct = result.correct;
+      var filledFrame = String(item.target_frame).replace(/_{2,}/, accepted[0] || '');
+      if (blank) {
+        blank.textContent = value;
+        blank.removeAttribute('aria-label');
+        blank.classList.add(correct ? 'done-correct' : 'done-wrong');
+      }
+      input.classList.add(correct ? 'done-correct' : 'done-wrong');
+      recordAnswer(item, correct);
+      if (correct) {
+        SOUND.correct();
+        if (!DC.ui.motion.isReduced()) wrap.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        sdFx(true, wrap);
+        DC.ui.ttsButton(filledFrame, slip);
+        advanceTimer = setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        DC.ui.announce('Forkert. Rigtigt svar: ' + filledFrame + '. ' + (item.note || ''));
+        sdFx(false, wrap);
+        buildSlip(slip, filledFrame, item.note, filledFrame);
+      }
+    }
+    submit.addEventListener('click', submitAnswer);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); } });
+  };
+
+  // Mode 6 — Der eller det?: choose the correct word for the blank.
+  RENDERERS.der_or_det = function(item){
+    var wrap = document.createElement('div');
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Opgave');
+
+    var tag = document.createElement('p');
+    tag.className = 'mode-tag';
+    tag.textContent = 'Opgave ' + (state.idx + 1) + ' · Der eller det?';
+    wrap.appendChild(tag);
+
+    var promptLine = document.createElement('div');
+    promptLine.className = 'prompt-line';
+    var blank = null;
+    String(item.sentence).split(/_{2,}/).forEach(function(seg, i, arr){
+      promptLine.appendChild(document.createTextNode(seg));
+      if (i < arr.length - 1) {
+        blank = document.createElement('span');
+        blank.className = 'blank';
+        blank.textContent = '?';
+        blank.setAttribute('aria-label', 'tomt felt');
+        promptLine.appendChild(blank);
+      }
+    });
+    wrap.appendChild(promptLine);
+    DC.ui.ttsButton(String(item.sentence).replace(/_{2,}/g, '…'), promptLine);
+
+    var trayLabel = document.createElement('p');
+    trayLabel.className = 'group-label';
+    trayLabel.textContent = 'Vælg det rigtige ord';
+    wrap.appendChild(trayLabel);
+    var bank = document.createElement('div');
+    bank.className = 'bank';
+    wrap.appendChild(bank);
+    var slip = document.createElement('div');
+    wrap.appendChild(slip);
+
+    el.itemHost.innerHTML = '';
+    el.itemHost.appendChild(wrap);
+
+    var answered = false;
+    var buttons = [];
+
+    shuffle(item.options.slice()).forEach(function(text){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tile violet';
+      btn.textContent = text;
+      btn.addEventListener('click', function(){ choose(btn, text); });
+      buttons.push(btn);
+      bank.appendChild(btn);
+    });
+
+    function choose(btn, text){
+      if (answered) return;
+      answered = true;
+      SOUND.select();
+      var correct = text === item.correct;
+      buttons.forEach(function(b){
+        b.disabled = true;
+        if (b === btn) b.classList.add(correct ? 'result-correct' : 'result-wrong');
+        else if (!correct && b.textContent === item.correct) b.classList.add('result-correct');
+      });
+      var filledSentence = String(item.sentence).replace(/_{2,}/, text);
+      var solution = String(item.sentence).replace(/_{2,}/, item.correct);
+      if (blank) {
+        blank.textContent = text;
+        blank.removeAttribute('aria-label');
+        blank.classList.add(correct ? 'done-correct' : 'done-wrong');
+      }
+      recordAnswer(item, correct);
+      if (correct) {
+        SOUND.correct();
+        btn.classList.add('pop');
+        if (!DC.ui.motion.isReduced()) wrap.classList.add('press');
+        DC.ui.announce('Rigtigt.');
+        sdFx(true, wrap);
+        DC.ui.ttsButton(filledSentence, slip);
+        advanceTimer = setTimeout(advance, 800);
+      } else {
+        SOUND.wrong();
+        btn.classList.add('bounce');
+        DC.ui.announce('Forkert. Rigtigt svar: ' + solution + '. ' + (item.note || ''));
+        sdFx(false, wrap);
+        buildSlip(slip, solution, item.note, solution);
+      }
+    }
+  };
+
+  // Mode 7 — Sætningskæden: reorder up to five clause chunks (shared tile-reorder, green clause tiles).
+  RENDERERS.clause_chain = function(item){
+    renderTileReorder(item, {
+      title: 'Sætningskæden',
+      tokens: item.chunks,
+      tileClass: 'green',
+      fullAnswer: item.sentence
+    });
+  };
+
   RENDERERS._fallback = function(){ renderEmpty(); };
 
   // ---- summary ----
@@ -922,6 +1125,9 @@
     if (m === 'main_to_subordinate') return item.full_answer || '';
     if (m === 'direct_question') return item.full_answer || '';
     if (m === 'indirect_question') return String(item.prompt || '').replace(/_{2,}/, (item.accepted_answers || [])[0] || '');
+    if (m === 'relative_clause') return String(item.target_frame || '').replace(/_{2,}/, (item.accepted_answers || [])[0] || '');
+    if (m === 'der_or_det') return String(item.sentence || '').replace(/_{2,}/, item.correct || '');
+    if (m === 'clause_chain') return item.sentence || '';
     return item.id;
   }
 

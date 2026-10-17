@@ -79,6 +79,7 @@
   .tile.coral{background:var(--coral);color:#fff;border-color:var(--coral);box-shadow:0 2px 0 rgba(0,0,0,.35)}
   .tile.blue{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 2px 0 rgba(0,0,0,.35)}
   .tile.violet{background:var(--violet);color:#fff;border-color:var(--violet);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .tile.green{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 2px 0 rgba(0,0,0,.35)}
   .tile:disabled{opacity:.3;cursor:default;box-shadow:none}
   .tile:not(:disabled):hover{transform:rotate(-1.5deg) translateY(-1px)}
   .tile:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -99,6 +100,15 @@
   .slot-fixed{min-height:44px;padding:.5em .85em;border-radius:9px;border:2px solid var(--ink);background:var(--panel-2);color:var(--text);font-weight:600;display:inline-flex;align-items:center}
   .slot-empty{min-height:44px;min-width:44px}
   .slot-item{min-height:44px;padding:.5em .85em;border-radius:9px;border:2px solid var(--ink);background:var(--tile);color:var(--ink);cursor:pointer;font:inherit;font-weight:600}
+  .slot-item.coral{border-left:6px solid var(--coral)}
+  .slot-item.blue{border-left:6px solid var(--blue)}
+  .slot-item.green{border-left:6px solid var(--green)}
+
+  input.answer{min-height:44px;min-width:7em;padding:.4em .6em;border:1px solid var(--line);border-radius:10px;background:var(--dc-input-bg);color:var(--text);font:inherit;font-size:1.05rem}
+  input.answer:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  input.answer.done-correct{border:2px solid var(--dc-correct);background:var(--dc-correct-bg)}
+  input.answer.done-wrong{border:2px solid var(--wrongc);background:var(--dc-wrong-bg)}
+  .answer-actions{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-top:.7em}
 
   .source-line,.frame-line{font-size:1.1rem;margin:.3em 0;display:flex;align-items:center;gap:.5em;flex-wrap:wrap}
   .frame-line .dots{color:var(--muted);font-style:italic}
@@ -240,9 +250,9 @@
     { key: 'main_to_subordinate', num: 2, name: 'Hovedsætning til ledsætning',  ready: true },
     { key: 'direct_question',     num: 3, name: 'Byg spørgsmålet',              ready: true },
     { key: 'indirect_question',   num: 4, name: 'Indirekte spørgsmål',          ready: true },
-    { key: 'relative_clause',     num: 5, name: 'Relativværkstedet',            ready: false },
-    { key: 'der_or_det',          num: 6, name: 'Der eller det?',                ready: false },
-    { key: 'clause_chain',        num: 7, name: 'Sætningskæden',                ready: false }
+    { key: 'relative_clause',     num: 5, name: 'Relativværkstedet',            ready: true },
+    { key: 'der_or_det',          num: 6, name: 'Der eller det?',                ready: true },
+    { key: 'clause_chain',        num: 7, name: 'Sætningskæden',                ready: true }
   ];
   var MODE_BY_KEY = {};
   MODES.forEach(function(m){ MODE_BY_KEY[m.key] = m; });
@@ -366,6 +376,9 @@
       }
       return m === 'direct_question' ? 'ja-nej' : 'om';
     }
+    if (m === 'relative_clause') return slug((item.accepted_answers || [])[0] || 'other');
+    if (m === 'der_or_det') return slug(item.correct || 'other');
+    if (m === 'clause_chain') return 'chain';
     return 'other';
   }
   function patternKey(item){ return 'pattern:' + GAME_ID + ':' + effMode(item) + ':' + patternBucket(item); }

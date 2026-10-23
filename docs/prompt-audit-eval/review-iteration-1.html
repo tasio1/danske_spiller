@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "claude-prompt-audit", "runs": [{"id": "ci-and-headless-automation-with_skill", "prompt": "before I turn the nightly job on for real, review the claude automation in this repo (the CI workflows and the nightly script) for anything risky. write it up as a report.", "eval_id": null, "outputs": [{"name": "report.md", "type": "text", "content": "# Prompt audit \u00e2\u20ac\u201d calc repo (Claude automation)\n(Saved by the eval harness from the subagent's hand-back; subagent Write of report files was blocked.)\n\nDate: 2026-10-22 \u00c2\u00b7 Branch: `main` \u00c2\u00b7 Read-only; `nightly.sh` not run.\n\n| Surface | Files |\n|---|---|\n| Project memory | `CLAUDE.md` |\n| Headless CLI | `nightly.sh` \u00e2\u2020\u2019 `prompts/nightly.md` |\n| claude-code-action | `.github/workflows/claude-fix.yml`, `claude-triage.yml` |\n| Gates relied on | `package.json` (`npm test`), `.gitignore` |\n| Evidence | `git log` (3 `auto: nightly leftovers` commits), `nightly-output.json`, `.env.local` |\n\nOverall: Written rules are sensible; the plumbing undoes them. Damage already in history: 3 unreviewed commits on `main`, one committed a secret. **Don't enable the nightly until H1\u00e2\u20ac\u201cH3 are fixed.**\n\n## High\n### H1. `nightly.sh` wrapper commits everything and pushes, overriding every prompt rule\n- `nightly.sh:10-12` `git add -A` / `git commit \u00e2\u20ac\u00a6 || true` / `git push`, unconditionally, on the current branch.\n- Conflicts with `prompts/nightly.md:2` (never commit/push main), `:3` (commit only if green), `:7` (stop without committing), `CLAUDE.md:3` (nobody pushes to main).\n- Evidence: `main` has three `auto: nightly leftovers 2026-10-19/20/21` commits; `src/math.ts` sub/mul landed unreviewed.\n- Fix: delete lines 9\u00e2\u20ac\u201c12; check `branch != main`; enable branch protection.\n\n### H2. Secret committed by the wrapper; `.gitignore` doesn't cover it\n- `.gitignore:1` only `.env`; `.env.local` swept in by `git add -A`.\n- Evidence: commit \"auto: nightly leftovers 2026-10-20\" adds `.env.local` (`TOKEN=\u00e2\u20ac\u00a6`) and `nightly-output.json`.\n- Fix: rotate token, purge if pushed, ignore `.env*`, `nightly-output.json`, `NIGHTLY.log`.\n\n### H3. Nightly allow-list can't do what the prompt requires; bypass flag makes intent unclear\n- `nightly.sh:7-8` `--allowedTools \"Read,Write,Edit,Glob,Grep\"` (no Bash) + `--dangerously-skip-permissions`.\n- Prompt requires git branch, `npm test`, commit, `gh pr create`.\n- Unconfirmed which flag wins in their CLI version: either agent can't do any of it (fits history), or it has unrestricted shell.\n- Fix: drop bypass flag; scoped Bash for exactly those commands; branch protection.\n\n### H4. `@claude` fix workflow: no prompt, broad write tools, issue trigger\n- `claude-fix.yml` no `prompt:`; tools `Edit,Write,Bash(git *),Bash(npm *),Bash(curl *)`; `contents: write` etc.\n- Conflicts with CLAUDE.md PR rule; curl enables exfiltration; npm runs arbitrary packages with the API key present.\n- Fix: drop curl, narrow git to `claude/*`, add explicit prompt, drop `id-token` unless needed, author_association check.\n\n### H5. Triage told \"only label and comment\" but has code-write permissions; interpolates untrusted issue title\n- `claude-triage.yml:20` vs `:22` (Edit, Write, Bash(git *)) and `:9` `contents: write`; `:18` `${{ github.event.issue.title }}` in the prompt; any issue opener triggers it.\n- Fix: tools \u00e2\u2020\u2019 Read/Glob/Grep + gh issue edit/comment; `contents: read`; pass only the issue number and read it as untrusted data.\n\n## Medium\n- M1. `npm test` is `echo ok` \u00e2\u20ac\u201d the gate every prompt relies on always passes.\n- M2. Loop never ticks TODO items; next run redoes item 1.\n- M3. No timeout/cost cap or failure alert beyond `--max-turns 40`.\n- M4. `nightly/\u003cdate>` branch collides on same-day rerun.\n\n## Low\n- No NOT VERIFIED rule in nightly prompt.\n- `claude-fix.yml` `if:` refires on every comment once issue body mentions @claude.\n- Actions pinned to tags, not SHAs.\n\n## What's working\n- Nightly prompt has the right shape (unattended notice, branch rule, test gate, PR-and-stop, 3-failure stop).\n- Short, clear CLAUDE.md. `set -euo pipefail`, `--max-turns`. Narrow triage job description.\n\n## Suggested order\nRotate token \u00e2\u2020\u2019 remove wrapper push + widen .gitignore \u00e2\u2020\u2019 branch protection \u00e2\u2020\u2019 fix nightly flags + real tests \u00e2\u2020\u2019 lock down workflows \u00e2\u2020\u2019 M2\u00e2\u20ac\u201cM4, one supervised run.\n"}], "grading": {"expectations": [{"text": "The report flags that nightly.sh runs git add -A, commits and pushes after the agent finishes, contradicting the nightly prompt's branch/PR rule and/or CLAUDE.md's rule that nobody pushes to main.", "passed": true, "evidence": "H1 nightly.sh:10-12 vs nightly.md:2,3,7 and CLAUDE.md:3"}, {"text": "The report cites git history (the 'auto: nightly leftovers' commits on main) as evidence the problem already happened, and notes that a committed file such as .env.local or nightly-output.json was swept in.", "passed": true, "evidence": "H1/H2 cite 3 auto: nightly leftovers commits on main; .env.local + nightly-output.json swept in"}, {"text": "The report flags that the nightly prompt requires running npm test and/or gh pr create (and creating a branch) but the --allowedTools list contains no Bash.", "passed": true, "evidence": "H3 allow-list has no Bash vs branch/npm test/commit/gh pr create"}, {"text": "The report flags --dangerously-skip-permissions on the unattended run (including its tension with the --allowedTools list) as a risk.", "passed": true, "evidence": "H3 bypass flag + allowedTools contradiction, flags uncertainty about precedence"}, {"text": "The report flags that claude-fix.yml passes no prompt (so the repo's rules aren't stated) while granting broad tools such as Bash(git *) / Bash(curl *) with contents: write.", "passed": true, "evidence": "H4 'There is no prompt:' + git/npm/curl tools, contents: write"}, {"text": "The report flags that claude-triage.yml's tools/permissions (contents: write, Edit/Write, Bash(git *)) exceed its label-and-comment-only prompt.", "passed": true, "evidence": "H5 triage Edit/Write/Bash(git *) + contents: write vs label-only prompt"}, {"text": "The report notes that the triage prompt interpolates the untrusted issue title directly into the prompt (prompt-injection risk).", "passed": true, "evidence": "H5 issue title interpolated into prompt"}], "summary": {"passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0}, "timing": {"total_duration_seconds": 127.2}}}, {"id": "ci-and-headless-automation-without_skill", "prompt": "before I turn the nightly job on for real, review the claude automation in this repo (the CI workflows and the nightly script) for anything risky. write it up as a report.", "eval_id": null, "outputs": [{"name": "report.md", "type": "text", "content": "# Claude automation risk review (baseline, no skill)\n(Condensed by the eval harness from the subagent's hand-back; its Write of report files was blocked. Findings and evidence preserved.)\n\nBottom line: don't turn the nightly on. Prompt describes a safe flow; the script does the opposite. Three `auto: nightly leftovers` commits already on `main`, one committed `.env.local` with a token.\n\n| # | Severity | Where | Problem |\n|---|---|---|---|\n| 1 | Critical | git history / .gitignore | Secret token committed on main (commit `bbb2472`, \"auto: nightly leftovers 2026-10-20\"; `.gitignore` only has `.env`) |\n| 2 | Critical | nightly.sh:9-12 | `git add -A && git commit && git push` overrides every prompt rule (never push main, commit only if green, stop on failure, open PR) and CLAUDE.md \"nobody pushes to main\"; also commits nightly-output.json each night |\n| 3 | Critical | nightly.sh | `--dangerously-skip-permissions` makes `--allowedTools` meaningless \u00e2\u2020\u2019 full shell at 02:00 as the user; TODO.md becomes an injection path |\n| 4 | High | claude-fix.yml | No author gate; `issue.body` clause re-fires on every later comment; `curl *` = exfiltration, `npm *` = arbitrary code, `git *` = push to main/force; contents: write. (Does not explicitly note the missing `prompt:`.) |\n| 5 | High | claude-triage.yml | Runs on every issue from anyone; untrusted title interpolated into prompt (prompt injection, not shell injection); prompt says never modify code/push but tools Edit/Write/Bash(git *) + contents: write allow it; gh issue edit works on any issue; both workflows fire on one issue |\n| 6 | Medium | both workflows | id-token: write unneeded; floating tags; no timeout/max-turns; no concurrency; persist-credentials |\n| 7 | Medium | nightly design | `npm test` is `echo ok`; stale TODO repeats work; prompt needs git/npm/gh but allow-list is file tools only; branch push not covered; no idempotency; failures unnoticed (.json without --output-format json); no spend cap; schedule not in repo |\n\nRecommended order: rotate token + fix .gitignore \u00e2\u2020\u2019 branch protection \u00e2\u2020\u2019 strip wrapper commit/push and bypass flag, narrow allow-list \u00e2\u2020\u2019 real tests + tick TODO, supervised run \u00e2\u2020\u2019 lock down claude-fix \u00e2\u2020\u2019 lock down triage \u00e2\u2020\u2019 pin SHAs.\n"}], "grading": {"expectations": [{"text": "The report flags that nightly.sh runs git add -A, commits and pushes after the agent finishes, contradicting the nightly prompt's branch/PR rule and/or CLAUDE.md's rule that nobody pushes to main.", "passed": true, "evidence": "#2 wrapper add/commit/push overrides prompt rules and CLAUDE.md"}, {"text": "The report cites git history (the 'auto: nightly leftovers' commits on main) as evidence the problem already happened, and notes that a committed file such as .env.local or nightly-output.json was swept in.", "passed": true, "evidence": "#1/#2 commit bbb2472 committed .env.local; nightly-output.json committed"}, {"text": "The report flags that the nightly prompt requires running npm test and/or gh pr create (and creating a branch) but the --allowedTools list contains no Bash.", "passed": true, "evidence": "#7 prompt needs git/npm/gh but allow-list is file tools only"}, {"text": "The report flags --dangerously-skip-permissions on the unattended run (including its tension with the --allowedTools list) as a risk.", "passed": true, "evidence": "#3 bypass flag makes allow-list meaningless"}, {"text": "The report flags that claude-fix.yml passes no prompt (so the repo's rules aren't stated) while granting broad tools such as Bash(git *) / Bash(curl *) with contents: write.", "passed": false, "evidence": "#4 covers broad tools + write token and missing author gate, but never notes that claude-fix.yml passes no prompt"}, {"text": "The report flags that claude-triage.yml's tools/permissions (contents: write, Edit/Write, Bash(git *)) exceed its label-and-comment-only prompt.", "passed": true, "evidence": "#5 tools/token allow code changes despite label-only prompt"}, {"text": "The report notes that the triage prompt interpolates the untrusted issue title directly into the prompt (prompt-injection risk).", "passed": true, "evidence": "#5 untrusted title interpolated into prompt"}], "summary": {"passed": 6, "failed": 1, "total": 7, "pass_rate": 0.86}, "timing": {"total_duration_seconds": 151.5}}}, {"id": "pipeline-seams-and-shared-gate-with_skill", "prompt": "can you audit my agent setup? the shipper keeps refusing releases and im not sure the pipeline prompts actually line up with each other. write the findings up somewhere i can read them.", "eval_id": null, "outputs": [{"name": "final_message.md", "type": "text", "content": "I audited your agent setup. The shipper is right to refuse: the agents before it hand over work in a state its gate rejects. The report is at `C:/Users/taras/AppData/Local/Temp/claude/C--Users-taras-Downloads-danske-spiller/429dbd3c-663f-4adf-a10e-8fb790b37087/scratchpad/claude-prompt-audit-workspace/iteration-1/pipeline-seams-and-shared-gate/with_skill/outputs/report.md`. I didn't change any of your files.\n\n**Why the shipper refuses**\n- **Leftover memory files:** the builder commits its work, then writes its notes to `.claude/agent-memory/builder/` (`builder.md:13` and `:15`). Those notes are uncommitted files in the task folder, and the shipper's second check requires a clean folder (`shipper.md:12`). The shipper's own notes record 3 refusals this week for exactly this reason.\n- **Report filename mismatch:** the checker names its report after the feature (`reports/\u003cfeature-name>.md`), but the shipper looks for the task id (`reports/\u003ctask-id>.md`). For quiz-timer, the shipper looked for `reports/quiz-timer.md` and the checker had written `reports/timer.md`.\n- **Fix for both:** add `.claude/agent-memory/` and `reports/` to `.gitignore`, and have the checker name its report after the task id.\n\n**The bigger problem: the data check passes data it never looked at**\n- The builder and checker prompts both say `scripts/check-data.js` validates every data file, including `features/*/data.json`. It only reads `data/shared/`.\n- `npm test` runs that same script, so you effectively have one check, not two.\n- I ran it: `TOTAL errors: 0`. But `features/quiz/data.json` has a duplicate id and an empty answer. The pipeline would pass that data and ship it.\n\n**Other things that don't line up**\n- `docs-writer` runs `git push origin main` directly. That breaks the \"only the shipper pushes\" rule, and the orchestrator never dispatches it.\n- The builder is told to run tests and commit, but it doesn't have Bash, so it can't do either.\n- The checker can report `FLAKY` or `NOT VERIFIED`, but the orchestrator and shipper only know PASS and FAIL.\n- No agent creates or names the task branch.\n\nThe report ranks all of this by severity, with file:line references and a suggested order. The folder isn't a git repo, so I couldn't check commit history.\n\nShould I start with the data check script and the memory/report fixes?\n"}, {"name": "report.md", "type": "text", "content": "# Prompt audit \u00e2\u20ac\u201d feature pipeline (orchestrator, builder, checker, shipper, docs-writer)\n(Saved by the eval harness from the subagent's hand-back; subagent Write of report files was blocked.)\n\nDate: 2026-10-22 \u00c2\u00b7 Branch: n/a (fixture is not a git repo)\n\n| Surface | Files |\n|---|---|\n| Subagents | `.claude/agents/orchestrator.md`, `builder.md`, `checker.md`, `shipper.md`, `docs-writer.md` |\n| Shared gate | `scripts/check-data.js` (also `npm test` via `package.json`) |\n| Agent memory (evidence) | `.claude/agent-memory/shipper/refusals.md` |\n| Skills / commands / CLAUDE.md / workflows / headless / hooks | none found |\n\nMethod: inventory script \u00e2\u2020\u2019 read every prompt \u00e2\u2020\u2019 producer/consumer comparison \u00e2\u2020\u2019 tools vs instructions \u00e2\u2020\u2019 referenced files \u00e2\u2020\u2019 ran `node scripts/check-data.js`.\n\nOverall: Sound shape (one orchestrator, independent checker, single pusher with strict gate). The shipper's refusals are correct \u00e2\u20ac\u201d upstream prompts hand it work in a state its gate rejects (dirty worktree, wrong report filename). Bigger risk: the data gate builder and checker both rely on doesn't check feature data at all.\n\n## High\n### H1. Shared data gate skips every `features/*/data.json` \u00e2\u20ac\u201d broken feature data passes\n- What: `scripts/check-data.js:4` only reads `data/shared/`.\n- Conflicts with: `builder.md:12` (\"validates every data file in the repo, including features/*/data.json\"), `checker.md:9` (\"the data gate for the whole repo\"); `package.json` makes `npm test` the same script \u00e2\u20ac\u201d the \"two checks\" are one check run twice.\n- Evidence: `features/quiz/data.json` has duplicate id `q1` and an empty answer; running the gate \u00e2\u2020\u2019 `words.json: 2 items` / `TOTAL errors: 0` (exit 0). Checker would write PASS, shipper would merge.\n- Fix: also scan `features/*/data.json`, print each file checked; then fix the quiz data; give `npm test` real tests or say plainly it's the same check.\n\n### H2. Builder's \"write memory after task\" vs shipper gate 2 (clean worktree) \u00e2\u20ac\u201d main cause of refusals\n- What: `builder.md:13` commit + leave tree clean; `builder.md:15` write lessons to `.claude/agent-memory/builder/` at end of every task (after the commit).\n- Conflicts with: `shipper.md:12` gate 2.\n- Evidence: `refusals.md:7` \"Refused 3 releases this week (quiz-scoring, quiz-timer, data-cleanup): gate 2 failed because the task worktree had uncommitted files under .claude/agent-memory/builder/.\"\n- Unconfirmed related risk: checker's report location unspecified \u00e2\u20ac\u201d uncommitted \u00e2\u2020\u2019 gate 2; committed \u00e2\u2020\u2019 moves tip, fails gate 1 sha check.\n- Fix: keep agent memory + reports out of the task worktree (gitignore or main checkout); or reorder builder (memory \u00e2\u2020\u2019 final commit), noting `chore:`/`docs:` commits fail gate 3 regex.\n\n### H3. Checker writes report under feature name; shipper looks under task id\n- `checker.md:13` `reports/\u003cfeature-name>.md` vs `shipper.md:11` `reports/\u003ctask-id>.md`; orchestrator passes task id (`orchestrator.md:12`).\n- Evidence: `refusals.md:8` \"checker had written reports/timer.md\".\n- Fix: `reports/\u003ctask-id>.md`; orchestrator passes task id to checker explicitly.\n\n### H4. docs-writer pushes straight to `origin main`, ungated\n- `docs-writer.md:8` \"git push origin main\", unrestricted Bash.\n- Conflicts with `shipper.md:8` (only agent allowed to push), `orchestrator.md:12`; `docs:` would fail gate 3 anyway.\n- Not dispatched by orchestrator (`orchestrator.md:15` lists only builder/checker/shipper); loads non-existent `style-guide` skill (`docs-writer.md:6`, no `.claude/skills/`).\n- Evidence: none of actual pushes (no git history) \u00e2\u20ac\u201d High on possibility.\n- Fix: remove push; branch + hand off via orchestrator/shipper, or delete agent; create or drop the skill reference.\n\n## Medium\n- **M1. Builder told to run commands and commit but has no Bash** (`builder.md:4` vs `:12-13`). Test output will be missing or fabricated; nobody owns commit message format. Fix: scoped Bash + NOT VERIFIED rule.\n- **M2. Verdict vocabulary mismatch.** `checker.md:16` PASS|FAIL, `:20` adds FLAKY, `:21` NOT VERIFIED; orchestrator handles PASS/FAIL only, shipper PASS only. Fix: list all four, add orchestrator handling.\n- **M3. No prompt creates/names the task branch or worktree** (builder/checker/shipper assume one; orchestrator never creates/passes it).\n- **M4. No path for shipper refusal** in orchestrator; shipper memory says \"ask orchestrator to clean\" but no prompt gives that job.\n- **M5. Force-push ban is prompt-only** for shipper and docs-writer (unrestricted Bash); add deny rules in settings.json.\n\n## Low\n- `checker.md:4` has no Write but must write a report.\n- `shipper.md:6` `memory: project` \u00e2\u2020\u2019 same dirty-tree risk.\n- docs-writer has no `model:`; very broad description invites auto-dispatch.\n- Base branch `main` unverified (no git repo).\n\n## What's working (keep)\n- Strict shipper gate (sha = tip, commit regex, \"refusing is a correct outcome\").\n- Independent checker with NOT VERIFIED rule.\n- Orchestrator caps FAIL rounds at 2.\n- Shipper logs refusal reasons \u00e2\u20ac\u201d that is what diagnosed H2/H3.\n\n## Suggested order\n1. H1 \u00e2\u2020\u2019 2. H2+H3 (stops refusals) \u00e2\u2020\u2019 3. H4 \u00e2\u2020\u2019 4. M1\u00e2\u20ac\u201cM3 \u00e2\u2020\u2019 5. M4, M5, Lows.\n"}], "grading": {"expectations": [{"text": "The report identifies that scripts/check-data.js only validates data/shared/*.json (not features/*/data.json), even though builder and/or checker prompts treat it as the gate for all data files \u2014 and supports this by reading or running the script.", "passed": true, "evidence": "H1: check-data.js:4 reads only data/shared; ran it: TOTAL errors 0 despite duplicate q1 + empty answer in features/quiz/data.json"}, {"text": "The report flags that builder is instructed to run npm test / node scripts/check-data.js but its tools list has no Bash, so it cannot run them.", "passed": true, "evidence": "M1: builder.md:4 tools lack Bash vs :12-13 run npm test/node"}, {"text": "The report flags at least one checker\u2192shipper hand-off mismatch: checker can emit FLAKY which shipper's gate doesn't handle, or checker writes reports/\u003cfeature-name>.md while shipper reads reports/\u003ctask-id>.md.", "passed": true, "evidence": "H3 report path feature-name vs task-id; M2 FLAKY/NOT VERIFIED unhandled"}, {"text": "The report connects builder's end-of-task memory writes with the clean-worktree requirement (builder's own rule and/or shipper gate 2) as the cause of refused releases, citing the shipper agent-memory note as evidence.", "passed": true, "evidence": "H2 cites builder.md:13,15, shipper.md:12 and quotes refusals.md:7"}, {"text": "The report flags that docs-writer pushes directly to main, contradicting the rule that shipper is the only agent allowed to push.", "passed": true, "evidence": "H4: docs-writer.md:8 git push origin main vs shipper.md:8"}, {"text": "The report notes that docs-writer depends on a style-guide skill that does not exist in the repo.", "passed": true, "evidence": "H4: style-guide skill missing, no .claude/skills/"}, {"text": "The report is saved to a file, groups findings by severity (e.g. High/Medium/Low), and each of the top findings cites specific files (with line numbers or quoted text).", "passed": true, "evidence": "High/Medium/Low sections with file:line; report file saved by harness from hand-back because subagent Write was blocked"}], "summary": {"passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0}, "timing": {"total_duration_seconds": 133.6}}}, {"id": "pipeline-seams-and-shared-gate-without_skill", "prompt": "can you audit my agent setup? the shipper keeps refusing releases and im not sure the pipeline prompts actually line up with each other. write the findings up somewhere i can read them.", "eval_id": null, "outputs": [{"name": "final_message.md", "type": "text", "content": "The shipper is right to refuse. The prompts feeding it send it work it's told to reject. I read every agent file, the shipper's memory and the check script, and ran the script. I didn't change anything in the repo.\n\nThe full write-up is at `C:/Users/taras/AppData/Local/Temp/claude/C--Users-taras-Downloads-danske-spiller/429dbd3c-663f-4adf-a10e-8fb790b37087/scratchpad/claude-prompt-audit-workspace/iteration-1/pipeline-seams-and-shared-gate/without_skill/outputs/report.md`.\n\n**Why releases get refused:**\n1. **The builder leaves its worktree dirty.** It's told to leave a clean tree, then to write lesson files to `.claude/agent-memory/builder/` after its last commit. That breaks shipper gate 2 every time, and it's the cause your shipper logged for 3 of this week's refusals. Easiest fix: gitignore `.claude/agent-memory/`.\n2. **The checker and shipper name the report differently.** The checker writes `reports/\u003cfeature-name>.md` and the shipper looks for `reports/\u003ctask-id>.md`. That's why the `quiz-timer` report ended up as `timer.md` and the shipper couldn't find it. Use the task id in both.\n3. **The report location makes gates 1 and 2 contradict each other.** If the report sits uncommitted in the task worktree, the tree is dirty. If it's committed, the branch tip no longer matches the tested sha. Keep reports outside the worktree, or gitignore `reports/`.\n4. **The builder can't run anything.** It has no Bash tool, but its prompt tells it to run `npm test` and `check-data`, then commit.\n\n**Worse than the refusals: the data gate doesn't check what everyone thinks.** `scripts/check-data.js` only reads `data/shared/`, but the builder and checker prompts both say it covers every data file. `features/quiz/data.json` has a duplicate id `q1` and an empty answer, and the script still exits 0. Also, `npm test` runs the same script, so the \"two checks\" are really one.\n\n**Other places the prompts don't line up:**\n- The checker can return `FLAKY` or `NOT VERIFIED`, but the orchestrator only has rules for PASS and FAIL.\n- Nobody creates the task branch or worktree, or passes the branch and sha to the checker and shipper.\n- The docs-writer pushes straight to `main`, which breaks \"only shipper pushes\". It also isn't in the orchestrator's list, and it loads a `style-guide` skill that doesn't exist.\n- The shipper's memory says to \"ask orchestrator to clean\", which a subagent can't do.\n- I couldn't confirm the branch name: the prompts push to `main`, but your main project uses `master`.\n\nThe report has a seam-by-seam table and a suggested fix order. Want me to make the changes?"}, {"name": "report.md", "type": "text", "content": "# Agent pipeline audit (orchestrator, builder, checker, shipper, docs-writer)\n\nDate: 2026-10-22\nScope: every file in `.claude/agents/`, `.claude/agent-memory/shipper/refusals.md`, `scripts/check-data.js`, `package.json`, the data files and `TODO.md`. I read all of them in full and ran `node scripts/check-data.js`. I changed nothing in the repo.\n\n## TL;DR\n\nThe shipper is doing its job. The refusals come from the other prompts, which send it inputs it is told to reject. Three problems cause every refusal on record:\n\n1. **Builder dirties its own worktree after committing.** It is told to \"leave the working tree clean\" and then, \"at the end of every task\", to write lesson files into `.claude/agent-memory/builder/`. Those files are uncommitted, so shipper gate 2 (`git status --porcelain` empty) fails every time a builder learns something.\n2. **Checker and shipper name the report file differently.** Checker writes `reports/\u003cfeature-name>.md`. Shipper reads `reports/\u003ctask-id>.md`. For `quiz-timer` the checker wrote `reports/timer.md`, so the shipper found nothing and gate 1 failed.\n3. **The checker's report ends up in the gated worktree too.** If it stays uncommitted, gate 2 fails. If someone commits it, the branch tip moves away from the `Tested: \u003cbranch>@\u003csha>` value and gate 1 fails. As written, gates 1 and 2 cannot both pass.\n\nThere is also a separate problem that is arguably worse: **the shared data gate checks almost nothing.** `scripts/check-data.js` only reads `data/shared/`, but builder and checker are both told it validates every data file. `features/quiz/data.json` has a duplicate id and an empty answer, and the gate exits 0.\n\n---\n\n## Findings by severity\n\n### Critical: why releases are refused\n\n#### C1. Builder writes memory after its \"clean tree\" commit\n- `builder.md:13`: \"Commit on the task branch ... Leave the working tree clean when you report.\"\n- `builder.md:15`: \"At the end of every task, write any non-obvious lessons to `.claude/agent-memory/builder/`.\" (`memory: project` keeps this directory inside the repo.)\n- `shipper.md:12`: gate 2 needs `git status --porcelain` to be empty.\n- Evidence: `refusals.md:7` lists 3 of this week's refusals (quiz-scoring, quiz-timer, data-cleanup) for exactly this reason: \"Builder writes them after its last commit.\"\n\n**Fix (choose one, the first is cleanest):**\n- Add `.claude/agent-memory/` to `.gitignore`, so memory never appears in porcelain output. It is per-agent working memory, not product code.\n- Or reorder the builder prompt: \"Write lessons to `.claude/agent-memory/builder/` *before* your final commit and include them in it. Then confirm `git status --porcelain` is empty.\"\n- Or narrow the shipper gate to ignore `.claude/agent-memory/`. This is the weakest option because it hides the drift instead of fixing it.\n\n#### C2. The report path has no shared key\n- `checker.md:13`: `reports/\u003cfeature-name>.md`\n- `shipper.md:11`: `reports/\u003ctask-id>.md`\n- `orchestrator.md:10-12`: hands builder and shipper a **task id** but never tells the checker which name to use (\"dispatch checker on the same task\").\n- Evidence: `refusals.md:8`. The checker wrote `reports/timer.md` for task `quiz-timer`.\n\n**Fix:** use the task id everywhere. Change the checker line to \"Write your report to `reports/\u003ctask-id>.md`, where `\u003ctask-id>` is the id the orchestrator gave you (e.g. `quiz-timer`)\". Have the orchestrator pass task id, branch and worktree path to all three agents explicitly.\n\n#### C3. Where the report lives conflicts with gates 1 and 2\nThe checker writes the report inside the repo, and the prompts never say whether it gets committed:\n- If it stays uncommitted in the task worktree, it is an untracked file and gate 2 fails.\n- If it gets committed (by whom? the checker has no instruction to commit, and its tools do not include Write), the branch tip changes and `Tested: \u003cbranch>@\u003csha>` no longer matches it, so gate 1 fails.\n- If it is written in the main checkout, the shipper running in the task worktree may not find it at all. No prompt says which checkout `reports/` refers to.\n\n**Fix:** pick one location and state it in all three prompts. Two options work:\n- Write reports to a directory **outside the task worktree**, e.g. the main checkout's `reports/` (gitignored), or a path the orchestrator passes in. The shipper reads it from there.\n- Or make `reports/` gitignored and say so, which takes it out of the porcelain check.\n\n#### C4. Builder cannot do what its prompt asks\n`builder.md:4` grants `Read, Write, Edit, Glob, Grep`, with **no Bash**. The same prompt requires it to run `npm test` and `node scripts/check-data.js`, paste the output, and `git commit`. Without Bash it can do none of these. In practice it will fail the task, ask for help, or (worst case) report test output it never produced. If the orchestrator then commits on its behalf, the commit message format and the clean-tree promise are no longer the builder's responsibility.\n\n**Fix:** add `Bash` to the builder's tools.\n\n### High: the gate itself is hollow\n\n#### H1. `check-data.js` does not validate `features/*/data.json`\n- `scripts/check-data.js:4` hardcodes `data/shared` as the only directory.\n- `builder.md:12` says \"it validates every data file in the repo, including features/*/data.json\".\n- `checker.md:9` says \"this is the data gate for the whole repo.\"\n- `features/quiz/data.json` holds `q1` twice and an empty answer. Real run:\n\n      words.json: 2 items\n      TOTAL errors: 0      (exit 0)\n\nBuilder and checker both report this as a green gate, and the shipper merges bad data. Both prompts make a claim the code does not back up.\n\n**Fix:** have the script walk `data/shared/*.json` plus `features/*/data.json`, or take globs as arguments. Re-run it, and it should now fail on the quiz data. If you would rather not change the script yet, at least remove the false claim from both prompts so nobody trusts it.\n\n#### H2. `npm test` and `check-data` are the same command\n`package.json`: `\"test\": \"node scripts/check-data.js\"`. Builder and checker each run \"both\", so the report shows two green results that are really one. This is not a bug, but it overstates coverage. Either add real tests or drop the duplicate step from the prompts.\n\n#### H3. The checker can emit verdicts that nothing downstream handles\n- `checker.md:16` template: `Verdict: PASS | FAIL`.\n- `checker.md:20-21` adds `FLAKY` and `NOT VERIFIED`.\n- The orchestrator branches only on `PASS` and `FAIL` (`orchestrator.md:12-13`). The shipper accepts only `PASS`.\n\nA `FLAKY` or `NOT VERIFIED` task stalls with no rule for what happens next. **Fix:** list all four verdicts in the template, and give the orchestrator a rule for each (e.g. FLAKY goes back to the builder like FAIL; NOT VERIFIED means re-dispatch the checker with the missing check named).\n\n#### H4. Checker has no Write tool but must write a file\n`checker.md:4`: `Read, Glob, Grep, Bash`. It can still write the report through Bash redirection, but nothing tells it to. Add `Write`, or say explicitly \"write the report with Bash\". Better still, have the checker *return* the report text and let the orchestrator save it to the agreed path (see C3).\n\n### Medium: seams between the prompts\n\n#### M1. Nobody creates the branch or worktree, and nobody passes it on\nThe shipper refers to \"the task worktree\" and `\u003cbranch>`, and the builder commits \"on the task branch\". The orchestrator never creates either, and only gives the shipper a task id (`orchestrator.md:12`). The shipper has to guess the branch name. **Fix:** add a step 0 to the orchestrator (\"create branch `task/\u003ctask-id>` and a worktree at ...\"), and put task id, branch and worktree path in every dispatch.\n\n#### M2. The checker is not told which sha to test\nThe orchestrator dispatches the checker \"on the same task\" without the builder's commit sha. The checker has to work out `\u003cbranch>@\u003csha>` for itself, and a later stray commit silently invalidates the report. Pass the builder's reported sha through, and have the checker test exactly that sha.\n\n#### M3. docs-writer breaks the \"only shipper pushes\" rule and is outside the pipeline\n- `docs-writer.md:8`: commits `docs: ...` and runs `git push origin main` directly.\n- `shipper.md:8`: \"You are the only agent allowed to `git push`.\" `orchestrator.md:12` repeats this.\n- A `docs:` commit would also fail shipper gate 3 (`^(feat|fix)\\(.+\\): `) if it ever went through the shipper.\n- The orchestrator does not list docs-writer among its agents, so \"whenever a feature ships\" has no trigger.\n- It loads a `style-guide` skill that does not exist in this repo, and `docs/` does not exist either.\n\n**Fix:** decide whether docs belong in the pipeline. If yes, add a step after the shipper (or before the checker) where docs-writer commits on the task branch with no push. Allow `docs` in the shipper regex and add docs-writer to the orchestrator's list. If no, remove the push from docs-writer and say it runs by hand. Either way, create the style-guide skill or remove the reference.\n\n#### M4. The commit-type contract is narrower than real work\nThe builder is told to use only `feat(\u003cscope>): ...`, and the shipper accepts `feat|fix`. Rework rounds after a FAIL (\"max 2 rounds\") are naturally `fix(...)`, which the shipper accepts but the builder is never told to use. Any `chore`, `test`, `docs` or `refactor` commit, or an orchestrator-made commit, is refused. Make the builder prompt list the exact allowed types, and keep it in sync with the shipper regex.\n\n#### M5. The shipper's own memory teaches a workaround that cannot work\n`refusals.md:9` says: \"check porcelain first and ask orchestrator to clean.\" A subagent cannot message the orchestrator mid-run. It can only refuse and report. The orchestrator also has no rule for handling a shipper refusal. That memory will not stop refusals; the fixes in C1-C3 will. Once those land, replace the note so the shipper does not keep a stale belief. Also add a step 5 to the orchestrator: \"On shipper refusal, read the stated gate failure, fix the cause (or send it back to builder/checker), and re-dispatch the shipper once.\"\n\n### Low\n\n- **L1. Branch name.** The shipper and docs-writer push to `main`. I could not confirm this matches your repo's default branch, because this folder is not a git checkout. Your outer project uses `master`. Check it, because a wrong name makes `git switch main` fail.\n- **L2. The orchestrator must run as the main session.** It uses the `Agent` tool, and subagents cannot spawn subagents. Run it as `claude --agent orchestrator`. Say this in its description so it is never dispatched as a subagent.\n- **L3. Merge-gate scope.** Gate 3 says \"every commit message\", but not over which range. Specify `git log main..\u003cbranch> --format=%s`, otherwise the shipper may check all of history or include the merge commit it is about to create.\n- **L4. docs-writer has no `model`.** It inherits the session model. That is fine if intended.\n\n---\n\n## Contract table (what each agent produces vs what the next expects)\n\n| Seam | Producer says | Consumer expects | Status |\n|---|---|---|---|\n| Orchestrator to builder | task id, files, criteria | branch to commit on | branch never given (M1) |\n| Builder to shipper (tree) | \"clean tree\", then writes memory | empty porcelain | **broken** (C1) |\n| Builder tools | Read/Write/Edit/Glob/Grep | run npm/node/git | **broken** (C4) |\n| Checker to shipper (path) | `reports/\u003cfeature-name>.md` | `reports/\u003ctask-id>.md` | **broken** (C2) |\n| Checker report location | in repo, uncommitted | gates 1 + 2 both pass | **contradictory** (C3) |\n| Checker to orchestrator (verdict) | PASS/FAIL/FLAKY/NOT VERIFIED | PASS/FAIL | partial (H3) |\n| check-data to everyone | validates `data/shared` only | \"whole repo\" | **false claim** (H1) |\n| Builder commits to shipper regex | `feat(...)` | feat or fix | OK, but narrow (M4) |\n| docs-writer to push rule | pushes main directly | only shipper pushes | **violates** (M3) |\n\n## Suggested order of fixes\n\n1. Gitignore `.claude/agent-memory/` and `reports/`, or move reports outside the worktree (fixes C1 and C3 together).\n2. Change the checker to `reports/\u003ctask-id>.md`, and pass task id, branch, worktree and sha in every orchestrator dispatch (C2, M1, M2).\n3. Add `Bash` to the builder (C4), and `Write` to the checker or have it return the report text (H4).\n4. Make `check-data.js` cover `features/*/data.json`, then fix the duplicate `q1` and the empty answer in `features/quiz/data.json` (H1).\n5. Align the verdict set and add orchestrator rules for FLAKY, NOT VERIFIED and shipper refusal (H3, M5).\n6. Decide where docs-writer belongs, and remove its direct push (M3).\n7. Update the shipper's `refusals.md` memory once the fixes land."}], "grading": {"expectations": [{"text": "The report identifies that scripts/check-data.js only validates data/shared/*.json (not features/*/data.json), even though builder and/or checker prompts treat it as the gate for all data files \u2014 and supports this by reading or running the script.", "passed": true, "evidence": "H1 check-data.js does not validate features/*/data.json; ran script exit 0"}, {"text": "The report flags that builder is instructed to run npm test / node scripts/check-data.js but its tools list has no Bash, so it cannot run them.", "passed": true, "evidence": "C4 builder cannot do what its prompt asks (no Bash)"}, {"text": "The report flags at least one checker\u2192shipper hand-off mismatch: checker can emit FLAKY which shipper's gate doesn't handle, or checker writes reports/\u003cfeature-name>.md while shipper reads reports/\u003ctask-id>.md.", "passed": true, "evidence": "C2 report path; H3 verdicts nothing downstream handles"}, {"text": "The report connects builder's end-of-task memory writes with the clean-worktree requirement (builder's own rule and/or shipper gate 2) as the cause of refused releases, citing the shipper agent-memory note as evidence.", "passed": true, "evidence": "C1 quotes builder.md:13/15, shipper.md:12, shipper memory names cause of 3 refusals"}, {"text": "The report flags that docs-writer pushes directly to main, contradicting the rule that shipper is the only agent allowed to push.", "passed": true, "evidence": "M3 docs-writer breaks only-shipper-pushes rule"}, {"text": "The report notes that docs-writer depends on a style-guide skill that does not exist in the repo.", "passed": true, "evidence": "M3 notes style-guide skill doesn't exist"}, {"text": "The report is saved to a file, groups findings by severity (e.g. High/Medium/Low), and each of the top findings cites specific files (with line numbers or quoted text).", "passed": true, "evidence": "report.md with Critical/High/Medium/Low, file:line quotes (written via PowerShell after Write block)"}], "summary": {"passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0}, "timing": {"total_duration_seconds": 243.2}}}, {"id": "small-sound-setup-with_skill", "prompt": "quick sanity check of my claude config here (CLAUDE.md, the reviewer agent, and the PR review workflow). anything actually worth fixing?", "eval_id": null, "outputs": [{"name": "final_message.md", "type": "text", "content": "Short answer: the setup is sound. Two small fixes are worth making, and nothing is serious.\n\n**Worth fixing**\n\n1. **The CLAUDE.md test gate can't pass yet.** `CLAUDE.md:3` says \"run `pytest -q`, don't commit if it fails,\" but there's no `tests/` directory (and no pytest config). With no tests to collect, pytest exits with code 5, which counts as a failure. So Claude will either refuse to commit or learn to explain the failure away. Fix: add one `tests/test_notes.py` for `add_note`, or add \"exit 5 (no tests collected) is OK until tests/ exists.\"\n\n2. **The reviewer agent can't find the merge base it's told to diff against.** `reviewer.md:7` says \"git diff against the merge base,\" but its only tools are `git diff` and `git log`, and it isn't told the base branch. It can't run `git merge-base` or `git branch`. If it falls back to a plain `git diff`, it only sees unstaged changes and may wrongly report \"diff is empty\" and stop. Fix in one line, still within its current tools: \"Run `git diff main...HEAD` and `git diff HEAD`.\" Swap in your actual default branch name.\n\n**Optional**\n- The CI review prompt (`claude-review.yml:21`) is looser than your local reviewer: it has no \"concrete failing input\" bar. If you want them consistent, add \"Follow the reporting rules in .claude/agents/reviewer.md\" to the workflow prompt.\n- The workflow posts a new summary comment on every push (`synchronize`). claude-code-action's sticky-comment option should keep it to one, but I haven't checked it against your action version.\n\n**Already good, so leave it:** the fork-PR guard, `contents: read`, an explicit tool allow-list with no push or broad Bash, the read-only reviewer with a clear output format and an empty-diff stop, and a short, concrete CLAUDE.md.\n\nI didn't change any files. The directory isn't a git repo, so there was no commit history to check.\n"}], "grading": {"expectations": [{"text": "The audit reports no High-severity (or critical/blocker) findings for this setup.", "passed": true, "evidence": "Two Medium, rest Low; 'nothing is serious'"}, {"text": "The audit explicitly recognises at least two things done well, e.g. the reviewer being read-only, the review workflow having contents: read, a prompt, narrow allowed tools or the fork-PR guard.", "passed": true, "evidence": "Lists fork guard, contents: read, explicit allow-list, read-only reviewer"}, {"text": "Every problem the audit reports is real in the given files \u2014 it does not claim a file, tool or permission is missing/present when it isn't (e.g. does not say the workflow can push or that the reviewer can edit files).", "passed": true, "evidence": "All claims check out (pytest exit 5, reviewer lacks merge-base, no base branch)"}, {"text": "The audit notes that CLAUDE.md refers to tests/ (and pytest) but there is no tests/ directory in the repo.", "passed": true, "evidence": "CLAUDE.md:3 pytest gate with no tests/ dir"}], "summary": {"passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0}, "timing": {"total_duration_seconds": 76.2}}}, {"id": "small-sound-setup-without_skill", "prompt": "quick sanity check of my claude config here (CLAUDE.md, the reviewer agent, and the PR review workflow). anything actually worth fixing?", "eval_id": null, "outputs": [{"name": "final_message.md", "type": "text", "content": "Short answer: this setup is in good shape. All three files are short and specific, and the permissions are tight. I found two things worth fixing and one I'd tidy if you're already in there. Nothing is broken in a risky way.\n\n**Worth fixing**\n\n1. **The PR workflow posts a new review on every push.** `synchronize` runs a full review each time you push. There's no `concurrency` group, and the prompt asks for \"one short summary comment\", so a PR with 5 pushes ends up with 5 summaries and repeated inline comments. Two small changes fix it:\n   ```yaml\n   concurrency:\n     group: claude-review-${{ github.event.pull_request.number }}\n     cancel-in-progress: true\n   ```\n   Then add a line to the prompt: \"If you already left a summary comment on this PR, update it with `gh pr comment --edit-last` instead of posting a new one, and don't repeat inline comments that are already there.\" Your existing `Bash(gh pr comment:*)` allowance already covers `--edit-last`.\n\n2. **The reviewer agent doesn't say which diff to review.** \"`git diff` against the merge base\" leaves out the base branch. The obvious way to do it, `git diff $(git merge-base HEAD main)`, also probably won't get through your `Bash(git diff:*)` allowlist, because the `git merge-base` inside it isn't allowed. Name the command outright, for example: \"Run `git diff main...HEAD` (committed branch changes) plus `git diff HEAD` (uncommitted changes).\" The three-dot form already compares against the merge base, and both commands match `git diff:*`.\n\n**Minor**\n\n- `CLAUDE.md` says tests live in `tests/`, but that folder doesn't exist yet. With no tests, `pytest -q` exits with code 5 (\"no tests collected\"). Claude may read that as a failing run and then refuse to commit, following your own rule. Either add a first test or say \"exit code 5 (no tests) is OK for now.\"\n\n**Fine as is (no change needed)**\n- The fork guard, the minimal `permissions`, and the narrow `--allowed-tools` list are all good. `id-token: write` is needed for the action's GitHub App auth.\n- The reviewer's \"only report issues you can show with a concrete input\" rule is a deliberate trade-off: fewer false positives, but it can miss things like races or resource leaks. Keep it if you prefer precision.\n- The pinned model ID works. The `sonnet` alias would follow new versions automatically, if you'd rather not update it by hand.\n\nI didn't change any files.\n"}], "grading": {"expectations": [{"text": "The audit reports no High-severity (or critical/blocker) findings for this setup.", "passed": true, "evidence": "'Worth fixing' items framed as small; no High"}, {"text": "The audit explicitly recognises at least two things done well, e.g. the reviewer being read-only, the review workflow having contents: read, a prompt, narrow allowed tools or the fork-PR guard.", "passed": true, "evidence": "Fork guard, minimal permissions, narrow allowed-tools, id-token rationale"}, {"text": "Every problem the audit reports is real in the given files \u2014 it does not claim a file, tool or permission is missing/present when it isn't (e.g. does not say the workflow can push or that the reviewer can edit files).", "passed": true, "evidence": "Claims check out (no concurrency group, merge-base not covered by allow-list)"}, {"text": "The audit notes that CLAUDE.md refers to tests/ (and pytest) but there is no tests/ directory in the repo.", "passed": true, "evidence": "Minor: CLAUDE.md says tests/ which doesn't exist; pytest exit 5"}], "summary": {"passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0}, "timing": {"total_duration_seconds": 45.5}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "claude-prompt-audit", "skill_path": "\u003cpath/to/skill>", "executor_model": "\u003cmodel-name>", "analyzer_model": "\u003cmodel-name>", "timestamp": "2026-10-22T19:33:37Z", "evals_run": ["ci-and-headless-automation", "pipeline-seams-and-shared-gate", "small-sound-setup"], "runs_per_configuration": 1}, "runs": [{"eval_id": "ci-and-headless-automation", "eval_name": "ci-and-headless-automation", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 7, "failed": 0, "total": 7, "time_seconds": 127.2, "tokens": 80178, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The report flags that nightly.sh runs git add -A, commits and pushes after the agent finishes, contradicting the nightly prompt's branch/PR rule and/or CLAUDE.md's rule that nobody pushes to main.", "passed": true, "evidence": "H1 nightly.sh:10-12 vs nightly.md:2,3,7 and CLAUDE.md:3"}, {"text": "The report cites git history (the 'auto: nightly leftovers' commits on main) as evidence the problem already happened, and notes that a committed file such as .env.local or nightly-output.json was swept in.", "passed": true, "evidence": "H1/H2 cite 3 auto: nightly leftovers commits on main; .env.local + nightly-output.json swept in"}, {"text": "The report flags that the nightly prompt requires running npm test and/or gh pr create (and creating a branch) but the --allowedTools list contains no Bash.", "passed": true, "evidence": "H3 allow-list has no Bash vs branch/npm test/commit/gh pr create"}, {"text": "The report flags --dangerously-skip-permissions on the unattended run (including its tension with the --allowedTools list) as a risk.", "passed": true, "evidence": "H3 bypass flag + allowedTools contradiction, flags uncertainty about precedence"}, {"text": "The report flags that claude-fix.yml passes no prompt (so the repo's rules aren't stated) while granting broad tools such as Bash(git *) / Bash(curl *) with contents: write.", "passed": true, "evidence": "H4 'There is no prompt:' + git/npm/curl tools, contents: write"}, {"text": "The report flags that claude-triage.yml's tools/permissions (contents: write, Edit/Write, Bash(git *)) exceed its label-and-comment-only prompt.", "passed": true, "evidence": "H5 triage Edit/Write/Bash(git *) + contents: write vs label-only prompt"}, {"text": "The report notes that the triage prompt interpolates the untrusted issue title directly into the prompt (prompt-injection risk).", "passed": true, "evidence": "H5 issue title interpolated into prompt"}], "notes": []}, {"eval_id": "pipeline-seams-and-shared-gate", "eval_name": "pipeline-seams-and-shared-gate", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 7, "failed": 0, "total": 7, "time_seconds": 133.6, "tokens": 80426, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The report identifies that scripts/check-data.js only validates data/shared/*.json (not features/*/data.json), even though builder and/or checker prompts treat it as the gate for all data files \u2014 and supports this by reading or running the script.", "passed": true, "evidence": "H1: check-data.js:4 reads only data/shared; ran it: TOTAL errors 0 despite duplicate q1 + empty answer in features/quiz/data.json"}, {"text": "The report flags that builder is instructed to run npm test / node scripts/check-data.js but its tools list has no Bash, so it cannot run them.", "passed": true, "evidence": "M1: builder.md:4 tools lack Bash vs :12-13 run npm test/node"}, {"text": "The report flags at least one checker\u2192shipper hand-off mismatch: checker can emit FLAKY which shipper's gate doesn't handle, or checker writes reports/\u003cfeature-name>.md while shipper reads reports/\u003ctask-id>.md.", "passed": true, "evidence": "H3 report path feature-name vs task-id; M2 FLAKY/NOT VERIFIED unhandled"}, {"text": "The report connects builder's end-of-task memory writes with the clean-worktree requirement (builder's own rule and/or shipper gate 2) as the cause of refused releases, citing the shipper agent-memory note as evidence.", "passed": true, "evidence": "H2 cites builder.md:13,15, shipper.md:12 and quotes refusals.md:7"}, {"text": "The report flags that docs-writer pushes directly to main, contradicting the rule that shipper is the only agent allowed to push.", "passed": true, "evidence": "H4: docs-writer.md:8 git push origin main vs shipper.md:8"}, {"text": "The report notes that docs-writer depends on a style-guide skill that does not exist in the repo.", "passed": true, "evidence": "H4: style-guide skill missing, no .claude/skills/"}, {"text": "The report is saved to a file, groups findings by severity (e.g. High/Medium/Low), and each of the top findings cites specific files (with line numbers or quoted text).", "passed": true, "evidence": "High/Medium/Low sections with file:line; report file saved by harness from hand-back because subagent Write was blocked"}], "notes": []}, {"eval_id": "small-sound-setup", "eval_name": "small-sound-setup", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 76.2, "tokens": 71425, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The audit reports no High-severity (or critical/blocker) findings for this setup.", "passed": true, "evidence": "Two Medium, rest Low; 'nothing is serious'"}, {"text": "The audit explicitly recognises at least two things done well, e.g. the reviewer being read-only, the review workflow having contents: read, a prompt, narrow allowed tools or the fork-PR guard.", "passed": true, "evidence": "Lists fork guard, contents: read, explicit allow-list, read-only reviewer"}, {"text": "Every problem the audit reports is real in the given files \u2014 it does not claim a file, tool or permission is missing/present when it isn't (e.g. does not say the workflow can push or that the reviewer can edit files).", "passed": true, "evidence": "All claims check out (pytest exit 5, reviewer lacks merge-base, no base branch)"}, {"text": "The audit notes that CLAUDE.md refers to tests/ (and pytest) but there is no tests/ directory in the repo.", "passed": true, "evidence": "CLAUDE.md:3 pytest gate with no tests/ dir"}], "notes": []}, {"eval_id": "ci-and-headless-automation", "eval_name": "ci-and-headless-automation", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.86, "passed": 6, "failed": 1, "total": 7, "time_seconds": 151.5, "tokens": 78224, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The report flags that nightly.sh runs git add -A, commits and pushes after the agent finishes, contradicting the nightly prompt's branch/PR rule and/or CLAUDE.md's rule that nobody pushes to main.", "passed": true, "evidence": "#2 wrapper add/commit/push overrides prompt rules and CLAUDE.md"}, {"text": "The report cites git history (the 'auto: nightly leftovers' commits on main) as evidence the problem already happened, and notes that a committed file such as .env.local or nightly-output.json was swept in.", "passed": true, "evidence": "#1/#2 commit bbb2472 committed .env.local; nightly-output.json committed"}, {"text": "The report flags that the nightly prompt requires running npm test and/or gh pr create (and creating a branch) but the --allowedTools list contains no Bash.", "passed": true, "evidence": "#7 prompt needs git/npm/gh but allow-list is file tools only"}, {"text": "The report flags --dangerously-skip-permissions on the unattended run (including its tension with the --allowedTools list) as a risk.", "passed": true, "evidence": "#3 bypass flag makes allow-list meaningless"}, {"text": "The report flags that claude-fix.yml passes no prompt (so the repo's rules aren't stated) while granting broad tools such as Bash(git *) / Bash(curl *) with contents: write.", "passed": false, "evidence": "#4 covers broad tools + write token and missing author gate, but never notes that claude-fix.yml passes no prompt"}, {"text": "The report flags that claude-triage.yml's tools/permissions (contents: write, Edit/Write, Bash(git *)) exceed its label-and-comment-only prompt.", "passed": true, "evidence": "#5 tools/token allow code changes despite label-only prompt"}, {"text": "The report notes that the triage prompt interpolates the untrusted issue title directly into the prompt (prompt-injection risk).", "passed": true, "evidence": "#5 untrusted title interpolated into prompt"}], "notes": []}, {"eval_id": "pipeline-seams-and-shared-gate", "eval_name": "pipeline-seams-and-shared-gate", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 7, "failed": 0, "total": 7, "time_seconds": 243.2, "tokens": 90920, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The report identifies that scripts/check-data.js only validates data/shared/*.json (not features/*/data.json), even though builder and/or checker prompts treat it as the gate for all data files \u2014 and supports this by reading or running the script.", "passed": true, "evidence": "H1 check-data.js does not validate features/*/data.json; ran script exit 0"}, {"text": "The report flags that builder is instructed to run npm test / node scripts/check-data.js but its tools list has no Bash, so it cannot run them.", "passed": true, "evidence": "C4 builder cannot do what its prompt asks (no Bash)"}, {"text": "The report flags at least one checker\u2192shipper hand-off mismatch: checker can emit FLAKY which shipper's gate doesn't handle, or checker writes reports/\u003cfeature-name>.md while shipper reads reports/\u003ctask-id>.md.", "passed": true, "evidence": "C2 report path; H3 verdicts nothing downstream handles"}, {"text": "The report connects builder's end-of-task memory writes with the clean-worktree requirement (builder's own rule and/or shipper gate 2) as the cause of refused releases, citing the shipper agent-memory note as evidence.", "passed": true, "evidence": "C1 quotes builder.md:13/15, shipper.md:12, shipper memory names cause of 3 refusals"}, {"text": "The report flags that docs-writer pushes directly to main, contradicting the rule that shipper is the only agent allowed to push.", "passed": true, "evidence": "M3 docs-writer breaks only-shipper-pushes rule"}, {"text": "The report notes that docs-writer depends on a style-guide skill that does not exist in the repo.", "passed": true, "evidence": "M3 notes style-guide skill doesn't exist"}, {"text": "The report is saved to a file, groups findings by severity (e.g. High/Medium/Low), and each of the top findings cites specific files (with line numbers or quoted text).", "passed": true, "evidence": "report.md with Critical/High/Medium/Low, file:line quotes (written via PowerShell after Write block)"}], "notes": []}, {"eval_id": "small-sound-setup", "eval_name": "small-sound-setup", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 45.5, "tokens": 64726, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The audit reports no High-severity (or critical/blocker) findings for this setup.", "passed": true, "evidence": "'Worth fixing' items framed as small; no High"}, {"text": "The audit explicitly recognises at least two things done well, e.g. the reviewer being read-only, the review workflow having contents: read, a prompt, narrow allowed tools or the fork-PR guard.", "passed": true, "evidence": "Fork guard, minimal permissions, narrow allowed-tools, id-token rationale"}, {"text": "Every problem the audit reports is real in the given files \u2014 it does not claim a file, tool or permission is missing/present when it isn't (e.g. does not say the workflow can push or that the reviewer can edit files).", "passed": true, "evidence": "Claims check out (no concurrency group, merge-base not covered by allow-list)"}, {"text": "The audit notes that CLAUDE.md refers to tests/ (and pytest) but there is no tests/ directory in the repo.", "passed": true, "evidence": "Minor: CLAUDE.md says tests/ which doesn't exist; pytest exit 5"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 112.3333, "stddev": 31.4556, "min": 76.2, "max": 133.6}, "tokens": {"mean": 77343.0, "stddev": 5126.6382, "min": 71425, "max": 80426}}, "without_skill": {"pass_rate": {"mean": 0.9533, "stddev": 0.0808, "min": 0.86, "max": 1.0}, "time_seconds": {"mean": 146.7333, "stddev": 98.9362, "min": 45.5, "max": 243.2}, "tokens": {"mean": 77956.6667, "stddev": 13099.0461, "min": 64726, "max": 90920}}, "delta": {"pass_rate": "+0.05", "time_seconds": "-34.4", "tokens": "-614"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + escapeHtml(summary.passed || 0) + ' passed, ' + escapeHtml(summary.failed || 0) + ' failed of ' + escapeHtml(summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML.replace(/"/g, "&quot;");
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += escapeHtml(metadata.timestamp) + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + escapeHtml(metadata.evals_run.join(", ")) + " &mdash; ";
+      html += escapeHtml(metadata.runs_per_configuration || "?") + (metadata.runs_per_configuration === 1 ? " run" : " runs") + " per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+      // With a single configuration there is nothing to compare: only its column is shown
+      const compare = cells => configs.length >= 2 ? cells : "";
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th>" + compare("<th>" + escapeHtml(labelB) + "</th><th>Delta</th>") + "</tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += compare("<td>" + fmtStat(b.pass_rate, true) + "</td>");
+      html += compare('<td class="' + deltaClass(delta.pass_rate) + '">' + escapeHtml(delta.pass_rate || "—") + "</td>") + "</tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += compare("<td>" + fmtStat(b.time_seconds, false) + "</td>");
+        html += compare('<td class="' + deltaClass(delta.time_seconds) + '">' + escapeHtml(delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td>") + "</tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += compare("<td>" + fmtStat(b.tokens, false) + "</td>");
+        html += compare('<td class="' + deltaClass(delta.tokens) + '">' + escapeHtml(delta.tokens || "—") + "</td>") + "</tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        // Numeric ids first, then ids that are names
+        const rank = id => typeof id === "number" ? 0 : 1;
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) =>
+          rank(a) - rank(b) || (rank(a) ? String(a).localeCompare(String(b)) : a - b));
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = escapeHtml(config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()));
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + escapeHtml(run.run_number) + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + escapeHtml(r.passed || 0) + "/" + escapeHtml(r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + escapeHtml(r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + escapeHtml(run.run_number) + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

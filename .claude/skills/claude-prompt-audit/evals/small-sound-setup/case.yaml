@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: small-sound-setup
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  A short, proportionate answer: the setup is sound (read-only reviewer with concrete-input rule, review
+  workflow with contents: read, a prompt, narrow tools, fork guard). At most minor findings, e.g. CLAUDE.md
+  mentions tests/ which doesn't exist, or similar nits. No High-severity findings and no invented problems.

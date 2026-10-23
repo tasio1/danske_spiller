@@ -1,0 +1,22 @@
+name: Claude triage
+on:
+  issues:
+    types: [opened]
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Triage issue #${{ github.event.issue.number }}: "${{ github.event.issue.title }}".
+            Add one of the labels bug / feature / question and a one-line comment.
+            Only label and comment. Never modify code or push.
+          claude_args: |
+            --allowed-tools "Read,Glob,Grep,Edit,Write,Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(git *)"

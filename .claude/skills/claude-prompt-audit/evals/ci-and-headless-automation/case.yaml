@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: ci-and-headless-automation
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  A severity-ranked report that finds: nightly.sh's wrapper runs git add -A / commit / git push after the
+  agent, overriding the prompt's branch+PR rule and CLAUDE.md's no-push-to-main rule — and git history shows
+  "auto: nightly leftovers" commits already on main, one including .env.local and output junk;
+  the nightly prompt requires npm test / gh pr create but the allow-list has no Bash; the
+  --dangerously-skip-permissions + --allowedTools contradiction; claude-fix.yml has no prompt and broad
+  git/curl tools with contents: write; claude-triage says label-only but has contents: write, Edit/Write
+  and Bash(git *), and interpolates the untrusted issue title into the prompt.

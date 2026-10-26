@@ -1870,7 +1870,7 @@ window.TIDS_DATA = {
       "id": "auktionen-finder-sted-den-3-marts",
       "level": "B1",
       "mode": "present_vs_preterite",
-      "context": "Datoen er fastsat.",
+      "context": "Auktionshuset har netop sendt kataloget ud til den kommende auktion.",
       "sentence": "Auktionen ___ sted den 3. marts.",
       "options": [
         "fandt",
@@ -2591,7 +2591,7 @@ window.TIDS_DATA = {
       "id": "hun-har-ikke-hoert-fra-ham-siden-paaske",
       "level": "B1",
       "mode": "preterite_vs_perfect",
-      "context": "Han er rejst, og hun har ikke hørt fra ham siden.",
+      "context": "Han rejste for flere måneder siden, og hun har ingen nyheder fra ham.",
       "sentence": "Hun ___ fra ham siden påske.",
       "options": [
         "havde ikke hørt",
@@ -3876,7 +3876,7 @@ window.TIDS_DATA = {
       "id": "det-er-den-bedste-film-jeg-nogensinde-har-set",
       "level": "B1",
       "mode": "preterite_vs_perfect",
-      "context": "Du sammenligner med alt, du har set indtil nu.",
+      "context": "Du udtaler en stærk personlig dom om filmens kvalitet i forhold til alt andet i dit liv.",
       "sentence": "Det er den bedste film, jeg nogensinde ___.",
       "options": [
         "så",
@@ -4636,7 +4636,7 @@ window.TIDS_DATA = {
       "id": "han-har-ikke-drukket-noget-endnu-i-dag",
       "level": "A2",
       "mode": "preterite_vs_perfect",
-      "context": "Du vil have noget at drikke, og din ven har ikke drukket endnu.",
+      "context": "Det er eftermiddag, og din ven er stadig tørstig, fordi han ikke har rørt sin kop.",
       "sentence": "Han ___ noget endnu i dag.",
       "options": [
         "har ikke drukket",
@@ -8314,7 +8314,7 @@ window.TIDS_DATA = {
       "id": "han-var-forsvundet-i-en-uge-da-man-fandt-ham",
       "level": "B2",
       "mode": "pluperfect",
-      "context": "Han var forsvundet i en uge. Så fandt man ham.",
+      "context": "Familien havde ikke set ham i en uge, før politiet fandt ham.",
       "sentence": "Han ___ i en uge, da man fandt ham.",
       "options": [
         "var forsvundet",
@@ -8337,7 +8337,7 @@ window.TIDS_DATA = {
       "id": "han-havde-malet-hele-dagen-da-han-endelig-blev-faerdig",
       "level": "B1",
       "mode": "pluperfect",
-      "context": "Han havde malet siden morgenen. Kl. 16 var han færdig.",
+      "context": "Han tog penslen op klokken otte om morgenen og lagde den først fra sig klokken 16.",
       "sentence": "Han ___ hele dagen, da han endelig blev færdig.",
       "options": [
         "har malet",
@@ -8360,7 +8360,7 @@ window.TIDS_DATA = {
       "id": "de-havde-diskuteret-i-tre-timer-da-de-endelig-blev-enige",
       "level": "B2",
       "mode": "pluperfect",
-      "context": "De havde diskuteret i tre timer. Så blev de enige.",
+      "context": "Mødet begyndte klokken ti, og de var stadig ikke nået til enighed klokken et.",
       "sentence": "De ___ i tre timer, da de endelig blev enige.",
       "options": [
         "diskuterer",
@@ -8383,7 +8383,7 @@ window.TIDS_DATA = {
       "id": "jeg-havde-sovet-to-timer-da-telefonen-ringede",
       "level": "B1",
       "mode": "pluperfect",
-      "context": "Jeg havde sovet to timer. Så ringede telefonen.",
+      "context": "Jeg lagde mig klokken ti, og telefonen ringede pludselig klokken tolv.",
       "sentence": "Jeg ___ to timer, da telefonen ringede.",
       "options": [
         "sov",
@@ -8406,7 +8406,7 @@ window.TIDS_DATA = {
       "id": "hun-havde-skrevet-i-en-time-da-computeren-gik-i-stykker",
       "level": "B1",
       "mode": "pluperfect",
-      "context": "Hun havde skrevet i en time. Så gik computeren i stykker.",
+      "context": "Hun satte sig ved tastaturet klokken ni for at skrive en rapport, og klokken ti holdt computeren op med at virke.",
       "sentence": "Hun ___ i en time, da computeren gik i stykker.",
       "options": [
         "skriver",
@@ -8429,7 +8429,7 @@ window.TIDS_DATA = {
       "id": "firmaet-havde-eksisteret-i-halvtreds-aar-da-det-lukkede",
       "level": "B2",
       "mode": "pluperfect",
-      "context": "Firmaet havde eksisteret i 50 år. I 2020 lukkede det.",
+      "context": "Firmaet blev grundlagt i 1970, og det holdt helt til lukningen i 2020.",
       "sentence": "Firmaet ___ i halvtreds år, da det lukkede i 2020.",
       "options": [
         "eksisterer",
@@ -8452,7 +8452,7 @@ window.TIDS_DATA = {
       "id": "vi-havde-gaaet-i-to-timer-da-regnen-kom",
       "level": "B1",
       "mode": "pluperfect",
-      "context": "Vi havde gået i to timer. Så kom regnen.",
+      "context": "Vi startede vandreturen klokken ni, og det begyndte pludselig at regne klokken elleve.",
       "sentence": "Vi ___ i to timer, da regnen kom.",
       "options": [
         "havde gået",
@@ -8475,7 +8475,7 @@ window.TIDS_DATA = {
       "id": "hun-havde-sparet-op-i-ti-aar-da-hun-endelig-koebte-huset",
       "level": "B2",
       "mode": "pluperfect",
-      "context": "Hun havde sparet op i ti år. Så købte hun huset.",
+      "context": "Hun lagde lidt til side hver måned i ti år, før hun endelig havde nok til at købe huset.",
       "sentence": "Hun ___ op i ti år, da hun endelig købte huset.",
       "options": [
         "sparer",
@@ -9352,7 +9352,7 @@ window.TIDS_DATA = {
         "skal spise"
       ],
       "distractors": [
-        "kommer til at spise",
+        "ville spise",
         "spiste",
         "har spist"
       ],
@@ -14328,7 +14328,9 @@ window.TIDS_DATA = {
         {
           "accepted_answers": [
             "tager",
-            "går"
+            "går",
+            "vil tage",
+            "vil gå"
           ],
           "distractors": [
             "tog",

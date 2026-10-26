@@ -14328,9 +14328,7 @@ window.TIDS_DATA = {
         {
           "accepted_answers": [
             "tager",
-            "går",
-            "vil tage",
-            "vil gå"
+            "går"
           ],
           "distractors": [
             "tog",
@@ -14338,7 +14336,7 @@ window.TIDS_DATA = {
           ]
         }
       ],
-      "note": "Åbne betingelser bruger nutid i hvis-sætningen og nutid eller vil/skal i hovedsætningen."
+      "note": "Åbne betingelser i en sætning med flere led bruger nutid i både hvis-sætningen og hovedsætningen."
     },
     {
       "id": "du-faar-en-gratis-kop-kaffe-hvis-du-koeber-en-kage",

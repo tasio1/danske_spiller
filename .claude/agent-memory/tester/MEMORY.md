@@ -8,4 +8,5 @@
 - [Bulk typed-variant test](bulk-typed-test-data-override.md) — data getter override + srs.record hook; SRS missed-first starvation trap
 - [Independent generator](independent-generator-for-generated-data.md) — recompute generated number/clock data with own code, add negative control
 - [Shared file:// localStorage](file-origin-shared-localstorage.md) — isolate spec sections with browser contexts; "flake" was prefs leaking
+- [Conditional slot word order](conditional-slot-multiword-word-order.md) — render every accepted answer into the sentence; "vil tage vi" bug
 - [replace() $ trap](node-replace-dollar-collapse.md) — splice code with function replacer; `$$` collapses, `node -e` eats backslashes
